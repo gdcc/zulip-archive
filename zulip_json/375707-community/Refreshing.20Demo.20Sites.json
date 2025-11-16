@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>I asked this in the google forum (Borealis is also interested):  <a href=\"https://groups.google.com/g/dataverse-community/c/Zf9ME-8Uc0Y\">https://groups.google.com/g/dataverse-community/c/Zf9ME-8Uc0Y</a></p>\n<p>How does Harvard (IQSS) refresh <a href=\"http://demo.dataverse.org/\">demo.dataverse.org</a>? The note at the top of the page says datasets deleted after 30 days.</p>\n<p>We would like to incorporate that on our test server.<br>\nThanks.</p>",
+        "id": 464045197,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1724244703
+    },
+    {
+        "content": "<p>So, I look a quick look and it's a bit complicated. Let me at least throw some of the code over the wall to you (and Borealis).</p>",
+        "id": 464059237,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247308
+    },
+    {
+        "content": "<p>From root's crontab:</p>\n<p><code>0 5 1 * * (cd /usr/local/dvn-admin/clean; /usr/local/dvn-admin/clean/delete_older_datasets.sh) &gt; /dev/null 2&gt;&amp;1</code></p>",
+        "id": 464059356,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247334
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code># cat delete_older_datasets.sh\n#!/bin/sh\n\ndatestamp=`date +%Y%m%d`; export datesteamp\npsql -U postgres -d dvndb -t -f finddatasetstoclean.sql &gt; cleandatasets_${datestamp}.sh\nif /bin/sh cleandatasets_${datestamp}.sh\nthen\n    /bin/rm cleandatasets_${datestamp}.sh\nfi\n</code></pre></div>",
+        "id": 464059454,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247357
+    },
+    {
+        "content": "<p><code># cat finddatasetstoclean.sql</code></p>\n<p><code>select 'curl --header \"X-Dataverse-key: REDACTED\" -X DELETE http://localhost:8080/api/datasets/:persistentId/destroy?persistentId=doi:'||authority||'/'||identifier||';echo;sleep 1;' from dvobject where dtype='Dataset' and modificationtime &lt; current_date-60 and identifier not in ('FK2/Q1RSNG','FK2/XSAZXH','FK2/U6AEZM','FK2/PPPORT','FK2/AJM2AT','FK2/HJVOXL','FK2/PPIAXE','FK2/HXJVJU','FK2/QZDNI4') and owner_id not in (select id from dataverse where alias in ('trade_statistics','csvconfv723','CAP_demo','CAP_USA', 'rdprincipal')) order by indextime asc;</code></p>",
+        "id": 464059936,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247447
+    },
+    {
+        "content": "<p>You end up with a shell script with lines like this in it:</p>\n<p><code>curl --header \"X-Dataverse-key: REDACTED\" -X DELETE http://localhost:8080/api/datasets/:persistentId/destroy?persistentId=doi:10.70122/FK2/MSSBNE;echo;sleep 1;</code></p>",
+        "id": 464060283,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247520
+    },
+    {
+        "content": "<p>I hope that helps! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 464060312,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724247529
+    },
+    {
+        "content": "<p>This is awesome! We are interested as well. I have been running a terraform script to completely destroy and rebuild our QA environment from snapshots and this is waaaayy better!</p>",
+        "id": 464086335,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724253336
+    },
+    {
+        "content": "<p>so, you keep the last 60 days and then a few demo datasets that are preserved?</p>",
+        "id": 464090328,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724254206
+    },
+    {
+        "content": "<p>Yes, we skip over a few datasets to avoid deleting them.</p>",
+        "id": 464090986,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724254375
+    },
+    {
+        "content": "<p>60 days? Well, whatever that crontab says. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 464091075,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724254396
+    },
+    {
+        "content": "<p>Oh i was looking at the \"<code>and modificationtime &lt; current_date-60</code>\" in the sql query .. i may be reading it wrong. This is awesome! Thanks for posting.</p>",
+        "id": 464091304,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724254449
+    },
+    {
+        "content": "<p>It worked! Just need another script/query to delete empty dataverses using <a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#delete-a-dataverse-collection\">that API</a> .. working on that</p>",
+        "id": 464105491,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724257754
+    },
+    {
+        "content": "<p>Nice. I'm glad it's useful. I'm pretty sure we have <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> to thank for writing those scripts. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 464120911,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724261593
+    },
+    {
+        "content": "<p>oops that is deleting everything within the last 60 days .. lol </p>\n<p>i created a script that just deletes all of the dataverses except the root dataverse (ID = 1) using that API .. but we currently  just want to wipe everything clean .. so we could set the filter to filter on specific IDs if we wanted to keep some</p>",
+        "id": 464124689,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724262961
+    },
+    {
+        "content": "<p>Oh, if you want to delete everything, you might like destroy_all_dvobjects.py from <a href=\"https://github.com/IQSS/dataverse-sample-data\">https://github.com/IQSS/dataverse-sample-data</a></p>",
+        "id": 464124991,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724263033
+    },
+    {
+        "content": "<p>Oh that's awesome, too! This would work well for our Dev env so will try it. For QA we will likely want to keep some, so will still use Leonid's script/query and adjust the filters, as we can be much more selective.</p>",
+        "id": 464127596,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724263492
+    },
+    {
+        "content": "<p>so for the demo dataverse, you just keep all of the dataverses ever created?</p>",
+        "id": 464127734,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724263518
+    },
+    {
+        "content": "<p>sorry to hijack this stream, <span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> .. I've been working on the same thing! <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 464128182,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1724263586
+    },
+    {
+        "content": "<p>Yes, I'm pretty sure we do keep collections. They're \"free\" in the sense that they only take up a tiny bit of space in the database. No files.</p>",
+        "id": 464128273,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724263606
+    },
+    {
+        "content": "<p>No problem <span class=\"user-mention\" data-user-id=\"660583\">@Dieuwertje Bloemen</span> I'm learning lots tool!</p>",
+        "id": 464128921,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1724263754
+    }
+]

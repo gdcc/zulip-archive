@@ -1,0 +1,32 @@
+[
+    {
+        "content": "<p>Thanks for the info <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> , could the feature flag <code>disable-dataset-thumbnail-autoselect</code> set to On solve this problem? I never configured a feature flag before, is <code>asadmin create-jvm-options \"-Ddataverse.feature.disable-dataset-thumbnail-autoselect=On\"</code> the correct way?</p>",
+        "id": 554894563,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1762861437
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> I don't think so - the log messages you're seeing are triggered by the API endpoint <code>/api/datasets/{id}/logo</code>.</p>\n<p>More details: the JSF UI will access this API endpoint <a href=\"https://github.com/IQSS/dataverse/blob/ad031a9174f4bb905ed078f93960948e1c33193d/src/main/java/edu/harvard/iq/dataverse/ThumbnailServiceWrapper.java#L215-L215\">from here</a>, which is called anytime someone accesses a Dataset page in \"view\" mode. This API endpoint will always reach out the storage system, so there's no way for you to stop it with the feature flag. The flag is only influencing which thumbnail will be automatically selected if no explicit one has been configured by the dataset owner/admin.</p>",
+        "id": 555060880,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762937369
+    },
+    {
+        "content": "<p>But if that feature flag is set to On a new dataset will use the generic thumbnail by default if no thumbnail is chosen by the dataset owner/admin, or am I understanding this wrong? This way that request would <a href=\"https://github.com/IQSS/dataverse/blob/ad031a9174f4bb905ed078f93960948e1c33193d/src/main/java/edu/harvard/iq/dataverse/ThumbnailServiceWrapper.java#L190\">return null</a> instead of an URL for the logo. I assume the option to use a generic thumbnail is configured with this feature flag because there is no option in the Thumbnail+Widgets page for that purpose.</p>\n<p>The logs I am getting are like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2025-11-01T16:09:06.292+0000] [Payara 6.2025.2] [WARNING] [] [edu.harvard.iq.dataverse.ThumbnailServiceWrapper] [tid: _ThreadID=6294 _ThreadName=http-thread-pool::http-listener-1(33)] [timeMillis: 1762013346292] [levelValue: 900] getDatasetCardImageAsUrl(): Failed to initialize dataset StorageIO for minio://10.82210/RZGI5S (S3AccessIO: Failed to cache auxilary object : dataset_logo_original)\n[2025-11-07T09:37:01.756+0000] [Payara 6.2025.2] [WARNING] [] [edu.harvard.iq.dataverse.dataset.DatasetUtil] [tid: _ThreadID=6338 _ThreadName=http-thread-pool::http-listener-1(77)] [timeMillis: 1762508221756] [levelValue: 900] getThumbnail(): Failed to initialize dataset StorageIO for null (getDataAccessObject: null or invalid datafile.)\n</code></pre></div>\n<p>The first log matches the enpoint you shared. Regarding the second log, I noticed that in the <code>dataset</code> table the column <code>storagedriver</code> is set to null for every entry, wasn't this supposed to have the storage driver id I configured? I followed this part of the <a href=\"https://guides.dataverse.org/en/6.6/installation/config.html#amazon-s3-storage-or-compatible\">documentation</a> to setup S3 and the uploads are working.</p>",
+        "id": 555072775,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1762940847
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> please feel free to open an issue about this.</p>",
+        "id": 555154012,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762962213
+    },
+    {
+        "content": "<p>I created an issue <a href=\"https://github.com/IQSS/dataverse/issues/11973#issue-3620345145\">https://github.com/IQSS/dataverse/issues/11973#issue-3620345145</a></p>",
+        "id": 555305934,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1763026400
+    }
+]
