@@ -1,0 +1,110 @@
+[
+    {
+        "content": "<p>Goes down and then back up again.  If it's at a time where I can catch it - rather then the middle of the night) I'll restart payara.   The error seems to be:<br>\n**</p>\n<p>[#|2024-04-08T17:32:50.037+0000|SEVERE|Payara 5.2022.4|org.glassfish.jersey.server.ServerRuntime$Responder|_ThreadI=97;_ThreadName=http-thread-pool::jk-connector(2);_TimeMillis=1712597570037;_LevelValue=1000;|<br>\n  An I/O error has occurred while writing a response message entity to the container output stream.<br>\norg.glassfish.jersey.server.internal.process.MappableException: java.io.IOException: Connection closed<br>\n        at org.glassfish.jersey.server.internal.MappableExceptionWrapperInterceptor.aroundWriteTo(MappableExceptionWrapperInterceptor.java:67)<br>\n**</p>",
+        "id": 432056169,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1712605980
+    },
+    {
+        "content": "<p>Hmm, I don't think I've seen that error.</p>",
+        "id": 432060858,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712607788
+    },
+    {
+        "content": "<p>We have a restart script at Harvard Dataverse.</p>",
+        "id": 432060916,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712607821
+    },
+    {
+        "content": "<p>Is that part of the Dataverse package or a separate script?</p>",
+        "id": 432087289,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1712620948
+    },
+    {
+        "content": "<p>It's separate. I'm not sure if we've ever published it.</p>",
+        "id": 432088961,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712622090
+    },
+    {
+        "content": "<p>Could I take a look at it?</p>",
+        "id": 432089436,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1712622444
+    },
+    {
+        "content": "<p>The version I have is from 2015:</p>\n<div class=\"codehilite\"><pre><span></span><code><span class=\"ch\">#!/bin/bash</span>\n<span class=\"c1\"># Script for use with Nagios to bounce Tomcat Services when they are critical</span>\n\n<span class=\"nv\">PATH</span><span class=\"o\">=</span>/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin\n\n<span class=\"nv\">mailTO</span><span class=\"o\">=</span><span class=\"s2\">&quot;&quot;</span>\n\n<span class=\"k\">case</span><span class=\"w\"> </span><span class=\"nv\">$1</span><span class=\"w\"> </span><span class=\"k\">in</span>\n<span class=\"w\">   </span>OK<span class=\"o\">)</span>\n<span class=\"w\">      </span><span class=\"p\">;;</span>\n<span class=\"w\">   </span>WARNING<span class=\"o\">)</span>\n<span class=\"w\">      </span><span class=\"p\">;;</span>\n<span class=\"w\">   </span>CRITICAL<span class=\"o\">)</span>\n<span class=\"w\">      </span><span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span><span class=\"nv\">$2</span><span class=\"w\"> </span><span class=\"o\">==</span><span class=\"w\"> </span><span class=\"s2\">&quot;HARD&quot;</span><span class=\"w\"> </span><span class=\"o\">]</span><span class=\"p\">;</span><span class=\"w\"> </span><span class=\"k\">then</span>\n<span class=\"w\">         </span><span class=\"nb\">echo</span><span class=\"w\"> </span><span class=\"s2\">&quot;restarting glassfish for Dataverse&quot;</span>\n<span class=\"w\">     </span><span class=\"c1\"># get stack dump first</span>\n<span class=\"w\">         </span><span class=\"nv\">glassfish_pid</span><span class=\"o\">=</span><span class=\"sb\">`</span>ps<span class=\"w\"> </span>-ef<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>java<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>glassfish<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>-v<span class=\"w\"> </span>grep<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>awk<span class=\"w\"> </span><span class=\"s1\">&#39;{print $2}&#39;</span><span class=\"sb\">`</span>\n<span class=\"w\">         </span><span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span><span class=\"s2\">&quot;x</span><span class=\"si\">${</span><span class=\"nv\">glassfish_pid</span><span class=\"si\">}</span><span class=\"s2\">&quot;</span><span class=\"w\"> </span>!<span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s2\">&quot;x&quot;</span><span class=\"w\"> </span><span class=\"o\">]</span><span class=\"p\">;</span><span class=\"w\"> </span><span class=\"k\">then</span>\n<span class=\"w\">           </span>/usr/bin/jstack<span class=\"w\"> </span><span class=\"nv\">$glassfish_pid</span><span class=\"w\"> </span>&gt;<span class=\"w\"> </span><span class=\"s2\">&quot;/tmp/glassfish-jstack.</span><span class=\"si\">${</span><span class=\"nv\">glassfish_pid</span><span class=\"si\">}</span><span class=\"s2\">&quot;</span>\n<span class=\"w\">     </span><span class=\"k\">fi</span>\n<span class=\"w\">         </span>/etc/init.d/glassfish<span class=\"w\"> </span>stop\n<span class=\"w\">         </span>sleep<span class=\"w\"> </span><span class=\"m\">20</span>\n<span class=\"w\">         </span><span class=\"nv\">glassfish_pid</span><span class=\"o\">=</span><span class=\"sb\">`</span>ps<span class=\"w\"> </span>-ef<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>java<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>glassfish<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span>-v<span class=\"w\"> </span>grep<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>awk<span class=\"w\"> </span><span class=\"s1\">&#39;{print $2}&#39;</span><span class=\"sb\">`</span>\n<span class=\"w\">         </span><span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span><span class=\"s2\">&quot;x</span><span class=\"si\">${</span><span class=\"nv\">glassfish_pid</span><span class=\"si\">}</span><span class=\"s2\">&quot;</span><span class=\"w\"> </span>!<span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s2\">&quot;x&quot;</span><span class=\"w\"> </span><span class=\"o\">]</span><span class=\"p\">;</span><span class=\"w\"> </span><span class=\"k\">then</span>\n<span class=\"w\">            </span><span class=\"nb\">echo</span><span class=\"w\"> </span><span class=\"s2\">&quot;Dataverse glassfish is not responding to init script; trying kill -9&quot;</span>\n<span class=\"w\">            </span><span class=\"nb\">kill</span><span class=\"w\"> </span>-9<span class=\"w\"> </span><span class=\"nv\">$glassfish_pid</span>\n<span class=\"w\">            </span>sleep<span class=\"w\"> </span><span class=\"m\">10</span>\n<span class=\"w\">         </span><span class=\"k\">fi</span>\n<span class=\"w\">         </span>/etc/init.d/glassfish<span class=\"w\"> </span>start\n<span class=\"w\">         </span><span class=\"nb\">echo</span><span class=\"w\"> </span><span class=\"s2\">&quot;&quot;</span><span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>mail<span class=\"w\"> </span>-s<span class=\"w\"> </span><span class=\"s2\">&quot;bounced glassfish on `hostname`&quot;</span><span class=\"w\"> </span><span class=\"nv\">$mailTO</span>\n<span class=\"w\">      </span><span class=\"k\">fi</span>\n<span class=\"w\">      </span><span class=\"p\">;;</span>\n<span class=\"w\">   </span>UNKNOWN<span class=\"o\">)</span>\n<span class=\"w\">   </span><span class=\"p\">;;</span>\n<span class=\"k\">esac</span>\n<span class=\"nb\">exit</span><span class=\"w\"> </span><span class=\"m\">0</span>\n</code></pre></div>",
+        "id": 432090783,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712623540
+    },
+    {
+        "content": "<p>Let me ask around tomorrow to see if we have something newer.</p>",
+        "id": 432090842,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712623563
+    },
+    {
+        "content": "<p>thank you</p>",
+        "id": 432108376,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1712632373
+    },
+    {
+        "content": "<p>Please note that it's easy with systemd to write a timer and a oneshot service. That would monitor something to detect Payara hangs and will restart the payara service.</p>",
+        "id": 432120067,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712638352
+    },
+    {
+        "content": "<p>Basically the same idea as the healthcheck / liveness probe in Kubernetes/Compose.</p>",
+        "id": 432120133,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712638385
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/Dataverse.20doing.20down.20with.20connection.20refused.20error/near/432090842\">said</a>:</p>\n<blockquote>\n<p>Let me ask around tomorrow to see if we have something newer.</p>\n</blockquote>\n<p>Yes, we used to use Nagios  a while back. What we are doing now is much simpler, the script below is run every 5 min. from the root's cronjob, like this:</p>\n<div class=\"codehilite\"><pre><span></span><code># Monitor Payara and bounce if down. To PAUSE, touch /tmp/stop, then remove /tmp/stop when done!\n*/5 * * * * /usr/local/bin/check_site.sh\n</code></pre></div>\n<p>The script just calls a low-cost page, and forces a restart if it doesn't get a happy response. It's super simple, the only remotely non-trivial parts in it are the hooks for being able to pause it (when you actually want to restart or redeploy), and also, to prevent multiple instances of the script from stacking up, if for whatever reason it is taking more than 5 min. </p>\n<p>Here it is, lightly redacted. </p>\n<div class=\"codehilite\"><pre><span></span><code><span class=\"ch\">#!/bin/bash</span>\n\n<span class=\"nv\">SITE</span><span class=\"o\">=</span><span class=\"s2\">&quot;http://localhost:8080/loginpage.xhtml&quot;</span>\n<span class=\"c1\">#SITE=&quot;http://localhost:8080/file.xhtml?persistentId=doi:10.7910/DVN/XXXXXX/YYYYYY&quot;</span>\n<span class=\"c1\"># (we have experimented over the years using more and less expensive pages for</span>\n<span class=\"c1\"># the purposes of monitoring; using login page, one of the less resource-consuming</span>\n<span class=\"c1\"># pages, now)</span>\n\n\n<span class=\"c1\"># timeout value is in seconds:</span>\n<span class=\"nv\">TIMEOUT</span><span class=\"o\">=</span><span class=\"m\">180</span>\n\n<span class=\"c1\"># This pauses the check. Touch /tmp/stop to disable, remove /tmp/stop to enable</span>\n<span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span>-f<span class=\"w\"> </span>/tmp/stop<span class=\"w\"> </span><span class=\"o\">]</span><span class=\"p\">;</span><span class=\"k\">then</span>\n<span class=\"w\">    </span><span class=\"nb\">exit</span><span class=\"w\"> </span><span class=\"m\">0</span>\n<span class=\"k\">fi</span>\n\n<span class=\"c1\"># Since the curl timeout + whatever overhead may be more than the interval</span>\n<span class=\"c1\"># at which the cron job runs, let&#39;s prevent these jobs from stacking up:</span>\n\n<span class=\"nv\">LOCKFILE</span><span class=\"o\">=</span>/var/lock/check_website.lock\n\n<span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span>-f<span class=\"w\"> </span><span class=\"nv\">$LOCKFILE</span><span class=\"w\"> </span><span class=\"o\">]</span>\n<span class=\"k\">then</span>\n<span class=\"w\">    </span><span class=\"nb\">echo</span><span class=\"w\"> </span><span class=\"s2\">&quot;Site check taking more than 5 minutes!!&quot;</span><span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>mailx<span class=\"w\"> </span>-s<span class=\"w\"> </span><span class=\"s2\">&quot;ATTENTION: DELAYED SITE RESPONSE&quot;</span><span class=\"w\"> </span>xxxxx@yyyyy.harvard.edu\n<span class=\"w\">    </span><span class=\"c1\"># this implies that the previous instance of this job (run by cron every 5 min.)</span>\n<span class=\"w\">    </span><span class=\"c1\"># is still running.</span>\n\n<span class=\"w\">    </span><span class=\"c1\"># the only excuse for a page call to take this long would be if the payara</span>\n<span class=\"w\">    </span><span class=\"c1\"># process were in a stop-the-world phase of garbage collection.</span>\n<span class=\"w\">    </span><span class=\"c1\"># GC logging (above, and in the Payara log directory) should tell</span>\n<span class=\"w\">    </span><span class=\"c1\"># whether that was the case.</span>\n<span class=\"w\">    </span><span class=\"nb\">echo</span><span class=\"w\"> </span>-n<span class=\"w\"> </span><span class=\"s2\">&quot;bailing out; check already in progress. &quot;</span><span class=\"w\"> </span>&gt;&gt;<span class=\"w\"> </span>/var/log/dataverse-bounce.log\n<span class=\"w\">    </span>date<span class=\"w\"> </span>+%m/%d/%y<span class=\"s2\">&quot; &quot;</span>%H:%M<span class=\"w\"> </span>&gt;&gt;<span class=\"w\"> </span>/var/log/dataverse-bounce.log\n<span class=\"w\">    </span><span class=\"nb\">exit</span><span class=\"w\"> </span><span class=\"m\">0</span>\n<span class=\"k\">fi</span>\n\ntouch<span class=\"w\"> </span><span class=\"nv\">$LOCKFILE</span>\n\n<span class=\"nv\">STAT</span><span class=\"o\">=</span><span class=\"sb\">`</span>curl<span class=\"w\"> </span>-s<span class=\"w\"> </span>-o<span class=\"w\"> </span>/dev/null<span class=\"w\"> </span>-m<span class=\"w\"> </span><span class=\"si\">${</span><span class=\"nv\">TIMEOUT</span><span class=\"si\">}</span><span class=\"w\"> </span>-w<span class=\"w\"> </span><span class=\"s2\">&quot;%{http_code}&quot;</span><span class=\"w\"> </span><span class=\"nv\">$SITE</span><span class=\"sb\">`</span>\n\n<span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span><span class=\"si\">${</span><span class=\"nv\">STAT</span><span class=\"si\">}</span><span class=\"s2\">&quot;x&quot;</span><span class=\"w\"> </span>!<span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s2\">&quot;200x&quot;</span><span class=\"w\"> </span><span class=\"o\">]</span><span class=\"p\">;</span><span class=\"k\">then</span>\n\n<span class=\"w\">    </span><span class=\"nv\">APP</span><span class=\"o\">=</span><span class=\"sb\">`</span>cat<span class=\"w\"> </span>/xxxxx/payara6/domain1/config/pid.prev<span class=\"sb\">`</span>\n<span class=\"w\">    </span>/sbin/service<span class=\"w\"> </span>payara<span class=\"w\"> </span>stop\n<span class=\"w\">    </span>sleep<span class=\"w\"> </span><span class=\"m\">5</span>\n\n<span class=\"w\">    </span><span class=\"c1\"># and, to make sure it&#39;s really dead:</span>\n<span class=\"w\">    </span><span class=\"nb\">kill</span><span class=\"w\"> </span>-9<span class=\"w\"> </span><span class=\"nv\">$APP</span><span class=\"w\"> </span><span class=\"m\">2</span>&gt;/dev/null\n<span class=\"w\">    </span>sleep<span class=\"w\"> </span><span class=\"m\">5</span>\n<span class=\"w\">    </span>/sbin/service<span class=\"w\"> </span>payara<span class=\"w\"> </span>start\n\n<span class=\"w\">    </span><span class=\"k\">if</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"w\"> </span><span class=\"si\">${</span><span class=\"nv\">STAT</span><span class=\"si\">}</span><span class=\"s2\">&quot;x&quot;</span><span class=\"w\"> </span><span class=\"o\">==</span><span class=\"w\"> </span><span class=\"s2\">&quot;000x&quot;</span><span class=\"w\"> </span><span class=\"o\">]</span>\n<span class=\"w\">    </span><span class=\"k\">then</span>\n<span class=\"w\">    </span><span class=\"nv\">STAT</span><span class=\"o\">=</span><span class=\"s2\">&quot;TIMEOUT&quot;</span>\n<span class=\"w\">    </span><span class=\"k\">fi</span>\n\n<span class=\"w\">    </span><span class=\"c1\"># We have two application nodes in our prod. setup, so on each of the hosts</span>\n<span class=\"w\">    </span><span class=\"c1\"># the &lt;hostname&gt; entry in the next two lines indicates the local hostname</span>\n<span class=\"w\">    </span><span class=\"c1\"># of the specific node that is being restarted:</span>\n\n<span class=\"w\">    </span><span class=\"nb\">echo</span><span class=\"w\"> </span><span class=\"s2\">&quot;Restarted Payara on &lt;hostname&gt;&quot;</span><span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>mailx<span class=\"w\"> </span>-s<span class=\"w\"> </span><span class=\"s2\">&quot;Bounced Payara &lt;hostname&gt;&quot;</span><span class=\"w\"> </span>xxxxx@yyyyy.harvard.edu\n<span class=\"w\">    </span><span class=\"nb\">echo</span><span class=\"w\"> </span>-n<span class=\"w\"> </span><span class=\"s2\">&quot;Restarted Payara on &lt;hostname&gt;. (http code: </span><span class=\"si\">${</span><span class=\"nv\">STAT</span><span class=\"si\">}</span><span class=\"s2\">) &quot;</span><span class=\"w\"> </span>&gt;&gt;<span class=\"w\"> </span>/var/log/dataverse-bounce.log\n<span class=\"w\">    </span>date<span class=\"w\"> </span>+%m/%d/%y<span class=\"s2\">&quot; &quot;</span>%H:%M<span class=\"w\"> </span>&gt;&gt;<span class=\"w\"> </span>/var/log/dataverse-bounce.log\n\n<span class=\"w\">    </span><span class=\"c1\"># With Payara 6, there is some appreciable time before the completion of asadmin start-domain</span>\n<span class=\"w\">    </span><span class=\"c1\"># and the application becoming active and beginning to respond to requests!</span>\n<span class=\"w\">    </span>sleep<span class=\"w\"> </span><span class=\"m\">60</span>\n<span class=\"k\">fi</span>\n\n/bin/rm<span class=\"w\"> </span><span class=\"nv\">$LOCKFILE</span>\n</code></pre></div>",
+        "id": 432976249,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1712953309
+    },
+    {
+        "content": "<p>Awesome. Thanks, <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span>! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 432976493,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712953427
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/Dataverse.20doing.20down.20with.20connection.20refused.20error/near/432976493\">said</a>:</p>\n<blockquote>\n<p>Awesome ...</p>\n</blockquote>\n<p>There was some weirdness with my initial copy-and-paste, but I have fixed it, I think...</p>",
+        "id": 432976777,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1712953564
+    },
+    {
+        "content": "<p>Looks nice. Even has syntax coloring.</p>",
+        "id": 432977486,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712953895
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653479\">@jamie jamison</span> just making sure you saw the updated restart script above ^^</p>",
+        "id": 433550318,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713281516
+    },
+    {
+        "content": "<p>Sorry, will look for the updated version.</p>",
+        "id": 433869927,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1713385858
+    },
+    {
+        "content": "<p>No worries. You just have to scroll up a bit. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 433870384,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713386051
+    }
+]

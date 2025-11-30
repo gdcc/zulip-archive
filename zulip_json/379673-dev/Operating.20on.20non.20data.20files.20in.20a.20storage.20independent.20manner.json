@@ -1,0 +1,110 @@
+[
+    {
+        "content": "<p>This is again related to RO-Crate. So far we worked with a local filesystem storage and so we could easily create, edit, delete ro-crate-metatadata.json files in the same directory where the data files of a dataset are stored. </p>\n<p>However, we want to support any storage type that is available in a Dataverse installation. </p>\n<p>So, my question is: how can we manage non-data files that are store along with data files in a dataset in a storage independent manner? </p>\n<p>For example, if a dataverse is configured to use S3 storage, how can I create an ro-crate-metatadata.json file in a dataset of that dataverse? I think I somehow need to get access to a StorageIO subclass matching the configured storage of the dataverse ofmy target dataset, eg. S3AccessIO in my example. Given that I have a Dataset object how can I get  an S3AccessIO to manage my ro-crate-metatadata.json (create, edit, rename, delete)? Should I maybe use the AuxiliaryFile mechanism? But as far as I understand, an AuxiliaryFile is related to a DataFile and not a Dataset.</p>",
+        "id": 416823851,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1705683562
+    },
+    {
+        "content": "<p>Maybe the way files like export_OAI_ORE.cached are handled?</p>\n<p><a href=\"https://github.com/IQSS/dataverse/blob/df318f0c54dba0e216f4e06c8cf80b38e3533876/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L372-L375\">https://github.com/IQSS/dataverse/blob/df318f0c54dba0e216f4e06c8cf80b38e3533876/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L372-L375</a></p>",
+        "id": 416829578,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1705684992
+    },
+    {
+        "content": "<p>Yes, auxiliary files are associated with data files, not datasets.</p>",
+        "id": 417250112,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705936212
+    },
+    {
+        "content": "<p>I'm a little confused. How is S3 so different than local? You should be able to create a JSON file for either one... unless, are you saying you aren't creating the JSON file with Dataverse? You're using some other process.</p>\n<p>Can you please link to an example of how it all looks with local files? It sounds like you want to replicate that for S3.</p>",
+        "id": 417250639,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705936376
+    },
+    {
+        "content": "<p>To put simple: I just want to add a random file next to the datafiles, no matter where the dataset is stored (locally, in S3, Swift, etc.).</p>\n<p>I think I was looking for the StorageIO interface and methods like openAuxChannel(), getAuxFileAsInputStream(), etc.</p>",
+        "id": 417264778,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1705939940
+    },
+    {
+        "content": "<p>Ok, and you don't want this file to be entered into the database? It just sits there with Dataverse not knowing about it?</p>",
+        "id": 417266896,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705940523
+    },
+    {
+        "content": "<p>Yes. This is not a datafile, but a \"random file\" (ro-crate-metadata.json), which lives with the dataset. Much like the thumbnails, cache files, etc. that are already handled this way by Dataverse.</p>",
+        "id": 417267213,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1705940617
+    },
+    {
+        "content": "<p>I'm not sure but I'm asking internally.</p>",
+        "id": 417271210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705941750
+    },
+    {
+        "content": "<p>Going back to auxiliary files, what if you associated your ro-crate json file with one of the data files? Would that be a problem? Maybe there could always be a README.md or something.</p>",
+        "id": 417283334,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705945497
+    },
+    {
+        "content": "<p>I'm chatting with <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and Jim a bit.</p>",
+        "id": 417300909,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705951843
+    },
+    {
+        "content": "<p>Can you use the standard exporter framework?</p>",
+        "id": 417300966,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705951867
+    },
+    {
+        "content": "<p>Otherwise we might need to extend the idea of aux files to datasets.</p>",
+        "id": 417301017,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705951891
+    },
+    {
+        "content": "<p>This probably goes without saying, but I assume it's all related to your PR <a href=\"https://github.com/IQSS/dataverse/issues/10086\">#10086</a>. But now you want it to work with S3.</p>",
+        "id": 417302313,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1705952359
+    },
+    {
+        "content": "<p>Yes, it is all in the context of RO-Crate handling. The RO-Crate metadata belongs to the dataset not a datafile, so it would be awkward to artificially join it to an adhoc datafile, like README.md, I think. </p>\n<p>I think the \"aux\" things in StorageIO have nothing to do with the AuxiliaryFile objects and their handling. But it would be great if you could confirm it.</p>",
+        "id": 417399524,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1706000669
+    },
+    {
+        "content": "<p>Well, the naming is confusing. They can be related. We have a <a href=\"https://iqss.slack.com/archives/C010LA04BCG/p1657656447143669?thread_ts=1657656181.370759&amp;cid=C010LA04BCG\">discussion on Slack</a> about this recently. AuxiliaryFile objects do make use of those \"aux\" methods in StorageIO. However, those \"aux\" methods have been around a long time and are used for a number of things besides AuxiliaryFile objects, such as thumbnails, exports, and provenance files.</p>\n<p>I know it's confusing! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 417431963,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706011699
+    },
+    {
+        "content": "<p>But what about using the standard exporter framework? Will that work for you?</p>",
+        "id": 417448294,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706017503
+    },
+    {
+        "content": "<p>What I try to achieve here is not actually part of <a href=\"https://github.com/IQSS/dataverse/issues/10086\">#10086</a>, there we don't need this, because there we only generate the ro-crate-metadata.json for the latest version of the dataset (we actually cache it in the filesystem, but it would work without the cache as well). </p>\n<p>However, in our custom Dataverse installation we want to keep the ro-crate-metadata.json for all versions of the dataset and besides ro-crate-metadata.json  we also store ro-crate-preview.html as well. So, here we need to manage all these \"aux\" files.</p>",
+        "id": 417449443,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1706017827
+    },
+    {
+        "content": "<p>I see. It still feels like the exporter framework is close to what you need. Maybe it could be extended somehow?</p>",
+        "id": 417449928,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706017970
+    }
+]

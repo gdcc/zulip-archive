@@ -1,0 +1,49 @@
+<html>
+<head><meta charset="utf-8"><title>Collection custom metadata &amp; DCAT-AP · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html">Collection custom metadata &amp; DCAT-AP</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="560361917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560361917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560361917">(Nov 26 2025 at 11:02)</a>:</h4>
+<p>Thanks.</p>
+<p>I have raised this issue in Paul Boon's repo for the DCAT-AP exporter: <a href="https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1">https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1</a></p>
+<p>We can find the metadata export function in the UI for individual datasets which uses the ordinary API, but we cannot find the exporter in our list of OAI metadata exporters. See: <a href="https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats">https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats</a></p>
+<p>Do you have a take on why that is?</p>
+
+
+
+<a name="560385589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560385589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560385589">(Nov 26 2025 at 13:06)</a>:</h4>
+<p>Hi, just improved that exporter, now it also has isHarvestable return true, should make it available via OAI then. <br>
+The code and Jar is here: <a href="https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0">https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0</a></p>
+
+
+
+<a name="560386476"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560386476" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560386476">(Nov 26 2025 at 13:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> I hope you understand that plugin loading better that I do, because I do have some issues with the class loading. When I run it from my dev environment (just the maven test via that clean install) I do get different results from running it via the Dataverse application. Somehow it usess different implementation of libs, even though I build a 'fat' jar with all libs in it.</p>
+
+
+
+<a name="560389204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560389204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560389204">(Nov 26 2025 at 13:24)</a>:</h4>
+<p>Getting the basic DCAT-AP in RDF (XML) does not look to complicated because there are not many mandatory fields. Those DCAT-AP extensions however are problematic, also because some information must be extracted from custom metadatablocks, as indicated by <span class="user-mention" data-user-id="617722">@Johannes D</span> .  <br>
+But, before continuing with making the plugin more fexible I want to have the RDF eyeballed by some RDF experts...</p>
+
+
+
+<a name="560625503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560625503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560625503">(Nov 27 2025 at 15:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Is it possible for an exporter plugin to be in the OAI output; I see this line in the <code>OAIServlet.java</code>: <code>if (exporter != null &amp;&amp; (exporter instanceof XMLExporter) &amp;&amp; exporter.isHarvestable()) </code>. <br>
+And that plugin is a <code>io.gdcc.spi.export.Exporter</code>. Should the test look for <code>MediaType.APPLICATION_XML</code> instead?</p>
+
+
+
+<hr><p>Last updated: Nov 30 2025 at 15:13 UTC</p>
+</html>
