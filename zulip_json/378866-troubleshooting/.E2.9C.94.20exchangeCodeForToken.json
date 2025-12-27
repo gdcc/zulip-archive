@@ -1,0 +1,614 @@
+[
+    {
+        "content": "<p>I have my OpenID provider running. I have also my dockerized dataverse running. I set the OpenID jvm options and see the OpenID button in the dataverse login view. My authorize endpoint is called properly but my token endpoint is not called at all.</p>\n<p>The following is the output of the .well-know/openid-configuration endpoint:</p>\n<p>{<br>\n  \"issuer\": \"<a href=\"http://host.docker.internal:3000/api/auth\">http://host.docker.internal:3000/api/auth</a>\",<br>\n  \"authorization_endpoint\": \"<a href=\"http://host.docker.internal:3000/api/auth/authorize\">http://host.docker.internal:3000/api/auth/authorize</a>\",<br>\n  \"token_endpoint\": \"<a href=\"http://host.docker.internal:3000/api/auth/oauth-access-token\">http://host.docker.internal:3000/api/auth/oauth-access-token</a>\",<br>\n  \"userinfo_endpoint\": \"<a href=\"http://host.docker.internal:3000/api/auth/oauth-user-profile\">http://host.docker.internal:3000/api/auth/oauth-user-profile</a>\",<br>\n  \"jwks_uri\": \"<a href=\"http://host.docker.internal:3000/api/auth/.well-known/jwks.json\">http://host.docker.internal:3000/api/auth/.well-known/jwks.json</a>\",<br>\n  \"response_types_supported\": [\"code\", \"token\", \"id_token\", \"code id_token\"],<br>\n  \"subject_types_supported\": [\"public\", \"pairwise\"],<br>\n  \"id_token_signing_alg_values_supported\": [\"RS256\", \"ES256\", \"HS256\"]<br>\n}</p>\n<p>And this is the log I see in the dataverse container logs:</p>\n<p>[#|2024-03-11T08:35:03.773+0000|WARNING|Payara 6.2023.8|jakarta.enterprise.resource.webcontainer.faces.lifecycle|_ThreadID=76;_ThreadName=http-thread-pool::http-listener-1(1);_TimeMillis=1710146103773;_LevelValue=900;|<br>\ndataverse         |   #{OAuth2Page.exchangeCodeForToken()}: /oauth2/callback.xhtml @14,74 action=\"#{OAuth2Page.exchangeCodeForToken()}\": java.net.ConnectException: Connection refused<br>\ndataverse         | jakarta.faces.FacesException: #{OAuth2Page.exchangeCodeForToken()}: /oauth2/callback.xhtml @14,74 action=\"#{OAuth2Page.exchangeCodeForToken()}\": java.net.ConnectException: Connection refused<br>\ndataverse         |     at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:83)<br>\ndataverse         |     at com.sun.faces.application.ActionListenerImpl.processAction(ActionListenerImpl.java:62)<br>\ndataverse         |     at jakarta.faces.component.UIViewAction.broadcast(UIViewAction.java:506)<br>\ndataverse         |     at jakarta.faces.component.UIViewRoot.broadcastEvents(UIViewRoot.java:858)<br>\ndataverse         |     at jakarta.faces.component.UIViewRoot.processApplication(UIViewRoot.java:1332)<br>\ndataverse         |     at com.sun.faces.lifecycle.InvokeApplicationPhase.execute(InvokeApplicationPhase.java:56)<br>\ndataverse         |     at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)<br>\ndataverse         |     at com.sun.faces.lifecycle.LifecycleImpl.execute(LifecycleImpl.java:159)<br>\ndataverse         |     at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:691)<br>\ndataverse         |     at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)<br>\ndataverse         |     at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\ndataverse         |     at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:83)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\ndataverse         |     at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>\ndataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\ndataverse         |     at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)<br>\ndataverse         |     at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:166)<br>\ndataverse         |     at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)<br>\ndataverse         |     at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)<br>\ndataverse         |     at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)<br>\ndataverse         |     at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)<br>\ndataverse         |     at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:372)<br>\ndataverse         |     at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)<br>\ndataverse         |     at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)<br>\ndataverse         |     at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)<br>\ndataverse         |     at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:174)<br>\ndataverse         |     at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:153)<br>\ndataverse         |     at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:196)<br>\ndataverse         |     at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:88)<br>\ndataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)<br>\ndataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:178)<br>\ndataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:118)<br>\ndataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:96)<br>\ndataverse         |     at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:51)<br>\ndataverse         |     at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:510)<br>\ndataverse         |     at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:82)<br>\ndataverse         |     at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)<br>\ndataverse         |     at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)<br>\ndataverse         |     at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)<br>\ndataverse         |     at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>\ndataverse         |     at java.base/java.lang.Thread.run(Unknown Source)<br>\ndataverse         | Caused by: jakarta.el.ELException: /oauth2/callback.xhtml @14,74 action=\"#{OAuth2Page.exchangeCodeForToken()}\": java.net.ConnectException: Connection refused<br>\ndataverse         |     at com.sun.faces.facelets.el.TagMethodExpression.invoke(TagMethodExpression.java:76)<br>\ndataverse         |     at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:74)<br>\ndataverse         |     ... 44 more<br>\ndataverse         | Caused by: java.net.ConnectException: Connection refused<br>\ndataverse         |     at java.base/sun.nio.ch.Net.connect0(Native Method)<br>\ndataverse         |     at java.base/sun.nio.ch.Net.connect(Unknown Source)<br>\ndataverse         |     at java.base/sun.nio.ch.Net.connect(Unknown Source)<br>\ndataverse         |     at java.base/sun.nio.ch.NioSocketImpl.connect(Unknown Source)<br>\ndataverse         |     at java.base/java.net.Socket.connect(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.NetworkClient.doConnect(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.http.HttpClient.openServer(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.http.HttpClient.openServer(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.http.HttpClient.&lt;init&gt;(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.http.HttpClient.New(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.http.HttpClient.New(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getOutputStream0(Unknown Source)<br>\ndataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getOutputStream(Unknown Source)<br>\ndataverse         |     at com.nimbusds.oauth2.sdk.http.HTTPRequest.toHttpURLConnection(HTTPRequest.java:939)<br>\ndataverse         |     at com.nimbusds.oauth2.sdk.http.HTTPRequest.send(HTTPRequest.java:1007)<br>\ndataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getAccessToken(OIDCAuthProvider.java:268)<br>\ndataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserRecord(OIDCAuthProvider.java:223)<br>\ndataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean.exchangeCodeForToken(OAuth2LoginBackingBean.java:103)<br>\ndataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean$Proxy$_$$_WeldSubclass.exchangeCodeForToken(Unknown Source)<br>\ndataverse         |     at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\ndataverse         |     at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)<br>\ndataverse         |     at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)<br>\ndataverse         |     at java.base/java.lang.reflect.Method.invoke(Unknown Source)<br>\ndataverse         |     at jakarta.el.ELUtil.invokeMethod(ELUtil.java:227)<br>\ndataverse         |     at jakarta.el.BeanELResolver.invoke(BeanELResolver.java:481)<br>\ndataverse         |     at jakarta.el.CompositeELResolver.invoke(CompositeELResolver.java:198)...</p>",
+        "id": 425860706,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710146860
+    },
+    {
+        "content": "<p>Which Docker image are you using? The one called \"alpha\", which is 6.1 right now? Or \"unstable\", which is the \"develop\" branch?</p>",
+        "id": 425886859,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710155931
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/exchangeCodeForToken/near/425886859\">said</a>:</p>\n<blockquote>\n<p>Which Docker image are you using? The one called \"alpha\", which is 6.1 right now? Or \"unstable\", which is the \"develop\" branch?</p>\n</blockquote>\n<p>The following is my compose.yml:</p>\n<p>version: \"2.4\"</p>\n<p>services:</p>\n<p>dataverse:<br>\n    container_name: \"dataverse\"<br>\n    hostname: dataverse<br>\n    image: gdcc/dataverse:alpha<br>\n    restart: on-failure<br>\n    user: payara<br>\n    environment:<br>\n      _CT_DATAVERSE_SITEURL: \"<a href=\"http://localhost:8080\">http://localhost:8080</a>\"<br>\n      DATAVERSE_DB_HOST: postgres<br>\n      DATAVERSE_DB_PASSWORD: secret<br>\n      DATAVERSE_DB_USER: dataverse<br>\n      DATAVERSE_FEATURE_API_BEARER_AUTH: \"1\"<br>\n      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1<br>\n        -Ddataverse.files.file1.type=file<br>\n        -Ddataverse.files.file1.label=Filesystem<br>\n        -Ddataverse.files.file1.directory=${STORAGE_DIR}/store<br>\n        -Ddataverse.pid.providers=fake<br>\n        -Ddataverse.pid.default-provider=fake<br>\n        -Ddataverse.pid.fake.type=FAKE<br>\n        -Ddataverse.pid.fake.label=FakeDOIProvider<br>\n        -Ddataverse.pid.fake.authority=10.5072<br>\n        -Ddataverse.pid.fake.shoulder=FK2/<br>\n        -Ddataverse.auth.oidc.enabled=true<br>\n        -Ddataverse.auth.oidc.client-id=some_id<br>\n        -Ddataverse.auth.oidc.client-secret=some_secret<br>\n        -Ddataverse.auth.oidc.auth-server-url=http://host.docker.internal:3000/api/auth/<br>\n        -Ddataverse.auth.oidc.title=OpenID<br>\n    ports:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - &quot;8080:8080&quot; # HTTP (Dataverse Application)\n  - &quot;4848:4848&quot; # HTTP (Payara Admin Console)\n  - &quot;9009:9009&quot; # JDWP\n  - &quot;8686:8686&quot; # JMX\nnetworks:\n\n  - dataverse\ndepends_on:\n\n  - postgres\n  - solr\n  - dv_initializer\nvolumes:\n\n  - ./data/app/data:/dv\n  - ./data/app/secrets:/secrets\ntmpfs:\n\n  - /dumps:mode=770,size=2052M,uid=1000,gid=1000\n  - /tmp:mode=770,size=2052M,uid=1000,gid=1000\nmem_limit: 2147483648 # 2 GiB\nmem_reservation: 1024m\nprivileged: false\n</code></pre></div>\n\n<p>bootstrap:<br>\n    container_name: \"bootstrap\"<br>\n    image: gdcc/configbaker:alpha<br>\n    restart: \"no\"<br>\n    command:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - bootstrap.sh\n  - dev\n  #- demo\n#volumes:\n#  - ./demo:/scripts/bootstrap/demo\nnetworks:\n\n  - dataverse\n</code></pre></div>\n\n<p>dv_initializer:<br>\n    container_name: \"dv_initializer\"<br>\n    image: gdcc/configbaker:alpha<br>\n    restart: \"no\"<br>\n    command:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - sh\n  - -c\n  - &quot;fix-fs-perms.sh dv&quot;\nvolumes:\n\n  - ./data/app/data:/dv\n</code></pre></div>\n\n<p>postgres:<br>\n    container_name: \"postgres\"<br>\n    hostname: postgres<br>\n    image: postgres:13<br>\n    restart: on-failure<br>\n    environment:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - POSTGRES_USER=dataverse\n  - POSTGRES_PASSWORD=secret\nports:\n\n  - &quot;5432:5432&quot;\nnetworks:\n\n  - dataverse\nvolumes:\n\n  - ./data/postgresql/data:/var/lib/postgresql/data\n</code></pre></div>\n\n<p>solr_initializer:<br>\n    container_name: \"solr_initializer\"<br>\n    image: gdcc/configbaker:alpha<br>\n    restart: \"no\"<br>\n    command:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - sh\n  - -c\n  - &quot;fix-fs-perms.sh solr &amp;&amp; cp -a /template/* /solr-template&quot;\nvolumes:\n\n  - ./data/solr/data:/var/solr\n  - ./data/solr/conf:/solr-template\n</code></pre></div>\n\n<p>solr:<br>\n    container_name: \"solr\"<br>\n    hostname: \"solr\"<br>\n    image: solr:9.3.0<br>\n    depends_on:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - solr_initializer\nrestart: on-failure\nports:\n\n  - &quot;8983:8983&quot;\nnetworks:\n\n  - dataverse\ncommand:\n\n  - &quot;solr-precreate&quot;\n  - &quot;collection1&quot;\n  - &quot;/template&quot;\nvolumes:\n\n  - ./data/solr/data:/var/solr\n  - ./data/solr/conf:/template\n</code></pre></div>\n\n<p>smtp:<br>\n    container_name: \"smtp\"<br>\n    hostname: \"smtp\"<br>\n    image: maildev/maildev:2.0.5<br>\n    restart: on-failure<br>\n    ports:</p>\n<div class=\"codehilite\"><pre><span></span><code>  - &quot;25:25&quot; # smtp server\n  - &quot;1080:1080&quot; # web ui\nenvironment:\n\n  - MAILDEV_SMTP_PORT=25\n  - MAILDEV_MAIL_DIRECTORY=/mail\nnetworks:\n\n  - dataverse\n#volumes:\n#  - ./data/smtp/data:/mail\ntmpfs:\n\n  - /mail:mode=770,size=128M,uid=1000,gid=1000\n</code></pre></div>\n\n<p>networks:<br>\n  dataverse:<br>\n    driver: bridge</p>",
+        "id": 425888663,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710156644
+    },
+    {
+        "content": "<p>Ok, \"alpha\", thanks. So 6.1.</p>",
+        "id": 425894814,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710158886
+    },
+    {
+        "content": "<p>Can you reach <a href=\"http://host.docker.internal:3000/api/auth\">http://host.docker.internal:3000/api/auth</a> from the Dataverse container? With curl or whatever?</p>",
+        "id": 425895003,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710158975
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/exchangeCodeForToken/near/425895003\">said</a>:</p>\n<blockquote>\n<p>Can you reach <a href=\"http://host.docker.internal:3000/api/auth\">http://host.docker.internal:3000/api/auth</a> from the Dataverse container? With curl or whatever?</p>\n</blockquote>\n<p>But The <code>http://host.docker.internal:3000/api/auth</code> is my OpenID Provider's auth controller and not any specific endpoint within it.</p>",
+        "id": 425895934,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710159319
+    },
+    {
+        "content": "<p>But if I call any specific endpoint of the auth controller from within the dataverse they are called. For example the following is the result of the <a href=\"http://host.docker.internal:3000/api/auth/.well-known/openid-configuration\">http://host.docker.internal:3000/api/auth/.well-known/openid-configuration</a> endpoint:</p>\n<p>{\"issuer\":\"http://host.docker.internal:3000/api/auth\",\"authorization_endpoint\":\"http://localhost:3000/api/auth/authorize\",\"token_endpoint\":\"http://host.docker.internal:3000/api/auth/oauth-access-token\",\"userinfo_endpoint\":\"http://host.docker.internal:3000/api/auth/oauth-user-profile\",\"jwks_uri\":\"http://host.docker.internal:3000/api/auth/.well-known/jwks.json\",\"response_types_supported\":[\"code\",\"token\",\"id_token\",\"code id_token\"],\"subject_types_supported\":[\"public\",\"pairwise\"],\"id_token_signing_alg_values_supported\":[\"RS256\",\"ES256\",\"HS256\"]}</p>",
+        "id": 425896301,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710159434
+    },
+    {
+        "content": "<p>I see <code>Connection refused</code> for  <code>edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getAccessToken(OIDCAuthProvider.java:268</code>. That line is specifically the point where Dataverse reaches out to the token endpoint.</p>",
+        "id": 425904584,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162258
+    },
+    {
+        "content": "<p>Yes, but I don't know what endpoint exactly it is trying to call. I think all my configs are fine (as shown above).</p>",
+        "id": 425904902,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710162365
+    },
+    {
+        "content": "<p>Seeing this \"connection refused\" might either be a connection problem between Dataverse and the provider or an invalid secret thing.</p>",
+        "id": 425904950,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162391
+    },
+    {
+        "content": "<p>If you use <code>docker exec</code> to open a shell in your container, can you try to reachout to the URL given in the token endpoint?</p>",
+        "id": 425905091,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162433
+    },
+    {
+        "content": "<p>Just to make sure it's not DNS getting in our way</p>",
+        "id": 425905129,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162447
+    },
+    {
+        "content": "<p>(I've seen very weird DNS issues lately with alpine glibc/musl images, but this is an Ubuntu based image so we should be fine with DNS resolvers)</p>",
+        "id": 425905290,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162492
+    },
+    {
+        "content": "<p>mohsen@Mohsens-Air % docker exec -it dataverse sh<br>\n$ curl -X POST <a href=\"http://host.docker.internal:3000/api/auth/oauth-access-token\">http://host.docker.internal:3000/api/auth/oauth-access-token</a><br>\n{\"statusCode\":401,\"message\":\"Unauthorized\"}$</p>",
+        "id": 425905511,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710162576
+    },
+    {
+        "content": "<p>The exec could be something like <code>docker exec -it dataverse-1 curl \"http://host.docker.internal:3000/api/auth/oauth-access-token\"</code></p>",
+        "id": 425905516,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162580
+    },
+    {
+        "content": "<p>The above is the call.</p>",
+        "id": 425905711,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710162629
+    },
+    {
+        "content": "<p>OK that's something! Looks like Dataverse can talk to the endpoint! Great!</p>",
+        "id": 425905830,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162676
+    },
+    {
+        "content": "<p>Did you enable PKCE? (This is not yet very battle tested and might cause problems, checking to potentially rule it out)</p>",
+        "id": 425906208,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162827
+    },
+    {
+        "content": "<p>I don't know how to enable or disable PKCE.</p>",
+        "id": 425906325,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710162853
+    },
+    {
+        "content": "<p>That would be JVM options</p>",
+        "id": 425906422,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162886
+    },
+    {
+        "content": "<p>See <a href=\"https://guides.dataverse.org/en/latest/installation/oidc.html#provision-via-jvm-options\">https://guides.dataverse.org/en/latest/installation/oidc.html#provision-via-jvm-options</a></p>",
+        "id": 425906515,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162916
+    },
+    {
+        "content": "<p>Just to double check: does your OIDC provider work without PKCE enabled? (Asking because some providers explicitely require you to enable PKCE)</p>",
+        "id": 425906646,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710162960
+    },
+    {
+        "content": "<p>But as you can see in the above compose.yml, I didn't set any PKCE to true.</p>",
+        "id": 425906707,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710162973
+    },
+    {
+        "content": "<p>I personally implemented the OpenID Provider and I did not implement the PKCE part, yet.</p>",
+        "id": 425906792,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163006
+    },
+    {
+        "content": "<p>Oha! A custom OIDC provider! Fancy that!</p>",
+        "id": 425906829,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163023
+    },
+    {
+        "content": "<p>I took some time to implement it using NestJS.</p>",
+        "id": 425906920,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163063
+    },
+    {
+        "content": "<p>OK at this point I would either go for tcpdump + Wireshark to take a look at the packages being exchanged and/or use a Debugger to see what's going on inside</p>",
+        "id": 425906943,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163071
+    },
+    {
+        "content": "<p>Could you give me a clue on the Debugger approach, so I can follow it.</p>",
+        "id": 425907078,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163114
+    },
+    {
+        "content": "<p>Of course. Just a moment</p>",
+        "id": 425907125,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163132
+    },
+    {
+        "content": "<p>Do you have a Java IDE around?</p>",
+        "id": 425907257,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163162
+    },
+    {
+        "content": "<p>I have VSCode in my MacBook.</p>",
+        "id": 425907296,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163176
+    },
+    {
+        "content": "<p>OK never used VSCode with a Java debugger, but I suppose there will be docs online to use it.</p>",
+        "id": 425907410,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163204
+    },
+    {
+        "content": "<p>I will check.</p>",
+        "id": 425907474,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163217
+    },
+    {
+        "content": "<p>You will need to checkout the v6.1 codebase <a href=\"https://github.com/IQSS/dataverse/tree/v6.1\">https://github.com/IQSS/dataverse/tree/v6.1</a></p>",
+        "id": 425907479,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163219
+    },
+    {
+        "content": "<p>Please add option as suggested in the container docs: <a href=\"https://guides.dataverse.org/en/latest/container/dev-usage.html#using-a-debugger\">https://guides.dataverse.org/en/latest/container/dev-usage.html#using-a-debugger</a></p>",
+        "id": 425907603,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163274
+    },
+    {
+        "content": "<p>Then you can use the debugger in your IDE to set breaking points and attach it to the running JVM process</p>",
+        "id": 425907658,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163300
+    },
+    {
+        "content": "<p>Upon trying the login, the breaking point will be triggered and the debugger should kick in</p>",
+        "id": 425907869,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163366
+    },
+    {
+        "content": "<p>Thank you so much Oliver</p>",
+        "id": 425907977,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163401
+    },
+    {
+        "content": "<p>No worries! I'm the one who built in any errors and bugs, so happy to help <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 425908059,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163428
+    },
+    {
+        "content": "<p>We definetly should add a try/catch there to add some more helpful log output than just forwarding the exception <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 425908328,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163515
+    },
+    {
+        "content": "<p>Exactly</p>",
+        "id": 425908395,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163545
+    },
+    {
+        "content": "<p>This might be helpful: <a href=\"https://code.visualstudio.com/docs/java/java-debugging\">https://code.visualstudio.com/docs/java/java-debugging</a></p>",
+        "id": 425908606,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163619
+    },
+    {
+        "content": "<p>I will check it.</p>",
+        "id": 425908710,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163656
+    },
+    {
+        "content": "<p>This answer looks helpful, too, as the docs are mostly about running + debug - but we want to attach to a running JVM. <a href=\"https://stackoverflow.com/a/53389655\">https://stackoverflow.com/a/53389655</a></p>",
+        "id": 425908973,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163733
+    },
+    {
+        "content": "<p>Sure</p>",
+        "id": 425909019,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163748
+    },
+    {
+        "content": "<p>Note the <a href=\"https://code.visualstudio.com/docs/java/java-debugging#_hot-code-replace\">https://code.visualstudio.com/docs/java/java-debugging#_hot-code-replace</a></p>",
+        "id": 425909074,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163766
+    },
+    {
+        "content": "<p>You might be able to alter the running code in the JVM this way to add this try/catch block or add other specifics</p>",
+        "id": 425909230,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710163807
+    },
+    {
+        "content": "<p>Yeah</p>",
+        "id": 425909303,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163834
+    },
+    {
+        "content": "<p>Do you know what HTTP method does dataverse use when calling the token endpoint?</p>",
+        "id": 425909731,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710163979
+    },
+    {
+        "content": "<p>POST</p>",
+        "id": 425909986,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164065
+    },
+    {
+        "content": "<p><code>HTTPRequest httpRequest = new HTTPRequest(Method.POST, this.getEndpointURI());</code> from TokenRequest.class in Nimbus SDK</p>",
+        "id": 425910041,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164090
+    },
+    {
+        "content": "<p>Again, a first easy step might be dumping the traffic via tcpdump and look at the packages using Wireshark</p>",
+        "id": 425910125,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164127
+    },
+    {
+        "content": "<p>And, in the codebase, I see a bunch of <code>isDebug()</code> to log/not log helpful information. Can it be set using an environment variable so the isDebug() returns true, making logs to the container logs?</p>",
+        "id": 425910392,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710164233
+    },
+    {
+        "content": "<p>Sorry where do you see those? <code>rg -i \"isDebug\" src/main/java</code> gives me nothing?</p>",
+        "id": 425911799,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164708
+    },
+    {
+        "content": "<p>OAuth20Service.class</p>",
+        "id": 425912266,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710164879
+    },
+    {
+        "content": "<p>Sounds like Scribus SDK</p>",
+        "id": 425912479,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164941
+    },
+    {
+        "content": "<p>That is beyond our control and not used for OIDC</p>",
+        "id": 425912519,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164952
+    },
+    {
+        "content": "<p>OIDC uses Nimbus SDK <a href=\"https://connect2id.com/products/nimbus-oauth-openid-connect-sdk\">https://connect2id.com/products/nimbus-oauth-openid-connect-sdk</a></p>",
+        "id": 425912637,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710164989
+    },
+    {
+        "content": "<p>I put some logging middleware in my OIDC side so that I understood the problem. My token endpoint expects these four items to be received from dataverse when calling token endpoint:</p>\n<p>client_id<br>\nclient_secret<br>\nredirect_uri<br>\ncode</p>\n<p>However, the dataverse is sending the following data when calling my token endpoint:</p>\n<p>code<br>\nredirect_uri<br>\ngrant_type<br>\nscope</p>",
+        "id": 426111172,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710245501
+    },
+    {
+        "content": "<p>I updated my message.</p>",
+        "id": 426111367,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710245565
+    },
+    {
+        "content": "<p>Huh? Why are you expecting the client_id and secret?</p>",
+        "id": 426111377,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245570
+    },
+    {
+        "content": "<p><a href=\"https://openid.net/specs/openid-connect-core-1_0.html#TokenRequest\">https://openid.net/specs/openid-connect-core-1_0.html#TokenRequest</a></p>",
+        "id": 426111610,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245659
+    },
+    {
+        "content": "<p>I thought authorization code and redirect_uri wouldn't be enough as security perspective.</p>",
+        "id": 426111616,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710245663
+    },
+    {
+        "content": "<p>Implementations will likely stick to the spec and not add extras <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 426111719,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245706
+    },
+    {
+        "content": "<p>Thanks</p>",
+        "id": 426111751,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710245721
+    },
+    {
+        "content": "<p>I see \"If the Client is a Confidential Client, then it MUST authenticate to the Token Endpoint using the authentication method registered for its client_id, as described in Section 9\" in there.</p>",
+        "id": 426112136,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245882
+    },
+    {
+        "content": "<p>What kind of authentication methods do you support for confidential clients?</p>",
+        "id": 426112233,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245906
+    },
+    {
+        "content": "<p>To be honest, I never thought of a confidential client at all in my OIDC.</p>",
+        "id": 426112369,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710245960
+    },
+    {
+        "content": "<p>You can require a confidential client to present its client_id and client_secret</p>",
+        "id": 426112444,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710245989
+    },
+    {
+        "content": "<p>With non-confidential / public clients, you can't <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 426112575,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246031
+    },
+    {
+        "content": "<p>You mean I can configure the dataverse so that it also sends the client_id and secret when calling token endpoint?</p>",
+        "id": 426112641,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246055
+    },
+    {
+        "content": "<p>Actually I think this should already happen</p>",
+        "id": 426112785,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246109
+    },
+    {
+        "content": "<p>As in \"supposed to happen\"</p>",
+        "id": 426112863,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246125
+    },
+    {
+        "content": "<p>From \"new TokenRequest(this.idpMetadata.getTokenEndpointURI(), this.clientAuth,...\" it's already clear that the request has the confidential information (this.clientAuth)</p>",
+        "id": 426112956,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246159
+    },
+    {
+        "content": "<p>This is the whole body of the dataverse request towards my token endpoint:</p>\n<p>Body: {\"code\":\"123456789\",\"redirect_uri\":\"http://some_IP:8080/oauth2/callback.xhtml\",\"grant_type\":\"authorization_code\",\"scope\":\"openid email profile\"}</p>",
+        "id": 426113180,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246244
+    },
+    {
+        "content": "<p>Sorry I forgot: have you configured the confidential secrets?</p>",
+        "id": 426113283,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246277
+    },
+    {
+        "content": "<p>From what I see in the code, this _should_ work already and include these details.</p>",
+        "id": 426113369,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246311
+    },
+    {
+        "content": "<p>Oh oh oh wait</p>",
+        "id": 426113426,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246334
+    },
+    {
+        "content": "<p>We're using \"ClientSecretBasic\".</p>",
+        "id": 426113455,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246346
+    },
+    {
+        "content": "<p>That one sets the secrets as Authorization HTTP header</p>",
+        "id": 426113559,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246371
+    },
+    {
+        "content": "<p>I only set the following in domain.xml</p>\n<p>&lt;jvm-options&gt;-Ddataverse.auth.oidc.enabled=true&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Ddataverse.auth.oidc.client-id=some_id&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Ddataverse.auth.oidc.client-secret=some_secret&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Ddataverse.auth.oidc.auth-server-url=https://my.domain.com/api/auth/&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Ddataverse.auth.oidc.title=OpenID&lt;/jvm-options&gt;</p>",
+        "id": 426113579,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246381
+    },
+    {
+        "content": "<p>Could you check the headers if they are present?</p>",
+        "id": 426113587,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246384
+    },
+    {
+        "content": "<p>Yes</p>",
+        "id": 426113663,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246413
+    },
+    {
+        "content": "<p>Headers: {\"x-real-ip\":\"some_ip\",\"x-forwarded-for\":\"some_ip, some_ip\",\"host\":\"my.example.com\",\"x-nginx-proxy\":\"true\",\"connection\":\"close\",\"content-length\":\"172\",\"authorization\":\"Basic YzdjZGE5NjgtNWM3Mi00NTg1LTlmOGEtNWQ4NjBlNzFhNzE2OmJjM2RhMWNjMTY2MGIxMTRiNDA4ZThiNTJmYzM0OThmZDJlMDI4ZDg5MmJkMGMyMTc5MzhmZjBlNmIxMzNkYjU=\",\"content-type\":\"application/x-www-form-urlencoded; charset=UTF-8\",\"user-agent\":\"Java/17.0.10\",\"accept\":\"text/html, image/gif, image/jpeg, *; q=.2, <em>/</em>; q=.2\"}</p>",
+        "id": 426113765,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246451
+    },
+    {
+        "content": "<p>Ha there we go!</p>",
+        "id": 426113782,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246461
+    },
+    {
+        "content": "<p>Quoting from the OIDC spec:<br>\n\"client_secret_basic<br>\n    Clients that have received a client_secret value from the Authorization Server authenticate with the Authorization Server in accordance with Section 2.3.1 of OAuth 2.0 [RFC6749] using the HTTP Basic authentication scheme. \"</p>",
+        "id": 426113890,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246502
+    },
+    {
+        "content": "<p><a href=\"https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication\">https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a></p>",
+        "id": 426113913,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246508
+    },
+    {
+        "content": "<p>So you could say your confidential clients are only allowed to use the post method (quote: \"including the Client Credentials in the request body\"), which would indeed need an extension of Dataverse to make people select the method to be used</p>",
+        "id": 426114096,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246595
+    },
+    {
+        "content": "<p>Doing that should be simple: this constructor for the provider needs to be changed:</p>\n<div class=\"codehilite\"><pre><span></span><code>public OIDCAuthProvider(String aClientId, String aClientSecret, String issuerEndpointURL,\n                            boolean pkceEnabled, String pkceMethod) throws AuthorizationSetupException {\n        this.clientSecret = aClientSecret; // nedded for state creation\n        this.clientAuth = new ClientSecretBasic(new ClientID(aClientId), new Secret(aClientSecret));\n</code></pre></div>",
+        "id": 426114629,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246767
+    },
+    {
+        "content": "<p>This would need a distinction which method to use and act accordingly (different classes)</p>",
+        "id": 426114672,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246785
+    },
+    {
+        "content": "<p>Was I in the wrong path when implementing my OIDC that now need to modify the dataverse's codebase, OR this is usual?</p>",
+        "id": 426114974,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710246889
+    },
+    {
+        "content": "<p>Yes and no</p>",
+        "id": 426115056,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246922
+    },
+    {
+        "content": "<p>It seems to me you have only implemented one option of client auth methods</p>",
+        "id": 426115109,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246941
+    },
+    {
+        "content": "<p>The HTTP Basic Auth theme is pretty common as far as I know. I'm not aware of a provider not supporting it.</p>",
+        "id": 426115181,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246964
+    },
+    {
+        "content": "<p>These are design decisions you have to make.</p>",
+        "id": 426115272,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710246990
+    },
+    {
+        "content": "<p>So updating my OIDC provider to support it would make more sense, compared to touching the dataverse side.</p>",
+        "id": 426115388,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710247035
+    },
+    {
+        "content": "<p>We would be glad to accept a pull request extending Dataverse. There even are integration tests in place using Keycloak, so it would be easy to get you started.</p>",
+        "id": 426115405,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710247044
+    },
+    {
+        "content": "<p>That said, if you are looking for quick results and want to be more compatible with clients, it probably is a good idea to add HTTP basic auth support to your provider</p>",
+        "id": 426115473,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710247077
+    },
+    {
+        "content": "<p>I have to discuss with my team lead and decide what to do. Anyway, thank you so much for your help.</p>",
+        "id": 426115669,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710247143
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> has marked this topic as resolved.</p>",
+        "id": 426115778,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1710247192
+    },
+    {
+        "content": "<p>No worries! That's what we're here for. I am going ahead and mark this topic as resolved. If you opt for developing a patch for Dataverse, please create a new topic over at the <a class=\"stream\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev\">#dev</a> stream, thx!</p>",
+        "id": 426115783,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710247194
+    },
+    {
+        "content": "<p>You beat me to it <span aria-label=\"smile cat\" class=\"emoji emoji-1f638\" role=\"img\" title=\"smile cat\">:smile_cat:</span></p>",
+        "id": 426115898,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1710247220
+    }
+]

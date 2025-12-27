@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>I've created some API scripts to update the metadata of multiple datasets. I'm now testing the scripts in our test environment, which currently is a copy of production from yesterday, but we switched the DOIs from production DOIs (10.18710) to our test DOIs (10.21337). Here's what I've been doing:</p>\n<ol>\n<li>Download JSON with metdata from test.</li>\n<li>Run the script on all these JSON files. Looks good.</li>\n<li>Upload the updated JSON files to test.<br>\nBut the files wouldn't upload. Is this because the metadata still refers to the production DOI? See, e.g.:</li>\n</ol>\n<p>*{<br>\n  \"id\": 2966,<br>\n  \"datasetId\": 175757,<br>\n  \"datasetPersistentId\": \"doi:10.21337/MXCA5S\",<br>\n  \"storageIdentifier\": \"S3://10.18710/MXCA5S\",<br>\n  \"versionNumber\": 1,<br>\n  \"versionMinorNumber\": 0,<br>\n  \"versionState\": \"RELEASED\",*</p>",
+        "id": 392097346,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695209471
+    },
+    {
+        "content": "<p>Hmm, what errors do you get from the client side (curl, python, etc.)?</p>\n<p>And what errors do you get in server.log?</p>",
+        "id": 392097956,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695209708
+    },
+    {
+        "content": "<p>Thanks! No errors in the command line. I'll need to ask our devops for the server.log. I'm now trying this on production for one dataset without publishing.</p>",
+        "id": 392101883,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695211199
+    },
+    {
+        "content": "<p>I forgot to mention, we only copied the metadata, not the data to test.</p>",
+        "id": 392102357,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695211362
+    },
+    {
+        "content": "<p>What if you try downloading the JSON from a dataset in your test environment and try to make a change? Does that work? Just a simple change like an edit to the description or something.</p>",
+        "id": 392103056,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695211602
+    },
+    {
+        "content": "<p>Yes, that's basically what I've been doing, but uploading the modified JSON file does not work :-/</p>",
+        "id": 392107644,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695213125
+    },
+    {
+        "content": "<p>Maybe we should get you set up with a dev environment on your laptop so you can see server.log. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 392108908,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695213634
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> what do you think? Is it time for Docker?</p>",
+        "id": 392109058,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695213692
+    },
+    {
+        "content": "<p>Probably...?</p>",
+        "id": 392109353,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695213777
+    },
+    {
+        "content": "<p>Easiest way to setup a clean environment</p>",
+        "id": 392109380,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695213787
+    },
+    {
+        "content": "<p>Yes, but the idea was to test it on ~identical datasets before we run it on prod.</p>",
+        "id": 392115153,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695215669
+    },
+    {
+        "content": "<p>What if I tried to import your prod JSON into my dev environment? Would that be a good test? I'm running the tip of the develop branch.</p>",
+        "id": 392118726,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695216830
+    },
+    {
+        "content": "<p>Thanks, I might want to do that. Let me just first test a couple of datasets on prod.</p>",
+        "id": 392119564,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695217085
+    },
+    {
+        "content": "<p>In the same clean-up job, I'll be publishing new versions of about 800 datasets. From previous, similar jobs (e.g. uploading many files to a dataset via API), I've learned to put a sleep command after each API publishing command. This means running the script will take about 8-10 hours. The idea is to disable login during that time. Now, to reduce the work load, I'm considering turning off file validation, like this:</p>\n<p>Before the script is run:<br>\ncurl -X PUT -d 'false' <a href=\"http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled\">http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled</a></p>\n<p>After the script is run:<br>\ncurl -X PUT -d 'true' <a href=\"http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled\">http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled</a></p>\n<p>None of the changes are at file level. Are there any concerns turning off file validation in this case?</p>",
+        "id": 392121249,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695217642
+    },
+    {
+        "content": "<p>I don't think so. And I saw your mailing list post. You're only changing metadata, not files. Should be fine.</p>",
+        "id": 392121666,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695217761
+    },
+    {
+        "content": "<p>Great, thanks, good to get this confirmed. I think turning it off will make the process smoother and faster.</p>",
+        "id": 392122481,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1695218009
+    }
+]
