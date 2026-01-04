@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Hello!</p>\n<p>I'd like to use the Native API to find the (finest) dataverse that a dataset is contained in. I don't think that information is given in the JSON metadata export, and I couldn't find an endpoint to query directly for this question in the documentation. Have I missed something, or is there no such API function available?</p>\n<p>If there is no simple way, I might have to resort to scraping it from the \"breadcrumbs\" in the HTML of the web page, but I'd rather not...</p>\n<p>Thanks in advance!</p>",
+        "id": 529045426,
+        "sender_full_name": "Remie Janssen",
+        "timestamp": 1752668098
+    },
+    {
+        "content": "<p>I suspect you'd need to construct this information by retrieving the parent collection information recursively. I'm not aware of any  API endpoint that immediately gives you the information you're looking for.</p>",
+        "id": 529051050,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1752669801
+    },
+    {
+        "content": "<p>If you think such an endpoint should be added (it might be relevant for the SPA work), please feel free to create an issue. Ideally propose how you think the JSON for this should look like.</p>",
+        "id": 529051276,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1752669860
+    },
+    {
+        "content": "<p>My 2 cents: essentially, this is a graph, so maybe it should use a knowledge graph representation to also have more metadata available from a single query.</p>",
+        "id": 529051517,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1752669931
+    },
+    {
+        "content": "<p>There are breadcrumbs in the new React frontend. <a href=\"https://github.com/IQSS/dataverse-frontend/pull/297\">https://github.com/IQSS/dataverse-frontend/pull/297</a> might be a good place to start looking. I'm sure <span class=\"user-mention\" data-user-id=\"598447\">@Ellen K</span> <span class=\"user-mention\" data-user-id=\"751566\">@Cheng Shi</span> <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span> or <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> would know more.</p>\n<p>Actually, now I'm seeing returnOwners=true at <a href=\"https://github.com/IQSS/dataverse/pull/10322\">https://github.com/IQSS/dataverse/pull/10322</a> which is probably part of the story.</p>",
+        "id": 529055843,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752671199
+    },
+    {
+        "content": "<p>Also, from <a href=\"https://dataverse.nl/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi%3A10.34894/YOMA9L\">https://dataverse.nl/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi%3A10.34894/YOMA9L</a> , for example, you can look at \"isPartOf\":</p>\n<div class=\"codehilite\"><pre><span></span><code>&quot;schema:isPartOf&quot;: {\n  &quot;schema:name&quot;: &quot;UG Faculty of Medical Sciences &amp; UMCG&quot;,\n  &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/RUGFMScUMCG&quot;,\n  &quot;schema:description&quot;: &quot;Faculty of Medical Sciences and UMCG&quot;,\n  &quot;schema:isPartOf&quot;: {\n    &quot;schema:name&quot;: &quot;University of Groningen&quot;,\n    &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/groningen&quot;,\n    &quot;schema:isPartOf&quot;: {\n      &quot;schema:name&quot;: &quot;DataverseNL&quot;,\n      &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/root&quot;,\n      &quot;schema:description&quot;: &quot;&lt;H1&gt;Welcome to DataverseNL&lt;/H1&gt;...&quot;\n    }\n  }\n},\n</code></pre></div>",
+        "id": 529058589,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752672030
+    },
+    {
+        "content": "<p>Hi <span aria-label=\"wave\" class=\"emoji emoji-1f44b\" role=\"img\" title=\"wave\">:wave:</span> , exactly as <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> is saying, returnOwners=true is doing the trick, it will return the <code>isPartOf</code> property. Open this <a href=\"https://beta.dataverse.org/api/v1/dataverses/a-subcollection?returnOwners=true\">URL</a> in the browser and check the <code>isPartOf</code> property.</p>",
+        "id": 529068553,
+        "sender_full_name": "Germán Saracca",
+        "timestamp": 1752674809
+    },
+    {
+        "content": "<p>Thanks all! </p>\n<p>The returnOwners parameter is exactly what I was looking for! The idea of using a different (or even custom) exporter might also come in handy, but I'm glad it doesn't seem necessary in this case  :)</p>",
+        "id": 529223171,
+        "sender_full_name": "Remie Janssen",
+        "timestamp": 1752739246
+    },
+    {
+        "content": "<p>I was completely unaware of this new query parameter! Feeds into my argument that our API docs are increasingly unreadable... <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 529223583,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1752739386
+    },
+    {
+        "content": "<p><code>% grep returnOwners *</code></p>\n<p><code>6.2-release-notes.md:The API endpoints for getting datasets, Dataverse collections, and datafiles have been extended to support the following optional 'returnOwners' query parameter.</code></p>",
+        "id": 529280021,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752759091
+    },
+    {
+        "content": "<p>But yeah, I hear you. Please feel free to kick off a topic in <a class=\"stream\" data-stream-id=\"446770\" href=\"/#narrow/channel/446770-docs\">#docs</a> about the API Guide!</p>",
+        "id": 529280291,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752759167
+    }
+]
