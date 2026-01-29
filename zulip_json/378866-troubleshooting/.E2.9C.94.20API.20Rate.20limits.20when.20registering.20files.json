@@ -1,0 +1,146 @@
+[
+    {
+        "content": "<p>Hi @all, I have encountered issues registering many files after directly uploading to an S3 storage. </p>\n<p>For context, upon direct upload the python-dvuploader library first uploads all files to the storage using the ticket system and then registers each file asynchronously at the instance. This is where I am running into, I guess, rate-limiting problems. The library that I am using throws an exception that the connection is closed and I suspect that it's simply too many requests at once or too frequent.</p>\n<p>Hence, my question is, how many concurrent requests are reasonable to handle by the backend and roughly how many per minute? I am trying to find a good default that can fit most instances equally well while being somewhat performant, compared to synchronous requests. </p>\n<p>I've been testing this with demo Dataverse and locally using the docker compose variant with localstack. In both cases I have encountered this issue.</p>",
+        "id": 423805309,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709122370
+    },
+    {
+        "content": "<p>I'm reminded of this cartoon. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> <br>\n<a href=\"/user_uploads/53090/ztcTVfLT181McxvvWKyNtbc1/bridge.png\">bridge.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ztcTVfLT181McxvvWKyNtbc1/bridge.png\" title=\"bridge.png\"><img src=\"/user_uploads/53090/ztcTVfLT181McxvvWKyNtbc1/bridge.png\"></a></div>",
+        "id": 423806818,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709123017
+    },
+    {
+        "content": "<p>Well, then it is time to load up the trucks <span aria-label=\"joy\" class=\"emoji emoji-1f602\" role=\"img\" title=\"joy\">:joy:</span></p>",
+        "id": 423807267,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709123209
+    },
+    {
+        "content": "<p>I'd say so. We'll learn something!</p>",
+        "id": 423807401,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709123258
+    },
+    {
+        "content": "<p>So I did a little more testing and tried with a larger amount of files (1000 small ones) and looked into the Dataverse logs. Once more than one request is sent simultaneously, the dataset goes into a lock. Plus, I am not able to remove the lock via the UI. If done synchronously, there is no issue and lock.</p>\n<p>Do you know what could be the cause of this? I have added the logs below:</p>\n<div class=\"codehilite\"><pre><span></span><code>2024-02-28 15:52:03 dev_dataverse   | [#|2024-02-28T14:52:03.794+0000|SEVERE|Payara 6.2023.8|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=104;_ThreadName=http-thread-pool::http-listener-1(5);_TimeMillis=1709131923794;_LevelValue=1000;|\n2024-02-28 15:52:03 dev_dataverse   |   Failed to add file to dataset.|#]\n2024-02-28 15:52:03 dev_dataverse   |\n2024-02-28 15:52:03 dev_dataverse   | [#|2024-02-28T14:52:03.795+0000|SEVERE|Payara 6.2023.8|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=104;_ThreadName=http-thread-pool::http-listener-1(5);_TimeMillis=1709131923795;_LevelValue=1000;|\n2024-02-28 15:52:03 dev_dataverse   |   Dataset cannot be edited due to dataset lock.|#]\n</code></pre></div>",
+        "id": 423836151,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709132255
+    },
+    {
+        "content": "<p>Sadly, I'm sort of not surprised that you're getting locks when sending files asynchronously.</p>",
+        "id": 423858599,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709138348
+    },
+    {
+        "content": "<p>What do you want to know the cause of? The locks? Or why you can't remove them? Or why you have to upload files synchronously? Or all of the above? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 423858720,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709138391
+    },
+    {
+        "content": "<p>Have you tried this? <a href=\"https://guides.dataverse.org/en/6.1/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset\">https://guides.dataverse.org/en/6.1/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset</a></p>",
+        "id": 423867000,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709141082
+    },
+    {
+        "content": "<p>Sometimes you can't see the forest for the trees <span aria-label=\"dizzy\" class=\"emoji emoji-1f635\" role=\"img\" title=\"dizzy\">:dizzy:</span> That did the trick! Thanks Phil <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 423868351,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709141534
+    },
+    {
+        "content": "<p>Fantastic! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 423869388,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709141916
+    },
+    {
+        "content": "<p>Jim wrote the code. I'm just the messenger. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 423869416,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709141932
+    },
+    {
+        "content": "<p>Should we improve the docs somehow? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 423869443,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709141940
+    },
+    {
+        "content": "<p>It's working flawlessly now, even with a bunch of files! Thanks again <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>\n<p><a href=\"/user_uploads/53090/Fe8FHzd9Y48FKdlr20zajTga/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Fe8FHzd9Y48FKdlr20zajTga/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/Fe8FHzd9Y48FKdlr20zajTga/image.png\"></a></div>",
+        "id": 423871626,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709142726
+    },
+    {
+        "content": "<p>Great!</p>",
+        "id": 423871712,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709142760
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/API.20Rate.20limits.20when.20registering.20files/near/423869443\">schrieb</a>:</p>\n<blockquote>\n<p>Should we improve the docs somehow? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>\n</blockquote>\n<p>No, I think this was just my fault here. I was thinking that the default file add endpoint is used and assumed that this is the only way. You never stop learning <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 423871741,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709142771
+    },
+    {
+        "content": "<p>Ok, well, this should probably go in a new thread but I've been thinking that perhaps we need more tutorials in the API Guide.</p>",
+        "id": 423871982,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709142855
+    },
+    {
+        "content": "<p>We have <a href=\"https://guides.dataverse.org/en/6.1/api/getting-started.html#uploading-files\">https://guides.dataverse.org/en/6.1/api/getting-started.html#uploading-files</a> but it only references the default way.</p>",
+        "id": 423872085,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709142895
+    },
+    {
+        "content": "<p>I think that listing the direct upload feature would also be good. At the very least, it raises awareness of its existence. The sentence within the Native API docs would be sufficient to add to the \"uploading files\" guide:</p>\n<blockquote>\n<p>when a Dataverse installation is configured to use S3 storage with direct upload enabled, there is API support to send a file directly to S3. This is more complex and is described in the Direct DataFile Upload/Replace API guide.</p>\n</blockquote>",
+        "id": 423956027,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709186958
+    },
+    {
+        "content": "<p>Sounds good. Do you want to make a PR?</p>",
+        "id": 424000321,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709206263
+    },
+    {
+        "content": "<p>Of course, just opened a PR for this </p>\n<p><a href=\"https://github.com/IQSS/dataverse/pull/10347\">https://github.com/IQSS/dataverse/pull/10347</a></p>",
+        "id": 424174173,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709278589
+    },
+    {
+        "content": "<p>Thanks! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span> I'm making a couple minor tweaks.</p>",
+        "id": 424210043,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709291489
+    },
+    {
+        "content": "<p>Merged! Thanks again!</p>",
+        "id": 424220834,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1709294696
+    },
+    {
+        "content": "<p>Awesome! Thanks <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 424276742,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1709309188
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599841\">Jan Range</span> has marked this topic as resolved.</p>",
+        "id": 424276781,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1709309198
+    }
+]
