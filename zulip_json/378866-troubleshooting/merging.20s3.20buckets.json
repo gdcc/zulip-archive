@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>So at UCLA we're still working on updateing from 5.14.   One of the issues is that historically we've had separate s3 buckets for direct-uploading and regular uploads.  Since that's no longer necessary we'd like to merge thiese.</p>\n<p>Any suggestions on how to proceed?</p>\n<p>Thank you,</p>\n<p>jamie</p>",
+        "id": 570165016,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1769453022
+    },
+    {
+        "content": "<p>Hmm, <a href=\"https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3\">https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3</a> is somewhat related. <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> added it a while back, in <a href=\"https://github.com/IQSS/dataverse/issues/6789\">#6789</a>.</p>",
+        "id": 570173558,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769456026
+    },
+    {
+        "content": "<p>Oh good, I see you asked here as well: <a href=\"https://groups.google.com/g/dataverse-community/c/zONHkY6gJMM/m/xxNSQT28GQAJ\">https://groups.google.com/g/dataverse-community/c/zONHkY6gJMM/m/xxNSQT28GQAJ</a></p>",
+        "id": 570173800,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769456127
+    },
+    {
+        "content": "<p>Fortunately I have a test system I can backup incase I break it.    </p>\n<p>I posed the question on chatgpt,  for what it's worth this is the suggestion:<br>\n**</p>\n<h4>Option B: True merge (advanced, risky)</h4>\n<p>You must:</p>\n<ol>\n<li>\n<p>Copy objects into a single bucket</p>\n</li>\n<li>\n<p>Update database references to the bucket name</p>\n</li>\n<li>\n<p>Reindex and test every dataset</p>\n</li>\n</ol>\n<p>Typical SQL (example only):</p>\n<p>UPDATE datafile</p>\n<p>SET storageidentifier = REPLACE(storageidentifier,</p>\n<p>'s3://old-bucket/',</p>\n<p>'s3://new-bucket/');</p>\n<p><span aria-label=\"warning\" class=\"emoji emoji-26a0\" role=\"img\" title=\"warning\">:warning:</span> Risks:</p>\n<ul>\n<li>\n<p>Broken downloads</p>\n</li>\n<li>\n<p>Corrupt previews</p>\n</li>\n<li>\n<p>Dataset integrity failures</p>\n</li>\n</ul>\n<p>This should only be done with:</p>\n<ul>\n<li>\n<p>Full DB backup</p>\n</li>\n<li>\n<p>Test environment</p>\n</li>\n</ul>\n<p>Reindex after (bin/reindex.sh)**</p>",
+        "id": 570176541,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1769457114
+    },
+    {
+        "content": "<p>I am rather sure (95%) that ChatGPT is wrong about reindexing the datasets.</p>",
+        "id": 570200677,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769466771
+    },
+    {
+        "content": "<p>I looked at the search/index code and schema and the storage identifier is nowhere to be found expect for one place, but then it is queried from DvObject which comes from the DB and not Solr.</p>",
+        "id": 570200808,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769466834
+    },
+    {
+        "content": "<p>(Also, it's in SolrSearchResult.json(), so very likely to be unrelated)</p>",
+        "id": 570200920,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769466884
+    },
+    {
+        "content": "<p>Aside from that: yes, you will need to change your storage identifiers by upgrading the location.</p>",
+        "id": 570200997,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769466916
+    },
+    {
+        "content": "<p>Keep in mind that the storage identifier has changed a bit over the versions, so take a look at the patterns your identifiers use first</p>",
+        "id": 570201083,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769466953
+    },
+    {
+        "content": "<p>I assume that chatgpt is questionable but there was this in documentation, file-to-s3 transfer:<br>\n(<a href=\"https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3\">https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3</a>)</p>",
+        "id": 570213832,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1769474003
+    }
+]
