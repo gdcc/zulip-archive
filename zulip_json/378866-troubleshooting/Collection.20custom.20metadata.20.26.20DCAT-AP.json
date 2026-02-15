@@ -1,0 +1,302 @@
+[
+    {
+        "content": "<p>Thanks.</p>\n<p>I have raised this issue in Paul Boon's repo for the DCAT-AP exporter: <a href=\"https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1\">https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1</a></p>\n<p>We can find the metadata export function in the UI for individual datasets which uses the ordinary API, but we cannot find the exporter in our list of OAI metadata exporters. See: <a href=\"https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats\">https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats</a></p>\n<p>Do you have a take on why that is?</p>",
+        "id": 560361917,
+        "sender_full_name": "Asbjørn Skødt",
+        "timestamp": 1764154963
+    },
+    {
+        "content": "<p>Hi, just improved that exporter, now it also has isHarvestable return true, should make it available via OAI then. <br>\nThe code and Jar is here: <a href=\"https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0\">https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0</a></p>",
+        "id": 560385589,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764162396
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> I hope you understand that plugin loading better that I do, because I do have some issues with the class loading. When I run it from my dev environment (just the maven test via that clean install) I do get different results from running it via the Dataverse application. Somehow it usess different implementation of libs, even though I build a 'fat' jar with all libs in it.</p>",
+        "id": 560386476,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764162656
+    },
+    {
+        "content": "<p>Getting the basic DCAT-AP in RDF (XML) does not look to complicated because there are not many mandatory fields. Those DCAT-AP extensions however are problematic, also because some information must be extracted from custom metadatablocks, as indicated by <span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> .  <br>\nBut, before continuing with making the plugin more fexible I want to have the RDF eyeballed by some RDF experts...</p>",
+        "id": 560389204,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764163449
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Is it possible for an exporter plugin to be in the OAI output; I see this line in the <code>OAIServlet.java</code>: <code>if (exporter != null &amp;&amp; (exporter instanceof XMLExporter) &amp;&amp; exporter.isHarvestable()) </code>. <br>\nAnd that plugin is a <code>io.gdcc.spi.export.Exporter</code>. Should the test look for <code>MediaType.APPLICATION_XML</code> instead?</p>",
+        "id": 560625503,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764257832
+    },
+    {
+        "content": "<p>Ok, I will try with <code>io.gdcc.spi.export.XMLExporter</code>, that should work.</p>",
+        "id": 561150423,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764593605
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> any luck? How's it going?</p>",
+        "id": 561180349,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1764600266
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Somehow it is not working, so I changed back to Exporter and started improving the RDF output. But I will try to wrap things up by the end of the week. Thanks for asking.</p>",
+        "id": 561491428,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764700302
+    },
+    {
+        "content": "<p>I have found the file for the OAI DDI exporter in the Dataverse source code for inspiration, if this might help:<br>\n<a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/export/OAI_DDIExporter.java\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/export/OAI_DDIExporter.java</a></p>",
+        "id": 561631746,
+        "sender_full_name": "Asbjørn Skødt",
+        "timestamp": 1764763042
+    },
+    {
+        "content": "<p>The main problem, I think, is that RDF/XML is not compatible with the OAI format, which needs an XML schema (xsd file), which we cannot provide. <br>\nThe alternative (for harvesting clients) might be to use OAI harvesting to retrieve the identifiers and use those to retrieve the individual DCAT-AP metadata from the API. <br>\nSo, it might be that we won't provide OAI for the DCAT-AP at all!</p>",
+        "id": 561646602,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764767305
+    },
+    {
+        "content": "<p>Huh. Interesting. <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> check this out ^^</p>",
+        "id": 561653428,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1764769030
+    },
+    {
+        "content": "<p>Maybe I am wrong; I would like to have that RDF/XML in there;</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; ...&gt;\n    &lt;GetRecord&gt;\n        &lt;record&gt;\n            &lt;header&gt;\n                &lt;identifier&gt;oai:example.org:item123&lt;/identifier&gt;\n                &lt;datestamp&gt;2025-12-02&lt;/datestamp&gt;\n                &lt;metadataFormat&gt;RDF&lt;/metadataFormat&gt;\n            &lt;/header&gt;\n            &lt;metadata&gt;\n                &lt;!-- RDF Content Here --&gt;\n            &lt;/metadata&gt;\n        &lt;/record&gt;\n    &lt;/GetRecord&gt;\n&lt;/OAI-PMH&gt;\n</code></pre></div>",
+        "id": 561654947,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764769436
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> as someone who did a lot of work on the OAI-PMH lib we use (XOAI) I am fairly familiar with the protocol. When you say you need an XSD, what exactly are you talking about? (I'm not sure I follow... <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> )</p>",
+        "id": 561661445,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771096
+    },
+    {
+        "content": "<p>Does the example at <a href=\"https://www.openarchives.org/OAI/openarchivesprotocol.html#Record\">https://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a> help clear up the situation? (Assuming you're talking about how to provide the namespace URLs and attach the schemaLocations to it)</p>",
+        "id": 561662207,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771273
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> The <code>oai?verb=ListMetadataFormats</code> returns this:</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd&quot;&gt;\n&lt;responseDate&gt;2025-12-03T14:07:45Z&lt;/responseDate&gt;\n&lt;request verb=&quot;ListMetadataFormats&quot;&gt;https://dev.dataverse.nl/oai&lt;/request&gt;\n&lt;ListMetadataFormats&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;dcatap&lt;/metadataPrefix&gt;\n&lt;schema/&gt;\n&lt;metadataNamespace/&gt;\n&lt;/metadataFormat&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;Datacite&lt;/metadataPrefix&gt;\n&lt;schema&gt;http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.5/metadata.xsd&lt;/schema&gt;\n&lt;metadataNamespace&gt;http://datacite.org/schema/kernel-4&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;oai_dc&lt;/metadataPrefix&gt;\n&lt;schema&gt;http://www.openarchives.org/OAI/2.0/oai_dc.xsd&lt;/schema&gt;\n&lt;metadataNamespace&gt;http://www.openarchives.org/OAI/2.0/oai_dc/&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;oai_datacite&lt;/metadataPrefix&gt;\n&lt;schema&gt;http://schema.datacite.org/meta/kernel-4.1/metadata.xsd&lt;/schema&gt;\n&lt;metadataNamespace&gt;http://datacite.org/schema/kernel-4&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;oai_ddi&lt;/metadataPrefix&gt;\n&lt;schema&gt;https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd&lt;/schema&gt;\n&lt;metadataNamespace&gt;ddi:codebook:2_5&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;dataverse_json&lt;/metadataPrefix&gt;\n&lt;schema&gt;https://dataverse.org/schema/core.xsd&lt;/schema&gt;\n&lt;metadataNamespace&gt;https://dataverse.org/schema/core&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n&lt;/ListMetadataFormats&gt;\n&lt;/OAI-PMH&gt;\n</code></pre></div>\n<p>So it has <code>dcatap</code>, but with no shema and no namspace...<br>\nThen if I request for the records; <code>oai?verb=ListRecords&amp;metadataPrefix=dcatap</code> I get: </p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd&quot;&gt;\n&lt;responseDate&gt;2025-12-03T14:11:32Z&lt;/responseDate&gt;\n&lt;request&gt;https://dataverse.nl/oai&lt;/request&gt;\n&lt;error code=&quot;cannotDisseminateFormat&quot;&gt;Format &#39;dcatap&#39; not applicable in this context&lt;/error&gt;\n&lt;/OAI-PMH&gt;\n</code></pre></div>\n<p>So it might be because it has no schema?</p>",
+        "id": 561662784,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764771376
+    },
+    {
+        "content": "<p>Code code code I need code <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span> Can you point me to a repo with your exporter code?</p>",
+        "id": 561663073,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771442
+    },
+    {
+        "content": "<p>(BTW why \"dcatap\" and not just \"dcat\"?)</p>",
+        "id": 561663509,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771553
+    },
+    {
+        "content": "<p>Code its here: <a href=\"https://github.com/PaulBoon/dataverse-exporter-dcatap/tree/FixOAIExport\">https://github.com/PaulBoon/dataverse-exporter-dcatap/tree/FixOAIExport</a><br>\nThe format is DCAT-AP; <a href=\"https://semiceu.github.io/DCAT-AP/releases/3.0.0\">https://semiceu.github.io/DCAT-AP/releases/3.0.0</a></p>",
+        "id": 561664060,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764771687
+    },
+    {
+        "content": "<p>Let me suggest using \"dcat_ap\" in this case then. As they use \"oai_dc\" to make it more readable.</p>",
+        "id": 561664233,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771728
+    },
+    {
+        "content": "<p>Let me also suggest using <a href=\"https://github.com/gdcc/dataverse-exporters\">https://github.com/gdcc/dataverse-exporters</a> as the Parent POM. It's not strictly necessary, but it may be useful to have an intermediate parent pom for all of the exporters. I'm happy to hear contra arguments! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 561664748,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771851
+    },
+    {
+        "content": "<p>WRT to no schemas being announced... I think I know the culprit. While you are using XMLExporter (good!), you're returning empty values for these: <a href=\"https://github.com/PaulBoon/dataverse-exporter-dcatap/blob/e12307d3ba32e5178610acebae3cdf6a3068dc1d/src/main/java/io/gdcc/spi/export/dcatap/DCATAPExporter.java#L94-L107\">https://github.com/PaulBoon/dataverse-exporter-dcatap/blob/e12307d3ba32e5178610acebae3cdf6a3068dc1d/src/main/java/io/gdcc/spi/export/dcatap/DCATAPExporter.java#L94-L107</a></p>",
+        "id": 561665249,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771959
+    },
+    {
+        "content": "<p>I'd have a hard time figuring this out as library, too <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 561665331,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764771977
+    },
+    {
+        "content": "<p>Exactly, empty values, because I don't have a schema...</p>",
+        "id": 561666351,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764772196
+    },
+    {
+        "content": "<p>But you will need a namespace!</p>",
+        "id": 561666454,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772217
+    },
+    {
+        "content": "<p>The RDF output starts like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;rdf:RDF\n    xmlns:dct=&quot;http://purl.org/dc/terms/&quot;\n    xmlns:spdx=&quot;http://spdx.org/rdf/terms#&quot;\n    xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;\n    xmlns:dcatap=&quot;http://data.europa.eu/r5r/&quot;\n    xmlns:vcard=&quot;http://www.w3.org/2006/vcard/ns#&quot;\n    xmlns:dcat=&quot;http://www.w3.org/ns/dcat#&quot;\n    xmlns:rdfs=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;\n    xmlns:foaf=&quot;http://xmlns.com/foaf/0.1/&quot;&gt;\n  &lt;rdf:Description rdf:about=&quot;https://doi.org/10.5072/FK2/6ZUDGC&quot;&gt;\n...\n</code></pre></div>",
+        "id": 561666872,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764772299
+    },
+    {
+        "content": "<p>Also, you're want to use the DCAT-AP namespace, aye?</p>",
+        "id": 561666879,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772301
+    },
+    {
+        "content": "<p>Yeah that seems right</p>",
+        "id": 561666995,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772324
+    },
+    {
+        "content": "<p>All the namespaces properly defined</p>",
+        "id": 561667053,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772337
+    },
+    {
+        "content": "<p>We may need to extend XOAI's model classes here. Currently, they expect 1 metadata format to have 1 namespace and 1 schemaLocation.</p>",
+        "id": 561667406,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772420
+    },
+    {
+        "content": "<p>With RDF, that may no longer be the case.</p>",
+        "id": 561667457,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772432
+    },
+    {
+        "content": "<p>Also, the XMLExporter interface may need an extension to reflect these facts.</p>",
+        "id": 561667545,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772453
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I guess it is somewhere validating the XML and discovers it's not valid, then throws an error?<br>\nI mean, there is no workaround ?</p>",
+        "id": 561668006,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764772557
+    },
+    {
+        "content": "<p>Not sure about that.</p>",
+        "id": 561668386,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772646
+    },
+    {
+        "content": "<p>I'd need to dive in deeper, can't tell from the top of my head what'll happen with empty strings like that.</p>",
+        "id": 561668566,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772693
+    },
+    {
+        "content": "<p>The XML bit is usually just copied from the export (which is cached) and then written. There usually is no more validation happening.</p>",
+        "id": 561668696,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772726
+    },
+    {
+        "content": "<p>See <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/harvest/server/xoai/DataverseXoaiItemRepository.java#L258-L258\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/harvest/server/xoai/DataverseXoaiItemRepository.java#L258-L258</a> - there's the bit that simple takes the exported data, reads it and then dumps it into the OAI metadata record.</p>",
+        "id": 561669578,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764772942
+    },
+    {
+        "content": "<p>Looks like I need to use the debugger...</p>",
+        "id": 561671198,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764773286
+    },
+    {
+        "content": "<p>I'd try to get the metadata format available first.</p>",
+        "id": 561671834,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773425
+    },
+    {
+        "content": "<p>It's in the list, but not completed.</p>",
+        "id": 561671887,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773437
+    },
+    {
+        "content": "<p>This may be a problem.</p>",
+        "id": 561671918,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773443
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP/near/561664748\">said</a>:</p>\n<blockquote>\n<p>Let me also suggest using <a href=\"https://github.com/gdcc/dataverse-exporters\">https://github.com/gdcc/dataverse-exporters</a> as the Parent POM. It's not strictly necessary, but it may be useful to have an intermediate parent pom for all of the exporters. I'm happy to hear contra arguments! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> please don't forget that it's still using the legacy ossrh config: <a href=\"https://github.com/gdcc/dataverse-exporters/issues/54\">https://github.com/gdcc/dataverse-exporters/issues/54</a></p>",
+        "id": 561673105,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1764773699
+    },
+    {
+        "content": "<p>Yikes <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 561673379,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773737
+    },
+    {
+        "content": "<p>Wasn't me</p>",
+        "id": 561673423,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773745
+    },
+    {
+        "content": "<p><span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 561673468,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773756
+    },
+    {
+        "content": "<p>Someone should change that... <span aria-label=\"speak no evil\" class=\"emoji emoji-1f64a\" role=\"img\" title=\"speak no evil\">:speak_no_evil:</span> <span aria-label=\"hear no evil\" class=\"emoji emoji-1f649\" role=\"img\" title=\"hear no evil\">:hear_no_evil:</span> <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 561673589,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764773784
+    },
+    {
+        "content": "<p>Well, it was never updated. ossrh was the right way to do things back in the day. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 561673599,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1764773788
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> I should also mention that you should not put the exporters in the SPI package. It should be its own package. Here's an example: <a href=\"https://github.com/gdcc/exporter-ddipdf/tree/main/src/main/java/io/gdcc/export/ddipdf\">https://github.com/gdcc/exporter-ddipdf/tree/main/src/main/java/io/gdcc/export/ddipdf</a></p>",
+        "id": 561682952,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1764775441
+    },
+    {
+        "content": "<p>Uhm, seems to be working... was looking at the wrong server, Sorry, my bad! <span aria-label=\"exploding head\" class=\"emoji emoji-1f92f\" role=\"img\" title=\"exploding head\">:exploding_head:</span><br>\nOnly that empty <code>schema</code> in the <code>ListMetadataFormats</code>, but we mayeb harvesting clients have no troubles with that.</p>",
+        "id": 561707369,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1764781211
+    },
+    {
+        "content": "<p>Yes, we have a breakthrough! Awesome.</p>\n<p>We get this info from list of metadata formats:</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;metadataFormat&gt;\n&lt;metadataPrefix&gt;dcat_ap&lt;/metadataPrefix&gt;\n&lt;schema/&gt;\n&lt;metadataNamespace&gt;http://purl.org/dc/terms/ http://spdx.org/rdf/terms# http://www.w3.org/1999/02/22-rdf-syntax-ns# http://data.europa.eu/r5r/ http://www.w3.org/2006/vcard/ns# http://www.w3.org/ns/dcat# http://www.w3.org/2000/01/rdf-schema# http://xmlns.com/foaf/0.1/&lt;/metadataNamespace&gt;\n&lt;/metadataFormat&gt;\n</code></pre></div>\n<p>Why does the namespace list several namespaces? The namespace for DCAT-AP according to the spec is:<br>\n<code>http://data.europa.eu/r5r/</code></p>\n<p>source:</p>\n<blockquote>\n<h2>5. Terminology</h2>\n<p><a href=\"https://semiceu.github.io/DCAT-AP/r5r/releases/3.0.0/#specterminology\">https://semiceu.github.io/DCAT-AP/r5r/releases/3.0.0/#specterminology</a><br>\nThe namespace for this vocabulary is <code>http://data.europa.eu/r5r/</code> .</p>\n</blockquote>",
+        "id": 562089684,
+        "sender_full_name": "Asbjørn Skødt",
+        "timestamp": 1764937846
+    },
+    {
+        "content": "<p>Sorry for the short notice but in two hours <span class=\"user-mention\" data-user-id=\"928391\">@Sjaak Derksen</span> will be talking about DCAT at the community call: <a href=\"https://groups.google.com/g/dataverse-community/c/sM5Kdwy1lT0/m/2Z-7a8fcBQAJ\">https://groups.google.com/g/dataverse-community/c/sM5Kdwy1lT0/m/2Z-7a8fcBQAJ</a></p>",
+        "id": 566539437,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767704506
+    }
+]
