@@ -1,0 +1,230 @@
+<html>
+<head><meta charset="utf-8"><title>Glitch in UI when deleting Datasets · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html">Glitch in UI when deleting Datasets</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="569687569"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569687569" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Björn Selent <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569687569">(Jan 23 2026 at 10:58)</a>:</h4>
+<p>Hi all, <br>
+since upgrading to dataverse 6.9 we encounter a very odd bug in our installation. When someone creates a new dataset and (for whatever reason) deletes it straight away the UI displays an "internal server error" and we find a warning in the payara logs.<br>
+<a href="/user_uploads/53090/-E53r6eNaZF9PYFJGewo11Qq/Screenshot-From-2026-01-23-11-48-33.png">UI error</a><br>
+<a href="/user_uploads/53090/HoeH9nP38PJSwNcjbv5Aro12/Screenshot-From-2026-01-23-11-27-28.png">payara log</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/-E53r6eNaZF9PYFJGewo11Qq/Screenshot-From-2026-01-23-11-48-33.png" title="UI error"><img data-original-content-type="image/png" data-original-dimensions="1234x430" src="/user_uploads/thumbnail/53090/-E53r6eNaZF9PYFJGewo11Qq/Screenshot-From-2026-01-23-11-48-33.png/840x560.webp"></a></div><div class="message_inline_image"><a href="/user_uploads/53090/HoeH9nP38PJSwNcjbv5Aro12/Screenshot-From-2026-01-23-11-27-28.png" title="payara log"><img data-original-content-type="image/png" data-original-dimensions="1711x165" src="/user_uploads/thumbnail/53090/HoeH9nP38PJSwNcjbv5Aro12/Screenshot-From-2026-01-23-11-27-28.png/840x560.webp"></a></div><p>The same error occurs sometimes when the last dataset inside of a collection is deleted<br>
+<a href="/user_uploads/53090/KwdeV-XnXdLVz28iOBYUdxfD/Screenshot-From-2026-01-23-11-47-35.png">last dataset</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/KwdeV-XnXdLVz28iOBYUdxfD/Screenshot-From-2026-01-23-11-47-35.png" title="last dataset"><img data-original-content-type="image/png" data-original-dimensions="1175x535" src="/user_uploads/thumbnail/53090/KwdeV-XnXdLVz28iOBYUdxfD/Screenshot-From-2026-01-23-11-47-35.png/840x560.webp"></a></div><p>By debugging we ended at DatasetPage.java lines 3130-3136<br>
+<a href="/user_uploads/53090/VdjUZf5xhrMzeP7_rUkAuMXO/Bildschirmfoto-vom-2026-01-16-09-58-10.png">debugging</a><br>
+We are out of ideas how to proceed to find the root cause of the bug and fix it. Any hints are highly appreciated.</p>
+<div class="message_inline_image"><a href="/user_uploads/53090/VdjUZf5xhrMzeP7_rUkAuMXO/Bildschirmfoto-vom-2026-01-16-09-58-10.png" title="debugging"><img data-original-content-type="image/png" data-original-dimensions="1992x1168" src="/user_uploads/thumbnail/53090/VdjUZf5xhrMzeP7_rUkAuMXO/Bildschirmfoto-vom-2026-01-16-09-58-10.png/840x560.webp"></a></div>
+
+
+
+<a name="569693533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569693533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569693533">(Jan 23 2026 at 11:30)</a>:</h4>
+<p>The problem with getting a clue about what's going on is related to how exceptions are treated in EJBs. Unless you throw custom exceptions that are annotated as being an @ApplicationException, EJB will always wrap any bubbling exceptions into their own (making sure it handles transaction rollbacks properly). So the log output you screenshotted is good, but there should be more related output around it regarding the exception with a root cause. Can you please add that output as well? (Also, please don't be afraid to paste them instead of a screenshot. Makes reading them easier sometimes.)</p>
+
+
+
+<a name="569703500"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569703500" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569703500">(Jan 23 2026 at 12:31)</a>:</h4>
+<p>I tried to reproduce this problem with a freshly deployed local Dataverse instance (using containers). I wasn't able to trigger the seen behaviour for an unpublished dataset nor for an unpublished dataset  version.</p>
+
+
+
+<a name="569703652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569703652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569703652">(Jan 23 2026 at 12:32)</a>:</h4>
+<p>I did not add any files to the dataset though... Your debugging so far may suggest this is related to File IO. (It's always good to confirm this to limit the possibilities where a bug may be hiding.)</p>
+
+
+
+<a name="569704917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569704917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Björn Selent <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569704917">(Jan 23 2026 at 12:38)</a>:</h4>
+<p>Hi, thanks for getting back. We also tried with a fresh install and could not reproduce the error. Importing our db also didn't trigger the bug. We think it might be related to indexing. Here is the output form the payara logs anyways:</p>
+<div class="codehilite"><pre><span></span><code>[2026-01-23T11:47:51.382+0100] [Payara 6.2025.10] [WARNING] [AS-EJB-00056] [jakarta.enterprise.ejb.container] [tid: _ThreadID=102 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1769165271382] [levelValue: 900] [[
+  A system exception occurred during an invocation on EJB PermissionServiceBean, method: public edu.harvard.iq.dataverse.PermissionServiceBean$RequestPermissionQuery edu.harvard.iq.dataverse.PermissionServiceBean.requestOn(edu.harvard.iq.dataverse.engine.command.DataverseRequest,edu.harvard.iq.dataverse.DvObject)]]
+
+[2026-01-23T11:47:51.382+0100] [Payara 6.2025.10] [WARNING] [] [jakarta.enterprise.ejb.container] [tid: _ThreadID=102 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1769165271382] [levelValue: 900] [[
+
+jakarta.ejb.EJBException
+    at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)
+    at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)
+    at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)
+    at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)
+    at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)
+    at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)
+    at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)
+    at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)
+    at jdk.proxy71/jdk.proxy71.$Proxy407.requestOn(Unknown Source)
+    at edu.harvard.iq.dataverse.__EJB31_Generated__PermissionServiceBean__Intf____Bean__.requestOn(Unknown Source)
+    at edu.harvard.iq.dataverse.PermissionsWrapper.doesSessionUserHaveDataSetPermission(PermissionsWrapper.java:191)
+    at edu.harvard.iq.dataverse.PermissionsWrapper.canViewUnpublishedDataset(PermissionsWrapper.java:154)
+    at edu.harvard.iq.dataverse.PermissionsWrapper$Proxy$_$$_WeldClientProxy.canViewUnpublishedDataset(Unknown Source)
+    at edu.harvard.iq.dataverse.search.SearchIncludeFragment.canSeeCurationStatus(SearchIncludeFragment.java:1559)
+    at jdk.internal.reflect.GeneratedMethodAccessor816.invoke(Unknown Source)
+    at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+    at jakarta.el.ELUtil.invokeMethod(ELUtil.java:215)
+    at jakarta.el.BeanELResolver.invoke(BeanELResolver.java:487)
+    at jakarta.el.CompositeELResolver.invoke(CompositeELResolver.java:198)
+    at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:298)
+    at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:144)
+    at org.glassfish.expressly.ValueExpressionImpl.getValue(ValueExpressionImpl.java:138)
+    at org.jboss.weld.module.web.el.WeldValueExpression.getValue(WeldValueExpression.java:50)
+    at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:73)
+    at jakarta.faces.component.ComponentStateHelper.eval(ComponentStateHelper.java:188)
+    at jakarta.faces.component.UIComponentBase.isRendered(UIComponentBase.java:309)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicRenderer.encodeRecursive(HtmlBasicRenderer.java:250)
+    at com.sun.faces.renderkit.html_basic.PassthroughRenderer.encodeChildren(PassthroughRenderer.java:75)
+    at jakarta.faces.component.UIComponentBase.encodeChildren(UIComponentBase.java:557)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicRenderer.encodeRecursive(HtmlBasicRenderer.java:257)
+    at com.sun.faces.renderkit.html_basic.TableRenderer.renderRow(TableRenderer.java:351)
+    at com.sun.faces.renderkit.html_basic.TableRenderer.encodeChildren(TableRenderer.java:135)
+    at jakarta.faces.component.UIComponentBase.encodeChildren(UIComponentBase.java:557)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicRenderer.encodeRecursive(HtmlBasicRenderer.java:257)
+    at com.sun.faces.renderkit.html_basic.PassthroughRenderer.encodeChildren(PassthroughRenderer.java:75)
+    at jakarta.faces.component.UIComponentBase.encodeChildren(UIComponentBase.java:557)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1435)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at com.sun.faces.application.view.FaceletViewHandlingStrategy.renderView(FaceletViewHandlingStrategy.java:448)
+    at com.sun.faces.application.view.MultiViewHandler.renderView(MultiViewHandler.java:160)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at org.omnifaces.viewhandler.OmniViewHandler.renderView(OmniViewHandler.java:151)
+    at com.sun.faces.lifecycle.RenderResponsePhase.execute(RenderResponsePhase.java:93)
+    at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)
+    at com.sun.faces.lifecycle.LifecycleImpl.render(LifecycleImpl.java:150)
+    at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:692)
+    at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)
+    at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.apache.catalina.core.ApplicationDispatcher.doInvoke(ApplicationDispatcher.java:816)
+    at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:683)
+    at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:527)
+    at org.apache.catalina.core.ApplicationDispatcher.doDispatch(ApplicationDispatcher.java:497)
+    at org.apache.catalina.core.ApplicationDispatcher.dispatch(ApplicationDispatcher.java:379)
+    at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:329)
+    at org.ocpsoft.rewrite.servlet.impl.HttpRewriteResultHandler.handleResult(HttpRewriteResultHandler.java:42)
+    at org.ocpsoft.rewrite.servlet.RewriteFilter.rewrite(RewriteFilter.java:297)
+    at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:198)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at edu.harvard.iq.dataverse.filter.CorsFilter.doFilter(CorsFilter.java:89)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)
+    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:166)
+    at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)
+    at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)
+    at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)
+    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)
+    at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:372)
+    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)
+    at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)
+    at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)
+    at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:174)
+    at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:153)
+    at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:196)
+    at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:88)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:178)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:118)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:96)
+    at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:51)
+    at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:510)
+    at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:82)
+    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)
+    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)
+    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)
+    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)
+    at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.NullPointerException
+``
+</code></pre></div>
+
+
+
+<a name="569706869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569706869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569706869">(Jan 23 2026 at 12:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="652614">@Björn Selent</span> if you don't min - would you wrap your log output in a code block? (Three "`" ) Thanks!</p>
+
+
+
+<a name="569707029"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569707029" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569707029">(Jan 23 2026 at 12:49)</a>:</h4>
+<p>Hmm:</p>
+<p><code>Caused by: java.lang.NullPointerException</code></p>
+<p>What's null?</p>
+
+
+
+<a name="569707185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569707185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569707185">(Jan 23 2026 at 12:50)</a>:</h4>
+<p><code>edu.harvard.iq.dataverse.search.SearchIncludeFragment.canSeeCurationStatus(SearchIncludeFragment.java:1559)</code> is:</p>
+<div class="codehilite" data-code-language="Java"><pre><span></span><code><span class="k">return</span><span class="w"> </span><span class="n">permissionsWrapper</span><span class="p">.</span><span class="na">canViewUnpublishedDataset</span><span class="p">(</span><span class="n">getDataverseRequest</span><span class="p">(),(</span><span class="n">Dataset</span><span class="p">)</span><span class="w"> </span><span class="n">dvObjectService</span><span class="p">.</span><span class="na">findDvObject</span><span class="p">(</span><span class="n">datasetId</span><span class="p">));</span>
+</code></pre></div>
+<p>This would be my next stop for trying to dig deeper.</p>
+
+
+
+<a name="569708235"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569708235" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569708235">(Jan 23 2026 at 12:55)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/blob/v6.9/src/main/java/edu/harvard/iq/dataverse/search/SearchIncludeFragment.java#L1559">https://github.com/IQSS/dataverse/blob/v6.9/src/main/java/edu/harvard/iq/dataverse/search/SearchIncludeFragment.java#L1559</a></p>
+<p><code>return permissionsWrapper.canViewUnpublishedDataset(getDataverseRequest(),(Dataset) dvObjectService.findDvObject(datasetId));</code></p>
+<p>So permissionsWrapper or dvObjectService is null? That would be strange.</p>
+
+
+
+<a name="569708364"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569708364" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569708364">(Jan 23 2026 at 12:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="652614">@Björn Selent</span> if you can replicate the bug on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> please give us detailed steps. I wasn't able to.</p>
+
+
+
+<a name="569709205"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569709205" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Björn Selent <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569709205">(Jan 23 2026 at 13:00)</a>:</h4>
+<p>No, I can't reproduce the bug on <a href="http://demo.dataverse.org">demo.dataverse.org</a>. <br>
+But what I can see and might be related is, that after successful deleting the dataset, it is still shown in the overview until the page is reloaded<br>
+<a href="/user_uploads/53090/UlYa3UUEjS6cKisv_jiJagPW/Screenshot-From-2026-01-23-13-58-26.png">Screenshot AFTER successfully deleting the dataset</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/UlYa3UUEjS6cKisv_jiJagPW/Screenshot-From-2026-01-23-13-58-26.png" title="Screenshot AFTER successfully deleting the dataset"><img data-original-content-type="image/png" data-original-dimensions="1203x443" src="/user_uploads/thumbnail/53090/UlYa3UUEjS6cKisv_jiJagPW/Screenshot-From-2026-01-23-13-58-26.png/840x560.webp"></a></div>
+
+
+
+<a name="569709575"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569709575" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569709575">(Jan 23 2026 at 13:02)</a>:</h4>
+<p>interesting</p>
+
+
+
+<a name="569711206"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569711206" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569711206">(Jan 23 2026 at 13:11)</a>:</h4>
+<p>Yeah, I did recognize that too!</p>
+
+
+
+<a name="569711342"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569711342" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569711342">(Jan 23 2026 at 13:11)</a>:</h4>
+<p>BTW this is also true for a draft dataset version on an already published dataset.</p>
+
+
+
+<a name="569728838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Glitch%20in%20UI%20when%20deleting%20Datasets/near/569728838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Glitch.20in.20UI.20when.20deleting.20Datasets.html#569728838">(Jan 23 2026 at 14:28)</a>:</h4>
+<p>Sounds like two different bugs, potentially. <span aria-label="lady beetle" class="emoji emoji-1f41e" role="img" title="lady beetle">:lady_beetle:</span> <span aria-label="lady beetle" class="emoji emoji-1f41e" role="img" title="lady beetle">:lady_beetle:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,100 @@
+<html>
+<head><meta charset="utf-8"><title>Getting dataset breadcrumbs (containing dataverses) via API · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html">Getting dataset breadcrumbs (containing dataverses) via API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="529045426"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529045426" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Remie Janssen <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529045426">(Jul 16 2025 at 12:14)</a>:</h4>
+<p>Hello!</p>
+<p>I'd like to use the Native API to find the (finest) dataverse that a dataset is contained in. I don't think that information is given in the JSON metadata export, and I couldn't find an endpoint to query directly for this question in the documentation. Have I missed something, or is there no such API function available?</p>
+<p>If there is no simple way, I might have to resort to scraping it from the "breadcrumbs" in the HTML of the web page, but I'd rather not...</p>
+<p>Thanks in advance!</p>
+
+
+
+<a name="529051050"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529051050" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529051050">(Jul 16 2025 at 12:43)</a>:</h4>
+<p>I suspect you'd need to construct this information by retrieving the parent collection information recursively. I'm not aware of any  API endpoint that immediately gives you the information you're looking for.</p>
+
+
+
+<a name="529051276"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529051276" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529051276">(Jul 16 2025 at 12:44)</a>:</h4>
+<p>If you think such an endpoint should be added (it might be relevant for the SPA work), please feel free to create an issue. Ideally propose how you think the JSON for this should look like.</p>
+
+
+
+<a name="529051517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529051517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529051517">(Jul 16 2025 at 12:45)</a>:</h4>
+<p>My 2 cents: essentially, this is a graph, so maybe it should use a knowledge graph representation to also have more metadata available from a single query.</p>
+
+
+
+<a name="529055843"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529055843" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529055843">(Jul 16 2025 at 13:06)</a>:</h4>
+<p>There are breadcrumbs in the new React frontend. <a href="https://github.com/IQSS/dataverse-frontend/pull/297">https://github.com/IQSS/dataverse-frontend/pull/297</a> might be a good place to start looking. I'm sure <span class="user-mention" data-user-id="598447">@Ellen K</span> <span class="user-mention" data-user-id="751566">@Cheng Shi</span> <span class="user-mention" data-user-id="770046">@Germán Saracca</span> or <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> would know more.</p>
+<p>Actually, now I'm seeing returnOwners=true at <a href="https://github.com/IQSS/dataverse/pull/10322">https://github.com/IQSS/dataverse/pull/10322</a> which is probably part of the story.</p>
+
+
+
+<a name="529058589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529058589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529058589">(Jul 16 2025 at 13:20)</a>:</h4>
+<p>Also, from <a href="https://dataverse.nl/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi%3A10.34894/YOMA9L">https://dataverse.nl/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi%3A10.34894/YOMA9L</a> , for example, you can look at "isPartOf":</p>
+<div class="codehilite"><pre><span></span><code>&quot;schema:isPartOf&quot;: {
+  &quot;schema:name&quot;: &quot;UG Faculty of Medical Sciences &amp; UMCG&quot;,
+  &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/RUGFMScUMCG&quot;,
+  &quot;schema:description&quot;: &quot;Faculty of Medical Sciences and UMCG&quot;,
+  &quot;schema:isPartOf&quot;: {
+    &quot;schema:name&quot;: &quot;University of Groningen&quot;,
+    &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/groningen&quot;,
+    &quot;schema:isPartOf&quot;: {
+      &quot;schema:name&quot;: &quot;DataverseNL&quot;,
+      &quot;@id&quot;: &quot;https://dataverse.nl/dataverse/root&quot;,
+      &quot;schema:description&quot;: &quot;&lt;H1&gt;Welcome to DataverseNL&lt;/H1&gt;...&quot;
+    }
+  }
+},
+</code></pre></div>
+
+
+
+<a name="529068553"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529068553" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Germán Saracca <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529068553">(Jul 16 2025 at 14:06)</a>:</h4>
+<p>Hi <span aria-label="wave" class="emoji emoji-1f44b" role="img" title="wave">:wave:</span> , exactly as <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> is saying, returnOwners=true is doing the trick, it will return the <code>isPartOf</code> property. Open this <a href="https://beta.dataverse.org/api/v1/dataverses/a-subcollection?returnOwners=true">URL</a> in the browser and check the <code>isPartOf</code> property.</p>
+
+
+
+<a name="529223171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529223171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Remie Janssen <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529223171">(Jul 17 2025 at 08:00)</a>:</h4>
+<p>Thanks all! </p>
+<p>The returnOwners parameter is exactly what I was looking for! The idea of using a different (or even custom) exporter might also come in handy, but I'm glad it doesn't seem necessary in this case  :)</p>
+
+
+
+<a name="529223583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529223583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529223583">(Jul 17 2025 at 08:03)</a>:</h4>
+<p>I was completely unaware of this new query parameter! Feeds into my argument that our API docs are increasingly unreadable... <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="529280021"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529280021" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529280021">(Jul 17 2025 at 13:31)</a>:</h4>
+<p><code>% grep returnOwners *</code></p>
+<p><code>6.2-release-notes.md:The API endpoints for getting datasets, Dataverse collections, and datafiles have been extended to support the following optional 'returnOwners' query parameter.</code></p>
+
+
+
+<a name="529280291"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Getting%20dataset%20breadcrumbs%20%28containing%20dataverses%29%20via%20API/near/529280291" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Getting.20dataset.20breadcrumbs.20.28containing.20dataverses.29.20via.20API.html#529280291">(Jul 17 2025 at 13:32)</a>:</h4>
+<p>But yeah, I hear you. Please feel free to kick off a topic in <a class="stream" data-stream-id="446770" href="/#narrow/channel/446770-docs">#docs</a> about the API Guide!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

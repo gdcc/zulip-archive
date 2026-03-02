@@ -1,0 +1,104 @@
+<html>
+<head><meta charset="utf-8"><title>dvuploader and double-zipped files · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html">dvuploader and double-zipped files</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="508380134"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508380134" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508380134">(Mar 26 2025 at 21:23)</a>:</h4>
+<p>i've been starting to use python-dvuploader's cli  for most of our uploads, and i'm running into an issue for zip files that have been "double-zipped" to workaround cases where a zip file in the data set contains more files than the dataverse limit. the upload seems to succeed, but results in an error like <code>ValueError: ('File DXXFAM.zip.zip not found in Dataverse repository.', 'This may be due to the file not being uploaded to the repository:')</code>.</p>
+<p>i'm guessing this is fine, as the unpacked double-zipped files contents are actually there. any suggestions about what the error handling logic might be here?</p>
+
+
+
+<a name="508608286"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508608286" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508608286">(Mar 27 2025 at 20:05)</a>:</h4>
+<p><span class="user-mention" data-user-id="735407">@María A. Matienzo</span> Thanks for the feedback! The issue likely stems from the postponed metadata update. I guess you are using the non-S3-upload? </p>
+<p>In this case, all files provided are zipped and uploaded. Due to the zipping, the individual file metadata cannot be passed, and this call updates the metadata for each file. My guess is that is that this is causing the issue.</p>
+<p>I will look into this and replicate it locally. Maybe the double-zipped case is an edge case I need to take care of.</p>
+
+
+
+<a name="508608955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508608955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508608955">(Mar 27 2025 at 20:09)</a>:</h4>
+<p>yes, that's correct - we're still using the native API as opposed to direct upload.</p>
+<p>i'll also note that the error where a zip file is <em>not</em> double-zipped and it contains more than the limit is failing silently with dvuploader, which leads to a retry loop (this is based on testing a rebased version of the branch for the <a href="https://github.com/gdcc/python-dvuploader/pull/24">tabIngest PR</a>).</p>
+
+
+
+<a name="508609276"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508609276" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508609276">(Mar 27 2025 at 20:11)</a>:</h4>
+<p>silent failure in this case means that it's not reported back from dvuploader to the user, despite the API endpoint returning an error.</p>
+
+
+
+<a name="508610076"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508610076" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508610076">(Mar 27 2025 at 20:16)</a>:</h4>
+<p>That's good to know! I was not aware of this. I guess it would make sense to explicitly check for this <a href="https://github.com/gdcc/python-dvuploader/blob/5fee264e7f6fd941cc6f7b0917747298dcb77d66/dvuploader/nativeupload.py#L255-L260">here</a>.</p>
+<p>I am checking for the status through <code>raise_for_status</code>, but it seems like it is not catching the error. Is the status code a different one in this case?</p>
+
+
+
+<a name="508614128"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508614128" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508614128">(Mar 27 2025 at 20:41)</a>:</h4>
+<p>i'm not sure what the HTTP return code for this is coming from Dataverse, but the following message is returned as JSON:</p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;The number of files in the zip archive is over the limit (1000); please upload a zip archive with fewer files, if you want them to be ingested as individual DataFiles.&quot;}
+</code></pre></div>
+
+
+
+<a name="508699254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508699254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508699254">(Mar 28 2025 at 08:52)</a>:</h4>
+<p>Okay, it may have a different status code that <code>httpx</code> does not recognize as an error. Reproducing now and will look into the status code.</p>
+
+
+
+<a name="508704683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508704683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508704683">(Mar 28 2025 at 09:19)</a>:</h4>
+<p>Okay, I got both cases fixed:</p>
+<p>The zip-zip case was related to the update metadata function, which tries to map the local file to the ones at Dataverse. Since the Zip is unpacked and not present in the dataset, this case will be skipped in the update step, since there is nothing to update.</p>
+<p><a href="/user_uploads/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="3680x2244" src="/user_uploads/thumbnail/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png/840x560.webp"></a></div><p>The zip limit case is now handled explicitly as well. It raises a 400 and if that is the case, plus the message matches, the code will raise a ValueError and will stop the upload process. Hence, the retry logic is stopped.</p>
+<p><a href="/user_uploads/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="3680x2244" src="/user_uploads/thumbnail/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png/840x560.webp"></a></div><p>Since these are rather small changes, I would ship it with the tabIngest PR after I have added test cases for this. Thanks again for raising awareness of this <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="508947630"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/508947630" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#508947630">(Mar 29 2025 at 18:40)</a>:</h4>
+<p>thank you! this is great. :)</p>
+
+
+
+<a name="509276658"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/509276658" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#509276658">(Mar 31 2025 at 18:42)</a>:</h4>
+<p>Perfect! I will add these to the PR this week and merge it <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="512543800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/512543800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#512543800">(Apr 16 2025 at 12:43)</a>:</h4>
+<p><span class="user-mention" data-user-id="735407">@María A. Matienzo</span> The new version of python-uploader has just been released <span aria-label="raised hands" class="emoji emoji-1f64c" role="img" title="raised hands">:raised_hands:</span></p>
+<p><a href="https://pypi.org/project/dvuploader/">https://pypi.org/project/dvuploader/</a></p>
+
+
+
+<a name="512548991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/512548991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#512548991">(Apr 16 2025 at 13:07)</a>:</h4>
+<p>Nice, I added it to the <a href="https://docs.google.com/document/d/1peZPI6UQOo37zJ409l_J-yAUsNrn3SF4KxFsEwp3SR0/edit?usp=sharing">upcoming news</a>.</p>
+
+
+
+<a name="512590059"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20and%20double-zipped%20files/near/512590059" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20and.20double-zipped.20files.html#512590059">(Apr 16 2025 at 16:00)</a>:</h4>
+<p>wonderful!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

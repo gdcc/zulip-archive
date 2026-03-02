@@ -1,0 +1,79 @@
+<html>
+<head><meta charset="utf-8"><title>Custom Identifier generation style per provider · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html">Custom Identifier generation style per provider</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="434696625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434696625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Patrick Kibies <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434696625">(Apr 22 2024 at 09:11)</a>:</h4>
+<p>Dear Community, <br>
+I am currently workin on launching tudodata, the Dataverse instance of TU Dortmund University and have some questions. With great pleasure I learned the 6.2 is able to use multiple PID providers, which can be selected on Dataverse Collection level. For some reason outside my scope of decision we need custom PID generation styles per Dataverse collection.</p>
+<p>As  a far as  I understand <a href="https://guides.dataverse.org/en/latest/installation/config.html#dataverse-pid-identifier-generation-style">https://guides.dataverse.org/en/latest/installation/config.html#dataverse-pid-identifier-generation-style</a>  correctly, there still can be just  one  generateIdentifierFromStoredProcedure() in the database, which makes it difficult to adapt the generation styles to pre-existing schemes.</p>
+<p>Is there any solution yet (meaning that I wasn't able to find the correct place in the docs) or is there a plan to add support for multiple database-stored functions?</p>
+<p>Thanks a lot for any info on that matter!</p>
+
+
+
+<a name="434705024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434705024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434705024">(Apr 22 2024 at 09:52)</a>:</h4>
+<p>Nope, that is not yet possible. If you would like to create a feature request, please feel free to do so in our issue tracker!</p>
+
+
+
+<a name="434705273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434705273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434705273">(Apr 22 2024 at 09:53)</a>:</h4>
+<p>In case you would be able to contribute development time, a PR would be welcome. (Please discuss in issue first, also mentioning <code>@qqmyers</code> would help.)</p>
+
+
+
+<a name="434706113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434706113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434706113">(Apr 22 2024 at 09:57)</a>:</h4>
+<p>Relevant code points to look at:</p>
+<ul>
+<li><a href="https://github.com/IQSS/dataverse/blob/516a73fe52b1a70971e69c161d22b6ca11b9cd27/src/main/java/edu/harvard/iq/dataverse/DvObjectServiceBean.java#L392-L396">https://github.com/IQSS/dataverse/blob/516a73fe52b1a70971e69c161d22b6ca11b9cd27/src/main/java/edu/harvard/iq/dataverse/DvObjectServiceBean.java#L392-L396</a></li>
+<li><a href="https://github.com/IQSS/dataverse/blob/516a73fe52b1a70971e69c161d22b6ca11b9cd27/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L411-L425">https://github.com/IQSS/dataverse/blob/516a73fe52b1a70971e69c161d22b6ca11b9cd27/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L411-L425</a></li>
+</ul>
+
+
+
+<a name="434716357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434716357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434716357">(Apr 22 2024 at 10:51)</a>:</h4>
+<p><span class="user-mention" data-user-id="683010">@Patrick Kibies</span> yes, just to reiterate, creating an issue at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> would be a great place to start if you're willing! Good luck with your installation!</p>
+
+
+
+<a name="434719489"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434719489" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Patrick Kibies <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434719489">(Apr 22 2024 at 11:09)</a>:</h4>
+<p>Thanks a lot, I'll find out in how far we're able to contribute development and come up with an issue as the very next step.</p>
+
+
+
+<a name="434755426"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434755426" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434755426">(Apr 22 2024 at 13:51)</a>:</h4>
+<p><span class="user-mention" data-user-id="683010">@Patrick Kibies</span> thanks for creating this issue! Feature Request/Idea: Stored procedure for Identifier generation per PID provider <a href="https://github.com/IQSS/dataverse/issues/10514">#10514</a></p>
+
+
+
+<a name="434755844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/434755844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#434755844">(Apr 22 2024 at 13:52)</a>:</h4>
+<p>I edited it to add a link back here to Zulip. I hope you don't mind.</p>
+
+
+
+<a name="435345514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Custom%20Identifier%20generation%20style%20per%20provider/near/435345514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Patrick Kibies <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider.html#435345514">(Apr 25 2024 at 09:09)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375707-community/topic/Custom.20Identifier.20generation.20style.20per.20provider/near/434755844">schrieb</a>:</p>
+<blockquote>
+<p>I edited it to add a link back here to Zulip. I hope you don't mind.</p>
+</blockquote>
+<p>No, that's absolutely fine and a good idea to reference the discussions in both directions, thx!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,509 @@
+<html>
+<head><meta charset="utf-8"><title>Error when  running &quot;mvn -Pct package docker:run&quot; · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html">Error when  running &quot;mvn -Pct package docker:run&quot;</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="392527871"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392527871" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392527871">(Sep 22 2023 at 14:13)</a>:</h4>
+<p>Hi, </p>
+<p>I'm working on a PR <a href="https://github.com/IQSS/dataverse/issues/9926">https://github.com/IQSS/dataverse/issues/9926</a> and wanted to add and run a test, but I'm having trouble starting my Dataverse locally... When I run <code>mvn -Pct package docker:run</code>, it fails with the following error:</p>
+<p><code>[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-build) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : "The command '/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}' returned a non-zero code: 8"  -&gt; [Help 1]</code></p>
+<p>I have the current <code>develop</code> branch checked out.</p>
+<p>Could someone help me troubleshoot?</p>
+
+
+
+<a name="392528171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392528171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392528171">(Sep 22 2023 at 14:15)</a>:</h4>
+<p>Absolutely. Let me pull the latest from develop (3b7d824) and check.</p>
+
+
+
+<a name="392529057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392529057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392529057">(Sep 22 2023 at 14:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="616555">@Vera Clemens</span> actually, as a sanity check, could you please add "clean"? Like this:</p>
+<div class="codehilite"><pre><span></span><code>mvn -Pct clean package docker:run
+</code></pre></div>
+
+
+
+<a name="392529816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392529816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392529816">(Sep 22 2023 at 14:22)</a>:</h4>
+<p>I worked for me without the "clean". Hmm. I wonder what's different. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="392530028"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392530028" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392530028">(Sep 22 2023 at 14:23)</a>:</h4>
+<p>Something else to try, building just the configbaker image:</p>
+<div class="codehilite"><pre><span></span><code>mvn -Pct docker:build -Ddocker.filter=dev_bootstrap
+</code></pre></div>
+
+
+
+<a name="392530182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392530182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392530182">(Sep 22 2023 at 14:24)</a>:</h4>
+<p>Are you on Mac, Linux or Windows?</p>
+
+
+
+<a name="392530240"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392530240" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392530240">(Sep 22 2023 at 14:24)</a>:</h4>
+<p>I tried running it with <code>clean</code> before, same error. And building the configbaker image results in the same error as well.</p>
+
+
+
+<a name="392530250"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392530250" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392530250">(Sep 22 2023 at 14:24)</a>:</h4>
+<p>I am on Linux</p>
+
+
+
+<a name="392530385"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392530385" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392530385">(Sep 22 2023 at 14:25)</a>:</h4>
+<p>Hmm, if it works for you, it must be some kind of issue with some cache or something on my end?</p>
+
+
+
+<a name="392531090"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392531090" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392531090">(Sep 22 2023 at 14:28)</a>:</h4>
+<p>There's some docker command like system prune that blows away the cache. Not sure if it will help.</p>
+
+
+
+<a name="392531222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392531222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392531222">(Sep 22 2023 at 14:28)</a>:</h4>
+<p>When you try to build just configbaker, is there any more output? Any clues?</p>
+
+
+
+<a name="392532827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392532827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392532827">(Sep 22 2023 at 14:35)</a>:</h4>
+<p>Just ran <code>docker rmi $(docker images -a --filter=dangling=true -q)</code> and <code>docker rm $(docker ps --filter=status=exited --filter=status=created -q)</code> to try and clear any caches (found here: <a href="https://forums.docker.com/t/how-to-delete-cache/5753/2">https://forums.docker.com/t/how-to-delete-cache/5753/2</a>) but no change</p>
+
+
+
+<a name="392532856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392532856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392532856">(Sep 22 2023 at 14:36)</a>:</h4>
+<p>The full output is:</p>
+<div class="codehilite"><pre><span></span><code>~/Documents/dataverse$ mvn -Pct docker:build -Ddocker.filter=dev_bootstrap
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------&lt; edu.harvard.iq:dataverse &gt;----------------------
+[INFO] Building dataverse 6.0
+[INFO] ----------------------------[ docker-build ]----------------------------
+[INFO]
+[INFO] --- docker-maven-plugin:0.43.0:build (default-cli) @ dataverse ---
+[INFO] Reading assembly descriptor: /home/clemens/Documents/dataverse/modules/container-configbaker/assembly.xml
+[INFO] Copying files to /home/clemens/Documents/dataverse/target/docker/gdcc/configbaker/unstable/build/maven
+[INFO] Building tar: /home/clemens/Documents/dataverse/target/docker/gdcc/configbaker/unstable/tmp/docker-build.tar
+[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Created docker-build.tar in 180 milliseconds
+[ERROR] DOCKER&gt; Unable to build image [gdcc/configbaker:unstable] : &quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot;  [&quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot; ]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.375 s
+[INFO] Finished at: 2023-09-22T16:35:24+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-cli) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : &quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot;  -&gt; [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+</code></pre></div>
+
+
+
+<a name="392533403"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392533403" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392533403">(Sep 22 2023 at 14:38)</a>:</h4>
+<p>It's Feierabend time now, thank you for your help so far. Will keep trying on Monday :)</p>
+
+
+
+<a name="392534030"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392534030" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392534030">(Sep 22 2023 at 14:40)</a>:</h4>
+<p>Ha, I've heard of Feierabend but for Monday. Maybe you can edit modules/container-configbaker/Dockerfile and try splitting up the following onto different RUN lines:</p>
+<div class="codehilite"><pre><span></span><code>RUN true &amp;&amp; \
+  # Install necessary software and tools
+  apk add --no-cache ${APK_PACKAGES} &amp;&amp; \
+  # Make our working directories
+  mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}
+</code></pre></div>
+
+
+
+<a name="392534066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392534066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392534066">(Sep 22 2023 at 14:40)</a>:</h4>
+<p>Have a good weekend!</p>
+
+
+
+<a name="392947928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392947928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392947928">(Sep 25 2023 at 08:48)</a>:</h4>
+<p>Hope you had a good weekend as well!</p>
+
+
+
+<a name="392947973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392947973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392947973">(Sep 25 2023 at 08:48)</a>:</h4>
+<p>That narrows it down to:</p>
+<p><code>[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-cli) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : "The command '/bin/sh -c apk add --no-cache ${APK_PACKAGES}' returned a non-zero code: 8"  -&gt; [Help 1]</code></p>
+
+
+
+<a name="392948107"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392948107" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392948107">(Sep 25 2023 at 08:49)</a>:</h4>
+<p>(btw: what is the purpose of the <code>true &amp;&amp;</code>?)</p>
+
+
+
+<a name="392967125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392967125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392967125">(Sep 25 2023 at 10:11)</a>:</h4>
+<p>More clues: I just ran <code>$ docker build . --build-arg SOLR_VERSION=8.3.0</code> in <code>modules/container-configbaker</code> and this is the output:</p>
+<div class="codehilite"><pre><span></span><code>Sending build context to Docker daemon  24.06kB
+Step 1/18 : ARG SOLR_VERSION
+Step 2/18 : FROM solr:${SOLR_VERSION} AS solr
+ ---&gt; 17dcf43eea9e
+Step 3/18 : FROM alpine:3
+ ---&gt; c1aabb73d233
+Step 4/18 : ENV SCRIPT_DIR=&quot;/scripts&quot;     SECRETS_DIR=&quot;/secrets&quot;     SOLR_TEMPLATE=&quot;/template&quot;
+ ---&gt; Using cache
+ ---&gt; 45d9286c2a05
+Step 5/18 : ENV PATH=&quot;${PATH}:${SCRIPT_DIR}&quot;     BOOTSTRAP_DIR=&quot;${SCRIPT_DIR}/bootstrap&quot;
+ ---&gt; Using cache
+ ---&gt; 36e58a2ed9a8
+Step 6/18 : ARG APK_PACKAGES=&quot;curl bind-tools netcat-openbsd jq bash dumb-init wait4x ed&quot;
+ ---&gt; Using cache
+ ---&gt; 4a2b261b3f13
+Step 7/18 : RUN true
+ ---&gt; Using cache
+ ---&gt; 625bfdb14a4d
+Step 8/18 : RUN apk add --no-cache ${APK_PACKAGES}
+ ---&gt; Running in fd628057a6d8
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/main/x86_64/APKINDEX.tar.gz
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.18/main: temporary error (try again later)
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/community/x86_64/APKINDEX.tar.gz
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.18/community: temporary error (try again later)
+ERROR: unable to select packages:
+  bash (no such package):
+    required by: world[bash]
+  bind-tools (no such package):
+    required by: world[bind-tools]
+  curl (no such package):
+    required by: world[curl]
+  dumb-init (no such package):
+    required by: world[dumb-init]
+  ed (no such package):
+    required by: world[ed]
+  jq (no such package):
+    required by: world[jq]
+  netcat-openbsd (no such package):
+    required by: world[netcat-openbsd]
+  wait4x (no such package):
+    required by: world[wait4x]
+The command &#39;/bin/sh -c apk add --no-cache ${APK_PACKAGES}&#39; returned a non-zero code: 8
+</code></pre></div>
+
+
+
+<a name="392967411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392967411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392967411">(Sep 25 2023 at 10:12)</a>:</h4>
+<p>I ran the <code>docker build</code> command again with <code>--network host</code> and the installation no longer failed. So, there seems to be some network connectivity issue during the <code>mvn docker:build</code>...</p>
+
+
+
+<a name="392976476"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/392976476" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#392976476">(Sep 25 2023 at 11:01)</a>:</h4>
+<p>Success: <code>$ DOCKER_HOST=unix:///var/run/docker.sock mvn -Pct clean package docker:run</code> fixed the problem. But still the Dataverse doesn't start:</p>
+<div class="codehilite"><pre><span></span><code>dev_bootstrap&gt; 2023-09-25T10:27:06Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:06Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:14Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:14Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:22Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:22Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:30Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:30Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:38Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:38Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:46Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:46Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:27:54Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:27:54Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:02Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:02Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:10Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:10Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:18Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:18Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:26Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:26Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:34Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:34Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:42Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:42Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:50Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:50Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:28:58Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:28:58Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; 2023-09-25T10:29:06Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2023-09-25T10:29:06Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200
+dev_bootstrap&gt; Error: context deadline exceeded
+</code></pre></div>
+
+
+
+<a name="393003445"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393003445" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393003445">(Sep 25 2023 at 12:47)</a>:</h4>
+<p>What if you increase the timeout from 3m in modules/container-configbaker/scripts/bootstrap.sh?</p>
+
+
+
+<a name="393004350"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393004350" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393004350">(Sep 25 2023 at 12:51)</a>:</h4>
+<p>Also, <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> probably has some ideas. And can probably explain why he added the "true" you mentioned. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span> I found this: <a href="https://stackoverflow.com/questions/73301757/run-true-in-dockerfile">https://stackoverflow.com/questions/73301757/run-true-in-dockerfile</a></p>
+
+
+
+<a name="393008906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393008906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393008906">(Sep 25 2023 at 13:08)</a>:</h4>
+<p>Trying with an increased timeout right now... But after looking more closely at the log, I think this may be the problem:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt; [#|2023-09-25T10:27:00.705+0000|SEVERE|Payara 5.2022.4|javax.enterprise.system.core|_ThreadID=46;_ThreadName=RunLevelControllerThread-1695637590671;_TimeMillis=1695637620705;_LevelValue=1000;|
+dev_dataverse&gt;   Exception while loading the app|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2023-09-25T10:27:00.729+0000|SEVERE|Payara 5.2022.4|javax.enterprise.system.core|_ThreadID=46;_ThreadName=RunLevelControllerThread-1695637590671;_TimeMillis=1695637620729;_LevelValue=1000;|
+dev_dataverse&gt;   Exception while loading the app : Class edu.harvard.iq.dataverse.settings.spi.AliasConfigSourceProvider has unsupported major or minor version numbers, which are greater than those found in the Java Runtime Environment version 11.0.18|#]
+</code></pre></div>
+
+
+
+<a name="393009725"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393009725" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393009725">(Sep 25 2023 at 13:11)</a>:</h4>
+<p>I see, interesting :) (about the <code>true</code>)</p>
+
+
+
+<a name="393012274"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393012274" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393012274">(Sep 25 2023 at 13:22)</a>:</h4>
+<p><span class="user-mention" data-user-id="616555">@Vera Clemens</span> are you running on Java 17? It sure doesn't look like...</p>
+
+
+
+<a name="393014899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393014899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393014899">(Sep 25 2023 at 13:32)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> hmm maybe not, I ran <code>update-java-alternatives</code> to switch in case I wasn't, now <code>java -version</code> prints "openjdk version "17.0.8.1" 2023-08-24", but the above error remains the same</p>
+
+
+
+<a name="393015152"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393015152" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393015152">(Sep 25 2023 at 13:33)</a>:</h4>
+<p>Sorry, I know very little about Java <span aria-label="face in clouds" class="emoji emoji-1f636-200d-1f32b" role="img" title="face in clouds">:face_in_clouds:</span></p>
+
+
+
+<a name="393015475"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393015475" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393015475">(Sep 25 2023 at 13:34)</a>:</h4>
+<p>Shouldn't the version of Java used be set by the Dockerfiles somehow? The one used inside the container at least? Not sure why the error message says something about Java version 11</p>
+
+
+
+<a name="393020680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393020680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393020680">(Sep 25 2023 at 13:55)</a>:</h4>
+<p>You are definitely not using an up to date base image - I see Payara 5.2022.4 in there and Java 11. So if you compile with 17, you'll be in trouble.</p>
+
+
+
+<a name="393020734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393020734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393020734">(Sep 25 2023 at 13:55)</a>:</h4>
+<p>Please go ahead and re-pull the base image from the hub</p>
+
+
+
+<a name="393169520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393169520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393169520">(Sep 26 2023 at 06:23)</a>:</h4>
+<p>Ahh I see, thanks!</p>
+
+
+
+<a name="393169626"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393169626" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393169626">(Sep 26 2023 at 06:24)</a>:</h4>
+<p>That is looking better but still not loading. Here's the error messages I see now:</p>
+<p>SOLR:</p>
+<div class="codehilite"><pre><span></span><code>dev_solr&gt; 2023-09-26 06:18:56.818 ERROR (coreContainerWorkExecutor-2-thread-1) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup =&gt; java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Unable to create core [collection1]
+</code></pre></div>
+<p>Flyway:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt; [#|2023-09-26T06:19:54.148+0000|SEVERE|Payara 6.2023.8|javax.enterprise.system.core|_ThreadID=50;_ThreadName=RunLevelControllerThread-1695709140312;_TimeMillis=1695709194148;_LevelValue=1000;|
+dev_dataverse&gt;   Exception while loading the app : jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator
+dev_dataverse&gt; jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator
+...
+dev_dataverse&gt; Caused by: org.flywaydb.core.api.exception.FlywayValidateException: Validate failed: Migrations have failed validation
+dev_dataverse&gt; Detected resolved migration not applied to database: 5.13.0.1.
+dev_dataverse&gt; To ignore this migration, set -ignoreMigrationPatterns=&#39;*:ignored&#39;. To allow executing this migration, set -outOfOrder=true.
+dev_dataverse&gt; Detected resolved migration not applied to database: 5.13.0.2.
+dev_dataverse&gt; To ignore this migration, set -ignoreMigrationPatterns=&#39;*:ignored&#39;. To allow executing this migration, set -outOfOrder=true.
+dev_dataverse&gt; Need more flexibility with validation rules? Learn more: https://rd.gt/3AbJUZE
+...
+dev__dataverse&gt; [#|2023-09-26T06:19:54.155+0000|WARNING|Payara 6.2023.8|fish.payara.boot.runtime.BootCommand|_ThreadID=50;_ThreadName=RunLevelControllerThread-1695709140312;_TimeMillis=1695709194155;_LevelValue=900;|
+dev_dataverse&gt;   Boot Command deploy failed PlainTextActionReporterFAILUREDescription: deploy AdminCommandError occurred during deployment: Exception while loading the app : jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator. Please see server.log for more details.
+dev_dataverse&gt;     [name=dataverse
+dev_dataverse&gt;
+dev_dataverse&gt;
+dev_dataverse&gt; PER01003: Deployment encountered SQL Exceptions:
+dev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE TABLE EXTERNALTOOLTYPE (ID  SERIAL NOT NULL, TYPE VARCHAR(255) NOT NULL, EXTERNALTOOL_ID BIGINT NOT NULL, PRIMARY KEY (ID))&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;externaltooltype&quot; already exists
+dev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE INDEX INDEX_EXTERNALTOOLTYPE_externaltool_id ON EXTERNALTOOLTYPE (externaltool_id)&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;index_externaltooltype_externaltool_id&quot; already exists
+dev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE TABLE DATAVERSETHEME (ID  SERIAL NOT NULL, BACKGROUNDCOLOR VARCHAR(255), LINKCOLOR VARCHAR(255), LINKURL VARCHAR(255), LOGO VARCHAR(255), LOGOALIGNMENT VARCHAR(255), LOGOBACKGROUNDCOLOR VARCHAR(255), LOGOFOOTER VARCHAR(255), LOGOFOOTERALIGNMENT INTEGER, LOGOFOOTERBACKGROUNDCOLOR VARCHAR(255), LOGOFORMAT VARCHAR(255), TAGLINE VARCHAR(255), TEXTCOLOR VARCHAR(255), dataverse_id BIGINT, PRIMARY KEY (ID))&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;dataversetheme&quot; already exists
+dev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE INDEX INDEX_DATAVERSETHEME_dataverse_id ON DATAVERSETHEME (dataverse_id)&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;index_dataversetheme_dataverse_id&quot; already exists
+...
+</code></pre></div>
+
+
+
+<a name="393171018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393171018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393171018">(Sep 26 2023 at 06:36)</a>:</h4>
+<p>OK, fixed those errors with <code>sudo rm -r docker-dev-volumes</code>, now it's running :) I ran <code>docker volume prune</code> before, which somehow didn't do the trick... Thanks a lot for your help!</p>
+
+
+
+<a name="393176412"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393176412" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393176412">(Sep 26 2023 at 07:20)</a>:</h4>
+<p>PR is posted <span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span> <a href="https://github.com/IQSS/dataverse/pull/9956">https://github.com/IQSS/dataverse/pull/9956</a></p>
+
+
+
+<a name="393212686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393212686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393212686">(Sep 26 2023 at 11:22)</a>:</h4>
+<p>Fantastic! Thanks for sticking with it!</p>
+
+
+
+<a name="393212772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393212772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393212772">(Sep 26 2023 at 11:22)</a>:</h4>
+<p>So what were the biggest problems getting the dev environment up? Not having the required version of Java? Anything else?</p>
+
+
+
+<a name="393212857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393212857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393212857">(Sep 26 2023 at 11:23)</a>:</h4>
+<p>You also needed this, which I don't seem to need on Mac:</p>
+<div class="codehilite"><pre><span></span><code>DOCKER_HOST=unix:///var/run/docker.sock mvn
+</code></pre></div>
+
+
+
+<a name="393213871"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393213871" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393213871">(Sep 26 2023 at 11:30)</a>:</h4>
+<p>Yes, I think in summary the fixes to my issues were 1. setting the DOCKER_HOST (otherwise the <code>apk add</code> in the Dockerfile fails due to no network connectivity), 2. pulling the most current version of the base image, and 3. removing the old postgres data in <code>docker-dev-volumes</code> (I assume those were leftovers from a dev environment I had running month(s) ago).</p>
+
+
+
+<a name="393214287"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393214287" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393214287">(Sep 26 2023 at 11:33)</a>:</h4>
+<p>Oh, interesting, did you have a base image saved from a few weeks (or months) ago? Before we released Dataverse 6.0 (which uses Payara 6 in the base image).</p>
+
+
+
+<a name="393214389"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393214389" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393214389">(Sep 26 2023 at 11:34)</a>:</h4>
+<p>Yes, pretty sure I did.</p>
+
+
+
+<a name="393214721"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393214721" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393214721">(Sep 26 2023 at 11:36)</a>:</h4>
+<p>Ok. Any thoughts on how to document this? Maybe right after the quickstart at <a href="https://guides.dataverse.org/en/6.0/developers/dev-environment.html">https://guides.dataverse.org/en/6.0/developers/dev-environment.html</a> we could say "If you have any trouble, please see the troubleshooting section."</p>
+<p>And "troubleshooting" would be a link, of course.</p>
+
+
+
+<a name="393218201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393218201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393218201">(Sep 26 2023 at 11:58)</a>:</h4>
+<p>Hmm, I just re-checked whether the DOCKER_HOST actually fixed the network issue and apparently not. It was something else.</p>
+<p>I noticed because I reverted the change of splitting the RUN command into three RUNs, and the network error re-occured even with the DOCKER_HOST set.</p>
+<p>I guess it only appeared as if setting the DOCKER_HOST fixed the issue because the real fix allowed the result of the <code>apk add</code> to be cached.</p>
+<p>Here's what the real fix was: running <code>docker build modules/container-configbaker/ --build-arg SOLR_VERSION=8.3.0 --network host</code>, then re-running the <code>mvn</code> command.</p>
+<p>Tbh this seems kind of hacky to me. <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> do you have an idea how this network issue should be properly fixed?</p>
+
+
+
+<a name="393218669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393218669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393218669">(Sep 26 2023 at 12:00)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22/near/393214721">said</a>:</p>
+<blockquote>
+<p>Ok. Any thoughts on how to document this? Maybe right after the quickstart at <a href="https://guides.dataverse.org/en/6.0/developers/dev-environment.html">https://guides.dataverse.org/en/6.0/developers/dev-environment.html</a> we could say "If you have any trouble, please see the troubleshooting section."</p>
+<p>And "troubleshooting" would be a link, of course.</p>
+</blockquote>
+<p>That sounds good. <span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span> Once we have the above thing properly figured out I can try and draft something and submit it as a PR if you'd like</p>
+
+
+
+<a name="393223157"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393223157" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393223157">(Sep 26 2023 at 12:30)</a>:</h4>
+<p>Adding <code>&lt;network&gt;host&lt;/network&gt;</code> to the dev_bootstrap image in pom.xml (see <a href="https://dmp.fabric8.io/#build-configuration">https://dmp.fabric8.io/#build-configuration</a>) fixes the issue for me, but not sure if that breaks anything for anybody else...</p>
+
+
+
+<a name="393236864"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393236864" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393236864">(Sep 26 2023 at 13:45)</a>:</h4>
+<p>To me, all of this sounds like some local specialty in your Docker setup interfering with the build. Something like the host mode for network is really weird. Are you doing this on Win, Linux or Mac?</p>
+
+
+
+<a name="393237032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393237032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393237032">(Sep 26 2023 at 13:46)</a>:</h4>
+<p>Linux (I already asked).</p>
+
+
+
+<a name="393237115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393237115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393237115">(Sep 26 2023 at 13:46)</a>:</h4>
+<p>Maybe we should say, "If you have any trouble, come tell us in <a href="http://chat.dataverse.org">chat.dataverse.org</a>!" <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="393238182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393238182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393238182">(Sep 26 2023 at 13:51)</a>:</h4>
+<p>I'm on Linux as well and don't need any of these specials. Today I did have a problem with my Docker not being able to pull images when coming from Maven, but was when doing it via CLI</p>
+
+
+
+<a name="393238308"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393238308" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393238308">(Sep 26 2023 at 13:52)</a>:</h4>
+<p>Solution was to restart the Docker daemon - looks like the DNS server was cached and could not be reached any longer.</p>
+
+
+
+<a name="393244251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/393244251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#393244251">(Sep 26 2023 at 14:18)</a>:</h4>
+<p>Yes. Linux inside a VM though, maybe that changes things</p>
+
+
+
+<a name="397726355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/397726355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#397726355">(Oct 20 2023 at 14:50)</a>:</h4>
+<p>Related: mvn -Pct clean package docker:run error <a href="https://github.com/IQSS/dataverse/issues/10011">#10011</a></p>
+
+
+
+<a name="399047293"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/399047293" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#399047293">(Oct 28 2023 at 12:41)</a>:</h4>
+<p>I just got the same error. I tried the docker install like 4 month ago and so I had old base images. After removing and reloading the images, now it works.</p>
+<p>I wonder if there maybe a way for the docker:run target to check whether the currently available base image is compatible with the rest of the build (Java version, Dataverse version, etc)?</p>
+
+
+
+<a name="399303744"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Error%20when%20%20running%20%22mvn%20-Pct%20package%20docker%3Arun%22/near/399303744" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22.html#399303744">(Oct 30 2023 at 13:40)</a>:</h4>
+<p>Hmm, I'm reminded of this PR by <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span>  feat(ct): add labels with service dependency versions to images <a href="https://github.com/IQSS/dataverse/issues/9930">#9930</a> </p>
+<p>Not sure if it would help or not but the app image now at least knows what versions of PostgreSQL and Solr it need.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

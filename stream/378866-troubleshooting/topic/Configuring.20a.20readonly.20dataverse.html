@@ -1,0 +1,82 @@
+<html>
+<head><meta charset="utf-8"><title>Configuring a readonly dataverse · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html">Configuring a readonly dataverse</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="509674917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509674917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eva Roddeck <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509674917">(Apr 02 2025 at 11:53)</a>:</h4>
+<p>Hi everyone,</p>
+<p>I hope this is the right channel, as I'm not troubleshooting per se, but looking for advice with a requirement.<br>
+We are running a dataverse instance in version v5.13. The research project whose data is stored in the dataverse is coming to an end. So we want to keep our users from uploading new data from a specific point in time forward. But the instance should be preserved in its current state. We would also like to preserve<br>
+user permissions and groups. Access and download of datasets should still be possible for all users.</p>
+<p>Is there a way to make that feasible?</p>
+<p>I thought of:</p>
+<ul>
+<li>setting file upload size to 0KB (couldn't find a way to do that)</li>
+<li>setting storage quotas (feature not available in current version)</li>
+<li>setting the whole dataverse into a readonly state somehow</li>
+</ul>
+<p>Is any of that possible in our used dataverse version, or can anyone think of a way to deactivate file upload without messing with the user permissions?</p>
+<p>Thank you<br>
+Eva</p>
+
+
+
+<a name="509691952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509691952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509691952">(Apr 02 2025 at 13:03)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="699903">@Eva Roddeck</span> ,<br>
+  I don't know a clean way of doing it. But perhaps you could:</p>
+<ul>
+<li>Put a warning next to the username (changing a little bit the code) warning that the system is read-only.</li>
+<li>
+<p>Remove the edit / save dataset and dataverse buttons  (changing a little bit the code).<br>
+To have more security and avoid modifications using the API:</p>
+</li>
+<li>
+<p>Make the directory or file system where the files are stored read-only.</p>
+</li>
+<li>Changing the pid configuration in the domain.xml configuration file to avoid changes in the pid provider (doi, handle, ....) with wrong urls/users/passwords.</li>
+</ul>
+
+
+
+<a name="509697352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509697352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509697352">(Apr 02 2025 at 13:24)</a>:</h4>
+<p>The tricky thing is that you want to preserve permissions. I say this because there's a handy "remove all roles" button in the "manage users" section of the superuser dashboard. <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="509701806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509701806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eva Roddeck <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509701806">(Apr 02 2025 at 13:43)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin ☀️</span> <a href="#narrow/channel/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse/near/509697352">schrieb</a>:</p>
+<blockquote>
+<p>The tricky thing is that you want to preserve permissions. I say this because there's a handy "remove all roles" button in the "manage users" section of the superuser dashboard. <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+</blockquote>
+<p>Yes, this is our plan B, in case it is not possible :) I wouldn't go as far as changing the code of our application.</p>
+
+
+
+<a name="509702506"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509702506" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509702506">(Apr 02 2025 at 13:46)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="699903">Eva Roddeck</span> <a href="#narrow/channel/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse/near/509674917">said</a>:</p>
+<blockquote>
+<p>setting file upload size to 0KB (couldn't find a way to do that)</p>
+</blockquote>
+<p>This should help: <a href="https://guides.dataverse.org/en/5.13/installation/config.html#maxfileuploadsizeinbytes">https://guides.dataverse.org/en/5.13/installation/config.html#maxfileuploadsizeinbytes</a></p>
+
+
+
+<a name="509703124"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Configuring%20a%20readonly%20dataverse/near/509703124" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eva Roddeck <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Configuring.20a.20readonly.20dataverse.html#509703124">(Apr 02 2025 at 13:48)</a>:</h4>
+<p>Thanks, I must have missed that, this setting should work!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

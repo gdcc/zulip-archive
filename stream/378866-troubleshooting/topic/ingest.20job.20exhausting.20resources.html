@@ -1,0 +1,181 @@
+<html>
+<head><meta charset="utf-8"><title>ingest job exhausting resources · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html">ingest job exhausting resources</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="506987789"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/506987789" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#506987789">(Mar 20 2025 at 14:23)</a>:</h4>
+<p>Hi there. We have an ingest job that is exhausting all our resources. We have run the imqcmd purge command to try to clear the job, but it will not clear for some reason. Are there any other steps we can take to clear the job?</p>
+
+
+
+<a name="506994856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/506994856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#506994856">(Mar 20 2025 at 14:47)</a>:</h4>
+<p>it was my understanding that I could purge the job queue, but not running jobs - I just had to wait.</p>
+
+
+
+<a name="507003612"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507003612" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507003612">(Mar 20 2025 at 15:20)</a>:</h4>
+<p>A number of installations preempt this problem by setting <a href="https://guides.dataverse.org/en/latest/installation/config.html#tabularingestsizelimit">https://guides.dataverse.org/en/latest/installation/config.html#tabularingestsizelimit</a> to some fraction of your Payara JVM heap setting. Leonid has said that R formats in particular can consume up to 10x the file size in memory during ingest.</p>
+
+
+
+<a name="507004000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507004000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507004000">(Mar 20 2025 at 15:22)</a>:</h4>
+<p>That's very helpful <span class="user-mention" data-user-id="626369">@Don Sizemore</span> I'll try that once this job finishes.</p>
+
+
+
+<a name="507021909"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507021909" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507021909">(Mar 20 2025 at 16:29)</a>:</h4>
+<p>Is it possible to separate out the ingest process onto another machine? Has anyone else done that? We're thinking of using a worker job on another machine whose only job would be to process ingest jobs.</p>
+
+
+
+<a name="507022217"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507022217" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507022217">(Mar 20 2025 at 16:30)</a>:</h4>
+<p>There is a proposal to do exactly that but I don't think the work has been planned / picked up yet.</p>
+
+
+
+<a name="507024012"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507024012" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507024012">(Mar 20 2025 at 16:36)</a>:</h4>
+<p>Yeah. Here's a related issue: Ingest Modularity/Improvements <a href="https://github.com/IQSS/dataverse/issues/7852">#7852</a></p>
+
+
+
+<a name="507036374"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507036374" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507036374">(Mar 20 2025 at 17:30)</a>:</h4>
+<p>Is there a way to know if this particular job is actually making progress? How can we monitor it and know when it's done?</p>
+
+
+
+<a name="507040949"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507040949" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507040949">(Mar 20 2025 at 17:51)</a>:</h4>
+<p>Is it feasible (and safe) to run two active Dataverse instances on different VMs, but using the same database, filesystem, etc.? We're wondering if, in that setup, we could load balance ingestion requests to one of the DV instances and web requests to the other. If it's possible without risking data corruption, that would eliminate the problem of ingestion interfering with web users.</p>
+
+
+
+<a name="507045716"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507045716" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507045716">(Mar 20 2025 at 18:16)</a>:</h4>
+<p>That's what <a href="https://github.com/IQSS/dataverse.harvard.edu/issues/111">https://github.com/IQSS/dataverse.harvard.edu/issues/111</a> is about, setting up a dedicated ingest server for Harvard Dataverse. We haven't done it though, and that issue is quite old at this point.</p>
+
+
+
+<a name="507045862"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507045862" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507045862">(Mar 20 2025 at 18:17)</a>:</h4>
+<p>Harvard runs with a dual-application-node setup and has for some time: <a href="https://guides.dataverse.org/en/latest/installation/prep.html">https://guides.dataverse.org/en/latest/installation/prep.html</a> though there were I think two concurrency problems in the database over the years.</p>
+
+
+
+<a name="507045870"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507045870" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507045870">(Mar 20 2025 at 18:17)</a>:</h4>
+<p>It is possible and I dare say safe to run multiple app servers pointed at the same database. We do this for Harvard Dataverse (two app servers) but you'll want to keep in mind the caveats at <a href="https://guides.dataverse.org/en/6.6/installation/advanced.html#multiple-app-servers">https://guides.dataverse.org/en/6.6/installation/advanced.html#multiple-app-servers</a></p>
+
+
+
+<a name="507046890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507046890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507046890">(Mar 20 2025 at 18:23)</a>:</h4>
+<p>Thanks! What about the question of monitoring the ingest job. Is there a way to observe it's progress? We just want to make sure that it is in fact making progress.</p>
+
+
+
+<a name="507048891"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507048891" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507048891">(Mar 20 2025 at 18:34)</a>:</h4>
+<p>Hmm, nothing at <a href="https://guides.dataverse.org/en/6.6/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources">https://guides.dataverse.org/en/6.6/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources</a></p>
+
+
+
+<a name="507048931"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507048931" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507048931">(Mar 20 2025 at 18:34)</a>:</h4>
+<p>I assume that's where you found the <code>imqcmd</code> command.</p>
+
+
+
+<a name="507049611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507049611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507049611">(Mar 20 2025 at 18:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="674237">@Jay Sundu</span> if you're running Linux and have <code>strace</code> installed, you can watch the system calls made by the sub-process handling ingest. In my case I could see it reading and seeking, and just let it finish.</p>
+
+
+
+<a name="507050037"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507050037" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507050037">(Mar 20 2025 at 18:40)</a>:</h4>
+<p>IIRC you can find the subprocess in <code>top</code> by pressing <code>H</code>? then <code>strace -p pid</code></p>
+
+
+
+<a name="507050186"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507050186" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507050186">(Mar 20 2025 at 18:40)</a>:</h4>
+<p>Stopping and starting Payara will only slow things down, as Payara will maintain job state and pick up where it left off once you start it back up.</p>
+
+
+
+<a name="507063196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507063196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507063196">(Mar 20 2025 at 19:54)</a>:</h4>
+<p>FYI, our long running job just finished and I've put in place the TabularIngestSizeLimit so hopefully that'll give us some safety but we're still looking at perhaps setting up another instance to offload the ingest process. Thanks for all your help!</p>
+
+
+
+<a name="507065934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507065934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507065934">(Mar 20 2025 at 20:11)</a>:</h4>
+<p>Phew! How long did it take?</p>
+
+
+
+<a name="507074351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507074351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507074351">(Mar 20 2025 at 21:02)</a>:</h4>
+<p>About twenty hours.</p>
+
+
+
+<a name="507074464"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507074464" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507074464">(Mar 20 2025 at 21:03)</a>:</h4>
+<p>Wow, what kind of file was it?</p>
+
+
+
+<a name="507074897"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507074897" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507074897">(Mar 20 2025 at 21:05)</a>:</h4>
+<p>There were six 3-5GB files with TXT and CSV. I haven't seen them myself yet just was told by the person who did the uploading what they were.</p>
+
+
+
+<a name="507075264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507075264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507075264">(Mar 20 2025 at 21:07)</a>:</h4>
+<p>now THAT's gonna be some variable-level metadata!</p>
+
+
+
+<a name="507075400"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507075400" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507075400">(Mar 20 2025 at 21:07)</a>:</h4>
+<p>Interesting. Was ingest successful?</p>
+
+
+
+<a name="507083517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507083517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507083517">(Mar 20 2025 at 22:02)</a>:</h4>
+<p>Apparently the publish is still in progress</p>
+
+
+
+<a name="507253587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507253587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507253587">(Mar 21 2025 at 11:33)</a>:</h4>
+<p><span class="user-mention" data-user-id="674237">@Jay Sundu</span> Dataverse will verify checksums on dataset publication; on larger files this can take some time depending on your datastore type. There is a maximum setting for that as well, but I haven't yet implemented it.</p>
+
+
+
+<a name="507261903"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/ingest%20job%20exhausting%20resources/near/507261903" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/ingest.20job.20exhausting.20resources.html#507261903">(Mar 21 2025 at 12:14)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/6.6/installation/config.html#datasetchecksumvalidationsizelimit">https://guides.dataverse.org/en/6.6/installation/config.html#datasetchecksumvalidationsizelimit</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

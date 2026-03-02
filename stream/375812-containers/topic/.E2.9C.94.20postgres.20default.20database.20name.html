@@ -1,0 +1,79 @@
+<html>
+<head><meta charset="utf-8"><title>✔ postgres default database name · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html">✔ postgres default database name</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="406633592"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/406633592" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#406633592">(Dec 07 2023 at 22:48)</a>:</h4>
+<p>I'm trying to setup a test database environment for Docker and noticed that the database name is <code>dataverse</code>.  I guess for the development environment is doesn't matter but I see lots of instances of <code>dvndb</code> as a database name in the main repository code. I'm just curious where this database name gets set for containers?</p>
+
+
+
+<a name="406758403"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/406758403" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#406758403">(Dec 08 2023 at 13:26)</a>:</h4>
+<p>I think it comes from here: <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/resources/META-INF/microprofile-config.properties#L35">https://github.com/IQSS/dataverse/blob/develop/src/main/resources/META-INF/microprofile-config.properties#L35</a></p>
+
+
+
+<a name="406771495"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/406771495" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#406771495">(Dec 08 2023 at 14:34)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="670990">kuhlaid</span> has marked this topic as resolved.</p>
+
+
+
+<a name="407902530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407902530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407902530">(Dec 14 2023 at 07:50)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> no it's not coming from that file. Oh how I wish it would work that way. These defaults are defined here: <a href="https://github.com/IQSS/dataverse/blob/1f9e10cfc8acb85780db641d1a6644eb62545b05/src/main/java/edu/harvard/iq/dataverse/util/DataSourceProducer.java#L24">https://github.com/IQSS/dataverse/blob/1f9e10cfc8acb85780db641d1a6644eb62545b05/src/main/java/edu/harvard/iq/dataverse/util/DataSourceProducer.java#L24</a></p>
+
+
+
+<a name="407902589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407902589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407902589">(Dec 14 2023 at 07:50)</a>:</h4>
+<p>The reason for this is the way how Payara works</p>
+
+
+
+<a name="407902727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407902727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407902727">(Dec 14 2023 at 07:51)</a>:</h4>
+<p>We cannot have read properties from the WAR shipped <code>microprofile-config.properties</code> file when the <code>@DataSourceDefinition</code> is being handled.</p>
+
+
+
+<a name="407943354"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407943354" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407943354">(Dec 14 2023 at 11:49)</a>:</h4>
+<p>Right, right, <code>@DataSourceDefinition</code>. How soon I forget! Thanks!</p>
+
+
+
+<a name="407952269"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407952269" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407952269">(Dec 14 2023 at 12:45)</a>:</h4>
+<p><code>rg dataverse.db.name</code> <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="407958884"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407958884" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407958884">(Dec 14 2023 at 13:22)</a>:</h4>
+<p>I wonder if we should mention this stuff in our docs for the base image. Or somewhere in the Container Guide (or maybe Dev Guide).</p>
+
+
+
+<a name="407968414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407968414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407968414">(Dec 14 2023 at 14:12)</a>:</h4>
+<p>I'm sorry, mention what exactly?</p>
+
+
+
+<a name="407968563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20postgres%20default%20database%20name/near/407968563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20postgres.20default.20database.20name.html#407968563">(Dec 14 2023 at 14:12)</a>:</h4>
+<p>That we're using <code>@DataSourceDefinition</code>. Maybe in the dev guide.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

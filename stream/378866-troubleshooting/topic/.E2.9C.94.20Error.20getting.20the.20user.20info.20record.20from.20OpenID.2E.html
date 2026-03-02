@@ -1,0 +1,217 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Error getting the user info record from OpenID. · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html">✔ Error getting the user info record from OpenID.</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="426560448"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426560448" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426560448">(Mar 14 2024 at 14:57)</a>:</h4>
+<p>My OIDC profile endpoint returns this:</p>
+<p>{"id":"b94e083c-8ee8-4177-af13-cf87ceab00d2","username":"john","email":"john@gmail.com"}</p>
+<p>But dataverse says this error:</p>
+<p>edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2Exception: Error getting the user info record from OpenID.<br>
+    at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserInfo(OIDCAuthProvider.java:316)<br>
+    at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserRecord(OIDCAuthProvider.java:227)<br>
+    at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean.exchangeCodeForToken(OAuth2LoginBackingBean.java:103)<br>
+    at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean$Proxy$_$$_WeldSubclass.exchangeCodeForToken(Unknown Source)</p>
+
+
+
+<a name="426577596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426577596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426577596">(Mar 14 2024 at 16:14)</a>:</h4>
+<p>Maybe I should explain more. I have already created the user 'john' in my OIDC. I press the 'Login by OpenID' in dataverse and it redirects me to my OIDC properly. I login there and redirected me to dataverse. By looking at logs, I noticed that dataverse can exchange the auth code with OIDC and gets the access token; then, it tries to call the profile endpoint to get user profile. At this point, I get the above error message in dataverser.</p>
+
+
+
+<a name="426577959"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426577959" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426577959">(Mar 14 2024 at 16:16)</a>:</h4>
+<p>Can you find the line number on GitHub?</p>
+
+
+
+<a name="426578236"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426578236" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426578236">(Mar 14 2024 at 16:17)</a>:</h4>
+<p>I think the following method is throwing the exception, but I am not sure.</p>
+<p>Optional&lt;UserInfo&gt; getUserInfo(BearerAccessToken accessToken) throws IOException, OAuth2Exception {<br>
+        // Retrieve data<br>
+        HTTPResponse response = new UserInfoRequest(this.idpMetadata.getUserInfoEndpointURI(), accessToken)<br>
+                                        .toHTTPRequest()<br>
+                                        .send();</p>
+<div class="codehilite"><pre><span></span><code>    // Parse/Extract
+    try {
+        UserInfoResponse infoResponse = UserInfoResponse.parse(response);
+
+        // If error --&gt; oauth2 ex
+        if (! infoResponse.indicatesSuccess() ) {
+            ErrorObject error = infoResponse.toErrorResponse().getErrorObject();
+            throw new OAuth2Exception(error.getHTTPStatusCode(),
+                                      error.getDescription(),
+                                      BundleUtil.getStringFromBundle(&quot;auth.providers.exception.userinfo&quot;, Arrays.asList(this.getTitle())));
+        }
+
+        // Success --&gt; return info
+        return Optional.of(infoResponse.toSuccessResponse().getUserInfo());
+
+    } catch (ParseException ex) {
+        throw new OAuth2Exception(-1, ex.getMessage(), BundleUtil.getStringFromBundle(&quot;auth.providers.exception.userinfo&quot;, Arrays.asList(this.getTitle())));
+    }
+}
+</code></pre></div>
+
+
+
+<a name="426578351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426578351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426578351">(Mar 14 2024 at 16:18)</a>:</h4>
+<p>dataverse/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/oidc/OIDCAuthProvider.java</p>
+
+
+
+<a name="426583117"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426583117" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426583117">(Mar 14 2024 at 16:41)</a>:</h4>
+<p>Yeah, auth.providers.exception.userinfo=Error getting the user info record from {0}.</p>
+
+
+
+<a name="426583132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426583132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426583132">(Mar 14 2024 at 16:41)</a>:</h4>
+<p>From <code>Bundle.properties</code></p>
+
+
+
+<a name="426583337"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426583337" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426583337">(Mar 14 2024 at 16:42)</a>:</h4>
+<p>Are you comfortable recompiling and adding some debugging lines?</p>
+
+
+
+<a name="426695947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426695947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426695947">(Mar 15 2024 at 08:38)</a>:</h4>
+<p>Unfortunately, I am not a Java developer.</p>
+
+
+
+<a name="426705469"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426705469" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426705469">(Mar 15 2024 at 09:37)</a>:</h4>
+<p>I found the root of the issue. My profile endpoint was returning a different structure than what was expected by dataverse (when calling profile endpoint).</p>
+
+
+
+<a name="426705486"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426705486" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426705486">(Mar 15 2024 at 09:37)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> has marked this topic as resolved.</p>
+
+
+
+<a name="426730612"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426730612" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426730612">(Mar 15 2024 at 12:11)</a>:</h4>
+<p>Interesting. So you changed the structure of what your profile endpoint was emitting? Should we add some more documentation to the Dataverse guides?</p>
+
+
+
+<a name="426733900"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426733900" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426733900">(Mar 15 2024 at 12:31)</a>:</h4>
+<p>You know, I have experienced the following stuff when integrating my OIDC with dataverse:</p>
+<ol>
+<li>It seems to me that dataverse/payara cache the discovery document for some time (.well-known/openid-configuration), as when I restarted Payara then it started to use my new discovery document. I didn't know it and just by try and error found it.</li>
+<li>I was not sure what data structure did dataverse expect from my profile endpoint. So, I looked at the source code and provided the minimum data. If I knew what data should have been returned by profile endpoint then it would have been much time-saving for me :)</li>
+<li>Another very helpful thing that I thought about was that, if I could set a flag for debugging (e.g., using environment variables or something else) and more logs appeared in the console then troubleshooting would have been much easier, but I am not sure if this is the correct approach or not.</li>
+<li>I was not sure at all where I will see the Login by OpenID button (after setting the related jvm options). It would be much better to have some information in dataverse documentation that says exactly such info.</li>
+</ol>
+<p>PS: I have used Standard installation approach.</p>
+
+
+
+<a name="426736168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/426736168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#426736168">(Mar 15 2024 at 12:45)</a>:</h4>
+<p>Sounds like we should document all of this. Are you interested in creating an issue? <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="427384669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427384669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427384669">(Mar 18 2024 at 08:25)</a>:</h4>
+<p>Yes. Where should I create the issue?</p>
+
+
+
+<a name="427670483"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427670483" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427670483">(Mar 19 2024 at 11:25)</a>:</h4>
+<p><span class="user-mention" data-user-id="698782">@Mohsen Jafari</span> <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> please</p>
+
+
+
+<a name="427912146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427912146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427912146">(Mar 20 2024 at 12:06)</a>:</h4>
+<p>I see you opened this, thanks: Add more information about the OpenID button <a href="https://github.com/IQSS/dataverse/issues/10392">#10392</a></p>
+
+
+
+<a name="427912391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427912391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427912391">(Mar 20 2024 at 12:07)</a>:</h4>
+<p>And OIDC profile endpoint <a href="https://github.com/IQSS/dataverse/issues/10393">#10393</a></p>
+
+
+
+<a name="427912640"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427912640" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427912640">(Mar 20 2024 at 12:08)</a>:</h4>
+<p>sure</p>
+
+
+
+<a name="427912671"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427912671" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427912671">(Mar 20 2024 at 12:08)</a>:</h4>
+<p>And</p>
+<ul>
+<li>Caching the result of .well-known/openid-configuration <a href="https://github.com/IQSS/dataverse/issues/10394">#10394</a> </li>
+<li>Debug flag <a href="https://github.com/IQSS/dataverse/issues/10395">#10395</a></li>
+</ul>
+
+
+
+<a name="427912696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427912696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427912696">(Mar 20 2024 at 12:09)</a>:</h4>
+<p>for debug flag, you mean just OIDC, right?</p>
+
+
+
+<a name="427913456"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427913456" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427913456">(Mar 20 2024 at 12:14)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E/near/427912696">said</a>:</p>
+<blockquote>
+<p>for debug flag, you mean just OIDC, right?</p>
+</blockquote>
+<p>I think, in general, having a boolean flag in order to have more/verbose information about what have happened (logs) would be really helpful, either regarding OIDC or anything else. For example, if verbose_flag = true, then we see more detailed information about what have happened. As an example, there were some situations where I really needed more information in the dataverse logs to fix the issue but without such a flag I had to pull the codebase put some logs and recompile and so on...<br>
+However, I think such a decision may really depend on your development/security strategies. I just shared my basic-level idea :)</p>
+
+
+
+<a name="427920826"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427920826" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427920826">(Mar 20 2024 at 12:55)</a>:</h4>
+<p>Makes sense. Sometimes we'll suggest increasing the logging level here or there: <a href="https://guides.dataverse.org/en/6.1/admin/troubleshooting.html#increasing-payara-logging">https://guides.dataverse.org/en/6.1/admin/troubleshooting.html#increasing-payara-logging</a></p>
+
+
+
+<a name="427920871"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/427920871" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#427920871">(Mar 20 2024 at 12:55)</a>:</h4>
+<p>Are you interested in creating a pull request for any of these issues?</p>
+
+
+
+<a name="429319248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/429319248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#429319248">(Mar 25 2024 at 08:49)</a>:</h4>
+<p>Sorry, but not at the moment.</p>
+
+
+
+<a name="429482955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Error%20getting%20the%20user%20info%20record%20from%20OpenID./near/429482955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E.html#429482955">(Mar 25 2024 at 18:22)</a>:</h4>
+<p>No worries!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

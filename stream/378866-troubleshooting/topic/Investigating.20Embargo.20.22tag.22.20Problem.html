@@ -1,0 +1,88 @@
+<html>
+<head><meta charset="utf-8"><title>Investigating Embargo &quot;tag&quot; Problem · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html">Investigating Embargo &quot;tag&quot; Problem</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="499284988"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499284988" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499284988">(Feb 12 2025 at 17:05)</a>:</h4>
+<p>Who has dataverse Admin rights on <a href="http://demo.dataverse.org">demo.dataverse.org</a>?</p>
+<p>I need the admin to run the following to remove an embargo from one of my datasets. <br>
+<a href="https://demo.dataverse.org/dataverse/lake_design">https://demo.dataverse.org/dataverse/lake_design</a></p>
+<p>Only the admin TOKEN is needed, all other settings are correct.<br>
+Documented here: <a href="https://guides.dataverse.org/en/latest/api/native-api.html#remove-an-embargo-on-files-in-a-dataset">https://guides.dataverse.org/en/latest/api/native-api.html#remove-an-embargo-on-files-in-a-dataset</a></p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">API_TOKEN</span><span class="o">=</span>NEEDS<span class="w"> </span>demo.dataverse<span class="w"> </span>Admin<span class="w"> </span>TOKEN
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">SERVER_URL</span><span class="o">=</span>https://demo.dataverse.org
+<span class="nb">export</span><span class="w"> </span><span class="nv">PERSISTENT_IDENTIFIER</span><span class="o">=</span>doi:10.70122/FK2/NAM7BG
+<span class="nb">export</span><span class="w"> </span><span class="nv">JSON</span><span class="o">=</span><span class="s1">'{"fileIds":[2533100]}'</span>
+curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">"X-Dataverse-key: </span><span class="nv">$API_TOKEN</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">"Content-Type:application/json"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SERVER_URL</span><span class="s2">/api/datasets/:persistentId/files/actions/:unset-embargo?persistentId=</span><span class="nv">$PERSISTENT_IDENTIFIER</span><span class="s2">"</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">"</span><span class="nv">$JSON</span><span class="s2">"</span>
+</code></pre></div>
+
+
+
+<a name="499303581"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499303581" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499303581">(Feb 12 2025 at 18:41)</a>:</h4>
+<p><span class="user-mention" data-user-id="599826">@Sherry Lake</span> sure, done:</p>
+<p><code>{"status":"OK","data":{"message":"Embargo(es) were removed from files"}}</code></p>
+
+
+
+<a name="499306166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499306166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499306166">(Feb 12 2025 at 18:56)</a>:</h4>
+<p>Thanks, <span class="user-mention" data-user-id="598112">@Philip Durbin ☃️</span> <br>
+And you can see the bug I found.... <a href="https://demo.dataverse.org/dataverse/lake_design">https://demo.dataverse.org/dataverse/lake_design</a><br>
+The dataset still has the "embargo" tag. But the file is no longer under embargo (only one file in the dataset).</p>
+<p>I am waiting to see if an embargo is removed on its own (after the embargo date) by the software if the tag is still there. I will have to wait until tomorrow for an auto-release embargo in another dataset.</p>
+
+
+
+<a name="499306661"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499306661" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499306661">(Feb 12 2025 at 18:59)</a>:</h4>
+<p>D'oh! <img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"></p>
+
+
+
+<a name="499306678"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499306678" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499306678">(Feb 12 2025 at 18:59)</a>:</h4>
+<p>Do you want a job in QA? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="499316659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499316659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499316659">(Feb 12 2025 at 19:52)</a>:</h4>
+<p>Ask me at the Dataverse Community Meeting in June....... <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="499317294"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499317294" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499317294">(Feb 12 2025 at 19:56)</a>:</h4>
+<p>ha, ok</p>
+
+
+
+<a name="499317353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499317353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499317353">(Feb 12 2025 at 19:56)</a>:</h4>
+<p>When you create the issue, please link it up here.</p>
+
+
+
+<a name="499523329"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499523329" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499523329">(Feb 13 2025 at 16:37)</a>:</h4>
+<p>Reported: <a href="https://github.com/IQSS/dataverse/issues/11257">https://github.com/IQSS/dataverse/issues/11257</a></p>
+
+
+
+<a name="499545353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Investigating%20Embargo%20%22tag%22%20Problem/near/499545353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Investigating.20Embargo.20.22tag.22.20Problem.html#499545353">(Feb 13 2025 at 18:07)</a>:</h4>
+<p>Thanks, <span class="user-mention" data-user-id="599826">@Sherry Lake</span>! Looks like Jim replied already.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

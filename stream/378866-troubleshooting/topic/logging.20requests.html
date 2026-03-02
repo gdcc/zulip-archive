@@ -1,0 +1,143 @@
+<html>
+<head><meta charset="utf-8"><title>logging requests · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html">logging requests</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="468282463"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468282463" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468282463">(Sep 06 2024 at 20:19)</a>:</h4>
+<p>Hello, <br>
+I'm trying to understand the level of logging using Payara.  I'm new to using payara, but I've developed in Java using the Spring framework.  I'm used to seeing every HTTP request in the log and I'm not seeing that level of logging here. I realize that has to do with configuration of logs, but if INFO is set, shouldn't we be seeing every request in the server.log?  I'm trying to get a base line understanding of how logging works in this system and am not sure what to expect. </p>
+<p>For example, I've used our test site many times over the last few days and there are no messages related to specific requests in the server.log.   There are hardly any messages to start with.</p>
+<p>I'm wondering if I'm either misunderstanding the level of logging to expect by default (assuming things are at an INFO level), or if we have some sort of misconfiguration.</p>
+<p>Should I be seeing every HTTP request being logged?  </p>
+<p>Thanks!</p>
+
+
+
+<a name="468282974"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468282974" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468282974">(Sep 06 2024 at 20:23)</a>:</h4>
+<p>Hi! Please try this:</p>
+<p><code>asadmin get server.http-service.access-logging-enabled</code></p>
+<p><code>asadmin set server.http-service.access-logging-enabled=true</code></p>
+
+
+
+<a name="468283657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283657">(Sep 06 2024 at 20:28)</a>:</h4>
+<p>It's surprising we don't have any docs on this. Please feel free to create an issue!</p>
+
+
+
+<a name="468283689"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283689" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283689">(Sep 06 2024 at 20:28)</a>:</h4>
+<p>I see it mentioned in passing here: <a href="https://github.com/IQSS/dataverse/releases/tag/v6.0">https://github.com/IQSS/dataverse/releases/tag/v6.0</a></p>
+
+
+
+<a name="468283704"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283704" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283704">(Sep 06 2024 at 20:28)</a>:</h4>
+<p>Hi Phil, <br>
+Thanks!  That was set to false. I just set it to true and now an "access" directory shows up in the logs directory for that domain. </p>
+<p>It's not actually logging anything, but that's a step closer.   Is there a log level associated with this one?</p>
+
+
+
+<a name="468283767"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283767" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283767">(Sep 06 2024 at 20:28)</a>:</h4>
+<p>And here: <a href="https://guides.dataverse.org/en/6.3/installation/config.html#recording-user-ip-addresses">https://guides.dataverse.org/en/6.3/installation/config.html#recording-user-ip-addresses</a></p>
+
+
+
+<a name="468283814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283814">(Sep 06 2024 at 20:29)</a>:</h4>
+<p>Oh, hmm. Nothing? There's a bit of a delay.</p>
+
+
+
+<a name="468283838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283838">(Sep 06 2024 at 20:29)</a>:</h4>
+<p>server.http-service.access-log.write-interval-seconds</p>
+
+
+
+<a name="468283864"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468283864" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468283864">(Sep 06 2024 at 20:29)</a>:</h4>
+<p>Maybe give it a minute.</p>
+
+
+
+<a name="468284051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468284051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468284051">(Sep 06 2024 at 20:30)</a>:</h4>
+<p>Ohhh, it's set to 300 seconds.  That seems a bit long.  Is that what folks typically set it to?</p>
+
+
+
+<a name="468284059"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468284059" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468284059">(Sep 06 2024 at 20:30)</a>:</h4>
+<p>In addition to the server.log, which is mostly for errors, you might be interested in the <code>actionlogrecord</code> database table: <a href="https://guides.dataverse.org/en/6.3/admin/monitoring.html#actionlogrecord">https://guides.dataverse.org/en/6.3/admin/monitoring.html#actionlogrecord</a></p>
+
+
+
+<a name="468284102"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468284102" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468284102">(Sep 06 2024 at 20:31)</a>:</h4>
+<p>Buh. I'm not sure if people use 300 seconds in production or not.</p>
+
+
+
+<a name="468284125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468284125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468284125">(Sep 06 2024 at 20:31)</a>:</h4>
+<p>I assume the Payara folks have it set to that for a reason.</p>
+
+
+
+<a name="468284883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468284883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468284883">(Sep 06 2024 at 20:37)</a>:</h4>
+<p>I am starting to see log messages show up.   Thanks for your help - I'd been a bit mystified. :)   I'll check out the  actionlogrecord. </p>
+<p>Do you know if you have to explicitly enable the "logs/process-failures" logging?  I am seeing the "logs/edit-drafts" directory with logs in it, but not the "logs/process-failures" one.    (we are using 5.13, so there's the possibility it wasn't a feature then?)</p>
+
+
+
+<a name="468285236"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468285236" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468285236">(Sep 06 2024 at 20:40)</a>:</h4>
+<p>Huh, I remember the "edit-drafts" one.</p>
+
+
+
+<a name="468285254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468285254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468285254">(Sep 06 2024 at 20:40)</a>:</h4>
+<p>I'm not sure about the process failures. Is it in the guides somewhere?</p>
+
+
+
+<a name="468285860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468285860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468285860">(Sep 06 2024 at 20:45)</a>:</h4>
+<p>It's related to solr:  <a href="https://guides.dataverse.org/en/6.3/admin/monitoring.html#solr-indexing-failures-logging">https://guides.dataverse.org/en/6.3/admin/monitoring.html#solr-indexing-failures-logging</a></p>
+
+
+
+<a name="468286430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468286430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468286430">(Sep 06 2024 at 20:50)</a>:</h4>
+<p>Hmm, it was added here: <a href="https://github.com/IQSS/dataverse/pull/5987/commits/4078c96953f77cd59c93a7291eb816c11bbf718c">https://github.com/IQSS/dataverse/pull/5987/commits/4078c96953f77cd59c93a7291eb816c11bbf718c</a></p>
+
+
+
+<a name="468286527"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468286527" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468286527">(Sep 06 2024 at 20:51)</a>:</h4>
+<p>My assumption is that you haven't had any indexing failures but if you do, that directory will be created.</p>
+
+
+
+<a name="468287100"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/logging%20requests/near/468287100" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/logging.20requests.html#468287100">(Sep 06 2024 at 20:57)</a>:</h4>
+<p>That makes sense. Thanks for looking into it.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,152 @@
+<html>
+<head><meta charset="utf-8"><title>Datacite issue · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html">Datacite issue</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="399802673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399802673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399802673">(Nov 01 2023 at 21:00)</a>:</h4>
+<p>Dear DV experts: </p>
+<p>We installed dataverse and used to be able to create datasets with the FAKE doi setting. But after configuring with our datacite account, I got a error message after clicking on "save dataset":</p>
+<p>XML Parsing Error: not well-formed<br>
+Location: <a href="https://dataverse.fgcu.edu/dataset.xhtml?persistentId=doi%3A10.60863%2FSF%2FJ4JRE9&amp;version=DRAFT">https://dataverse.fgcu.edu/dataset.xhtml?persistentId=doi%3A10.60863%2FSF%2FJ4JRE9&amp;version=DRAFT</a><br>
+Line Number 226, Column 17:<br>
+        &lt;/div&gt;&lt;!DOCTYPE html&gt;<br>
+----------------^</p>
+<p>I have checked the domain.xml settings and did not find obvious problems as shown below. <br>
+-Ddataverse.pid.datacite.mds-api-url=https://mds.datacite.org<br>
+-Ddataverse.pid.datacite.username=OUR.ACCOUNT<br>
+-Ddataverse.pid.datacite.rest-api-url=https://api.datacite.org<br>
+curl <a href="http://localhost:8080/api/admin/settings/:Authority">http://localhost:8080/api/admin/settings/:Authority</a> -w "\n" <br>
+{"status":"OK","data":{"message":"10.60863"}}<br>
+curl <a href="http://localhost:8080/api/admin/settings/:DoiProvider">http://localhost:8080/api/admin/settings/:DoiProvider</a> -w "\n" <br>
+{"status":"OK","data":{"message":"DataCite"}}<br>
+curl <a href="http://localhost:8080/api/admin/settings/:Protocol">http://localhost:8080/api/admin/settings/:Protocol</a> -w "\n" <br>
+{"status":"OK","data":{"message":"doi"}}</p>
+<p>Here is the server log:<br>
+<a href="/user_uploads/53090/6ql4-aZR0iNW8PhS2Xnknvne/server.log">server.log</a></p>
+<p>I have tested our Datacite account on <a href="https://doi.datacite.org/">https://doi.datacite.org/</a> and can successfully log in, but there is no record of any DOI. I also checked the PostgreSQL database and nothing was saved after clicking on "save dataset".  We installed PostgreSQL on one server and everything else on another server. I have checked both servers. They have no problems connecting to each other and I have no problems creating new sub-dataverse. I ran out of ideas of where the "Username may not be null" error comes from. The one thing I am not sure is that we moved both servers and got new IP addresses for them after installation. Could this cause the problem? Thank you in advance for reading and helping.</p>
+
+
+
+<a name="399803450"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399803450" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399803450">(Nov 01 2023 at 21:04)</a>:</h4>
+<p>Hi! What version of Dataverse are you running, please? It looks like 5.13?</p>
+
+
+
+<a name="399803470"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399803470" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399803470">(Nov 01 2023 at 21:05)</a>:</h4>
+<p>I see you found the "Username may not be null" error already.</p>
+
+
+
+<a name="399803657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399803657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399803657">(Nov 01 2023 at 21:06)</a>:</h4>
+<p>Here's the line from your logs: <a href="https://github.com/IQSS/dataverse/blob/v5.13/src/main/java/edu/harvard/iq/dataverse/DataCiteRESTfullClient.java#L53">https://github.com/IQSS/dataverse/blob/v5.13/src/main/java/edu/harvard/iq/dataverse/DataCiteRESTfullClient.java#L53</a></p>
+
+
+
+<a name="399804282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804282">(Nov 01 2023 at 21:11)</a>:</h4>
+<p>Hi Philip, Yes, it is 5.13. <a href="https://dataverse.fgcu.edu/">https://dataverse.fgcu.edu/</a>.</p>
+
+
+
+<a name="399804540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804540">(Nov 01 2023 at 21:14)</a>:</h4>
+<p>It seems the DataCiteRESTfullClient did not pick up our Datacite username.</p>
+
+
+
+<a name="399804632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804632">(Nov 01 2023 at 21:14)</a>:</h4>
+<p>I'm looking at <a href="https://guides.dataverse.org/en/5.13/installation/config.html#doi-username">https://guides.dataverse.org/en/5.13/installation/config.html#doi-username</a></p>
+
+
+
+<a name="399804654"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804654" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804654">(Nov 01 2023 at 21:14)</a>:</h4>
+<p>It seems to want <code>-Ddoi.username=YOUR_USERNAME_HERE</code></p>
+
+
+
+<a name="399804804"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804804" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804804">(Nov 01 2023 at 21:16)</a>:</h4>
+<p>But you have <code>-Ddataverse.pid.datacite.username=OUR.ACCOUNT</code>?</p>
+
+
+
+<a name="399804967"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399804967" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399804967">(Nov 01 2023 at 21:17)</a>:</h4>
+<p>I got <a href="https://guides.dataverse.org/en/latest/installation/config.html?highlight=datacite#dataverse-pid-datacite-username">https://guides.dataverse.org/en/latest/installation/config.html?highlight=datacite#dataverse-pid-datacite-username</a></p>
+
+
+
+<a name="399805064"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805064" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805064">(Nov 01 2023 at 21:18)</a>:</h4>
+<p>I though Ddoi was replaced. Do I still need it?</p>
+
+
+
+<a name="399805146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805146">(Nov 01 2023 at 21:19)</a>:</h4>
+<p>Maybe, but "latest" is for 6.0. The link I posted is for 5.13.</p>
+
+
+
+<a name="399805247"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805247" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805247">(Nov 01 2023 at 21:20)</a>:</h4>
+<p>Thanks a lot! I think that's the reason.</p>
+
+
+
+<a name="399805248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805248">(Nov 01 2023 at 21:20)</a>:</h4>
+<p>That is, "latest" is for the latest release, which is currently 6.0. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="399805267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805267">(Nov 01 2023 at 21:20)</a>:</h4>
+<p>Sure! Hope it helps.</p>
+
+
+
+<a name="399805345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805345">(Nov 01 2023 at 21:21)</a>:</h4>
+<p>I installed Dataverse in July and did not see 6.0. Where can I find it?</p>
+
+
+
+<a name="399805501"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805501" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805501">(Nov 01 2023 at 21:22)</a>:</h4>
+<p>Thank you so much! It puzzled me for a week. You saved my life <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="399805591"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805591" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805591">(Nov 01 2023 at 21:23)</a>:</h4>
+<p>Ha! Good!</p>
+
+
+
+<a name="399805610"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805610" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805610">(Nov 01 2023 at 21:23)</a>:</h4>
+<p>6.0 is here: <a href="https://github.com/IQSS/dataverse/releases/tag/v6.0">https://github.com/IQSS/dataverse/releases/tag/v6.0</a></p>
+
+
+
+<a name="399805684"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Datacite%20issue/near/399805684" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen C. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Datacite.20issue.html#399805684">(Nov 01 2023 at 21:24)</a>:</h4>
+<p>Got it. Have a great evening!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

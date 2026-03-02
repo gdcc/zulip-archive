@@ -1,0 +1,129 @@
+<html>
+<head><meta charset="utf-8"><title>metadata update · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html">metadata update</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="392097346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392097346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392097346">(Sep 20 2023 at 11:31)</a>:</h4>
+<p>I've created some API scripts to update the metadata of multiple datasets. I'm now testing the scripts in our test environment, which currently is a copy of production from yesterday, but we switched the DOIs from production DOIs (10.18710) to our test DOIs (10.21337). Here's what I've been doing:</p>
+<ol>
+<li>Download JSON with metdata from test.</li>
+<li>Run the script on all these JSON files. Looks good.</li>
+<li>Upload the updated JSON files to test.<br>
+But the files wouldn't upload. Is this because the metadata still refers to the production DOI? See, e.g.:</li>
+</ol>
+<p>*{<br>
+  "id": 2966,<br>
+  "datasetId": 175757,<br>
+  "datasetPersistentId": "doi:10.21337/MXCA5S",<br>
+  "storageIdentifier": "S3://10.18710/MXCA5S",<br>
+  "versionNumber": 1,<br>
+  "versionMinorNumber": 0,<br>
+  "versionState": "RELEASED",*</p>
+
+
+
+<a name="392097956"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392097956" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392097956">(Sep 20 2023 at 11:35)</a>:</h4>
+<p>Hmm, what errors do you get from the client side (curl, python, etc.)?</p>
+<p>And what errors do you get in server.log?</p>
+
+
+
+<a name="392101883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392101883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392101883">(Sep 20 2023 at 11:59)</a>:</h4>
+<p>Thanks! No errors in the command line. I'll need to ask our devops for the server.log. I'm now trying this on production for one dataset without publishing.</p>
+
+
+
+<a name="392102357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392102357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392102357">(Sep 20 2023 at 12:02)</a>:</h4>
+<p>I forgot to mention, we only copied the metadata, not the data to test.</p>
+
+
+
+<a name="392103056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392103056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392103056">(Sep 20 2023 at 12:06)</a>:</h4>
+<p>What if you try downloading the JSON from a dataset in your test environment and try to make a change? Does that work? Just a simple change like an edit to the description or something.</p>
+
+
+
+<a name="392107644"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392107644" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392107644">(Sep 20 2023 at 12:32)</a>:</h4>
+<p>Yes, that's basically what I've been doing, but uploading the modified JSON file does not work :-/</p>
+
+
+
+<a name="392108908"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392108908" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392108908">(Sep 20 2023 at 12:40)</a>:</h4>
+<p>Maybe we should get you set up with a dev environment on your laptop so you can see server.log. <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="392109058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392109058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392109058">(Sep 20 2023 at 12:41)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> what do you think? Is it time for Docker?</p>
+
+
+
+<a name="392109353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392109353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392109353">(Sep 20 2023 at 12:42)</a>:</h4>
+<p>Probably...?</p>
+
+
+
+<a name="392109380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392109380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392109380">(Sep 20 2023 at 12:43)</a>:</h4>
+<p>Easiest way to setup a clean environment</p>
+
+
+
+<a name="392115153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392115153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392115153">(Sep 20 2023 at 13:14)</a>:</h4>
+<p>Yes, but the idea was to test it on ~identical datasets before we run it on prod.</p>
+
+
+
+<a name="392118726"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392118726" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392118726">(Sep 20 2023 at 13:33)</a>:</h4>
+<p>What if I tried to import your prod JSON into my dev environment? Would that be a good test? I'm running the tip of the develop branch.</p>
+
+
+
+<a name="392119564"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392119564" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392119564">(Sep 20 2023 at 13:38)</a>:</h4>
+<p>Thanks, I might want to do that. Let me just first test a couple of datasets on prod.</p>
+
+
+
+<a name="392121249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392121249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392121249">(Sep 20 2023 at 13:47)</a>:</h4>
+<p>In the same clean-up job, I'll be publishing new versions of about 800 datasets. From previous, similar jobs (e.g. uploading many files to a dataset via API), I've learned to put a sleep command after each API publishing command. This means running the script will take about 8-10 hours. The idea is to disable login during that time. Now, to reduce the work load, I'm considering turning off file validation, like this:</p>
+<p>Before the script is run:<br>
+curl -X PUT -d 'false' <a href="http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled">http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled</a></p>
+<p>After the script is run:<br>
+curl -X PUT -d 'true' <a href="http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled">http://localhost:8080/api/admin/settings/:FileValidationOnPublishEnabled</a></p>
+<p>None of the changes are at file level. Are there any concerns turning off file validation in this case?</p>
+
+
+
+<a name="392121666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392121666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392121666">(Sep 20 2023 at 13:49)</a>:</h4>
+<p>I don't think so. And I saw your mailing list post. You're only changing metadata, not files. Should be fine.</p>
+
+
+
+<a name="392122481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20update/near/392122481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philipp Conzett <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20update.html#392122481">(Sep 20 2023 at 13:53)</a>:</h4>
+<p>Great, thanks, good to get this confirmed. I think turning it off will make the process smoother and faster.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

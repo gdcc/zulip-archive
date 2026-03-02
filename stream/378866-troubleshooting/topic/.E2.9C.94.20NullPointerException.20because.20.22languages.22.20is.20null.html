@@ -1,0 +1,207 @@
+<html>
+<head><meta charset="utf-8"><title>✔ NullPointerException because &quot;languages&quot; is null · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html">✔ NullPointerException because &quot;languages&quot; is null</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="482984757"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/482984757" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#482984757">(Nov 18 2024 at 10:35)</a>:</h4>
+<p>Hi, we are migrating e-cienciaDatos from Dataverse v5.10.1 to v6.4 and we get a null pointer exception in the languages Field.<br>
+It works in v5.10.1, but fails in v6.4</p>
+<p>The database <em>:Languages</em> setting entry is filled.<br>
+dvndb=&gt; select  * from setting where name =':Languages';<br>
+   name    |                                                content                                                 | id | lang  <br>
+------------+--------------------------------------------------------------------------------------------------------+----+------<br>
+:Languages | [{"locale":"es","title":"Spanish"},{"locale":"en","title":"English"},{"locale":"fr","title":"French"}] | 40 |  </p>
+<p>The <em>dataverse.lang .directory</em> value in <em>domain.xml</em> file is set<br>
+grep dataverse.lang $PAYARA/glassfish/domains/domain1/config/domain.xml<br>
+       &lt;jvm-options&gt;-Ddataverse.lang.directory=/usr/local/dataverseLang&lt;/jvm-options&gt;</p>
+<p>The log trace is long, but we have checked that the Dataverse.initLocale method is called and all languages are read:<br>
+The server.log trace shows: <br>
+[2024-11-18T11:05:40.772+0100] [Payara 6.2024.10] [WARNING] [AS-EJB-00056] [jakarta.enterprise.ejb.container] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340772] [levelValue: 900] [[<br>
+ A system exception occurred during an invocation on EJB DatasetFieldServiceBean, method: public java.lang.String edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(java.lang.String,java.lang.String)]]<br>
+[2024-11-18T11:05:40.773+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.ejb.container] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340773] [levelValue: 900] [[<br>
+<br>
+jakarta.ejb.EJBException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)<br>
+       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)<br>
+       at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>
+       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+  [.................]</p>
+<p>at java.base/java.lang.Thread.run(Thread.java:840)<br>
+Caused by: java.lang.NullPointerException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>
+       at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>
+       at java.base/java.lang.reflect.Method.invoke(Method.java:569)<br>
+  [.................]</p>
+<p>... 96 more<br>
+]]<br>
+[2024-11-18T11:05:40.775+0100] [Payara 6.2024.10] [SEVERE] [] [jakarta.enterprise.resource.webcontainer.faces.application] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340775] [levelValue: 1000] [[<br>
+ Error Rendering View[/dataverse.xhtml]<br>
+jakarta.el.ELException: /search-include-fragment.xhtml @390,208 value="#{DatasetPage.getFieldLanguage(cvocConf.get(SearchIncludeFragment.getFieldTypeId(friendlyNames.get(0))).getString('languages'))}": jakarta.ejb.EJBException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:77)<br>
+       at com.sun.faces.renderkit.html_basic.HtmlResponseWriter.getAttributeValue(HtmlResponseWriter.java:1137)<br>
+       at com.sun.faces.renderkit.html_basic.HtmlResponseWriter.flushAttributes(HtmlResponseWriter.java:1097)</p>
+<p>[.................]</p>
+<p>at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)<br>
+       at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)<br>
+       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)<br>
+       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>
+       at java.base/java.lang.Thread.run(Thread.java:840)<br>
+Caused by: jakarta.el.ELException: jakarta.ejb.EJBException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at jakarta.el.ELUtil.invokeMethod(ELUtil.java:221)<br>
+  [.................]<br>
+       at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:73)<br>
+       ... 80 more<br>
+Caused by: jakarta.ejb.EJBException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)<br>
+       at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)<br>
+       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)<br>
+       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)<br>
+       at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>
+       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>
+       at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>
+       ... 87 more<br>
+Caused by: java.lang.NullPointerException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+  [.................]<br>
+       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:212)<br>
+       ... 96 more<br>
+]]<br>
+[2024-11-18T11:05:40.783+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.web.core] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340783] [levelValue: 900] [[<br>
+ Servlet.service() for servlet Faces Servlet threw exception<br>
+java.lang.NullPointerException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+  [.................]<br>
+90)<br>
+       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+  [.................]<br>
+       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>
+       at java.base/java.lang.Thread.run(Thread.java:840)<br>
+]]<br>
+[2024-11-18T11:05:40.784+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.web] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340784] [levelValue: 900] [[<br>
+ StandardWrapperValve[default]: Servlet.service() for servlet default threw exception<br>
+java.lang.NullPointerException: Cannot invoke "String.split(String)" because "languages" is null<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>
+  [.................]<br>
+com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>
+       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>
+       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>
+  [.................]<br>
+       at java.base/java.lang.Thread.run(Thread.java:840)<br>
+]]</p>
+<p>Do you know where could be the problem?</p>
+<p>Thanks</p>
+<p>Juan</p>
+
+
+
+<a name="483028534"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483028534" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483028534">(Nov 18 2024 at 13:54)</a>:</h4>
+<p><span class="user-mention" data-user-id="663397">@Juan</span> yikes, thanks for letting us know. I see <code>cvocConf.get</code> in there. As an experiment, have you tried disabling the external controlled vocabulary feature?</p>
+
+
+
+<a name="483028852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483028852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483028852">(Nov 18 2024 at 13:55)</a>:</h4>
+<p>Thanks <span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> . I will try it.</p>
+
+
+
+<a name="483033302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483033302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483033302">(Nov 18 2024 at 14:14)</a>:</h4>
+<p>I didn't have the ":CVocConf" entry in the database settings:</p>
+<p>dvndb=&gt; select * from setting where name like '%CVocConf%';<br>
+name | content | id | lang  <br>
+------+---------+----+------<br>
+(0 rows)</p>
+<p>I think that the external vocabulary is disabled.</p>
+
+
+
+<a name="483034767"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483034767" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483034767">(Nov 18 2024 at 14:21)</a>:</h4>
+<p>Thanks. Interesting. I wonder why it appears in the stacktrace.</p>
+
+
+
+<a name="483035059"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483035059" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483035059">(Nov 18 2024 at 14:22)</a>:</h4>
+<p>According to <a href="https://metrics.dataverse.org">https://metrics.dataverse.org</a> eight installations have upgraded to 6.4 but I don't know if any of them are using multiple languages.</p>
+
+
+
+<a name="483035107"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483035107" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483035107">(Nov 18 2024 at 14:22)</a>:</h4>
+<p>We aren't at Harvard Dataverse. Just English.</p>
+
+
+
+<a name="483035249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483035249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483035249">(Nov 18 2024 at 14:22)</a>:</h4>
+<p>You might want to email <a href="https://groups.google.com/g/dataverse-community">https://groups.google.com/g/dataverse-community</a></p>
+
+
+
+<a name="483044520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483044520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483044520">(Nov 18 2024 at 14:59)</a>:</h4>
+<p>Thank you, I will send the e-mail.</p>
+
+
+
+<a name="483075841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483075841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483075841">(Nov 18 2024 at 17:05)</a>:</h4>
+<p>Thanks for posting <a href="https://groups.google.com/g/dataverse-community/c/pCMSLdiYR_0/m/aDsXzWXgCAAJ">https://groups.google.com/g/dataverse-community/c/pCMSLdiYR_0/m/aDsXzWXgCAAJ</a></p>
+<p>It looks like <span class="user-mention" data-user-id="698155">@Mireia Alcala</span> replied already.</p>
+
+
+
+<a name="483207251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483207251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483207251">(Nov 19 2024 at 08:34)</a>:</h4>
+<p>You are right, I will start with the Alfredo recommendation at first. Thanks.</p>
+
+
+
+<a name="483229998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483229998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483229998">(Nov 19 2024 at 10:33)</a>:</h4>
+<p>At the end, the problem was that we were using a wrong Payara version. The help here and on the Google group was, as always, perfect.</p>
+
+
+
+<a name="483230077"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20NullPointerException%20because%20%22languages%22%20is%20null/near/483230077" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20NullPointerException.20because.20.22languages.22.20is.20null.html#483230077">(Nov 19 2024 at 10:33)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="663397">Juan</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

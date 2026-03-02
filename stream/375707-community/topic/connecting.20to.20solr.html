@@ -1,0 +1,121 @@
+<html>
+<head><meta charset="utf-8"><title>connecting to solr · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html">connecting to solr</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="451042910"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451042910" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451042910">(Jul 12 2024 at 18:13)</a>:</h4>
+<p>The UCLA Dataverse is part of the library. The library would like to pull Dataverse objects into an Elasticsearch index for public discovery. Which would involve querying solr. This is what they use for other apps: <br>
+curl -I -L "<a href="https://dataverse.ucla.edu:8983/solr/collection1/select?q=*:*">https://dataverse.ucla.edu:8983/solr/collection1/select?q=*:*</a>"</p>
+<p>I tried this from localhost:<br>
+curl -I -L "<a href="https://localhost:8983/solr/collection1/select?q=*:*">https://localhost:8983/solr/collection1/select?q=*:*</a>"</p>
+<p>curl: (35) SSL received a record that exceeded the maximum permissible length.</p>
+<p>If I try not from a local host I just get a timeout.   Is there a way  to get this solr information from outside the dataverse server?</p>
+
+
+
+<a name="451044796"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451044796" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451044796">(Jul 12 2024 at 18:22)</a>:</h4>
+<p>Hmm, let's try to get it working from localhost first.</p>
+<p>I dev I do something like this:</p>
+<p><code>curl -s 'http://localhost:8983/solr/collection1/select?rows=1000000&amp;wt=json&amp;indent=true&amp;q=*%3A*'</code></p>
+<p>That's not working for you?</p>
+<p>This if from <a href="https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query">https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query</a> by the way.</p>
+
+
+
+<a name="451045505"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451045505" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451045505">(Jul 12 2024 at 18:25)</a>:</h4>
+<p>That works perfectly from localhost.   But, it needs to be run  from the outside.   I probably need to research that part.<br>
+Thank you!</p>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375707-community/topic/connecting.20to.20solr/near/451044796">said</a>:</p>
+<blockquote>
+<p>Hmm, let's try to get it working from localhost first.</p>
+<p>I dev I do something like this:</p>
+<p><code>curl -s 'http://localhost:8983/solr/collection1/select?rows=1000000&amp;wt=json&amp;indent=true&amp;q=*%3A*'</code></p>
+<p>That's not working for you?</p>
+<p>This if from <a href="https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query">https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query</a> by the way.</p>
+</blockquote>
+
+
+
+<a name="451046568"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451046568" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451046568">(Jul 12 2024 at 18:30)</a>:</h4>
+<p>We have a section on Solr security, one sec.</p>
+
+
+
+<a name="451046624"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451046624" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451046624">(Jul 12 2024 at 18:30)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/6.3/installation/prerequisites.html#securing-solr">https://guides.dataverse.org/en/6.3/installation/prerequisites.html#securing-solr</a></p>
+
+
+
+<a name="451047095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451047095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451047095">(Jul 12 2024 at 18:33)</a>:</h4>
+<p>It looks like there's a SOLR_IP_ALLOWLIST in <code>bin/solr.in.sh</code> (that file is mentioned above).</p>
+
+
+
+<a name="451047159"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451047159" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451047159">(Jul 12 2024 at 18:34)</a>:</h4>
+<p>I've never used it.</p>
+
+
+
+<a name="451047187"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451047187" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451047187">(Jul 12 2024 at 18:34)</a>:</h4>
+<p>The main thing is the make sure you keep blocking the rest of the Internet <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="451047335"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451047335" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451047335">(Jul 12 2024 at 18:35)</a>:</h4>
+<p><span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span></p>
+
+
+
+<a name="451069861"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451069861" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451069861">(Jul 12 2024 at 20:36)</a>:</h4>
+<p>It would be even better to protect your Solr with a username/password, but that would also require some code changes in Dataverse to inject these deets into the client. Also: it's probably a good idea to make use of HTTPS in Solr (which is no problemo for Dataverse already, as you can set the protocol bit).</p>
+
+
+
+<a name="451072016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451072016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451072016">(Jul 12 2024 at 20:47)</a>:</h4>
+<p>Related: Adding Solr Basic Authentication <a href="https://github.com/IQSS/dataverse/issues/9337">#9337</a></p>
+
+
+
+<a name="451072800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451072800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451072800">(Jul 12 2024 at 20:50)</a>:</h4>
+<p>I'm not sure if you can try to inject the basic auth stuff as part of the host definition</p>
+
+
+
+<a name="451072829"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451072829" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451072829">(Jul 12 2024 at 20:51)</a>:</h4>
+<p>host = "user:pass@host"</p>
+
+
+
+<a name="451072875"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451072875" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451072875">(Jul 12 2024 at 20:51)</a>:</h4>
+<p>MIght be worth a shot...</p>
+
+
+
+<a name="451072907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/connecting%20to%20solr/near/451072907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/connecting.20to.20solr.html#451072907">(Jul 12 2024 at 20:51)</a>:</h4>
+<p>Or readin' some docs</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

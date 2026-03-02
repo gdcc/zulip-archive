@@ -1,0 +1,81 @@
+<html>
+<head><meta charset="utf-8"><title>Create Guestbook using API · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html">Create Guestbook using API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="440519966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Create%20Guestbook%20using%20API/near/440519966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Dimitri Szabo <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html#440519966">(May 24 2024 at 14:22)</a>:</h4>
+<p>Hi there,<br>
+We've recently noticed that there were no issues to create guestbook (or guestbook entries) via APIs, which will be needed for SPA implementation of guestbook.<br>
+But writing the issue, I was wondering about the technical needs/choices, mostly the json input file, would it be ok to let it be minimal as the one to create collections or should we intent on new API calls to have something more complete in order to allow validations like datasets ?</p>
+
+
+
+<a name="440521001"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Create%20Guestbook%20using%20API/near/440521001" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html#440521001">(May 24 2024 at 14:28)</a>:</h4>
+<p>The SPA will definitely need an API endpoint to create a guestbook so we should get some feedback from <span class="user-mention" data-user-id="598447">@Ellen K</span> and <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> when the time is right.</p>
+
+
+
+<a name="440521793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Create%20Guestbook%20using%20API/near/440521793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html#440521793">(May 24 2024 at 14:32)</a>:</h4>
+<p>As for the JSON, I would probably start with whatever minimal JSON can successfully create a guestbook.</p>
+
+
+
+<a name="441243129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Create%20Guestbook%20using%20API/near/441243129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Dimitri Szabo <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html#441243129">(May 29 2024 at 13:39)</a>:</h4>
+<p>Here is a proposition,<br>
+we are wondering if the separation between default fields and custom question to reproduce the UI workflow is relevant or more confusing to API users.</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Name of the Guestbook"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"requiredFields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"institution "</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"position "</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"customQuestions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"What is the answer to the Ultimate Question of Life, the Universe, and Everything?"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"textarea"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"What is the answer to the Ultimate Question of Life, the Universe, and Everything?"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"options"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"What is the answer to the Ultimate Question of Life, the Universe, and Everything?"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">"41"</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"42"</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"43"</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>I'd also add in the issue the db fields but that's for the issue writing</p>
+
+
+
+<a name="441245184"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Create%20Guestbook%20using%20API/near/441245184" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Create.20Guestbook.20using.20API.html#441245184">(May 29 2024 at 13:50)</a>:</h4>
+<p>Hmm, overall looks good, but I would remove the <code>requiredFields</code> object. It's clear from each <code>customQuestions</code> item whether it is required or not. No need to duplicate.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

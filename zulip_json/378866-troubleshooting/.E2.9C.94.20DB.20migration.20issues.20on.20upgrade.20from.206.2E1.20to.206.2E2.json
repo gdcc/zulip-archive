@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Hi, I am trying to upgrade from version 6.1 to 6.2 using  a custom war file and I am getting a lot of sql exceptions from asadmin deploy dataverse.war and in server.log I found the following messages, the last one is about a sql file for db migration that seems to be missing:</p>\n<p><a href=\"/user_uploads/53090/S3t0Tdz7l6R2dHYO7asXC-m6/PastedText.txt\">PastedText.txt</a></p>\n<p>I checked the war file with the following command and the sql file is there. Any ideas for the cause of this problem and how I can solve it?</p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code>jar<span class=\"w\"> </span>tf<span class=\"w\"> </span>dataverse.war<span class=\"w\"> </span><span class=\"p\">|</span><span class=\"w\"> </span>grep<span class=\"w\"> </span><span class=\"s2\">\"db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql\"</span>\nWEB-INF/classes/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql\n</code></pre></div>",
+        "id": 532288732,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754048799
+    },
+    {
+        "content": "<p>Hmm...</p>\n<div class=\"codehilite\"><pre><span></span><code>Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V6.1.0.4__5645-geospatial-fieldname-fix.sql failed\n------------------------------------------------------------\nSQL State  : 23505\nError Code : 0\nMessage    : ERROR: duplicate key value violates unique constraint &quot;datasetfieldtype_name_key&quot;\n  Detail: Key (name)=(northLatitude) already exists.\nLocation   : db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql (/usr/local/payara6/glassfish/domains/domain1/applications/dataverse/WEB-INF/classes/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql)\nLine       : 1\nStatement  : UPDATE datasetfieldtype\nSET name = &#39;northLatitude&#39;\nWHERE name = &#39;northLongitude&#39;\n</code></pre></div>",
+        "id": 532292302,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754049971
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/5645\">#5645</a> was fixed by <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> in PR <a href=\"https://github.com/IQSS/dataverse/issues/10306\">#10306</a> in 6.2.</p>\n<p>And yes, that PR is where <code>src/main/resources/db/migration/V6.1.0.3__5645-geospatial-fieldname-fix.sql</code> comes from. (The version got bumped to .4 in <a href=\"https://github.com/IQSS/dataverse/issues/10346\">#10346</a>.)</p>",
+        "id": 532292511,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754050037
+    },
+    {
+        "content": "<p>This is all the script is doing...</p>\n<div class=\"codehilite\"><pre><span></span><code>UPDATE datasetfieldtype\nSET name = &#39;northLatitude&#39;\nWHERE name = &#39;northLongitude&#39;;\n\nUPDATE datasetfieldtype\nSET name = &#39;southLatitude&#39;\nWHERE name = &#39;southLongitude&#39;;\n</code></pre></div>\n<p>... from <a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/main/resources/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql\">https://github.com/IQSS/dataverse/blob/v6.2/src/main/resources/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql</a></p>",
+        "id": 532294136,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754050626
+    },
+    {
+        "content": "<p>I'm not sure why this result in the error you're seeing: <code>Message    : ERROR: duplicate key value violates unique constraint \"datasetfieldtype_name_key\"  Detail: Key (name)=(northLatitude) already exists.</code></p>",
+        "id": 532294298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754050682
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> does \"northLatitude\" already exist in your pre-6.2 database?</p>",
+        "id": 532294417,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754050736
+    },
+    {
+        "content": "<p>Yes, I already have these fields, maybe it is because I already updated the metadata blocks from the tsv files?</p>",
+        "id": 532295629,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754051177
+    },
+    {
+        "content": "<p>If you applied the new TSVs to an instance running an older version, that would make things break, yes.</p>",
+        "id": 532296554,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1754051475
+    },
+    {
+        "content": "<p>The easiest way to go around this is probably to edit your database before you restart Dataverse and remove any such failing entries.</p>",
+        "id": 532296769,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1754051560
+    },
+    {
+        "content": "<p>Thank you, that fixed the problem.</p>",
+        "id": 532297436,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754051783
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"622863\">César Ferreira</span> has marked this topic as resolved.</p>",
+        "id": 532302106,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1754053308
+    }
+]

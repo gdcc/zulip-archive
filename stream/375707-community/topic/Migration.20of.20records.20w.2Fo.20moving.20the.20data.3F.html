@@ -1,0 +1,88 @@
+<html>
+<head><meta charset="utf-8"><title>Migration of records w/o moving the data? · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html">Migration of records w/o moving the data?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="465841755"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465841755" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465841755">(Aug 28 2024 at 20:07)</a>:</h4>
+<p>Hello, </p>
+<p>We have a few collections we'd like to migrate into Dataverse where the files are already in an S3 bucket and curated by another application.  Ideally we wouldn't have to move the files, as they could be, in theory, accessed from where they already are, plus they already have handles pointing to them there (not that we couldn't change this pointer, I think).   We'd like to just give Dataverse access to this other bucket, in addition to it's other datastores. </p>
+<p>I know it'd be straightforward, via the native API, to move the <em>metadata</em> into Dataverse.  For the files, if we didn't want to migrate them, would we essentially be following the process for moving a large data set?  <br>
+0) ensure that the second S3 bucket is configured to be access by Dataverse </p>
+<p>1) have the metadata migration create place holder files for the datasets</p>
+<p>2) have a script that manipulates the Dataverse database to point to the right S3 bucket and location w/i it.  (This would be more than just replacing a placeholder, as the files wouldn't be where the place holder was set)</p>
+<p>Would this work? </p>
+<p>There are a few unknowns for us -- </p>
+<ol>
+<li>Can dataverse link to mulitple S3 buckets?  </li>
+<li>Is the only way to make the connection from the datasets to the file in S3 be by manipulating the database?</li>
+</ol>
+<p>Note: As mentioned, we do have Handles on the files that point directly to the files in the buckets, and one thought we've had is to just use those as links to the data in the Dataverse record. </p>
+<p>(I don't think OAI-PMH harvesting would be enough for this collection because the Datasets wouldn't technically be hosted elsewhere to point to.  The goal here is to have the dataset in one place and the curation tool and the public access website (Dataverse) access it from there)</p>
+<p>I'm still very new to Dataverse, so there might be other options I missing.  Would love to hear some perspectives on this.</p>
+
+
+
+<a name="465844763"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465844763" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465844763">(Aug 28 2024 at 20:29)</a>:</h4>
+<p>My first thought is that Jim Myers knows the most about this so you might want to cross post to <a href="https://groups.google.com/g/dataverse-community">https://groups.google.com/g/dataverse-community</a> to get his attention. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="465844958"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465844958" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465844958">(Aug 28 2024 at 20:30)</a>:</h4>
+<p>Yes, Dataverse can link to multiple S3 buckets. Each "store" can be configured separately, to use the same bucket, to use different buckets; it's up to you.</p>
+
+
+
+<a name="465845039"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465845039" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465845039">(Aug 28 2024 at 20:31)</a>:</h4>
+<p>You might want to look into Trusted Remote Storage: <a href="https://guides.dataverse.org/en/6.3/installation/config.html#trusted-remote-storage">https://guides.dataverse.org/en/6.3/installation/config.html#trusted-remote-storage</a></p>
+
+
+
+<a name="465845190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465845190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465845190">(Aug 28 2024 at 20:32)</a>:</h4>
+<p>Do you want Dataverse to take over management of the files? Or do you want to manage them in S3 separately and simply let Dataverse know where the files live?</p>
+
+
+
+<a name="465845843"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465845843" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465845843">(Aug 28 2024 at 20:37)</a>:</h4>
+<p>Thanks, Phil.  I'll cross post there. <br>
+Good question about file management. For this collection of data, I think it might be the later option, but I'll have to ask the collection manager.   What does it mean to have Dataverse take over management of the files?</p>
+
+
+
+<a name="465848678"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465848678" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465848678">(Aug 28 2024 at 20:57)</a>:</h4>
+<p>Here's the <a href="https://groups.google.com/g/dataverse-community/c/133bNBCtXYc/m/NYV77HAXCgAJ">cross post</a>. Thanks again.</p>
+
+
+
+<a name="465848702"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465848702" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465848702">(Aug 28 2024 at 20:57)</a>:</h4>
+<p>Well, do you want Dataverse to be able to delete files?</p>
+
+
+
+<a name="465848773"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/465848773" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#465848773">(Aug 28 2024 at 20:58)</a>:</h4>
+<p>When a dataset is in draft and files are deleted, they are removed from the S3 bucket. Poof.</p>
+
+
+
+<a name="468873748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Migration%20of%20records%20w/o%20moving%20the%20data%3F/near/468873748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Migration.20of.20records.20w.2Fo.20moving.20the.20data.3F.html#468873748">(Sep 09 2024 at 17:51)</a>:</h4>
+<p>A new reply from Jim: <a href="https://groups.google.com/g/dataverse-community/c/133bNBCtXYc/m/mZkJ-3W_AAAJ">https://groups.google.com/g/dataverse-community/c/133bNBCtXYc/m/mZkJ-3W_AAAJ</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

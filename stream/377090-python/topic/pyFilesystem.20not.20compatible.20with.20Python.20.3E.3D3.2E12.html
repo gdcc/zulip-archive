@@ -1,0 +1,57 @@
+<html>
+<head><meta charset="utf-8"><title>pyFilesystem not compatible with Python &gt;=3.12 · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html">pyFilesystem not compatible with Python &gt;=3.12</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="573738005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573738005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573738005">(Feb 13 2026 at 13:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> unfortunately pyFileSystem2 has turned out to be incompatible with newer versions, because it is using <code>pkg_resources</code> and its support has been removed. Huge bummer!</p>
+<p>Luckily the current pyDataverse 0.4.0 implementation simply uses their base class to implement necessary methods, but not the entire eco-system. Hence, I can restore compatibility by simply not inheriting and removing the dependency (see <a href="https://github.com/gdcc/pyDataverse/actions/runs/21987619496/job/63525807148">completed</a> vs <a href="https://github.com/gdcc/pyDataverse/actions/runs/21986071898">failed</a> run).</p>
+<p>I am now looking into alternatives, since other users have experienced the same issues. One of which is <a href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a> which looks very promising. What are your thoughts? To me it looks like it is a viable alternative and possibly offers even more.</p>
+
+
+
+<a name="573741130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573741130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573741130">(Feb 13 2026 at 13:21)</a>:</h4>
+<p>That looks like a well maintained library!</p>
+
+
+
+<a name="573741164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573741164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573741164">(Feb 13 2026 at 13:21)</a>:</h4>
+<p>They even provide chaining and local caching out of the box!</p>
+
+
+
+<a name="573741213"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573741213" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573741213">(Feb 13 2026 at 13:22)</a>:</h4>
+<p>Also their argument for serializable filesystem requests seem very reasonable!</p>
+
+
+
+<a name="573741267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573741267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573741267">(Feb 13 2026 at 13:22)</a>:</h4>
+<p>I'm not a Python expert, but it may be worth a shot!</p>
+
+
+
+<a name="573741893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573741893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573741893">(Feb 13 2026 at 13:25)</a>:</h4>
+<p>I like their overview of alternatives (e.g. <a href="https://github.com/piskvorky/smart_open">https://github.com/piskvorky/smart_open</a>), but as we seek abstraction, this seems to be a good fit</p>
+
+
+
+<a name="573797724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyFilesystem%20not%20compatible%20with%20Python%20%3E%3D3.12/near/573797724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyFilesystem.20not.20compatible.20with.20Python.20.3E.3D3.2E12.html#573797724">(Feb 13 2026 at 17:44)</a>:</h4>
+<p>I agree, looking through the docs this is an awesome library! I will test it out in the upcoming week <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

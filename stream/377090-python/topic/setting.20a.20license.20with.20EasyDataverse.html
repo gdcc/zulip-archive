@@ -1,0 +1,94 @@
+<html>
+<head><meta charset="utf-8"><title>setting a license with EasyDataverse · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html">setting a license with EasyDataverse</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="493635094"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493635094" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493635094">(Jan 14 2025 at 17:30)</a>:</h4>
+<p>Hmm, it seems like it isn't possible to set a license with EasyDataverse: <a href="https://github.com/gdcc/easyDataverse/issues/29">https://github.com/gdcc/easyDataverse/issues/29</a></p>
+<p>For me, datasets are being created with "Custom Dataset Terms" and a blank "Terms of Use". This is suboptimal because its an invalid state. Terms of Use are required when Custom Dataset Terms is selected.</p>
+
+
+
+<a name="493635125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493635125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493635125">(Jan 14 2025 at 17:30)</a>:</h4>
+<p><a href="/user_uploads/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png">Screenshot 2025-01-14 at 12.29.52 PM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png" title="Screenshot 2025-01-14 at 12.29.52 PM.png"><img data-original-dimensions="1182x666" src="/user_uploads/thumbnail/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png/840x560.webp"></a></div>
+
+
+
+<a name="493635226"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493635226" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493635226">(Jan 14 2025 at 17:31)</a>:</h4>
+<p>What's the easiest workaround I wonder? Hit the dataset with <code>requests</code> to flip the license to CC0? That's the license I'd like to use. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="493659245"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493659245" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493659245">(Jan 14 2025 at 19:58)</a>:</h4>
+<p>Bah. I couldn't figure out how to set a license easily with <code>requests</code>. So I flipped the whole thing around. I'm creating a dataset with <code>requests</code> and then using EasyDataverse to pull down that dataset and set the metadata fields I need.</p>
+
+
+
+<a name="493659648"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493659648" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493659648">(Jan 14 2025 at 20:00)</a>:</h4>
+<div class="codehilite"><pre><span></span><code># Strangely, datasets created with EasyDataverse have
+# Custom Terms rather than CC0, which is the default,
+# and it&#39;s not possible to change the license afterward
+# using EasyDataverse: https://github.com/gdcc/easyDataverse/issues/29
+# So, we create a basic dataset using requests and
+# then update the fields later with EasyDataverse.
+with open(&#39;initial-dataset.json&#39;) as f:
+    r = requests.post(server_url + &quot;/api/dataverses/&quot; + collection + &quot;/datasets&quot;, data=f, headers={&quot;X-Dataverse-key&quot;: api_token})
+    # We&#39;ll use this pid later to update the dataset
+    pid = r.json()[&#39;data&#39;][&#39;persistentId&#39;]
+dataset = dataverse.load_dataset(pid)
+dataset.citation.title = title
+dataset.update()
+</code></pre></div>
+
+
+
+<a name="493917568"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493917568" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493917568">(Jan 15 2025 at 12:43)</a>:</h4>
+<p>I am happy to implement this to the <code>Dataset</code> class. This has been on my list for far too long now :-D About to schedule a new release this week and it would be a good opportunity to sneak it in.</p>
+
+
+
+<a name="493918127"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493918127" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493918127">(Jan 15 2025 at 12:46)</a>:</h4>
+<p>In terms of how to tackle this some questions:</p>
+<ul>
+<li>Is there a fixed set of licenses given by Dataverse or can users add others dynamically?</li>
+<li>Can the licenses be acquired via API?</li>
+<li>Can we specify a default license or is it it bad practice?</li>
+</ul>
+<p>In general I would opt for an Enum approach to handle licenses. We either create them dynamically, similar to the metadata blocks, or we bake them into EasyDataverse.</p>
+
+
+
+<a name="493918785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493918785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493918785">(Jan 15 2025 at 12:49)</a>:</h4>
+<p>Yes, you can them from <a href="https://demo.dataverse.org/api/licenses">https://demo.dataverse.org/api/licenses</a></p>
+
+
+
+<a name="493919011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493919011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493919011">(Jan 15 2025 at 12:50)</a>:</h4>
+<p>And yes, you can add new licenses and change what the default license is: <a href="https://guides.dataverse.org/en/6.5/installation/config.html#configuring-licenses">https://guides.dataverse.org/en/6.5/installation/config.html#configuring-licenses</a></p>
+
+
+
+<a name="493919504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20license%20with%20EasyDataverse/near/493919504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20license.20with.20EasyDataverse.html#493919504">(Jan 15 2025 at 12:52)</a>:</h4>
+<p>Great, thanks! Thats a good start :-)</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

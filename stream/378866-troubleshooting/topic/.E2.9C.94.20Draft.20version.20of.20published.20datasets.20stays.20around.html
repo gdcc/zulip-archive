@@ -1,0 +1,145 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Draft version of published datasets stays around · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html">✔ Draft version of published datasets stays around</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="435183265"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435183265" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435183265">(Apr 24 2024 at 12:57)</a>:</h4>
+<p>I stumbled across another problem <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> We have a dataset that has been published, but the interface is still showing an unpublished draft version (only). Clicking on the dataset forwards me to the published version v1.0 of the dataset, since the draft version is no longer around. Things I tried:</p>
+<ul>
+<li>Re-index the dataset in SOLR via Database id as well as PID</li>
+<li>Clear SOLR orphans</li>
+<li>Manually publish a new version of the dataset</li>
+<li>A manual SOLR query via CURL is inconclusive (at least to my eyes)</li>
+</ul>
+<p>Things I have not tried:</p>
+<ul>
+<li>Since the instance is running v6.0, deleting that specific SOLR record is not an option (yet)</li>
+<li>I have not yet run a full re-index, since I would like to avoid the downtime for now.</li>
+</ul>
+<p>I have seen some JVM crashes during SOLR runs that occurred yesterday. I am not sure if they are related. This might be related to our problems with full text indexing that we had earlier.</p>
+<p>Has anyone encountered something like this before?</p>
+
+
+
+<a name="435188726"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435188726" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435188726">(Apr 24 2024 at 13:23)</a>:</h4>
+<p>Huh. I would expect that reindexing the specific dataset should remove the draft version. It's strange that it did not.</p>
+<p>You could delete the document from Solr by calling Solr directly.</p>
+<p>It sounds like you tried <a href="https://guides.dataverse.org/en/6.2/admin/solr-search-index.html#manually-querying-solr">https://guides.dataverse.org/en/6.2/admin/solr-search-index.html#manually-querying-solr</a> already. Inconclusive? Did it return two Solr documents? One published one draft?</p>
+
+
+
+<a name="435193320"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435193320" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435193320">(Apr 24 2024 at 13:44)</a>:</h4>
+<p>Thanks for the help! The first problem is solved, the manual query returned no results because I messed up the query URL. Now it shows all datasets.</p>
+<p>For the dataset in question, SOLR only return the draft version, but it seems like all SOLR reindexing runs crash with an OutOfMemory Exception. I think I need to dig into my settings here.</p>
+
+
+
+<a name="435194295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435194295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435194295">(Apr 24 2024 at 13:48)</a>:</h4>
+<p>Are you saying you get out of memory problems even if you try to reindex a single dataset? <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="435196685"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435196685" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435196685">(Apr 24 2024 at 14:00)</a>:</h4>
+<p>Correct <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> I re-index the single dataset and get a nice jvm crash report </p>
+<div class="codehilite"><pre><span></span><code># A fatal error has been detected by the Java Runtime Environment:
+#
+#  Internal Error (debug.cpp:362), pid=3178922, tid=3178961
+#  fatal error: OutOfMemory encountered: Java heap space
+[...]
+Command Line: -Xms512m -Xmx512m -XX:+UseG1GC -XX:+PerfDisableSharedMem -XX:+ParallelRefProcEnabled [...]
+</code></pre></div>
+<p>I am not this experienced with SOLR. Are the 512m a reasonable value?</p>
+
+
+
+<a name="435199978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435199978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435199978">(Apr 24 2024 at 14:15)</a>:</h4>
+<p>It seems to work with the same settings on other servers, so I am not sure what is going on here. I will try a complete re-index later today.</p>
+
+
+
+<a name="435208099"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435208099" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435208099">(Apr 24 2024 at 14:51)</a>:</h4>
+<p>Hmm, I'm not sure.</p>
+<p>I do see 1 GB here: <code>ExecStart = /usr/local/solr/solr-9.3.0/bin/solr start -m 1g</code></p>
+<p>Which is twice what you have. That's from the solr.service script at <a href="https://guides.dataverse.org/en/6.2/installation/prerequisites.html#solr-init-script">https://guides.dataverse.org/en/6.2/installation/prerequisites.html#solr-init-script</a></p>
+
+
+
+<a name="435208304"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435208304" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435208304">(Apr 24 2024 at 14:52)</a>:</h4>
+<p>Perhaps <span class="user-mention" data-user-id="626369">@Don Sizemore</span> or <span class="user-mention" data-user-id="637063">@Leo Andreev</span> can suggest a sufficient amount of memory for Solr.</p>
+
+
+
+<a name="435208436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435208436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435208436">(Apr 24 2024 at 14:53)</a>:</h4>
+<p>But obviously, you shouldn't get a crash like that when reindexing a single dataset. <span aria-label="scream" class="emoji emoji-1f631" role="img" title="scream">:scream:</span></p>
+
+
+
+<a name="435213033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435213033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435213033">(Apr 24 2024 at 15:08)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601943">Henning Timm</span> <a href="#narrow/stream/378866-troubleshooting/topic/Draft.20version.20of.20published.20datasets.20stays.20around/near/435196685">said</a>:</p>
+<blockquote>
+<p>Correct <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> I re-index the single dataset and get a nice jvm crash report </p>
+<div class="codehilite"><pre><span></span><code># A fatal error has been detected by the Java Runtime Environment:
+#
+#  Internal Error (debug.cpp:362), pid=3178922, tid=3178961
+#  fatal error: OutOfMemory encountered: Java heap space
+[...]
+Command Line: -Xms512m -Xmx512m -XX:+UseG1GC -XX:+PerfDisableSharedMem -XX:+ParallelRefProcEnabled [...]
+</code></pre></div>
+<p>I am not this experienced with SOLR. Are the 512m a reasonable value?</p>
+</blockquote>
+<p>Phil is correct; Harvard had trouble with Solr stability and bumped their SOLR JVM heap size to 1GB in response.</p>
+
+
+
+<a name="435214766"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435214766" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435214766">(Apr 24 2024 at 15:14)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="626369">Don Sizemore</span> <a href="#narrow/stream/378866-troubleshooting/topic/Draft.20version.20of.20published.20datasets.20stays.20around/near/435213033">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="601943">Henning Timm</span> <a href="#narrow/stream/378866-troubleshooting/topic/Draft.20version.20of.20published.20datasets.20stays.20around/near/435196685">said</a>:</p>
+<blockquote>
+<p>Correct <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> I re-index the single dataset and get a nice jvm crash report </p>
+<div class="codehilite"><pre><span></span><code># A fatal error has been detected by the Java Runtime Environment:
+#
+#  Internal Error (debug.cpp:362), pid=3178922, tid=3178961
+#  fatal error: OutOfMemory encountered: Java heap space
+[...]
+Command Line: -Xms512m -Xmx512m -XX:+UseG1GC -XX:+PerfDisableSharedMem -XX:+ParallelRefProcEnabled [...]
+</code></pre></div>
+<p>I am not this experienced with SOLR. Are the 512m a reasonable value?</p>
+</blockquote>
+<p>Phil is correct; Harvard had trouble with Solr stability and bumped their SOLR JVM heap size to 1GB in response.</p>
+</blockquote>
+<p>Thanks! I'll give this a try.</p>
+
+
+
+<a name="435235052"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435235052" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435235052">(Apr 24 2024 at 16:55)</a>:</h4>
+<p>That did the trick! Thank you for the help!</p>
+
+
+
+<a name="435235057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Draft%20version%20of%20published%20datasets%20stays%20around/near/435235057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around.html#435235057">(Apr 24 2024 at 16:55)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601943">Henning Timm</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

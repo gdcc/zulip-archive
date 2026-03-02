@@ -1,0 +1,77 @@
+<html>
+<head><meta charset="utf-8"><title>Updating Shibboleth pointer · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html">Updating Shibboleth pointer</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="430139303"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430139303" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430139303">(Mar 28 2024 at 18:24)</a>:</h4>
+<p>Our institution is updating its Shibboleth servers and requiring us to point to their new server. The issue I'm encountering involves it now asking existing users to create a new account, which then leads to an error message when they attempt to do so:</p>
+<p>"Error – Couldn't create user. If you believe this is an error, please contact...."<br>
+<a href="/user_uploads/53090/_f44GzxJuHWXJQ3ttYcUWDum/Screenshot-from-2024-03-28-14-20-44.png">Screenshot-from-2024-03-28-14-20-44.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/_f44GzxJuHWXJQ3ttYcUWDum/Screenshot-from-2024-03-28-14-20-44.png" title="Screenshot-from-2024-03-28-14-20-44.png"><img src="/user_uploads/53090/_f44GzxJuHWXJQ3ttYcUWDum/Screenshot-from-2024-03-28-14-20-44.png"></a></div><p>This outcome seems logical since the user already exists.</p>
+<p>I suspect the problem may lie with the "persistentUserId" that contains the old Shibboleth URL along with the user's email address. Is there a method to correct or update this?</p>
+
+
+
+<a name="430145660"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430145660" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430145660">(Mar 28 2024 at 19:02)</a>:</h4>
+<p>Yes, but you have to hack on the database.</p>
+
+
+
+<a name="430145790"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430145790" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430145790">(Mar 28 2024 at 19:03)</a>:</h4>
+<p>Please look at the persistentuserid column in the authenticateduserlookup table: <a href="https://guides.dataverse.org/en/5.14/schemaspy/tables/authenticateduserlookup.html">https://guides.dataverse.org/en/5.14/schemaspy/tables/authenticateduserlookup.html</a></p>
+
+
+
+<a name="430146473"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430146473" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430146473">(Mar 28 2024 at 19:08)</a>:</h4>
+<p>So it's basically a "find and replace" approach from the look of it.</p>
+
+
+
+<a name="430146552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430146552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430146552">(Mar 28 2024 at 19:09)</a>:</h4>
+<p>Yeah. If you'd like an API for this, please feel free to create an issue.</p>
+
+
+
+<a name="430147201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430147201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430147201">(Mar 28 2024 at 19:14)</a>:</h4>
+<p>Realistically, this would be for the next person who needs it, of course. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="430152517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430152517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430152517">(Mar 28 2024 at 19:55)</a>:</h4>
+<p>Thanks for opening this! API Endpoint for Updating persistentUserId <a href="https://github.com/IQSS/dataverse/issues/10446">#10446</a></p>
+
+
+
+<a name="430601481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430601481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430601481">(Apr 01 2024 at 14:29)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> I'm gonna need it sooner than later!</p>
+
+
+
+<a name="430601865"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/430601865" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#430601865">(Apr 01 2024 at 14:32)</a>:</h4>
+<p>Yeah, good it get it in the queue, at least. It happens, IdP entityIds changing, unfortunately.</p>
+
+
+
+<a name="455477792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Updating%20Shibboleth%20pointer/near/455477792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Updating.20Shibboleth.20pointer.html#455477792">(Jul 31 2024 at 20:27)</a>:</h4>
+<p>Another example: <a class="stream-topic" data-stream-id="378866" href="/#narrow/stream/378866-troubleshooting/topic/Switching.20SAML.20IDP.20servers.2C.20should.20it.20be.20seamless.3F">#troubleshooting &gt; Switching SAML IDP servers, should it be seamless?</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

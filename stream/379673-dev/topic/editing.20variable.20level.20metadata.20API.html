@@ -1,0 +1,109 @@
+<html>
+<head><meta charset="utf-8"><title>editing variable level metadata API · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html">editing variable level metadata API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="527956461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/527956461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#527956461">(Jul 09 2025 at 19:58)</a>:</h4>
+<p>Over at <a href="https://guides.dataverse.org/en/6.6/api/native-api.html#editing-variable-level-metadata">https://guides.dataverse.org/en/6.6/api/native-api.html#editing-variable-level-metadata</a> we have docs for an API that lets you edit variable level metadata. It was originally added in <a href="https://github.com/IQSS/dataverse/issues/5616">#5616</a> by <span class="user-mention" data-user-id="698148">@Victoria Lubitch</span>. I'm having trouble getting it to work.</p>
+
+
+
+<a name="527956736"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/527956736" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#527956736">(Jul 09 2025 at 20:00)</a>:</h4>
+<p>There's a <a href="https://guides.dataverse.org/en/6.6/_downloads/d126c03c90aebaa09467b38513728564/dct.xml">dct.xml</a> file provided but I assume it won't "just work".</p>
+<p>I assume I should first download variable-level DDI from my file from <code>$SERVER_URL/api/v1/access/datafile/$FILE_ID/metadata/ddi</code> (<a href="https://guides.dataverse.org/en/6.6/api/dataaccess.html#data-variable-metadata-access">docs</a>), edit it, and use that. Does that sound right?</p>
+
+
+
+<a name="535019135"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535019135" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535019135">(Aug 18 2025 at 20:40)</a>:</h4>
+<p>I just started playing with this as well. I downloaded variable level ddi from the record, changed it and ran the api call to edit it.  That seemed to work well. </p>
+<p>The results are that I see the proper DDI with the changes when I fetch it via the API.  But should I also see it in the GUI when I download the DDI for a file?  I'm not seeing the changes there, even after I publish the file. I half suspect that I need to re-run some back end process to regenerate them for the UI?</p>
+
+
+
+<a name="535019742"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535019742" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535019742">(Aug 18 2025 at 20:45)</a>:</h4>
+<p>You might need to reexport that dataset: <a href="https://guides.dataverse.org/en/6.7.1/admin/metadataexport.html#batch-exports-through-the-api">https://guides.dataverse.org/en/6.7.1/admin/metadataexport.html#batch-exports-through-the-api</a></p>
+
+
+
+<a name="535020000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535020000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535020000">(Aug 18 2025 at 20:47)</a>:</h4>
+<p>Does that run at a regular interval, or only when a record is re/published? (or when someone runs it explicitly like during an upgrade)</p>
+
+
+
+<a name="535020169"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535020169" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535020169">(Aug 18 2025 at 20:49)</a>:</h4>
+<p>Only when a dataset is republished.</p>
+
+
+
+<a name="535020227"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535020227" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535020227">(Aug 18 2025 at 20:49)</a>:</h4>
+<p>We ask people to reexport in release notes, sometimes, if we change something.</p>
+
+
+
+<a name="535020289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535020289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535020289">(Aug 18 2025 at 20:49)</a>:</h4>
+<p>For 6.7 we updated the Croissant export, for example. So we advise people to reexport all.</p>
+
+
+
+<a name="535020873"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535020873" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535020873">(Aug 18 2025 at 20:55)</a>:</h4>
+<p>Reexporting on a dataset should also work with the file metadata?  Or do I need to do something separate for that? I'm not seeing the file level<br>
+ variable changes in the metadata yet. </p>
+<p>I did this for the dataset: <br>
+curl <a href="http://localhost:8080/api/admin/metadata/:persistentId/reExportDataset?persistentId=doi:10.5072/FK2/F8WTAD">http://localhost:8080/api/admin/metadata/:persistentId/reExportDataset?persistentId=doi:10.5072/FK2/F8WTAD</a></p>
+<p>and I get a message it's started and see a success in the log. </p>
+<p>(dataverse version 5.14, for reference)</p>
+
+
+
+<a name="535021003"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535021003" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535021003">(Aug 18 2025 at 20:57)</a>:</h4>
+<p>The file metadata should come along for the ride. <span aria-label="rocket" class="emoji emoji-1f680" role="img" title="rocket">:rocket:</span></p>
+
+
+
+<a name="535023119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535023119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535023119">(Aug 18 2025 at 21:18)</a>:</h4>
+<p>fwiw, I am seeing this after I re-publish a dataset after a change to the file's metadata:</p>
+<blockquote>
+<p>[#|2025-08-18T21:16:27.600+0000|SEVERE|Payara 5.2022.5|javax.enterprise.resource.webcontainer.jsf.context|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1755551787600;_LevelValue=1000;|<br>
+  javax.faces.view.facelets.TagAttributeException: /dataset.xhtml @93,82 test="#{not empty DatasetPage.getSignpostingLinkHeader()}" /dataset.xhtml @93,82 test="#{not empty DatasetPage.getSignpostingLinkHeader()}": java.lang.NullPointerException<br>
+        at com.sun.faces.facelets.tag.TagAttributeImpl.getObject(TagAttributeImpl.java:318)<br>
+        at com.sun.faces.facelets.tag.TagAttributeImpl.getBoolean(TagAttributeImpl.java:109)<br>
+        at com.sun.faces.facelets.tag.jstl.core.IfHandler.apply(IfHandler.java:50)<br>
+        at javax.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:55)<br>
+        at com.sun.faces.facelets.tag.ui.DefineHandler.applyDefinition(DefineHandler.java:65)</p>
+</blockquote>
+
+
+
+<a name="535024529"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535024529" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535024529">(Aug 18 2025 at 21:32)</a>:</h4>
+<p>I'm guessing that the generation of the updated export files are failing in our setup due to (it seems like) the workingVersion in the DatasetPage.java is not set for some reason.  Weird. </p>
+<p>Actually, looks like I'm running into:  <a href="https://github.com/IQSS/dataverse/issues/9954">https://github.com/IQSS/dataverse/issues/9954</a></p>
+<p>This may be preventing the generation of the new files... Interesting.</p>
+
+
+
+<a name="535111328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/editing%20variable%20level%20metadata%20API/near/535111328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/editing.20variable.20level.20metadata.20API.html#535111328">(Aug 19 2025 at 11:54)</a>:</h4>
+<p>Yikes, yes, interesting is one way to put it. <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

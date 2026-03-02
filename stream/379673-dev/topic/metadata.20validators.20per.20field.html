@@ -1,0 +1,295 @@
+<html>
+<head><meta charset="utf-8"><title>metadata validators per field · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html">metadata validators per field</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="449219863"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449219863" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449219863">(Jul 05 2024 at 05:15)</a>:</h4>
+<p>I have a crazy idea. How about we enable configuring a metadata validator per field via MPCONFIG? We could allow loading these as plugins like exporters if an internal one does not suffice. (Even with the SPA we still need a server side validation.) These configurations could even be requested as a JSON Schema expression, allowing for client side validation. Comments?</p>
+
+
+
+<a name="449230222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449230222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449230222">(Jul 05 2024 at 06:38)</a>:</h4>
+<p>I like it! How would I write such a field-validator?</p>
+
+
+
+<a name="449230991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449230991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449230991">(Jul 05 2024 at 06:44)</a>:</h4>
+<p>I'd say some stuff should be included like numeric min/max</p>
+
+
+
+<a name="449231009"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231009" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231009">(Jul 05 2024 at 06:44)</a>:</h4>
+<p>Then you just use it by configuration</p>
+
+
+
+<a name="449231056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231056">(Jul 05 2024 at 06:45)</a>:</h4>
+<p>But to enable custom validators, these should use an SPI loaded Java plugin</p>
+
+
+
+<a name="449231116"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231116" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231116">(Jul 05 2024 at 06:45)</a>:</h4>
+<p>Obviously you can use the same tricks again to go from there to Javascript/Python, but this comes with a performance penalty</p>
+
+
+
+<a name="449231185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231185">(Jul 05 2024 at 06:46)</a>:</h4>
+<p>They'd be loaded and connected to a field by configuration</p>
+
+
+
+<a name="449231283"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231283" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231283">(Jul 05 2024 at 06:46)</a>:</h4>
+<p>It would certainly allow for much more complex validations</p>
+
+
+
+<a name="449231391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449231391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449231391">(Jul 05 2024 at 06:47)</a>:</h4>
+<p>Probably for a first step it would be instance wide configuration only, but one should consider a later extension to configuration per collection.</p>
+
+
+
+<a name="449232252"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232252" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232252">(Jul 05 2024 at 06:54)</a>:</h4>
+<p>Could the numeric and format validation logic be outsourced to the JSON Schema of a metadata block? This way, other instances could reuse the validation logic, and some existing features could be used already. Or is this not possible with the current implementation?</p>
+
+
+
+<a name="449232458"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232458" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232458">(Jul 05 2024 at 06:56)</a>:</h4>
+<p>This starts to sound like a chicken and egg problem</p>
+
+
+
+<a name="449232503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232503">(Jul 05 2024 at 06:56)</a>:</h4>
+<p>We could of course write a custom validator that extracts information like this from a JSON Schema</p>
+
+
+
+<a name="449232534"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232534" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232534">(Jul 05 2024 at 06:56)</a>:</h4>
+<p>In fact, that would be one of the ideas for these validators, enabling a textbox to be filled with JSON controlled by a schema</p>
+
+
+
+<a name="449232756"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232756" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232756">(Jul 05 2024 at 06:58)</a>:</h4>
+<p>Using JSON Schemas as a format for metadata schema definitions in Java (so they become the source, not the target like we're talking about in the JSON schema topic) is a long lasting dream, but goes beyond what I envisioned</p>
+
+
+
+<a name="449232783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449232783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449232783">(Jul 05 2024 at 06:58)</a>:</h4>
+<p>Also, this  would still need configuration per collection I suppose</p>
+
+
+
+<a name="449233260"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449233260" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449233260">(Jul 05 2024 at 07:01)</a>:</h4>
+<p>The validators I envision would have a Java interface that would be asked to hand out a JSON schema thing, to be included in the JSON schema you can retrieve now via the Dataverse API</p>
+
+
+
+<a name="449871747"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871747" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871747">(Jul 08 2024 at 13:36)</a>:</h4>
+<p>Custom validators sound fun. Out of curiosity, do you have a specific use case?</p>
+
+
+
+<a name="449871791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871791">(Jul 08 2024 at 13:37)</a>:</h4>
+<p>Yes!</p>
+
+
+
+<a name="449871849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871849">(Jul 08 2024 at 13:37)</a>:</h4>
+<p>Do tell.</p>
+
+
+
+<a name="449871905"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871905" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871905">(Jul 08 2024 at 13:37)</a>:</h4>
+<p>I'm grabbing the links as we speak</p>
+
+
+
+<a name="449871941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871941">(Jul 08 2024 at 13:37)</a>:</h4>
+<p><a href="https://data.fz-juelich.de/guide/juelich/data-linking.html">https://data.fz-juelich.de/guide/juelich/data-linking.html</a></p>
+
+
+
+<a name="449871976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449871976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449871976">(Jul 08 2024 at 13:37)</a>:</h4>
+<p>We have this custom metadata field</p>
+
+
+
+<a name="449872069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872069">(Jul 08 2024 at 13:38)</a>:</h4>
+<p>In our fork, we added a custom metadata type "uri" for it</p>
+
+
+
+<a name="449872119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872119">(Jul 08 2024 at 13:38)</a>:</h4>
+<p>As the URL type would not be sufficient</p>
+
+
+
+<a name="449872250"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872250" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872250">(Jul 08 2024 at 13:38)</a>:</h4>
+<p>With a text field and a custom validator, we could achieve the same but keep upstream compatibility, no fork necessary</p>
+
+
+
+<a name="449872702"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872702" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872702">(Jul 08 2024 at 13:40)</a>:</h4>
+<p>Ah, so you want to support both http:// and smb:// for example.</p>
+
+
+
+<a name="449872742"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872742" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872742">(Jul 08 2024 at 13:41)</a>:</h4>
+<p>Exactly :-)</p>
+
+
+
+<a name="449872868"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872868" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872868">(Jul 08 2024 at 13:41)</a>:</h4>
+<p>Sounds fairly custom but maybe someone can reuse your validator some day. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="449872914"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449872914" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449872914">(Jul 08 2024 at 13:41)</a>:</h4>
+<p>I can immediately envision more features for this</p>
+
+
+
+<a name="449873034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873034">(Jul 08 2024 at 13:42)</a>:</h4>
+<p>Controlled vocabularies without adding them to the schema</p>
+
+
+
+<a name="449873062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873062">(Jul 08 2024 at 13:42)</a>:</h4>
+<p>Lookup services</p>
+
+
+
+<a name="449873194"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873194" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873194">(Jul 08 2024 at 13:43)</a>:</h4>
+<p>Restriction of URLs</p>
+
+
+
+<a name="449873300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873300">(Jul 08 2024 at 13:43)</a>:</h4>
+<p>Someone might want to disallow using certain author schemes that are in citation.tsv</p>
+
+
+
+<a name="449873330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873330">(Jul 08 2024 at 13:43)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/9750">#9750</a> from <span class="user-mention" data-user-id="649905">@luddaniel</span> made it into 6.3 but it would be nice to drop in jar and not wait for a release.</p>
+
+
+
+<a name="449873363"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449873363" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449873363">(Jul 08 2024 at 13:43)</a>:</h4>
+<p>But instead of forking the schema, the validator would bark at sth that is forbidden</p>
+
+
+
+<a name="449952746"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449952746" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449952746">(Jul 08 2024 at 18:41)</a>:</h4>
+<p>Could the custom validators work on guestbook fields? See <a href="https://github.com/IQSS/dataverse/issues/10661">#10661</a> opened by <span class="user-mention" data-user-id="658065">@Dimitri Szabo</span></p>
+
+
+
+<a name="449952839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449952839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449952839">(Jul 08 2024 at 18:42)</a>:</h4>
+<p>Also, what's the plan for keeping React in sync with these custom validators?</p>
+
+
+
+<a name="449954191"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954191" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954191">(Jul 08 2024 at 18:50)</a>:</h4>
+<p>From a technical viewpoint, these validators would probably hook into Bean Validations.</p>
+
+
+
+<a name="449954275"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954275" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954275">(Jul 08 2024 at 18:51)</a>:</h4>
+<p>So it should be possible to use these on anything we want them to use on.</p>
+
+
+
+<a name="449954343"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954343" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954343">(Jul 08 2024 at 18:51)</a>:</h4>
+<p>Usually Bean Validators get attached using the decorator pattern, so I don't see why this shouldn't be possible for guest books.</p>
+
+
+
+<a name="449954577"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954577" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954577">(Jul 08 2024 at 18:53)</a>:</h4>
+<p>My idea to expose these validators would be to make any of these plugins express themselves as JSON Schema. That way they could be picked up by any client.</p>
+
+
+
+<a name="449954690"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954690" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954690">(Jul 08 2024 at 18:53)</a>:</h4>
+<p>As far as I know, the backend will still be the source of authority for any validation, right <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> ?</p>
+
+
+
+<a name="449954990"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449954990" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449954990">(Jul 08 2024 at 18:55)</a>:</h4>
+<p>If I understood it correctly, the frontend will now use the API to retrieve the fields and data types. So aside from including this into the JSON Schema API endpoints, it should be possible to embed these validators in some serialized form into any other API endpoint as well.</p>
+
+
+
+<a name="449955146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449955146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449955146">(Jul 08 2024 at 18:56)</a>:</h4>
+<p>It's not like we would remove everything else - we'd keep the data type around, but extend the definition to possible values/ranges/...</p>
+
+
+
+<a name="449955867"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/449955867" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#449955867">(Jul 08 2024 at 19:00)</a>:</h4>
+<p>For email validation there was a mismatch that was corrected in <a href="https://github.com/IQSS/dataverse-frontend/pull/402">https://github.com/IQSS/dataverse-frontend/pull/402</a></p>
+
+
+
+<a name="450523185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/450523185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#450523185">(Jul 10 2024 at 17:59)</a>:</h4>
+<p>Yeah, but is a duplication of the constraint check. I'm suggesting we enable receiving these constraints as regex or whatever using the API, based on the custom validator implementation. In addition to being able to receive a JSON Schema thing the same interface could request responding with some Javascript validator, reusable in the SPA and other clients.</p>
+
+
+
+<a name="450534520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/metadata%20validators%20per%20field/near/450534520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/metadata.20validators.20per.20field.html#450534520">(Jul 10 2024 at 18:49)</a>:</h4>
+<p>Reusable in the SPA would be great.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,186 @@
+<html>
+<head><meta charset="utf-8"><title>simultaneous upload · large-data · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/index.html">large-data</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html">simultaneous upload</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="504555074"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/504555074" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#504555074">(Mar 10 2025 at 11:53)</a>:</h4>
+<p>Good morning! <br>
+I am testing uploading simaltenously 1gb files. I am quite often getting a failed with 500 error but doens't seem to output anything in the server.log. Has anyone done similar tests ? Smaller file sizes seem to work fine. I wonder what is provoking the 500 error and how i Can track it.</p>
+
+
+
+<a name="504563254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/504563254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#504563254">(Mar 10 2025 at 12:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> this fix might help: <a href="https://github.com/gdcc/python-dvuploader/pull/24">https://github.com/gdcc/python-dvuploader/pull/24</a></p>
+
+
+
+<a name="504590507"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/504590507" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#504590507">(Mar 10 2025 at 13:59)</a>:</h4>
+<p>Thanks! Let me see (I was actually using the native API before).</p>
+
+
+
+<a name="504607881"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/504607881" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#504607881">(Mar 10 2025 at 14:55)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="671195">Simon Carroll</span> <a href="#narrow/channel/432390-large-data/topic/setting.20parameters.20for.20direct.20upload.20with.20python-dvuploader/near/504590507">said</a>:</p>
+<blockquote>
+<p>Thanks! Let me see (I was actually using the native API before).</p>
+</blockquote>
+<p>OK now I remember. We are not using S3 so the direct upload fails. It is not expect that 3 concurrent uploads would cause this with the Native API I suppose. I can try to investigate more.</p>
+
+
+
+<a name="504870622"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/504870622" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#504870622">(Mar 11 2025 at 15:12)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> are you using the Python-DVUploader native upload or the Native API directly?</p>
+
+
+
+<a name="505084885"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/505084885" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#505084885">(Mar 12 2025 at 10:12)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> <a href="#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/504870622">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="671195">Simon Carroll</span> are you using the Python-DVUploader native upload or the Native API directly?</p>
+</blockquote>
+<p>Good morning!  I was using the Native API. I was seeing 500 errors when launching 3 concurrent uploads of 1GB. Occasionally I was able to upload 2 concurrent but normally launching 3 causes all to fail. I just tried using the Python-DVUploader but since we dont have object storage (yet) it reverts to the using the Native API (I assume the results would be the same but I didn't test it yet). Is this somewhat expected or a suprising result ? We are imagining the use case of several users/jobs uploading data at the same time.</p>
+
+
+
+<a name="505096262"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/505096262" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#505096262">(Mar 12 2025 at 11:00)</a>:</h4>
+<p>Good morning <span class="user-mention" data-user-id="671195">@Simon Carroll</span> <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+<p>I assume that the 500 error stems from a dataset lock due to ingestion. This is typically the case for tabular files, which subsequently induce the lock and no further uploads/edits to the dataset are possible. There are two ways to circumvent this:</p>
+<ul>
+<li>
+<p>Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload.</p>
+</li>
+<li>
+<p>Disable <code>tabIngest</code> within the payload when sending the request to your instance. This will skip the ingestion process and no locks will happen. The downside is, that you need to manually trigger the ingestion, if wished.</p>
+</li>
+</ul>
+<p>I think the latter is the easiest way to get around this, but the zipping workflow really shines when you have a lot of small files.</p>
+<p>If you are uploading tabular files, this could potentially fix the issue <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="505096557"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/505096557" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#505096557">(Mar 12 2025 at 11:01)</a>:</h4>
+<p>As a last instance, you could move to sequential uploads and check for dataset locks, but I guess that's not as efficient as concurrent uploads.</p>
+
+
+
+<a name="505354939"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/505354939" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#505354939">(Mar 13 2025 at 08:40)</a>:</h4>
+<p>Good morning! Thanks a lot for the comprehensive feedback. I will try the different approaches to see what can work for us. Many thanks!</p>
+
+
+
+<a name="506100016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506100016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506100016">(Mar 17 2025 at 10:02)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> <a href="#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/505096262">said</a>:</p>
+<blockquote>
+<p>Good morning <span class="user-mention silent" data-user-id="671195">Simon Carroll</span> :)</p>
+<p>I assume that the 500 error stems from a dataset lock due to ingestion. This is typically the case for tabular files, which subsequently induce the lock and no further uploads/edits to the dataset are possible. There are two ways to circumvent this:</p>
+<ul>
+<li>
+<p>Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload.</p>
+</li>
+<li>
+<p>Disable <code>tabIngest</code> within the payload when sending the request to your instance. This will skip the ingestion process and no locks will happen. The downside is, that you need to manually trigger the ingestion, if wished.</p>
+</li>
+</ul>
+<p>I think the latter is the easiest way to get around this, but the zipping workflow really shines when you have a lot of small files.</p>
+<p>If you are uploading tabular files, this could potentially fix the issue :)</p>
+</blockquote>
+<p>Good moring! I am playing around. If  I upload via the native api 2 files iwith tab ingest diabled it seems one fails with internal server error 500 . I will attach an example. I am uploading files in to two  seperate datasets (in the same collection). The point is it seems another problem outside of the locks.</p>
+
+
+
+<a name="506100088"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506100088" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506100088">(Mar 17 2025 at 10:02)</a>:</h4>
+<p><a href="/user_uploads/53090/EqvZUPS5qJZ4R2WPkO7INV7P/nativeAPIuploadTabIngestDisabledFailed.log">nativeAPIuploadTabIngestDisabledFailed.log</a></p>
+
+
+
+<a name="506100787"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506100787" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506100787">(Mar 17 2025 at 10:04)</a>:</h4>
+<p>I dont see anything in the server logs which is quite strange. Is there some class I need to explictly add to the debug options that can help ?</p>
+
+
+
+<a name="506585557"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506585557" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506585557">(Mar 18 2025 at 21:36)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> thanks for testing! That is odd, given the <code>tabIngest</code> is turned off. Can you send me the script you are using? For debugging, upon failure the function will raise an error with the message returned by the Dataverse instance. Do you have a full traceback to inspect where the error is happening?</p>
+
+
+
+<a name="506688345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506688345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506688345">(Mar 19 2025 at 10:26)</a>:</h4>
+<p>OK here comes a bombardment. Here is the python script : </p>
+<p><a href="/user_uploads/53090/5LU2C79JTYCoOGEIqRUHNMFI/dataverse_uploader.py">dataverse_uploader.py</a><br>
+. </p>
+<p>Here is a log if a single upload </p>
+<p><a href="/user_uploads/53090/lDpinR3ZZ5vx201ri8YyKjPA/singleUpload.log">singleUpload.log</a></p>
+<p>here is a concurrent upload with ingestion on <br>
+<a href="/user_uploads/53090/SiE_BFdmbdqdgrkGLwH4LtNd/TwoConcurrentUploadsDiffEnvIngestionOn.log">TwoConcurrentUploadsDiffEnvIngestionOn.log</a></p>
+<p>and here with it off <br>
+<a href="/user_uploads/53090/cnsxMlgyz196ClXOoPr-q7Xo/TwoConcurrentUploadsDiffEnvIngestionOff.log">TwoConcurrentUploadsDiffEnvIngestionOff.log</a></p>
+<p>I have included the errors from just one enviroment. There is no error in dataverse actually and I have noticed <strong>it seems the file that seems vo fail via API upload is in dataverse and valid</strong>. I suppose this is why I am not seeing a error log sever side ?</p>
+
+
+
+<a name="506735572"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506735572" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506735572">(Mar 19 2025 at 13:55)</a>:</h4>
+<p>Thanks for providing the files! Now it is a bit clearer, because I thought you were using <a href="https://github.com/gdcc/python-dvuploader">python-dvuploader</a>. </p>
+<p>Have you tried adding the <code>tabIngest</code> into the <code>jsonData</code> payload? As far as I know, passing it into the query parameters is not working, but maybe I am wrong <span class="user-mention" data-user-id="598112">@Philip Durbin ☀️</span>? In ther <a href="https://guides.dataverse.org/en/latest/api/native-api.html#add-a-file-to-a-dataset">docs</a> it says to add it to the payload.</p>
+
+
+
+<a name="506736576"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506736576" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506736576">(Mar 19 2025 at 13:58)</a>:</h4>
+<p>Yes, it looks like tabIngest:false goes into the payload, the JSON you send.</p>
+
+
+
+<a name="506736714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506736714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506736714">(Mar 19 2025 at 13:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> which version of Dataverse are you running? tabIngest:false might be somewhat new. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="506914022"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506914022" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506914022">(Mar 20 2025 at 09:07)</a>:</h4>
+<p>OK thanks. With the param in the jsonData it works as expected. About this :</p>
+<blockquote>
+<p>"* Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload."</p>
+</blockquote>
+<p>Do you mean the python libary does this automatically in the case of non-S3 upload when falling back on the  native API??</p>
+
+
+
+<a name="506914329"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506914329" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506914329">(Mar 20 2025 at 09:09)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin ☀️</span> <a href="#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/506736714">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="671195">Simon Carroll</span> which version of Dataverse are you running? tabIngest:false might be somewhat new. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+</blockquote>
+<p>6.5 but I suppose it came down to me not reading the documentation properly :)</p>
+
+
+
+<a name="506985532"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/simultaneous%20upload/near/506985532" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/simultaneous.20upload.html#506985532">(Mar 20 2025 at 14:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> yes, the Python library takes care of zipping the data and shipping it. Data &gt;2gb will be zipped into multiple zips and uploaded simultaneously.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,55 @@
+<html>
+<head><meta charset="utf-8"><title>adding a Solr field to schema.xml · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html">adding a Solr field to schema.xml</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="456680567"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456680567" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456680567">(Aug 05 2024 at 19:07)</a>:</h4>
+<p>I'm pretty confused. In <a href="https://github.com/IQSS/dataverse/issues/10694">#10694</a> I added the field <code>&lt;field name="datasetType" type="string" stored="true" indexed="true" multiValued="false"/&gt;</code> and it's been working fine.</p>
+<p>I'm back on that branch testing again and that field I added (<code>datasetType</code>) to the schema.xml is not appearing in Solr. When I look at <a href="http://localhost:8983/solr/collection1/schema/fields">http://localhost:8983/solr/collection1/schema/fields</a> the field isn't present.</p>
+<p>I'm tried deleting all the images and rebuilding. What am I missing? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="456680773"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456680773" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456680773">(Aug 05 2024 at 19:08)</a>:</h4>
+<p>I'm also doing <code>rm -rf docker-dev-volumes</code>, of course.</p>
+
+
+
+<a name="456680928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456680928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456680928">(Aug 05 2024 at 19:08)</a>:</h4>
+<p>I've even played around with deleting fields from schema.xml but they're still appearing in the output of that "fields" API endpoint.</p>
+
+
+
+<a name="456682356"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456682356" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456682356">(Aug 05 2024 at 19:15)</a>:</h4>
+<p><code>datasetType</code> isn't appearing in <code>docker-dev-volumes/solr/conf/conf/schema.xml</code> <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="456684217"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456684217" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456684217">(Aug 05 2024 at 19:22)</a>:</h4>
+<p>Huh, <code>mvn -Pct docker:build -Ddocker.filter=dev_bootstrap</code> may have helped. But the docs at <a href="https://guides.dataverse.org/en/6.3/container/configbaker-image.html#build-instructions">https://guides.dataverse.org/en/6.3/container/configbaker-image.html#build-instructions</a> seem to suggest that <code>`mvn -Pct package</code> should be enough. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="456687124"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/adding%20a%20Solr%20field%20to%20schema.xml/near/456687124" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/adding.20a.20Solr.20field.20to.20schema.2Exml.html#456687124">(Aug 05 2024 at 19:31)</a>:</h4>
+<p>I think what I was doing last week when working on this feature was this:</p>
+<p><code>mvn -Pct clean package docker:run -Dapp.skipDeploy</code></p>
+<p>But then I got clever and shortened it down to this:</p>
+<p><code>mvn -Pct docker:run -Dapp.skipDeploy</code></p>
+<p>The shorter version seems to work for many things (and is faster) but I guess I need that "package" in there when adding a new Solr field.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

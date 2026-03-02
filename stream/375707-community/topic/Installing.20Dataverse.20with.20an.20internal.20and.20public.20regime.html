@@ -1,0 +1,76 @@
+<html>
+<head><meta charset="utf-8"><title>Installing Dataverse with an internal and public regime · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html">Installing Dataverse with an internal and public regime</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="523625114"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523625114" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523625114">(Jun 11 2025 at 19:28)</a>:</h4>
+<p>Hi,</p>
+<p>We are currently installing Dataverse. The purpose is twofold: publish datasets externally and/or make data sets available for internal consumption and reuse. Depending on the data set all three combinations are possible. The idea is to have 2 web-portals: one public - and one internal portal. I'm wondering whether such setup is possible at all to start with.</p>
+<p>If so, the next problem is in the "and" case. We want to have the same data set available with two metadata descriptions which in general overlap but have also have distinct fields. Think for instance on the contact field. On the public portal: we want to have as contact our service desk. On the internal portal we want to have as contact a real person or alternatively we would be an additional field "internal contact" which is not publicly available.  </p>
+<p>Is such setup possible?</p>
+<p>Best regards,<br>
+Sjaak Derksen</p>
+
+
+
+<a name="523732008"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523732008" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523732008">(Jun 12 2025 at 11:03)</a>:</h4>
+<p>Everything is possible. But it might be harder to do than you think. If I understood you correctly, you want to have your inner portal as the "source of truth" and then mirror this with some minor modifications to some outside visible portal.</p>
+<p>This kind of setup is similar to what <span class="user-mention" data-user-id="637063">@Leo Andreev</span> and others have been doing by mirroring the database, just the other way around (from production to an internal test system). So if you can have a sync job that enables you to automate the mirror, inject or transform any metadata you want changed from inside to outside, sure, that could work.</p>
+<p>I would take great care though about who is able to do changes on the outside instance. It should be "read-only", as you're likely to get into trouble when you need to do two-way merges. Also, you need to think about (read-only!) file access.</p>
+
+
+
+<a name="523732592"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523732592" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523732592">(Jun 12 2025 at 11:07)</a>:</h4>
+<p>Another way to go about this might be using OAI-PMH. Your internal instance would do all the heavy lifting like PIDs, etc and you use a search query to build a specific set of datasets that should be harvested by your outside instance. Keep in mind though that this will only take care of mirroring the metadata, but will not grant file access. There's probably some other kinks and caveats one need to look at.</p>
+
+
+
+<a name="523732953"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523732953" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523732953">(Jun 12 2025 at 11:09)</a>:</h4>
+<p>If you're willing to code some stuff or spend money for someone else to do that, there's probably more that can be made possible, but that would need a more in-depth discussion. Probably would be good to reach out to the GDCC (<a href="http://www.gdcc.io">www.gdcc.io</a>) and ask for a consult.</p>
+
+
+
+<a name="523809438"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523809438" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523809438">(Jun 12 2025 at 18:16)</a>:</h4>
+<p>Thanks Oliver. It is a bit more intricate I think. We would have datasets that are only available internally (to have an internal repository, not all our data is public or worth to publicize). We also would have datasets that are available both externally and internally. The latter with metadata that is common and some fields distinct. We need to think a bit more on this. Perhaps mirroring is a viable approach.</p>
+
+
+
+<a name="523877078"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523877078" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523877078">(Jun 13 2025 at 06:02)</a>:</h4>
+<p>Also, we have 2 realms (IAM wise). An internal realm (hooked up to SSO) and an external realm (user+pwd+token). I guess a portal cannot be in 2 realms at the same time. So I think we need an internal portal for our admins and an external one: public most of the time, but some data sets private. For the time being we focus on the external portal.</p>
+
+
+
+<a name="523943313"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/523943313" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#523943313">(Jun 13 2025 at 13:11)</a>:</h4>
+<p>I'll also forward this to Jim (GDCC) as it sounded like he might have some related work.</p>
+
+
+
+<a name="524322890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/524322890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#524322890">(Jun 16 2025 at 19:44)</a>:</h4>
+<p>I don't think Dataverse easily supports the exact requirements above but like Oliver said, everything is possible with code. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> </p>
+<p>If you only needed to advertise to the outside world the existence of some datasets (only their metadata, that is), yes, you could harvest (using OAI-PMH) from the private to the public instance.</p>
+<p>As long as you don't use the "native JSON" format when harvesting, you could put your "internal only" fields in a custom metadata block in the private instance. That is, if you use Dublin Core or DDI to harvest, those formats will contain an incomplete record (which is good for you!) from the private instance. So the public instance wouldn't have those "internal only" fields.</p>
+
+
+
+<a name="524322963"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Installing%20Dataverse%20with%20an%20internal%20and%20public%20regime/near/524322963" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Installing.20Dataverse.20with.20an.20internal.20and.20public.20regime.html#524322963">(Jun 16 2025 at 19:45)</a>:</h4>
+<p>Like Oliver says, this wouldn't help at all with file requests. It would just be a way to advertise some metadata for discovery.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

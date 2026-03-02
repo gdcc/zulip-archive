@@ -1,0 +1,59 @@
+<html>
+<head><meta charset="utf-8"><title>Full text indexing MATLAB .fig files · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html">Full text indexing MATLAB .fig files</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="429482518"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/429482518" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#429482518">(Mar 25 2024 at 18:19)</a>:</h4>
+<p>Does anyone have experience how matlab .fig figure files interact with Dataverse's full-text index? One of our scientists uploaded such files and the tika parser crashes with the following exception</p>
+<div class="codehilite"><pre><span></span><code>  org.apache.tika.exception.TikaException: Unexpected RuntimeException from org.apache.tika.parser.mat.MatParser@4a18daf3
+</code></pre></div>
+<p>Unfortunately, I have no easy way to verify if the files themselves are corrupted and I would be fine to just exclude them from the full text index.</p>
+<p>Is there any way to exclude those files from indexing? They are not particularly large, so exclduing them via size is not an option.</p>
+
+
+
+<a name="429482786"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/429482786" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#429482786">(Mar 25 2024 at 18:21)</a>:</h4>
+<p>Hmm, as you say we have a setting called <a href="https://guides.dataverse.org/en/6.1/installation/config.html#solrmaxfilesizeforfulltextindexing">:SolrMaxFileSizeForFullTextIndexing</a> but nothing about file types.</p>
+
+
+
+<a name="429482922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/429482922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#429482922">(Mar 25 2024 at 18:22)</a>:</h4>
+<p><span class="user-mention" data-user-id="601943">@Henning Timm</span> please feel free to open an issue: <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a></p>
+
+
+
+<a name="429885221"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/429885221" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#429885221">(Mar 27 2024 at 15:19)</a>:</h4>
+<p>Thanks for the reply Phil! In our case this error was probably responsible for gobbling up enough memory to make the Dataverse Server swap and then stay in HTTP 503 until we did a restart. We will try to reproduce the problem before opening an issue. Its still unclear if our users files were the problem (e.g. if they were corrupted somehow).</p>
+
+
+
+<a name="429892543"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/429892543" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#429892543">(Mar 27 2024 at 15:52)</a>:</h4>
+<p>Sounds good, thanks.</p>
+
+
+
+<a name="435593699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Full%20text%20indexing%20MATLAB%20.fig%20files/near/435593699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Full.20text.20indexing.20MATLAB.20.2Efig.20files.html#435593699">(Apr 26 2024 at 14:06)</a>:</h4>
+<p>Some small updates on this:</p>
+<ul>
+<li>Parsing the matlab files does not reproducibly cause the HTTP 503 error</li>
+<li>It is not a SOLR memory issues as with described <a href="#narrow/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around">https://dataverse.zulipchat.com/#narrow/stream/378866-troubleshooting/topic/.E2.9C.94.20Draft.20version.20of.20published.20datasets.20stays.20around</a></li>
+<li>It is still unclear, if our matlab figure files are corrupted or if it is a problem of SOLR</li>
+</ul>
+<p>The MatParser crashes for (our) matlab figure files, but this does not seem cause any further problems. I will open an issue once I have a matlab .fig file that causes this problem and that I am allowed to pass on. Our affected files are under embargo.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

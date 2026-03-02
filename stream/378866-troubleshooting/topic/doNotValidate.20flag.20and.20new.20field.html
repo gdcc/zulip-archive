@@ -1,0 +1,139 @@
+<html>
+<head><meta charset="utf-8"><title>doNotValidate flag and new field · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html">doNotValidate flag and new field</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="538660052"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538660052" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538660052">(Sep 10 2025 at 14:01)</a>:</h4>
+<p>Hello, <br>
+We are working with someone who is testing out a migration into our test server.  We enabled a few of the blocks and are noticing that a new field is showing up in one of them: Geospatial Metadata.  He is using the "doNotValidate" flag -- could that cause this new field creation?  (he does have super user admin perms)</p>
+<p><a href="/user_uploads/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1067x313" src="/user_uploads/thumbnail/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png/840x560.webp"></a></div><p>I'm guessing theres a bug in the consultant's code, as the field Other should really be in the Geographics Coverage -&gt; Other field.   Could the "doNotValidate" be creating this "Other" field?  If not, what would cause this field to be created? </p>
+<p>We have not modified the block at all.</p>
+<p>Thanks!<br>
+Bethany</p>
+
+
+
+<a name="538660866"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538660866" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538660866">(Sep 10 2025 at 14:04)</a>:</h4>
+<p>I'm pretty sure that even if the block (geospatial in this case) is not enabled for the collection one can still populate the block's fields (I see "Other" and "Geographical Unit").</p>
+<p>I'd take a look at the JSON being used to create this dataset. Do you see those two geospatial fields in there?</p>
+
+
+
+<a name="538662241"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538662241" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538662241">(Sep 10 2025 at 14:10)</a>:</h4>
+<p>Sorry to not be clear -- we did have it enabled first.  It's just that, in our setup now, there's an "Other" field that's part of the compound group and then there's another "Other" field that's disconnected from that.  There are not two "Other" fields in the actual block.  </p>
+<p>It looks like our consultant was able to add a field that wasn't there via adding a record.   I didn't realize that was possible.   But I'm also still troubleshooting what's going on. </p>
+<p>He started testing on our 5.14 server and on our 6.6 server -- both places magically have this new field. </p>
+<p>I'll get a sample of his JSON.  <br>
+Thanks!</p>
+
+
+
+<a name="538664215"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538664215" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538664215">(Sep 10 2025 at 14:18)</a>:</h4>
+<p>Oh, I now see how there are two "Other" fields in your screenshot of the geospatial block, one as part of geographic coverage and one on its own. Hmm.</p>
+<p>For reference, here's how the geographic block looks on <a href="https://demo.dataverse.org">demo</a>, with only one "Other" field (under geographic coverage):</p>
+<p><a href="/user_uploads/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png">Screenshot 2025-09-10 at 10.16.45 AM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png" title="Screenshot 2025-09-10 at 10.16.45 AM.png"><img data-original-content-type="image/png" data-original-dimensions="1164x450" src="/user_uploads/thumbnail/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png/840x560.webp"></a></div>
+
+
+
+<a name="538665222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538665222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538665222">(Sep 10 2025 at 14:22)</a>:</h4>
+<p>Yeah, that's what helped me realize there was an issue.  Is this a side effect of using the "doNotValidate" flag?  That new fields could be accidentally created?</p>
+
+
+
+<a name="538665349"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538665349" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538665349">(Sep 10 2025 at 14:22)</a>:</h4>
+<p>I have this note to myself: "can create publicationIDURL even thought it isn't valid". I discovered (or rediscovered this?) accidentally the other day when writing a test.</p>
+
+
+
+<a name="538665501"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538665501" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538665501">(Sep 10 2025 at 14:23)</a>:</h4>
+<p>I suspect it's an old bug, that you might be able to create arbitrary fields in Dataverse. If you have a moment to test this, please do!</p>
+
+
+
+<a name="538665731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538665731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538665731">(Sep 10 2025 at 14:23)</a>:</h4>
+<p>:-)    Sounds like we are in the same boat.  If I have a chance I'll test it out.</p>
+
+
+
+<a name="538665882"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538665882" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538665882">(Sep 10 2025 at 14:24)</a>:</h4>
+<p>If you can create a weird field, please open an issue!</p>
+
+
+
+<a name="538679484"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538679484" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538679484">(Sep 10 2025 at 15:18)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/11809">https://github.com/IQSS/dataverse/issues/11809</a></p>
+<p>It appears to only happen when you use a subfield outside of it's compound field setup.</p>
+
+
+
+<a name="538680698"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538680698" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538680698">(Sep 10 2025 at 15:23)</a>:</h4>
+<p>Yikes! Thanks! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="538681752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538681752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538681752">(Sep 10 2025 at 15:28)</a>:</h4>
+<p>Did you include the JSON for this one?</p>
+<ul>
+<li>tries to add a "Name" for an author outside of the author compound field -- this will succeed.</li>
+</ul>
+<p>It's this, right?</p>
+<div class="codehilite"><pre><span></span><code>{
+  &quot;typeName&quot;: &quot;authorName&quot;,
+  &quot;multiple&quot;: false,
+  &quot;typeClass&quot;: &quot;primitive&quot;,
+  &quot;value&quot;: &quot;This is a fun and new field, I just made it up!&quot;
+},
+</code></pre></div>
+<p>You're adding authorName, which is normally a subfield of author, as a higher-level field, at the same level as author, title, etc.</p>
+
+
+
+<a name="538681973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538681973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538681973">(Sep 10 2025 at 15:29)</a>:</h4>
+<p>That should work to demonstrate the issue<br>
+ -- I could include the full JSON, if that's helpful.</p>
+
+
+
+<a name="538682242"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538682242" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538682242">(Sep 10 2025 at 15:30)</a>:</h4>
+<p>It basically seems to happen when you use a field in a different spot (like outside of it's compound field).  I have not tried the reverse, of using a name from a non-compund field w/i a compound.</p>
+
+
+
+<a name="538682715"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538682715" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538682715">(Sep 10 2025 at 15:32)</a>:</h4>
+<p>Okay, just tried that and it failed: </p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;Error parsing Json: field title is not a child of author&quot;}
+</code></pre></div>
+
+
+
+<a name="538683105"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/doNotValidate%20flag%20and%20new%20field/near/538683105" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/doNotValidate.20flag.20and.20new.20field.html#538683105">(Sep 10 2025 at 15:33)</a>:</h4>
+<p>Yes, if you'd update the issue description and attach the full JSON, I'd appreciate it!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

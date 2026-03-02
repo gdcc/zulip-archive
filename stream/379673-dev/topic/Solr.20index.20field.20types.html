@@ -1,0 +1,186 @@
+<html>
+<head><meta charset="utf-8"><title>Solr index field types · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html">Solr index field types</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="469950974"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469950974" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469950974">(Sep 13 2024 at 12:15)</a>:</h4>
+<p>Hi, I was just playing around with the Dataverse Search API and I noticed that almost all fields are indexed in Solr as <code>text_en</code> fields, which doesn't allow e.g. range searches for integer and date fields. I found this relatively old (and now closed) issue from 2014 talking about using more fitting index data types: <a href="https://github.com/IQSS/dataverse/issues/370">https://github.com/IQSS/dataverse/issues/370</a> It seems that since the date range facet was so far not implemented, the index types have not been touched yet (?) Is there any open issue currently talking about this? Or any ongoing work? :)</p>
+
+
+
+<a name="469957019"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469957019" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469957019">(Sep 13 2024 at 12:47)</a>:</h4>
+<p>Yes, we should do this and no, there hasn't been any recent discussion.</p>
+
+
+
+<a name="469957061"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469957061" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469957061">(Sep 13 2024 at 12:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="616555">@Vera Clemens</span> are you mostly interested in date ranges?</p>
+
+
+
+<a name="469958185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469958185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469958185">(Sep 13 2024 at 12:53)</a>:</h4>
+<p><span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span> I'm interested in both date ranges and integer ranges</p>
+
+
+
+<a name="469963928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469963928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469963928">(Sep 13 2024 at 13:19)</a>:</h4>
+<p>Cool. Out of curiosity, are the integers in one of your custom metadata blocks? Or one of the standard blocks we ship with Dataverse?</p>
+
+
+
+<a name="469965367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469965367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469965367">(Sep 13 2024 at 13:24)</a>:</h4>
+<p>They're in custom metadata blocks.</p>
+
+
+
+<a name="469965791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469965791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469965791">(Sep 13 2024 at 13:26)</a>:</h4>
+<p>Ok. I'm wondering if we should also fix anything in the standard blocks. There are dates everywhere. And I believe some of the astro fields use integers.</p>
+<p>That way, when we make a release, there are some nice examples people can see without installing custom metadata blocks.</p>
+
+
+
+<a name="469967170"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469967170" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469967170">(Sep 13 2024 at 13:32)</a>:</h4>
+<p>Yes, sure! I think this could benefit integer and date fields in any metadata block.</p>
+<p>Even without implementing any new facet with sliders, I think if the fields were indexed as integers/dates, you could run Solr range queries via the search input field (or the search API <code>?q=...</code>) like <code>integerfield:[25 TO 50]</code> or <code>datefield:[2000-11-01 TO 2014-12-01]</code>.</p>
+
+
+
+<a name="469968369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469968369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469968369">(Sep 13 2024 at 13:37)</a>:</h4>
+<p>Yes, definitely. Please see <a href="https://guides.dataverse.org/en/6.3/api/search.html#date-range-search-example">https://guides.dataverse.org/en/6.3/api/search.html#date-range-search-example</a></p>
+
+
+
+<a name="469969064"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/469969064" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#469969064">(Sep 13 2024 at 13:39)</a>:</h4>
+<p>And <code>fileSizeInBytes:[32212254720 TO *]</code> at <a href="https://github.com/IQSS/dataverse/issues/4439#issuecomment-468685228">https://github.com/IQSS/dataverse/issues/4439#issuecomment-468685228</a></p>
+
+
+
+<a name="472709297"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472709297" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472709297">(Sep 25 2024 at 14:21)</a>:</h4>
+<p>I've been playing around with trying to index fields as something other than <code>text_en</code> and it seems to be working OK.</p>
+<p>You can try it out here: <a href="http://solr-fieldtypes-test-dataverse.qa.km.k8s.zbmed.de/">http://solr-fieldtypes-test-dataverse.qa.km.k8s.zbmed.de/</a> (note, this is on our dev cluster that is offline during the night, so if you're in the US, it might be offline if you are checking after 2pm-ish, sorry about that)</p>
+<p>I've added an experimental metadata block containing an integer, a float and a date field and indexed them in Solr as plong, pdouble and date_range (by just manually editing the schema.xml) and created 3 test datasets with the following values:</p>
+<ul>
+<li>Test dataset 1: integer 10, float 0.5, date 2024-09-01</li>
+<li>Test dataset 2: integer 3, float 23.5, date 2024-01-15</li>
+<li>Test dataset 3: integer 500, float -4.3, date 1980-04</li>
+</ul>
+<p>Here are some sample queries based on these fields:</p>
+<ul>
+<li>exampleIntegerField:[100 TO *] ⇨ test dataset 3</li>
+<li>exampleIntegerField:500 ⇨ test dataset 3</li>
+<li>exampleIntegerField:[0 TO 10] ⇨ test dataset 1 + 2</li>
+<li>exampleIntegerField:[0 TO 10] AND exampleFloatField:[20 TO 50] ⇨ test dataset 2</li>
+</ul>
+<p>(Filtering the date field still has some issues and needs some more testing)</p>
+
+
+
+<a name="472709788"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472709788" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472709788">(Sep 25 2024 at 14:23)</a>:</h4>
+<p>Great! I'm glad the testing is going well!</p>
+
+
+
+<a name="472849826"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472849826" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472849826">(Sep 26 2024 at 09:11)</a>:</h4>
+<p>Found the issue with the date field. The date fields were getting indexed as years only, without months or days (if present). It seems this is intentional: <a href="https://github.com/IQSS/dataverse/blob/050064ef264c667c2473c78b893def832c33f992/src/main/java/edu/harvard/iq/dataverse/search/IndexServiceBean.java#L1070">https://github.com/IQSS/dataverse/blob/050064ef264c667c2473c78b893def832c33f992/src/main/java/edu/harvard/iq/dataverse/search/IndexServiceBean.java#L1070</a> Do you see any issue with changing this? I assume maybe there might be an issue if the date field is set to be facetable? That's something I didn't test yet.</p>
+
+
+
+<a name="472868347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472868347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472868347">(Sep 26 2024 at 10:54)</a>:</h4>
+<p>Yes, probably we did that to have a reasonable (string-based) facet of four digits. But if we had a proper range facet... <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="472868564"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472868564" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472868564">(Sep 26 2024 at 10:55)</a>:</h4>
+<p>Would you want to add the UI for this in JSF? I always hesitate with this since it will be replaced by the <a href="https://github.com/IQSS/dataverse-frontend">new frontend</a>. Would you rather see it added there instead?</p>
+
+
+
+<a name="472877848"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472877848" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472877848">(Sep 26 2024 at 11:51)</a>:</h4>
+<p>Could we index the full date in "&lt;dateFieldName&gt;", but only the year in "&lt;dateFieldName&gt;_s"? From a quick test, that seems to allow proper range searches (using the <code>[... TO ...]</code> syntax) but keeps the facets as-is for now.</p>
+
+
+
+<a name="472878032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472878032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472878032">(Sep 26 2024 at 11:52)</a>:</h4>
+<p>And yes, if we were to add a proper range facet to the UI, I would like to see it in the new frontend :)</p>
+
+
+
+<a name="472881103"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/472881103" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#472881103">(Sep 26 2024 at 12:08)</a>:</h4>
+<p>Hmm, that might work.</p>
+
+
+
+<a name="473102285"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473102285" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473102285">(Sep 27 2024 at 12:48)</a>:</h4>
+<p>Yep, seems to work</p>
+
+
+
+<a name="473102316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473102316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473102316">(Sep 27 2024 at 12:48)</a>:</h4>
+<p>I've opened a PR with my changes here: <a href="https://github.com/IQSS/dataverse/pull/10887">https://github.com/IQSS/dataverse/pull/10887</a></p>
+
+
+
+<a name="473105511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473105511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473105511">(Sep 27 2024 at 13:03)</a>:</h4>
+<p><span class="user-mention" data-user-id="616555">@Vera Clemens</span> looks great! Should the title of the PR have something about highlighting in it?</p>
+
+
+
+<a name="473107099"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473107099" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473107099">(Sep 27 2024 at 13:11)</a>:</h4>
+<p>Also, can you please add a release note snippet?</p>
+
+
+
+<a name="473114277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473114277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473114277">(Sep 27 2024 at 13:43)</a>:</h4>
+<p>Both done <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="473116224"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473116224" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473116224">(Sep 27 2024 at 13:50)</a>:</h4>
+<p>Looks great. Amazing release note. Do you think it's worth it to add an API test?</p>
+
+
+
+<a name="473118598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473118598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473118598">(Sep 27 2024 at 14:00)</a>:</h4>
+<p>Thanks! <img alt=":dataverse_woman:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/e231c302.png" title="dataverse woman">  Hm, yes maybe. I'll try and take a look on Monday!</p>
+
+
+
+<a name="473120565"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Solr%20index%20field%20types/near/473120565" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Solr.20index.20field.20types.html#473120565">(Sep 27 2024 at 14:09)</a>:</h4>
+<p>Wonderful! Thanks!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

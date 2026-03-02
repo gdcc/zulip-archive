@@ -1,0 +1,246 @@
+<html>
+<head><meta charset="utf-8"><title>OAuth login · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html">OAuth login</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="397691146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/397691146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#397691146">(Oct 20 2023 at 11:39)</a>:</h4>
+<p>Good afternoon. I set up an OAuth identity provider to work with my Dataverse installation (rctsai). It was working but now whan I try to login with RCTSAI dataverse presents a login form '<a href="https://dados.ipb.pt//oauth2/firstLogin.xhtml">https://dados.ipb.pt//oauth2/firstLogin.xhtml</a>', even  thugh is nt the first login? What can I do to fix this? Thanks in advance</p>
+
+
+
+<a name="397695906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/397695906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#397695906">(Oct 20 2023 at 12:06)</a>:</h4>
+<p>Huh. Was is working ok for a long time? For weeks or months?</p>
+
+
+
+<a name="397696298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/397696298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#397696298">(Oct 20 2023 at 12:08)</a>:</h4>
+<p>Sometimes, sadly, the Identity Provider (IdP) will change their <code>entityId</code>. This makes Dataverse think it's a new IdP.</p>
+
+
+
+<a name="399332271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399332271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399332271">(Oct 30 2023 at 16:00)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/397696298">said</a>:</p>
+<blockquote>
+<p>Sometimes, sadly, the Identity Provider (IdP) will change their <code>entityId</code>. This makes Dataverse think it's a new IdP.</p>
+</blockquote>
+<p>I contacted the Identity Provider (IdP) and they assured me that the 'entityId' did not change. How can I check what user's fields are matched  with the response of the Identity Provider in order to identify users?  It seems that dataverse does not recognize already registered users because user's fields do not match IdP returned data .<br>
+Thanks in advance.</p>
+
+
+
+<a name="399334351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399334351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399334351">(Oct 30 2023 at 16:10)</a>:</h4>
+<p>Well, the logic seems to be in OAuth2LoginBackingBean.java</p>
+
+
+
+<a name="399334396"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399334396" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399334396">(Oct 30 2023 at 16:10)</a>:</h4>
+<p>You might need to add more logging statements and recompile Dataverse. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="399334474"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399334474" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399334474">(Oct 30 2023 at 16:10)</a>:</h4>
+<p>What version of Dataverse are you on?</p>
+
+
+
+<a name="399334632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399334632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399334632">(Oct 30 2023 at 16:12)</a>:</h4>
+<p>For 6.0, here is the logic to login an existing user or prompt to create a new user: <a href="https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137">https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>
+
+
+
+<a name="399335460"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399335460" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399335460">(Oct 30 2023 at 16:16)</a>:</h4>
+<p>I am in Dataverse v. 5.12.1 build 1122-cf90431. What do you suggest in order to quickly let users get in in the dataverse system<br>
+?</p>
+
+
+
+<a name="399336477"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399336477" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399336477">(Oct 30 2023 at 16:22)</a>:</h4>
+<p>Ok, it's the same. Hasn't changed: <a href="https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137">https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>
+
+
+
+<a name="399336686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399336686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399336686">(Oct 30 2023 at 16:23)</a>:</h4>
+<p>I'm suggesting adding more lines like this:</p>
+<div class="codehilite"><pre><span></span><code>logger.log(Level.INFO, &quot;debugging line here&quot;);
+</code></pre></div>
+
+
+
+<a name="399336688"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399336688" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399336688">(Oct 30 2023 at 16:23)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399336477">said</a>:</p>
+<blockquote>
+<p>Ok, it's the same. Hasn't changed: <a href="https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137">https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>
+</blockquote>
+<p>Is it possible to quickly disable signups?</p>
+
+
+
+<a name="399336838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399336838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399336838">(Oct 30 2023 at 16:24)</a>:</h4>
+<p>Hmm, I'm not sure. I don't believe so.</p>
+
+
+
+<a name="399337070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399337070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399337070">(Oct 30 2023 at 16:25)</a>:</h4>
+<p>Is there anything helpful or interesting in server.log?</p>
+
+
+
+<a name="399341061"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399341061" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399341061">(Oct 30 2023 at 16:48)</a>:</h4>
+<p>In server.log I see the warning message <br>
+" [WARNING] [] [edu.harvard.iq.dataverse.util.BundleUtil] [tid: _ThreadID=75 _ThreadName=http-thread-pool::http-listener-1(3)] [tim&gt;<br>
+  Could not find key "authenticationProvider.name.rctsaai" in bundle file: ]]", can this be the problem? How can I fix it?</p>
+
+
+
+<a name="399348064"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399348064" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399348064">(Oct 30 2023 at 17:30)</a>:</h4>
+<p>Interesting. You could edit src/main/java/propertyFiles/Bundle.properties but I doubt it will fix your problem, unfortunately.</p>
+
+
+
+<a name="399348159"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399348159" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399348159">(Oct 30 2023 at 17:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> actually, could you please go ahead and open up a support ticket by emailing <a href="mailto:support@dataverse.org">support@dataverse.org</a> ? And please let me know the ticket number.</p>
+
+
+
+<a name="399683986"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399683986" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399683986">(Nov 01 2023 at 09:00)</a>:</h4>
+<p>Maybe you sent <span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> into the wrong rabbit hole...</p>
+
+
+
+<a name="399684122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399684122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399684122">(Nov 01 2023 at 09:01)</a>:</h4>
+<p><span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> which OAuth provider exactly are you using? If this is from your institution, did you mean OIDC?</p>
+
+
+
+<a name="399684239"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399684239" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399684239">(Nov 01 2023 at 09:01)</a>:</h4>
+<p>Please note that remote users are identified by some persistent identificator</p>
+
+
+
+<a name="399684384"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399684384" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399684384">(Nov 01 2023 at 09:02)</a>:</h4>
+<p>In case of OIDC, this is the "sub" attribute of the providers auth response.</p>
+
+
+
+<a name="399684553"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399684553" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399684553">(Nov 01 2023 at 09:03)</a>:</h4>
+<p>I'm not sure right now what it is in case of OAuth2, would need to look into the code for that. And I would need to know which provider you're using exactly</p>
+
+
+
+<a name="399896854"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399896854" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399896854">(Nov 02 2023 at 10:06)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399684122">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="660626">Adília Isabel Domingues da Cruz Alves</span> which OAuth provider exactly are you using? If this is from your institution, did you mean OIDC?</p>
+</blockquote>
+<p>Our OAuth provider is FCCN (not our institution),  We are using rctsaai.</p>
+
+
+
+<a name="399915676"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399915676" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399915676">(Nov 02 2023 at 11:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> hi, did you email support yet? It would be good to track this. If you did, I can't find the ticket number.</p>
+
+
+
+<a name="399926690"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399926690" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399926690">(Nov 02 2023 at 12:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> did you add a custom OAuth2 provider for that? Or did you use one of the existing implementations?</p>
+
+
+
+<a name="399970411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399970411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399970411">(Nov 02 2023 at 15:43)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399926690">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="660626">Adília Isabel Domingues da Cruz Alves</span> did you add a custom OAuth2 provider for that? Or did you use one of the existing implementations?</p>
+</blockquote>
+<p>I used the curl command 'curl -X POST -H 'Content-type: application/json' --upload-file rctsaai.json <a href="http://localhost:8080/api/admin/authenticationProviders">http://localhost:8080/api/admin/authenticationProviders</a>' with the rctsaai.json that our OAuth provider sent us.</p>
+
+
+
+<a name="399971216"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399971216" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399971216">(Nov 02 2023 at 15:47)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399915676">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="660626">Adília Isabel Domingues da Cruz Alves</span> hi, did you email support yet? It would be good to track this. If you did, I can't find the ticket number.</p>
+</blockquote>
+<p>Hello Philip. I just emailed support. The tracking system ID of my message is <a href="https://github.com/IQSS/dataverse/issues/351508">#351508</a>.<br>
+Thank you very much for your support.</p>
+
+
+
+<a name="399975479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399975479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399975479">(Nov 02 2023 at 16:05)</a>:</h4>
+<p>Thanks, I see it at <a href="https://help.hmdc.harvard.edu/Ticket/Display.html?id=351508">https://help.hmdc.harvard.edu/Ticket/Display.html?id=351508</a></p>
+
+
+
+<a name="399975761"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/399975761" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#399975761">(Nov 02 2023 at 16:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="660626">@Adília Isabel Domingues da Cruz Alves</span> did we meet in Braga? And in IRC or Matrix a while back? I think so. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="400146650"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/400146650" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#400146650">(Nov 03 2023 at 14:38)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399975761">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="660626">Adília Isabel Domingues da Cruz Alves</span> did we meet in Braga? And in IRC or Matrix a while back? I think so. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+</blockquote>
+<p>Hello Philip. Yes we meet in Braga :-) and in Matrix :-). How are you? :-)</p>
+
+
+
+<a name="400147922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/400147922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#400147922">(Nov 03 2023 at 14:46)</a>:</h4>
+<p>Good. My daughter just rowed in a famous race in Boston, the Head of the Charles. She's on the far right in this pic: <a href="https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/">https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/</a></p>
+
+
+
+<a name="400147954"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/400147954" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#400147954">(Nov 03 2023 at 14:46)</a>:</h4>
+<p>her "game face", so serious <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="400150634"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAuth%20login/near/400150634" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adília Isabel Domingues da Cruz Alves <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAuth.20login.html#400150634">(Nov 03 2023 at 15:01)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/400147922">said</a>:</p>
+<blockquote>
+<p>Good. My daughter just rowed in a famous race in Boston, the Head of the Charles. She's on the far right in this pic: <a href="https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/">https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/</a></p>
+</blockquote>
+<p>She is still focused. Well done! Congratulations :-).</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

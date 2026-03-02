@@ -1,0 +1,116 @@
+<html>
+<head><meta charset="utf-8"><title>Dataverse Action JVM Options · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html">Dataverse Action JVM Options</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="512513051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512513051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512513051">(Apr 16 2025 at 10:03)</a>:</h4>
+<p>I am currently setting up the <a href="https://github.com/gdcc/dataverse-action/pull/17">Dataverse Action</a> to support S3 backends. Everything is functioning as expected, the storage change works.</p>
+<p>However, I am encountering an issue when including JVM options in the action's tests, as they appear to have no effect. For example, I have set the localstack backend's <code>min-part-size</code> to a lower value (see <a href="https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/.github/workflows/test-action.yml#L18-L21">here</a>) and then verified whether multipart URLs are generated (see <a href="https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/.github/workflows/scripts/test_dataverse.py#L211-L222">here</a>). Instead, I am receiving only a single-part URL, which is not the desired outcome.</p>
+<p>I have confirmed that the same JVM option works correctly when tested outside of the action by adding it to the compose file. Does anyone have any suggestions on how to resolve this issue (<span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> <span class="user-mention" data-user-id="598112">@Philip Durbin ☀️</span> )? I am not entirely confident in the MicroProfile approach used <a href="https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/action.yml#L70-L77">here</a>.</p>
+
+
+
+<a name="512523340"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512523340" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512523340">(Apr 16 2025 at 10:57)</a>:</h4>
+<p>Are you trying to change the JVM option on the fly? I don't think that's supported. I think you need to add it next to the other "localstack1" options like you do <a href="https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/docker-compose.yml#L35">here</a> in the compose file.</p>
+
+
+
+<a name="512524057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512524057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512524057">(Apr 16 2025 at 11:01)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> has set up a part of the workflow that utilizes a trick to ingest JVM options:</p>
+<p><a href="https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/action.yml#L70-L77">https://github.com/gdcc/dataverse-action/blob/a579da737db2e4cdbf6f37467b115be4875eb976/action.yml#L70-L77</a></p>
+<p>But if this does not work, I'd like to have a way to parametrize the <code>min-part-size</code> of LocalStack. Or do you think it is fine to hard-coding it to a reasonable size?</p>
+
+
+
+<a name="512533155"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512533155" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512533155">(Apr 16 2025 at 11:48)</a>:</h4>
+<p>Interesting. Have you confirmed the approach works?</p>
+
+
+
+<a name="512533309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512533309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512533309">(Apr 16 2025 at 11:49)</a>:</h4>
+<p>The "We use the MicroProfile Config Source trick of reading properties from a directory" approach, that is.</p>
+
+
+
+<a name="512533594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512533594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512533594">(Apr 16 2025 at 11:50)</a>:</h4>
+<p>I suspect it is not working because the <code>partSize</code> coming back in my test does not reflect the one specified in the action JVM options parameter.</p>
+
+
+
+<a name="512533887"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512533887" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512533887">(Apr 16 2025 at 11:52)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> has set this up and looking at the link it seems like a valid approach. I am not sure, though, if this is a mutually exclusive case (env JVM options vs the trick)</p>
+
+
+
+<a name="512536538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512536538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512536538">(Apr 16 2025 at 12:04)</a>:</h4>
+<p>Right but maybe you could set the version or something. Some random setting just to make sure it's working.</p>
+
+
+
+<a name="512537351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512537351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512537351">(Apr 16 2025 at 12:09)</a>:</h4>
+<p>I think it's <code>dataverse.version</code> from <a href="https://github.com/IQSS/dataverse/blob/v6.6/src/main/java/edu/harvard/iq/dataverse/settings/JvmSettings.java#L42">the code</a>. Or we could pick something else.</p>
+
+
+
+<a name="512537630"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512537630" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512537630">(Apr 16 2025 at 12:10)</a>:</h4>
+<p>Sounds good, what does it do, and how can I check it? Is it the typical <code>info/version</code> one?</p>
+
+
+
+<a name="512541594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512541594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512541594">(Apr 16 2025 at 12:32)</a>:</h4>
+<p>I went for a more radical test and excluded all the <code>localstack</code> JVM options and used them as input to the action. Although the <code>localstack</code> service is up, the tests are failing and do not recognize the storage driver. I'd conclude that the method does not work unfortunately <span aria-label="frown" class="emoji emoji-1f641" role="img" title="frown">:frown:</span></p>
+<p>Action Run --&gt; <a href="https://github.com/JR-1991/dataverse-action/actions/runs/14492676895">https://github.com/JR-1991/dataverse-action/actions/runs/14492676895</a> <br>
+Action Test --&gt; <a href="https://github.com/JR-1991/dataverse-action/blob/test-action-input/.github/workflows/test-action.yml">https://github.com/JR-1991/dataverse-action/blob/test-action-input/.github/workflows/test-action.yml</a><br>
+Compose --&gt; <a href="https://github.com/JR-1991/dataverse-action/blob/test-action-input/docker-compose.yml">https://github.com/JR-1991/dataverse-action/blob/test-action-input/docker-compose.yml</a></p>
+
+
+
+<a name="512542040"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512542040" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512542040">(Apr 16 2025 at 12:34)</a>:</h4>
+<p>Since this is not working as expected, I would like to choose a hard-coded solution for now and provide a minimum part size of around 10 MB to test the multi-part direct upload. I believe this should be fine. What do you think?</p>
+
+
+
+<a name="512548219"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512548219" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512548219">(Apr 16 2025 at 13:03)</a>:</h4>
+<p>Yes, the typical api/info/version</p>
+
+
+
+<a name="512548380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512548380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512548380">(Apr 16 2025 at 13:04)</a>:</h4>
+<p>Sure, hard-coded 10 MB sounds good.</p>
+
+
+
+<a name="512548483"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512548483" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512548483">(Apr 16 2025 at 13:04)</a>:</h4>
+<p>Is it possible to define multiple backends for the same service? Something along the lines of a storage backend with a bigger size and one with a smaller size.</p>
+
+
+
+<a name="512549031"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Dataverse%20Action%20JVM%20Options/near/512549031" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Dataverse.20Action.20JVM.20Options.html#512549031">(Apr 16 2025 at 13:07)</a>:</h4>
+<p>Yep, should work.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

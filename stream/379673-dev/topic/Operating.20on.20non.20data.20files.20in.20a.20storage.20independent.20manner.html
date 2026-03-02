@@ -1,0 +1,130 @@
+<html>
+<head><meta charset="utf-8"><title>Operating on non data files in a storage independent manner · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html">Operating on non data files in a storage independent manner</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="416823851"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/416823851" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#416823851">(Jan 19 2024 at 16:59)</a>:</h4>
+<p>This is again related to RO-Crate. So far we worked with a local filesystem storage and so we could easily create, edit, delete ro-crate-metatadata.json files in the same directory where the data files of a dataset are stored. </p>
+<p>However, we want to support any storage type that is available in a Dataverse installation. </p>
+<p>So, my question is: how can we manage non-data files that are store along with data files in a dataset in a storage independent manner? </p>
+<p>For example, if a dataverse is configured to use S3 storage, how can I create an ro-crate-metatadata.json file in a dataset of that dataverse? I think I somehow need to get access to a StorageIO subclass matching the configured storage of the dataverse ofmy target dataset, eg. S3AccessIO in my example. Given that I have a Dataset object how can I get  an S3AccessIO to manage my ro-crate-metatadata.json (create, edit, rename, delete)? Should I maybe use the AuxiliaryFile mechanism? But as far as I understand, an AuxiliaryFile is related to a DataFile and not a Dataset.</p>
+
+
+
+<a name="416829578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/416829578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#416829578">(Jan 19 2024 at 17:23)</a>:</h4>
+<p>Maybe the way files like export_OAI_ORE.cached are handled?</p>
+<p><a href="https://github.com/IQSS/dataverse/blob/df318f0c54dba0e216f4e06c8cf80b38e3533876/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L372-L375">https://github.com/IQSS/dataverse/blob/df318f0c54dba0e216f4e06c8cf80b38e3533876/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L372-L375</a></p>
+
+
+
+<a name="417250112"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417250112" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417250112">(Jan 22 2024 at 15:10)</a>:</h4>
+<p>Yes, auxiliary files are associated with data files, not datasets.</p>
+
+
+
+<a name="417250639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417250639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417250639">(Jan 22 2024 at 15:12)</a>:</h4>
+<p>I'm a little confused. How is S3 so different than local? You should be able to create a JSON file for either one... unless, are you saying you aren't creating the JSON file with Dataverse? You're using some other process.</p>
+<p>Can you please link to an example of how it all looks with local files? It sounds like you want to replicate that for S3.</p>
+
+
+
+<a name="417264778"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417264778" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417264778">(Jan 22 2024 at 16:12)</a>:</h4>
+<p>To put simple: I just want to add a random file next to the datafiles, no matter where the dataset is stored (locally, in S3, Swift, etc.).</p>
+<p>I think I was looking for the StorageIO interface and methods like openAuxChannel(), getAuxFileAsInputStream(), etc.</p>
+
+
+
+<a name="417266896"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417266896" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417266896">(Jan 22 2024 at 16:22)</a>:</h4>
+<p>Ok, and you don't want this file to be entered into the database? It just sits there with Dataverse not knowing about it?</p>
+
+
+
+<a name="417267213"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417267213" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417267213">(Jan 22 2024 at 16:23)</a>:</h4>
+<p>Yes. This is not a datafile, but a "random file" (ro-crate-metadata.json), which lives with the dataset. Much like the thumbnails, cache files, etc. that are already handled this way by Dataverse.</p>
+
+
+
+<a name="417271210"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417271210" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417271210">(Jan 22 2024 at 16:42)</a>:</h4>
+<p>I'm not sure but I'm asking internally.</p>
+
+
+
+<a name="417283334"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417283334" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417283334">(Jan 22 2024 at 17:44)</a>:</h4>
+<p>Going back to auxiliary files, what if you associated your ro-crate json file with one of the data files? Would that be a problem? Maybe there could always be a README.md or something.</p>
+
+
+
+<a name="417300909"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417300909" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417300909">(Jan 22 2024 at 19:30)</a>:</h4>
+<p>I'm chatting with <span class="user-mention" data-user-id="637063">@Leo Andreev</span> and Jim a bit.</p>
+
+
+
+<a name="417300966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417300966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417300966">(Jan 22 2024 at 19:31)</a>:</h4>
+<p>Can you use the standard exporter framework?</p>
+
+
+
+<a name="417301017"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417301017" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417301017">(Jan 22 2024 at 19:31)</a>:</h4>
+<p>Otherwise we might need to extend the idea of aux files to datasets.</p>
+
+
+
+<a name="417302313"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417302313" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417302313">(Jan 22 2024 at 19:39)</a>:</h4>
+<p>This probably goes without saying, but I assume it's all related to your PR <a href="https://github.com/IQSS/dataverse/issues/10086">#10086</a>. But now you want it to work with S3.</p>
+
+
+
+<a name="417399524"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417399524" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417399524">(Jan 23 2024 at 09:04)</a>:</h4>
+<p>Yes, it is all in the context of RO-Crate handling. The RO-Crate metadata belongs to the dataset not a datafile, so it would be awkward to artificially join it to an adhoc datafile, like README.md, I think. </p>
+<p>I think the "aux" things in StorageIO have nothing to do with the AuxiliaryFile objects and their handling. But it would be great if you could confirm it.</p>
+
+
+
+<a name="417431963"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417431963" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417431963">(Jan 23 2024 at 12:08)</a>:</h4>
+<p>Well, the naming is confusing. They can be related. We have a <a href="https://iqss.slack.com/archives/C010LA04BCG/p1657656447143669?thread_ts=1657656181.370759&amp;cid=C010LA04BCG">discussion on Slack</a> about this recently. AuxiliaryFile objects do make use of those "aux" methods in StorageIO. However, those "aux" methods have been around a long time and are used for a number of things besides AuxiliaryFile objects, such as thumbnails, exports, and provenance files.</p>
+<p>I know it's confusing! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="417448294"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417448294" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417448294">(Jan 23 2024 at 13:45)</a>:</h4>
+<p>But what about using the standard exporter framework? Will that work for you?</p>
+
+
+
+<a name="417449443"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417449443" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417449443">(Jan 23 2024 at 13:50)</a>:</h4>
+<p>What I try to achieve here is not actually part of <a href="https://github.com/IQSS/dataverse/issues/10086">#10086</a>, there we don't need this, because there we only generate the ro-crate-metadata.json for the latest version of the dataset (we actually cache it in the filesystem, but it would work without the cache as well). </p>
+<p>However, in our custom Dataverse installation we want to keep the ro-crate-metadata.json for all versions of the dataset and besides ro-crate-metadata.json  we also store ro-crate-preview.html as well. So, here we need to manage all these "aux" files.</p>
+
+
+
+<a name="417449928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Operating%20on%20non%20data%20files%20in%20a%20storage%20independent%20manner/near/417449928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Operating.20on.20non.20data.20files.20in.20a.20storage.20independent.20manner.html#417449928">(Jan 23 2024 at 13:52)</a>:</h4>
+<p>I see. It still feels like the exporter framework is close to what you need. Maybe it could be extended somehow?</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,215 @@
+<html>
+<head><meta charset="utf-8"><title>Metadata block naming convention docs and practice · docs · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/index.html">docs</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html">Metadata block naming convention docs and practice</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="568404465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568404465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568404465">(Jan 16 2026 at 10:42)</a>:</h4>
+<p>This may be a documentation issue, but it could also point to something deeper.</p>
+<p>In the Dataverse documentation:<br>
+<a href="https://guides.dataverse.org/en/6.9/admin/metadatacustomization.html#id20">https://guides.dataverse.org/en/6.9/admin/metadatacustomization.html#id20</a><br>
+the convention for metadata field <code>name</code>s is described as:</p>
+<blockquote>
+<p><strong>By convention, should start with a letter, and use lower camel case</strong></p>
+</blockquote>
+<p>This guidance was accurate for a long time. However, with the introduction of <em>3D Objects Metadata</em>, it appears that field names can now also start with digits. If this behavior is intentional, the documentation should probably be updated to reflect it.</p>
+<p>That said, field naming conventions are ultimately constrained by what Solr allows and officially supports. According to the Solr documentation:<br>
+<a href="https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html">https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html</a></p>
+<blockquote>
+<p><strong>Field names should consist of alphanumeric or underscore characters only and not start with a digit. This is not currently strictly enforced, but other field names will not have first class support from all components and back compatibility is not guaranteed.</strong></p>
+</blockquote>
+<p>In other words, while field names starting with digits may work in practice, they are not officially supported by Solr and could lead to compatibility issues in the future.</p>
+<p>Given that this behavior has existed for years, it is unlikely to cause immediate problems. Still, it is an important constraint to keep in mind when defining metadata fields, and it would be helpful for the Dataverse documentation to clarify this nuance explicitly.</p>
+
+
+
+<a name="568419447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568419447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568419447">(Jan 16 2026 at 12:09)</a>:</h4>
+<p>Huh. Interesting. <span class="user-mention" data-user-id="621770">@Julian Gautier</span>, what do you think?</p>
+
+
+
+<a name="568441861"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568441861" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Julian Gautier <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568441861">(Jan 16 2026 at 14:05)</a>:</h4>
+<p>Hey <span class="user-mention" data-user-id="602497">@Balázs Pataki</span> and <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>.</p>
+<p>I see in the Metadata Customization page's <a href="https://guides.dataverse.org/en/6.9/admin/metadatacustomization.html#datasetfield-field-properties">#datasetField (field) properties table</a> that someone used that text you pointed to, <span class="user-mention" data-user-id="602497">@Balázs Pataki</span>, from <a href="https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html">https://solr.apache.org/guide/solr/latest/indexing-guide/fields.html</a>, when describing the allowed values and restrictions of the database names of metadata fields.</p>
+<p>Since it sounds like the database names of metadata blocks and the database names of metadata fields should not start with digits for the same reason, maybe we should adjust the text in the allowed values and restrictions of the metadata block "name" property so it's similar to text in the allowed values and restrictions of the dataset field "name" property.</p>
+<p>Do you think that would be helpful?</p>
+<p>I don't have enough experience with Solr to guess how problematic database field names that start with digits might be in the future, either for the database names of metadata blocks or of metadata fields.</p>
+<p>Do y'all think we should fix this and any other database names of metadata block fields and dataset fields that start with numbers?</p>
+<p>I think that the folks who designed the 3D metadata block just didn't see that the guides say that these database names should start with letters. </p>
+<p>I do remember being worried about the process we used to design and add this 3D Objects metadata block. We didn't have the time to test it as I had planned, and we were asked to include it like we include the other "Supported Metadata" instead of adding it as "Experimental Metadata", which to be fair I think has it's own challenges.</p>
+
+
+
+<a name="568445212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568445212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568445212">(Jan 16 2026 at 14:19)</a>:</h4>
+<p>From a pragmatic point of view, I think we should stick to “not starting with a digit,” since practically no mainstream programming languages allow symbol names that begin with digits. And there are probably good reasons for that.</p>
+<p>Now, the 3D metadata block might already be in use by the community, so I’m not sure how difficult it would be to change it at this point. </p>
+<p>On the other hand, it <em>does</em> work, so… ¯_(ツ)_/¯</p>
+<p>Still, I’d support the pragmatic approach. Both in docs and in actual use.</p>
+
+
+
+<a name="568447528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568447528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568447528">(Jan 16 2026 at 14:30)</a>:</h4>
+<p>In <a href="https://github.com/IQSS/dataverse/issues/9176">#9176</a> <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> added a script to check for duplicate metadata field names. Maybe it could be extended to enforce a naming convention.</p>
+
+
+
+<a name="568448000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448000">(Jan 16 2026 at 14:31)</a>:</h4>
+<p>I have been preaching that our "specification" of how our TSV format works and how this is mixing specification and file format and how the parser is lacking.... OMG finally someone else is stumbling over this and being annoyed.</p>
+
+
+
+<a name="568448153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448153">(Jan 16 2026 at 14:32)</a>:</h4>
+<p>After some rant, here some more productive stuff: I currently have a trainee that I assigned to doing something about this.</p>
+
+
+
+<a name="568448519"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448519" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448519">(Jan 16 2026 at 14:34)</a>:</h4>
+<p>We will implement a Java library that a) has a proper data model for our metadata blocks, b) create an extensible parser interface, c) make these serializable (so we can generate Solr Schema from it or whatever), d) add validation, e) make it easy to use programmatically and f) put it also in a CLI application for more use cases.</p>
+
+
+
+<a name="568448650"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448650" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448650">(Jan 16 2026 at 14:34)</a>:</h4>
+<p>That way I want him to have a solid understanding of all we do around these parts and get a real contribution also into the core! (As the idea would be to replace the current "parser")</p>
+
+
+
+<a name="568448800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448800">(Jan 16 2026 at 14:35)</a>:</h4>
+<p>Maybe it also time to move away from TSV then, isn’t it?</p>
+
+
+
+<a name="568448857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448857">(Jan 16 2026 at 14:35)</a>:</h4>
+<p>We will be free to do so, yes.</p>
+
+
+
+<a name="568448956"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568448956" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568448956">(Jan 16 2026 at 14:35)</a>:</h4>
+<p>But this needs a proper model first! Then parsers can use whatever format they want.</p>
+
+
+
+<a name="568449042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449042">(Jan 16 2026 at 14:36)</a>:</h4>
+<p>If someone wants to use same fancy exotic whatever: fine, write a parser and be done with it.</p>
+
+
+
+<a name="568449514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449514">(Jan 16 2026 at 14:38)</a>:</h4>
+<p>This reminds me of how <code>markdown.pl</code> evolved into CommonMark. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="568449588"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449588" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449588">(Jan 16 2026 at 14:38)</a>:</h4>
+<p>I had some discussions with Gustavo, and he said it was a rather adhoc decision to use TSV at the time, not much thinking went to it, so I guess IQSS won’t be against some better input/output formats.</p>
+
+
+
+<a name="568449806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449806">(Jan 16 2026 at 14:39)</a>:</h4>
+<p>Again, the culprit was not the create a specification and data model first! What we have in the guides is a whole mix of spec, model and format, all influencing each other.</p>
+
+
+
+<a name="568449888"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449888" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449888">(Jan 16 2026 at 14:39)</a>:</h4>
+<p>Would a discussion around the model/spec need a community review?</p>
+
+
+
+<a name="568449958"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568449958" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568449958">(Jan 16 2026 at 14:40)</a>:</h4>
+<p>As you said: these choices have consequences! (see 3D fields)</p>
+
+
+
+<a name="568450113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568450113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568450113">(Jan 16 2026 at 14:40)</a>:</h4>
+<p>We used TSV because the person developing the metadata blocks used Google Spreadsheets. We'd download the TSV from the spreadsheet. Then we wrote a parser.</p>
+
+
+
+<a name="568450253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568450253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568450253">(Jan 16 2026 at 14:41)</a>:</h4>
+<p>Historically grown mess <span aria-label="stuck out tongue wink" class="emoji emoji-1f61c" role="img" title="stuck out tongue wink">:stuck_out_tongue_wink:</span> (I get it, no blame here. But we should pay back that tech debt...)</p>
+
+
+
+<a name="568450585"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568450585" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568450585">(Jan 16 2026 at 14:43)</a>:</h4>
+<p>Related: harmonize formats for metadata schema and dataset creation <a href="https://github.com/IQSS/dataverse/issues/4451">#4451</a></p>
+<p>"As a repository administrator / curator / metadata person, I would like to deal with hierarchical metadata schema in a way that is less awkward than a spreadsheet..."</p>
+
+
+
+<a name="568450878"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568450878" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568450878">(Jan 16 2026 at 14:44)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice/near/568450585">said</a>:</p>
+<blockquote>
+<p>Related: harmonize formats for metadata schema and dataset creation <a href="https://github.com/IQSS/dataverse/issues/4451">#4451</a></p>
+<p>"As a repository administrator / curator / metadata person, I would like to deal with hierarchical metadata schema in a way that is less awkward than a spreadsheet..."</p>
+</blockquote>
+<p>This is me! <span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span></p>
+
+
+
+<a name="568451153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451153">(Jan 16 2026 at 14:45)</a>:</h4>
+<p>Been there, done that. Failed... <span aria-label="sad" class="emoji emoji-2639" role="img" title="sad">:sad:</span></p>
+
+
+
+<a name="568451462"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451462" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451462">(Jan 16 2026 at 14:47)</a>:</h4>
+<p>This “symbols starting with digit” problem actually came up with our CEDAR integration meeting with the new 3D MDB, because we validate/enforce the Solr rules, and this MDB failed to work.</p>
+
+
+
+<a name="568451511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451511">(Jan 16 2026 at 14:47)</a>:</h4>
+<p>After DCM2025 I already sketched up a few ideas for a JSON/YAML/TOML based format... But then again found myself locked in the problem of we don't have a model and a validator. <span class="user-mention" data-user-id="602497">@Balázs Pataki</span> how interested are you in this? You know, for now I have plenty to do. But FZJ is offering paid development services... (As is Jim under the GDCC flag...)</p>
+
+
+
+<a name="568451737"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451737" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451737">(Jan 16 2026 at 14:48)</a>:</h4>
+<p>I am interested for sure.</p>
+
+
+
+<a name="568451770"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451770" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451770">(Jan 16 2026 at 14:48)</a>:</h4>
+<p>Yeah, I remember that field names where limited due to Solr... <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> The current attempt at writing this is not publicly available (yet).</p>
+
+
+
+<a name="568451883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/Metadata%20block%20naming%20convention%20docs%20and%20practice/near/568451883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice.html#568451883">(Jan 16 2026 at 14:49)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="602497">Balázs Pataki</span> <a href="#narrow/channel/446770-docs/topic/Metadata.20block.20naming.20convention.20docs.20and.20practice/near/568451737">said</a>:</p>
+<blockquote>
+<p>I am interested for sure.</p>
+</blockquote>
+<p>Ha! But I suppose that money is not gonna find itself, right? <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> <span aria-label="money with wings" class="emoji emoji-1f4b8" role="img" title="money with wings">:money_with_wings:</span> (DM me if you want to talk more)</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

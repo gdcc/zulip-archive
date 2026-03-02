@@ -1,0 +1,288 @@
+<html>
+<head><meta charset="utf-8"><title>admin API and superuser authorization · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html">admin API and superuser authorization</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="443079852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443079852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443079852">(Jun 06 2024 at 14:53)</a>:</h4>
+<p>Hey :) I would like to have a community view on this subject : <a href="https://github.com/IQSS/dataverse/pull/10612#issuecomment-2150667213">https://github.com/IQSS/dataverse/pull/10612#issuecomment-2150667213</a></p>
+<p><code>/api/admin</code> API is blocked theoretically by settings :</p>
+<ul>
+<li><code>curl -X PUT -d localhost-only http://localhost:8080/api/admin/settings/:BlockedApiPolicy</code></li>
+<li><code>curl -X PUT -d "admin,builtin-users" http://localhost:8080/api/admin/settings/:BlockedApiEndpoints</code><br>
+meaning it requires to be in localhost to excecute <code>/api/admin</code>.</li>
+</ul>
+<p>Some API need superuser API_TOKEN to work so my mind says : </p>
+<ul>
+<li>under <code>/api/admin</code> must be placed every sensible endpoint that change/show global and technical configuration of Dataverse</li>
+<li>under superuser credentials and not <code>/api/admin</code> must be placed every sensible endpoint that change/show the user rights/functionality of Dataverse</li>
+</ul>
+<p>does this mean <code>/api/admin</code> should never require uperuser authorization ? Ex: should we remove this check <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Admin.java#L617">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Admin.java#L617</a> ?</p>
+<p>when should we combine both superuser credentials + <code>/api/admin</code>?</p>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> <span class="user-mention" data-user-id="598112">@Philip Durbin</span> <span class="user-mention" data-user-id="651106">@Jérôme Roucou</span></p>
+
+
+
+<a name="443081267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443081267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443081267">(Jun 06 2024 at 15:00)</a>:</h4>
+<p>Right now we have a mix. It's quite inconsistent. We should probably pick one and stick with it.</p>
+<p>Recently, in <a href="https://github.com/IQSS/dataverse/issues/10440">#10440</a>, we introduced PUT <code>/api/admin/superuser/$USERNAME</code>. It does not require a superuser API token. It's used by the setup process to promote the first user (dataverseAdmin) into a superuser. It's a use case I think we want to keep, unless we decide on some other way to make dataverseAdmin a superuser.</p>
+
+
+
+<a name="443084656"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443084656" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443084656">(Jun 06 2024 at 15:11)</a>:</h4>
+<p>I agree : for deployment usage (sh/ansible) we should avoid working with supersuper api key (or Burrito Key <span aria-label="peep" class="emoji emoji-1fae3" role="img" title="peep">:peep:</span>).<br>
+maybe the discussion should be around <a href="https://guides.dataverse.org/en/latest/installation/config.html#blockedapipolicy">:BlockedApiPolicy</a> setting : </p>
+<ul>
+<li>localhost-only: Allow from localhost. <strong>DEFAULT combined with <code>curl -X PUT -d "admin,builtin-users" http://localhost:8080/api/admin/settings/:BlockedApiEndpoints</code></strong></li>
+<li>unblock-key: Require a key defined in <a href="https://guides.dataverse.org/en/latest/installation/config.html#blockedapikey">:BlockedApiKey</a>.</li>
+<li>drop: Disallow the blocked endpoints completely.</li>
+</ul>
+<hr>
+<ul>
+<li><code>drop</code> exists but should never be set in real env</li>
+<li><code>unblock-key</code> can be use when you reallllly want not only localhost usage</li>
+</ul>
+<p>If that is OK, then we should remove every superadmin authorization check in <code>/api/admin</code> don't you think ?</p>
+
+
+
+<a name="443280806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443280806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443280806">(Jun 07 2024 at 11:46)</a>:</h4>
+<p>For consistency, you mean? I guess that's ok, to remove superuser checks under <code>/api/admin</code>.</p>
+
+
+
+<a name="443281259"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281259" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281259">(Jun 07 2024 at 11:49)</a>:</h4>
+<p>I agree that we should start using a single approach and not keep going with this mix of stuff</p>
+
+
+
+<a name="443281303"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281303" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281303">(Jun 07 2024 at 11:49)</a>:</h4>
+<p>IMHO this whole blocking thing can be made obsolete</p>
+
+
+
+<a name="443281430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281430">(Jun 07 2024 at 11:50)</a>:</h4>
+<p>We can use other means to authorize access to the admin API</p>
+
+
+
+<a name="443281558"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281558" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281558">(Jun 07 2024 at 11:51)</a>:</h4>
+<p>IMHO it would be much more consistent if we allow usage of access tokens</p>
+
+
+
+<a name="443281597"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281597" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281597">(Jun 07 2024 at 11:51)</a>:</h4>
+<p>Access tokens = OIDC / JWT based</p>
+
+
+
+<a name="443281759"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443281759" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443281759">(Jun 07 2024 at 11:52)</a>:</h4>
+<p>Allowing provisioning of a pre-generated thing would enable bootstrapping via any framework etc</p>
+
+
+
+<a name="443292754"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443292754" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443292754">(Jun 07 2024 at 12:54)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization/near/443280806">said</a>:</p>
+<blockquote>
+<p>For consistency, you mean? </p>
+</blockquote>
+<p>yes</p>
+
+
+
+<a name="443293729"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443293729" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443293729">(Jun 07 2024 at 13:00)</a>:</h4>
+<p>Or do it the other way around: allow superusers access only and stop doing it in code manually but apply a proper auth filter</p>
+
+
+
+<a name="443297116"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443297116" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443297116">(Jun 07 2024 at 13:20)</a>:</h4>
+<p>In development it's more convenient to have <code>/api/admin</code> open (no API token required, let alone a superuser token), but it freaks me out a bit when it comes to production installations.</p>
+<p>I most recently bumped into this when writing <a href="https://guides.dataverse.org/en/6.2/container/running/demo.html">https://guides.dataverse.org/en/6.2/container/running/demo.html</a> . If you look for "unblock", you'll see that I wrote about how to set the <code>unblock-key</code>.  That way, you can change database setting securely.</p>
+
+
+
+<a name="443298132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298132">(Jun 07 2024 at 13:25)</a>:</h4>
+<p>If you're developing with containers, you need the unblock key anyway unkess you always go for running a curl command inside the app container</p>
+
+
+
+<a name="443298240"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298240" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298240">(Jun 07 2024 at 13:26)</a>:</h4>
+<p>That's making it harder because it's less documented and non standardized</p>
+
+
+
+<a name="443298295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298295">(Jun 07 2024 at 13:26)</a>:</h4>
+<p>IMHO the default should be inversed</p>
+
+
+
+<a name="443298335"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298335" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298335">(Jun 07 2024 at 13:26)</a>:</h4>
+<p>Make it require AA by default</p>
+
+
+
+<a name="443298379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298379">(Jun 07 2024 at 13:27)</a>:</h4>
+<p>But you can disable the filter using a feature flag</p>
+
+
+
+<a name="443298514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298514">(Jun 07 2024 at 13:28)</a>:</h4>
+<p>Sure, as long as everything still works, especially having a superuser at installation time.</p>
+
+
+
+<a name="443298771"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298771" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298771">(Jun 07 2024 at 13:29)</a>:</h4>
+<p>Also: if we ever want to have the SPA or other Frontends enable some admin UI, proper auth is the way to go</p>
+
+
+
+<a name="443298831"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443298831" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443298831">(Jun 07 2024 at 13:29)</a>:</h4>
+<p>Same goes for client libs like pyDataverse</p>
+
+
+
+<a name="443300984"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443300984" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443300984">(Jun 07 2024 at 13:42)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization/near/443293729">said</a>:</p>
+<blockquote>
+<p>Or do it the other way around: allow superusers access only and stop doing it in code manually but apply a proper auth filter</p>
+</blockquote>
+<p>If we do this, do we also remove everything about <code>:BlockedApi</code>?<br>
+Do you see side effect for users/admins ?</p>
+
+
+
+<a name="443301414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443301414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443301414">(Jun 07 2024 at 13:44)</a>:</h4>
+<p>Classic installations probably are not often using the unblock key feature. If they do, they can migrate to the new auth scheme. It would probably be good to have a fallback thing in place for migration. Haven't thought much about it yet.</p>
+
+
+
+<a name="443301547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443301547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443301547">(Jun 07 2024 at 13:45)</a>:</h4>
+<p>Containers users probably will be greatful to have a simpler option than the unblock key...</p>
+
+
+
+<a name="443301671"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443301671" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443301671">(Jun 07 2024 at 13:45)</a>:</h4>
+<p>Creating a feature flag to disable the filter should be good enough for backward compatibility for localhost devs</p>
+
+
+
+<a name="443302146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443302146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443302146">(Jun 07 2024 at 13:48)</a>:</h4>
+<p>I'm a bit scared (security) about 1 setting that allow everything. Or it should be something not in :Setting</p>
+
+
+
+<a name="443302356"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443302356" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443302356">(Jun 07 2024 at 13:49)</a>:</h4>
+<p>No no I'm talking about a feature flag. Not a database setting. I agree that would be a bad idea</p>
+
+
+
+<a name="443302512"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443302512" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443302512">(Jun 07 2024 at 13:50)</a>:</h4>
+<p>that does not ring a bell for me can you explain <code>feature flag</code> ?</p>
+
+
+
+<a name="443302620"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443302620" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443302620">(Jun 07 2024 at 13:50)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/latest/developers/configuration.html#adding-a-feature-flag">https://guides.dataverse.org/en/latest/developers/configuration.html#adding-a-feature-flag</a></p>
+
+
+
+<a name="443302724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443302724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443302724">(Jun 07 2024 at 13:51)</a>:</h4>
+<p>Maybe we should enable using both ways for some time, but deprecate the old ways. Log warnings etc</p>
+
+
+
+<a name="443303724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443303724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443303724">(Jun 07 2024 at 13:56)</a>:</h4>
+<p>Should we start a DEP? Is what we called them? <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span> Like PEP or JEP or JSR. Dataverse Enhancement Proposals (DEPs).</p>
+
+
+
+<a name="443307354"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443307354" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443307354">(Jun 07 2024 at 14:14)</a>:</h4>
+<p>As you prefere, hope it does fall into a forsaken box <span aria-label="face with peeking eye" class="emoji emoji-1fae3" role="img" title="face with peeking eye">:face_with_peeking_eye:</span></p>
+
+
+
+<a name="443307515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443307515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443307515">(Jun 07 2024 at 14:15)</a>:</h4>
+<p>Yes, a DEP would be good</p>
+
+
+
+<a name="443307624"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443307624" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443307624">(Jun 07 2024 at 14:16)</a>:</h4>
+<p>We could use the template from <span class="user-mention" data-user-id="600327">@Ceilyn Boyd</span></p>
+
+
+
+<a name="443317980"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443317980" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443317980">(Jun 07 2024 at 15:13)</a>:</h4>
+<p>This one, sure: <a href="https://docs.google.com/document/d/1GnZiAyh2C6TQLlhKYD5m2JhtSGLg0ZwyiyF8M6y9cuw/edit?usp=sharing">https://docs.google.com/document/d/1GnZiAyh2C6TQLlhKYD5m2JhtSGLg0ZwyiyF8M6y9cuw/edit?usp=sharing</a></p>
+
+
+
+<a name="443318163"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443318163" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443318163">(Jun 07 2024 at 15:14)</a>:</h4>
+<p>Private? <img alt=":doh:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/48103.png" title="doh"></p>
+
+
+
+<a name="443318185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/admin%20API%20and%20superuser%20authorization/near/443318185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization.html#443318185">(Jun 07 2024 at 15:14)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>Purpose
+Background
+Approach
+  Plan
+  Assessment
+Participants
+Assumptions and Dependencies
+  Requirements and Resources
+  Requirements
+Resources
+Timeline
+Deliverables
+Outcomes
+Benefits
+Risks
+  Risk Mitigation
+</code></pre></div>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

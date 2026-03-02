@@ -1,0 +1,113 @@
+<html>
+<head><meta charset="utf-8"><title>Regression or is it just me? · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html">Regression or is it just me?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="571985856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/571985856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#571985856">(Feb 04 2026 at 18:50)</a>:</h4>
+<p>I just checked out a fresh develop instance <code>https://github.com/IQSS/dataverse.git</code> and built it:</p>
+<p><code>&gt; mvn -Pct clean package</code></p>
+<p><code>&gt; docker image ls | grep gdcc</code></p>
+<div class="codehilite"><pre><span></span><code>WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+gdcc/base:6.10-noble-p6.2025.10-j17                                                                     e08cf058384d       1.06GB          348MB
+gdcc/configbaker:unstable                                                                               af96bd628e30        722MB          198MB
+gdcc/dataverse:unstable                                                                                 bbba32344ed0       1.45GB          522MB
+</code></pre></div>
+<p>When I run it I get this error:</p>
+<p><code>&gt; mvn -Pct docker:run</code></p>
+<div class="codehilite"><pre><span></span><code>[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------&lt; edu.harvard.iq:dataverse &gt;----------------------
+[INFO] Building dataverse 6.9
+[INFO]   from pom.xml
+[INFO] ----------------------------[ docker-build ]----------------------------
+[INFO]
+[INFO] --- docker:0.46.0:run (default-cli) @ dataverse ---
+[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Skipped running
+[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Start container 92100e417c55
+dev_bootstrap&gt; Waiting for http://dataverse:8080 to become ready in max 3m.
+dev_bootstrap&gt; 2026-02-04T18:46:17Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...
+dev_bootstrap&gt; 2026-02-04T18:46:17Z ERR Expectation failed error=&quot;failed to establish an http connection, caused by: Get \&quot;http://dataverse:8080/api/info/version\&quot;: dial tcp: lookup dataverse on 127.0.0.11:53: no such host&quot; address=http://dataverse:8080/api/info/version
+[ERROR] DOCKER&gt; Error occurred during container startup, shutting down...
+[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Stop and removed container 92100e417c55 after 0 ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.608 s
+[INFO] Finished at: 2026-02-04T19:46:17+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.46.0:run (default-cli) on project dataverse: Execution default-cli of goal io.fabric8:docker-maven-plugin:0.46.0:run failed: Cannot invoke &quot;com.google.gson.JsonElement.isJsonNull()&quot; because the return value of &quot;com.google.gson.JsonObject.get(String)&quot; is null -&gt; [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginExecutionException
+</code></pre></div>
+<p>Any idea what could be the problem?</p>
+
+
+
+<a name="571989190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/571989190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#571989190">(Feb 04 2026 at 19:08)</a>:</h4>
+<p>By the way, <code>docker compose -f docker-compose-dev.yml up</code> works.</p>
+
+
+
+<a name="572004024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572004024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572004024">(Feb 04 2026 at 20:34)</a>:</h4>
+<p>You may need to assign some more RAM to the DV container.</p>
+
+
+
+<a name="572004132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572004132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572004132">(Feb 04 2026 at 20:35)</a>:</h4>
+<p>I recently did get the impression that at some point during the last releases, we made Dataverse too big to fit into 2G RAM.</p>
+
+
+
+<a name="572004429"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572004429" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572004429">(Feb 04 2026 at 20:36)</a>:</h4>
+<p>Also: some log output would be helpful. There might be other stuff causing regressions</p>
+
+
+
+<a name="572004593"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572004593" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572004593">(Feb 04 2026 at 20:38)</a>:</h4>
+<p>I have 16G for docker, memory should not be an issue</p>
+
+
+
+<a name="572004675"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572004675" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572004675">(Feb 04 2026 at 20:38)</a>:</h4>
+<p>Where should I look for logs?</p>
+
+
+
+<a name="572005517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572005517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572005517">(Feb 04 2026 at 20:43)</a>:</h4>
+<p>This is  the <code>mvn -Pct -e -X  docker:run</code>. Does it help?</p>
+<p><a href="/user_uploads/53090/kT3Qzp-_yExL1O1RGYJ4gmgv/mvn.log">mvn.log</a></p>
+
+
+
+<a name="572119310"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572119310" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572119310">(Feb 05 2026 at 11:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> you need to assign more RAM to the container. See also <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F/with/555465953">#containers &gt; compose: DV needs 2.5G RAM?</a></p>
+
+
+
+<a name="572119677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Regression%20or%20is%20it%20just%20me%3F/near/572119677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Regression.20or.20is.20it.20just.20me.3F.html#572119677">(Feb 05 2026 at 11:14)</a>:</h4>
+<p>But this is not about the RAM anyway at this point. The message you get in the logs is absolutely related to <a href="#narrow/channel/375812-containers/topic/DMP.20.26.20Docker.2029.2B">#containers &gt; DMP &amp; Docker 29+</a> I've seen it before. Please try again with adding the plugin version.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

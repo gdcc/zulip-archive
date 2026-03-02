@@ -1,0 +1,140 @@
+[
+    {
+        "content": "<p>Hi,</p>\n<p>we are currently updating our dataverse instance from 5.13 to 5.14 and found a strange beahivour: Normally, when publishing a dataset, the dataset page refreshes every few seconds and then displays the published dataset. <br>\nWith 5.14 however, the page is still refreshed, but at the end the old draft version is displayed, although the dataset is in status published. If you refresh the page manually, the correct status (published) is displayed.</p>\n<p>Is this a known bug? It seems to be fixed with 6.0, but I couldn't find any ticket or commit regarding this issue. We would like to fix it for 5.14 until we update to 6.0 at a later stage.</p>\n<p>Thank you (and thanks for the new Zulip chat, it's great)</p>",
+        "id": 392476427,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695374507
+    },
+    {
+        "content": "<p>This topic was moved here from <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev/topic/dataset.20status.20change.20isn.27t.20visible.20after.20publish.20.28v5.2E14.29\">#dev &gt; dataset status change isn't visible after publish (v5.14)</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 392482305,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1695376437
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"652521\">@Markus Haarländer</span> I hope you don't mind - I moved this to troubleshooting, as it seems some investigation would be necessary</p>",
+        "id": 392482414,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695376470
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"652521\">@Markus Haarländer</span> anything in server.log? In <a href=\"https://github.com/IQSS/dataverse/issues/9015\">#9015</a> there was a null pointer exception, for example.</p>",
+        "id": 392494646,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695380733
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  Thank you for the hint. There's indeed a null pointer exception in the log:</p>\n<blockquote>\n<p>[2023-09-22T13:47:14.081+0200] [Payara 5.2022.5] [SCHWERWIEGEND] [] [javax.enterprise.resource.webcontainer.jsf.context] [tid: _ThreadID=98 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1695383234081] [levelValue: 1000] [[<br>\n  javax.faces.view.facelets.TagAttributeException: /dataset.xhtml @93,82 test=\"#{not empty DatasetPage.getSignpostingLinkHeader()}\" /dataset.xhtml @93,82 test=\"#{not empty DatasetPage.getSignpostingLinkHeader()}\": java.lang.NullPointerException<br>\n    at com.sun.faces.facelets.tag.TagAttributeImpl.getObject(TagAttributeImpl.java:318)<br>\n    ...<br>\nCaused by: java.lang.NullPointerException<br>\n    at edu.harvard.iq.dataverse.DatasetPage.getSignpostingLinkHeader(DatasetPage.java:6149)<br>\n    at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n    at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)<br>\n    at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>\n    at java.base/java.lang.reflect.Method.invoke(Method.java:566)<br>\n    at javax.el.ELUtil.invokeMethod(ELUtil.java:236)<br>\n    ... 84 more<br>\n]]</p>\n</blockquote>\n<p>The method DatasetPage.getSignPostingLinkHeader (<a href=\"https://github.com/IQSS/dataverse/blob/9f4ddbbbd3ea9aca23d2d828f575c7ba0747c2c7/src/main/java/edu/harvard/iq/dataverse/DatasetPage.java#L6148\">https://github.com/IQSS/dataverse/blob/9f4ddbbbd3ea9aca23d2d828f575c7ba0747c2c7/src/main/java/edu/harvard/iq/dataverse/DatasetPage.java#L6148</a>) is called a lot of times during the publishing process. The last 3 times it's called, workingVersion is null. This leads to the null pointer exception. </p>\n<p>I changed the line to</p>\n<div class=\"codehilite\" data-code-language=\"Java\"><pre><span></span><code><span class=\"k\">if</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">workingVersion</span><span class=\"w\"> </span><span class=\"o\">==</span><span class=\"w\"> </span><span class=\"kc\">null</span><span class=\"w\"> </span><span class=\"o\">||</span><span class=\"w\"> </span><span class=\"o\">!</span><span class=\"n\">workingVersion</span><span class=\"p\">.</span><span class=\"na\">isReleased</span><span class=\"p\">())</span><span class=\"w\"> </span><span class=\"p\">{</span>\n</code></pre></div>\n<p>and tried again, then the next null pointer exception is thrown:</p>\n<blockquote>\n<p>[2023-09-22T14:02:53.418+0200] [Payara 5.2022.5] [SCHWERWIEGEND] [] [javax.enterprise.resource.webcontainer.jsf.context] [tid: _ThreadID=97 _ThreadName=http-thread-pool::http-listener-1(1)] [timeMillis: 1695384173418] [levelValue: 1000] [[<br>\n  javax.faces.view.facelets.TagAttributeException: /dataset.xhtml @319,197 test=\"#{!((showSubmitForReviewLink or showReturnToAuthorLink or not empty DatasetPage.allowedExternalStatuses) and showPublishLink)}\" /dataset.xhtml @319,197 test=\"#{!((showSubmitForReviewLink or showReturnToAuthorLink or not empty DatasetPage.allowedExternalStatuses) and showPublishLink)}\": java.lang.NullPointerException<br>\n    ...<br>\nCaused by: java.lang.NullPointerException<br>\n    at edu.harvard.iq.dataverse.SettingsWrapper.getAllowedExternalStatuses(SettingsWrapper.java:714)<br>\n    at edu.harvard.iq.dataverse.SettingsWrapper$Proxy$_$$_WeldClientProxy.getAllowedExternalStatuses(Unknown Source)<br>\n    at edu.harvard.iq.dataverse.DatasetPage.getAllowedExternalStatuses(DatasetPage.java:5885)<br>\n    at jdk.internal.reflect.GeneratedMethodAccessor1482.invoke(Unknown Source)<br>\n    at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>\n    at java.base/java.lang.reflect.Method.invoke(Method.java:566)<br>\n    at javax.el.BeanELResolver.getValue(BeanELResolver.java:299)<br>\n    ... 110 more<br>\n]]</p>\n</blockquote>\n<p>Don't really get what's going on here. The actual problem seems to be that methods are called on the DatasetPage during the refresh calls, which work fine first, but for the last 3 calls or so the dataset is not properly initialized.</p>",
+        "id": 392505046,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695384737
+    },
+    {
+        "content": "<p>Hmm, <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> recently fixed a bug or two in Signposting in <a href=\"https://github.com/IQSS/dataverse/issues/9941\">#9941</a>. I wonder if he has an insight into this.</p>",
+        "id": 392507868,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695385907
+    },
+    {
+        "content": "<p>For the other NPE dataset is null: <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/SettingsWrapper.java#L714\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/SettingsWrapper.java#L714</a></p>",
+        "id": 392523943,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695391004
+    },
+    {
+        "content": "<p>And here's 5.14 link for the working version being null that you found: <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DatasetPage.java#L6148\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DatasetPage.java#L6148</a></p>",
+        "id": 392524083,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695391048
+    },
+    {
+        "content": "<p>The idea behind working version is that it's a version you can edit. A draft, basically.</p>",
+        "id": 392524163,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695391076
+    },
+    {
+        "content": "<p>Apart from that null check you just added, are there any other modifications you've made? That is, are you running a fork of 5.14 or vanilla 5.14?</p>",
+        "id": 392524715,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695391217
+    },
+    {
+        "content": "<p>We are running a fork. But I just tried it with clean vanilla 5.14 in a docker container. Same behaviour there and same NPE in the log.  So it seems to be a problem in the original dataverse source code. I made a short screencast. After the publish lock is removed, the tags \"DRAFT\" and \"UNPUBLISHED\" are still visible and the old version is displayed.<br>\n<a href=\"/user_uploads/53090/cWUZH52I95NBOUnVXe73Gj7l/Bildschirmaufnahme-2023-09-25-um-12.00.04.mov\">Bildschirmaufnahme-2023-09-25-um-12.00.04.mov</a></p>",
+        "id": 392965488,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695636265
+    },
+    {
+        "content": "<p>This is a tough one. Almost a policy question. Once we've created the next release, 6.0 in this case, we usually don't go back and release fixes for older releases, like 5.14 in this case. That is, we don't have any plans to release 5.14.1.</p>\n<p>I guess for now it wouldn't hurt to have an issue tracking this bug, if you're willing to create it.</p>",
+        "id": 393001481,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695645669
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"652521\">@Markus Haarländer</span> could you provide a reproducer with vanilla 6.0? That'd definitely help move matters along. Thanks!</p>",
+        "id": 393006619,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695646818
+    },
+    {
+        "content": "<p>He said it seems to be fixed with 6.0 ^^</p>",
+        "id": 393008441,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695647214
+    },
+    {
+        "content": "<p>Yes, it's fixed with 6.0<br>\nJust wanted to ask you guys if this is a known bug and if there's any known quick fix we could apply to our 5.14 fork. But as you said, it seems really tough. So we might directly update to 6.0 and skip 5.14. <br>\nThanks for your help and quick replies!</p>",
+        "id": 393013443,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695648404
+    },
+    {
+        "content": "<p>I'm not aware of this bug but I haven't tried to reproduce it yet.</p>",
+        "id": 393020918,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695650172
+    },
+    {
+        "content": "<p>I just asked internally if anyone has seen this: <a href=\"https://iqss.slack.com/archives/CVB2SMDFX/p1695652927563959\">https://iqss.slack.com/archives/CVB2SMDFX/p1695652927563959</a></p>",
+        "id": 393032576,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695652969
+    },
+    {
+        "content": "<p>A related issue, if not the same: Dataset page stays on the url with \"version=DRAFT\" after the dataset is published <a href=\"https://github.com/IQSS/dataverse/issues/8548\">#8548</a></p>",
+        "id": 393036767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695653995
+    },
+    {
+        "content": "<p>But in that issue a manual refresh doesn't fix it because <code>version=DRAFT</code> is in the URL. So I guess it's a little different. <span class=\"user-mention\" data-user-id=\"652521\">@Markus Haarländer</span> if you'd like to create an issue for your scenario please go ahead. You even have that nice video to upload. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 393040237,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695654821
+    },
+    {
+        "content": "<p>Thanks Phil, I created an issue: <a href=\"https://github.com/IQSS/dataverse/issues/9954\">https://github.com/IQSS/dataverse/issues/9954</a><br>\nHowever, I confused something in my first post. You're right, after a manual refresh, it's still not displaying correct. The message *Info – The \"DRAFT\" version was not found. This is version \"1.0\". * is displayed and version=DRAFT is in the URL. Don't know, maybe I tried it with an already published item before, and then the behaviour is different. Will have to test again. But anyway, still an undesired behaviour :)</p>",
+        "id": 393047386,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695656334
+    },
+    {
+        "content": "<p>Thanks!</p>",
+        "id": 393048103,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695656525
+    },
+    {
+        "content": "<p>Jim made a suggestion for a fix (<a href=\"https://github.com/IQSS/dataverse/issues/9954#issuecomment-1736297314\">https://github.com/IQSS/dataverse/issues/9954#issuecomment-1736297314</a>) and it works great.<br>\nThanks for all your help, will mark this topic as resolved now.</p>",
+        "id": 393412627,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1695799650
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"652521\">Markus Haarländer</span> has marked this topic as resolved.</p>",
+        "id": 393412654,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1695799658
+    }
+]

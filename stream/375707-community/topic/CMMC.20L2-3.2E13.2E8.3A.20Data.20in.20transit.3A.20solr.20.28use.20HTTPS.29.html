@@ -1,0 +1,43 @@
+<html>
+<head><meta charset="utf-8"><title>CMMC L2-3.13.8: Data in transit: solr (use HTTPS) · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/CMMC.20L2-3.2E13.2E8.3A.20Data.20in.20transit.3A.20solr.20.28use.20HTTPS.29.html">CMMC L2-3.13.8: Data in transit: solr (use HTTPS)</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="501176493"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/CMMC%20L2-3.13.8%3A%20Data%20in%20transit%3A%20solr%20%28use%20HTTPS%29/near/501176493" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steve Baroti <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/CMMC.20L2-3.2E13.2E8.3A.20Data.20in.20transit.3A.20solr.20.28use.20HTTPS.29.html#501176493">(Feb 21 2025 at 19:51)</a>:</h4>
+<p>Hello! We received the mandate to enable only FIP-compliant encrypted network communication, and we want to use HTTPS to query the solr server. Do you have any recommendations? I went through the relevant dataverse JAVA  search code, checked files like "SolrClientService.java", "AbstractSolrClientService.java", the Http2SolrClient.Builder (getSolrUrl), JvmSettings.SOLR_PROT.lookup() and it looks like the environment variable "DATAVERSE_SOLR_PROTOCOL" may help (we are not running containers, though). I am wondering how can I still squeeze in the HTTPS bit into ":SolrHostColonPort". Can you please point me to some documentation page (even experimental) on how to enable solr queries using HTTPS for dataverse? Thank you, Steve.<br>
+PS. the PostgreSQL JDBC driver talks seamless encryption over the network: TLSv1.3, cipher=TLS_AES_256_GCM_SHA384 <br>
+RE: CMMC L2-3.13.8 - Data in Transit: Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission.</p>
+
+
+
+<a name="501178996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/CMMC%20L2-3.13.8%3A%20Data%20in%20transit%3A%20solr%20%28use%20HTTPS%29/near/501178996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/CMMC.20L2-3.2E13.2E8.3A.20Data.20in.20transit.3A.20solr.20.28use.20HTTPS.29.html#501178996">(Feb 21 2025 at 20:09)</a>:</h4>
+<p>Please don't use the database SolrColonHostPort setting anymore. It's deprecated and may go away soon.</p>
+<p>The JVM options dataverse.solr.* are your friends in any environment, whether you're using containers or not. So using <a href="https://guides.dataverse.org/en/latest/installation/config.html#dataverse-solr-protocol">dataverse.solr.protocol=https</a> is what you're looking for.</p>
+<p>You can set these using <a href="https://docs.payara.fish/community/docs/Technical%20Documentation/MicroProfile/Config/Overview.html">any MPC source</a>, there should be a doc hint about that, too.</p>
+<p>Regarding Postgres look put for <a href="https://guides.dataverse.org/en/latest/installation/config.html#basic-database-settings">these options</a>, especially the .parameters one.</p>
+
+
+
+<a name="501205892"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/CMMC%20L2-3.13.8%3A%20Data%20in%20transit%3A%20solr%20%28use%20HTTPS%29/near/501205892" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steve Baroti <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/CMMC.20L2-3.2E13.2E8.3A.20Data.20in.20transit.3A.20solr.20.28use.20HTTPS.29.html#501205892">(Feb 21 2025 at 23:58)</a>:</h4>
+<p>Wonderful! Thank you, Oliver. Yes indeed, we found the HTTPS setting as you indicated:<br>
+<a href="https://borealisdata.ca/guides/en/latest/installation/config.html#id318">dataverse.solr.protocol</a>: The Solr server URL protocol for the connection. Remember to restart / redeploy Dataverse after changing the setting (as with <a href="https://borealisdata.ca/guides/en/latest/installation/config.html#solrhostcolonport">:SolrHostColonPort</a>). Defaults to <code>http</code>, but might be set to <code>https</code> for extra secure Solr installations.</p>
+
+
+
+<a name="501269585"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/CMMC%20L2-3.13.8%3A%20Data%20in%20transit%3A%20solr%20%28use%20HTTPS%29/near/501269585" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/CMMC.20L2-3.2E13.2E8.3A.20Data.20in.20transit.3A.20solr.20.28use.20HTTPS.29.html#501269585">(Feb 22 2025 at 13:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="692987">@Steve Baroti</span> The JDBC Postgres driver prefers SSL when available IIRC, but can be enforced to "always". I understand your compliant security mandate, but out of curiosity, will you have any sensitive information indexed in Solr unless you turn on full-text indexing?</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,104 @@
+[
+    {
+        "content": "<p>In <a href=\"https://github.com/IQSS/dataverse/issues/11281\">#11281</a> we are introducing optional, configurable search services (such as external AI search, as demonstrated during the recent community meeting).</p>\n<p>In the Dockerized environment (but not the classic environment), the example search services \"goldenOldies\" and \"oddlyEnough\" are being loaded up but as I argue at <a href=\"https://github.com/IQSS/dataverse/pull/11281#discussion_r2164017028\">https://github.com/IQSS/dataverse/pull/11281#discussion_r2164017028</a> I don't think they should be.</p>\n<p>As I just posted in that thread, <code>GoldenOldiesSearchServiceBean.class</code> and <code>OddlyEnoughSearchServiceBean.class</code> show up in <code>target/dataverse-6.6.jar.</code> Is this why they are loaded up? Any ideas on how we can prevent them from being loaded?</p>",
+        "id": 525912106,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750946554
+    },
+    {
+        "content": "<p>Why aren't they loaded in a classic environment? Are there exclusion rules for the WAR?</p>",
+        "id": 525943077,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955774
+    },
+    {
+        "content": "<p>Yes:</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;packagingExcludes&gt;\n    WEB-INF/classes/edu/harvard/iq/dataverse/search/GetExternalSearchServiceBean.class,\n    WEB-INF/classes/edu/harvard/iq/dataverse/search/PostExternalSearchServiceBean.class,\n    WEB-INF/classes/edu/harvard/iq/dataverse/search/GoldenOldiesSearchServiceBean.class,\n    WEB-INF/classes/edu/harvard/iq/dataverse/search/OddlyEnoughSearchServiceBean.class\n&lt;/packagingExcludes&gt;\n</code></pre></div>",
+        "id": 525943170,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750955810
+    },
+    {
+        "content": "<p>Ah!</p>",
+        "id": 525943201,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955820
+    },
+    {
+        "content": "<p>Well they probably shouldn't be a part of the main app Maven module anyway...</p>",
+        "id": 525943297,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955856
+    },
+    {
+        "content": "<p>That said, we can simply exclude them as well</p>",
+        "id": 525943325,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955869
+    },
+    {
+        "content": "<p>If we can define them once, great.</p>",
+        "id": 525943355,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750955881
+    },
+    {
+        "content": "<p>That may be tricky. We may be in luck to use the list in a property</p>",
+        "id": 525943470,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955928
+    },
+    {
+        "content": "<p>Also, why are these not at least in a separate package under the main module, so you can exclude them by glob?</p>",
+        "id": 525943575,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750955964
+    },
+    {
+        "content": "<p>No objection but it's Jim's PR. Maybe you can add on to the thread at <a href=\"https://github.com/IQSS/dataverse/pull/11281#discussion_r2164017028\">https://github.com/IQSS/dataverse/pull/11281#discussion_r2164017028</a></p>",
+        "id": 525943699,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750956009
+    },
+    {
+        "content": "<p>Painstaking to type... <span aria-label=\"weary\" class=\"emoji emoji-1f629\" role=\"img\" title=\"weary\">:weary:</span> (on my mobile)</p>",
+        "id": 525943767,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750956045
+    },
+    {
+        "content": "<p>I just linked back to here (again) from that thread.</p>",
+        "id": 525943948,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750956117
+    },
+    {
+        "content": "<p>Thanks for your thoughts on this!</p>",
+        "id": 525943993,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750956128
+    },
+    {
+        "content": "<p>Done. <a href=\"https://github.com/IQSS/dataverse/pull/11281#discussion_r2169476879\">https://github.com/IQSS/dataverse/pull/11281#discussion_r2169476879</a></p>",
+        "id": 525944484,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1750956316
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> thanks! Jim pushed some exclusions here but they aren't working for me: <a href=\"https://github.com/IQSS/dataverse/pull/11281/commits/d49256ca30f4b6ba548a94d93009d651be4a8d2a\">https://github.com/IQSS/dataverse/pull/11281/commits/d49256ca30f4b6ba548a94d93009d651be4a8d2a</a></p>\n<p><code>GoldenOldiesSearchServiceBean.class</code> (for example) is now absent from the <code>target/docker/gdcc/dataverse/unstable/build/maven/app/WEB-INF/classes/edu/harvard/iq/dataverse/search</code> directory.</p>\n<p>However, \"goldenOldies\" still active in the app. I can see it at <a href=\"http://localhost:8080/api/search/services\">http://localhost:8080/api/search/services</a></p>\n<p>Any ideas for us?</p>",
+        "id": 526070280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1751026166
+    },
+    {
+        "content": "<p>I went ahead and approved the PR. The <code>excludes</code> Jim added aren't working but he followed up with another change that prevents \"goldenOldies\" and friends from appearing: <a href=\"https://github.com/IQSS/dataverse/pull/11281/commits/56a63109e3b45518ec002b7b8e30b486ce67588a\">https://github.com/IQSS/dataverse/pull/11281/commits/56a63109e3b45518ec002b7b8e30b486ce67588a</a> <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 526138756,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1751050760
+    },
+    {
+        "content": "<p>Discussion at <a href=\"https://github.com/IQSS/dataverse/pull/11281#discussion_r2172488939\">https://github.com/IQSS/dataverse/pull/11281#discussion_r2172488939</a></p>",
+        "id": 526138814,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1751050792
+    }
+]

@@ -1,0 +1,140 @@
+<html>
+<head><meta charset="utf-8"><title>Upgrade and SAX Parser · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html">Upgrade and SAX Parser</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="548185011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/548185011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#548185011">(Oct 31 2025 at 15:19)</a>:</h4>
+<p>Hello, </p>
+<p>I'm tracking down some weirdness I'm seeing in log messages in a recent upgrade.   </p>
+<p>In doing so, I noticed that, in version 6.0 upgrade of Dataverse, the SAXParserFactory specification in the Domain.xml file appears to get dropped.  </p>
+<p>Is that intentional?   I'm not clear what effect that would have on the software running, but just wanted to check. </p>
+<p>Here's the install of it in 6.8 - so it seems like it's still useful?  <a href="https://github.com/IQSS/dataverse/blob/d63a7b1b60d1e96a592745cc26b829c48fe7f7cc/scripts/installer/as-setup.sh#L145">https://github.com/IQSS/dataverse/blob/d63a7b1b60d1e96a592745cc26b829c48fe7f7cc/scripts/installer/as-setup.sh#L145</a></p>
+<p>The instructions here do not propogate it forward during the upgrade, though.   (Step 6)  <a href="https://github.com/IQSS/dataverse/releases/tag/v6.0">https://github.com/IQSS/dataverse/releases/tag/v6.0</a></p>
+<p>Is it necessary?  </p>
+<p>Thanks!</p>
+
+
+
+<a name="548185139"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/548185139" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#548185139">(Oct 31 2025 at 15:19)</a>:</h4>
+<p><code>&lt;jvm-options&gt;-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&lt;/jvm-options&gt;</code></p>
+
+
+
+<a name="553393482"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553393482" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553393482">(Nov 03 2025 at 14:23)</a>:</h4>
+<p>Huh, it looks like I added it in <a href="https://github.com/IQSS/dataverse/commit/c9da26b5373b1fd484de91d96ab848e948573080">https://github.com/IQSS/dataverse/commit/c9da26b5373b1fd484de91d96ab848e948573080</a> 11 years ago (!) as a fix for this equally ancient issue:</p>
+<ul>
+<li>Dataverse Alias shows in the URL <a href="https://github.com/IQSS/dataverse/issues/235">#235</a></li>
+</ul>
+
+
+
+<a name="553394330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553394330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553394330">(Nov 03 2025 at 14:27)</a>:</h4>
+<p>I think we still want it. We still use PrettyFaces, which is what the fix was for.</p>
+
+
+
+<a name="553394435"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553394435" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553394435">(Nov 03 2025 at 14:28)</a>:</h4>
+<p>Interesting.  If the issue it was resolving is still resolved w/o that change, then maybe things are fine w/o the SAXparser in the domain.xml anymore. </p>
+<p>Ohh... interesting ... I need to look at our logs, as I'm seeing faces warnings....</p>
+
+
+
+<a name="553394531"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553394531" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553394531">(Nov 03 2025 at 14:28)</a>:</h4>
+<p>If you can do some testing with and without it, that would be great.</p>
+
+
+
+<a name="553395218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553395218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553395218">(Nov 03 2025 at 14:30)</a>:</h4>
+<p>And if you think we should update the 6.0 release notes to add it back in (sounds like maybe we should), if you could open an issue, I'd appreciate it!</p>
+
+
+
+<a name="553395271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553395271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553395271">(Nov 03 2025 at 14:30)</a>:</h4>
+<p>Is this related to pretty faces?  Seems unlikely, but figured I'd ask: </p>
+<div class="codehilite"><pre><span></span><code>[2025-11-03T11:09:06.390+0000] [Payara 6.2023.8] [WARNING] [] [] [tid: _ThreadID=104 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1762168146390] [levelValue: 900] [[
+  Skipping outbound rewriting of invalid URL: /?&quot;&gt;&lt;script&gt;alert(&#39;struts_sa_surl_xss.nasl-1762168146&#39;)&lt;/script&gt;]]
+
+[2025-11-03T11:09:06.526+0000] [Payara 6.2023.8] [WARNING] [] [jakarta.enterprise.web] [tid: _ThreadID=106 _ThreadName=http-thread-pool::jk-connector(3)] [timeMillis: 1762168146526] [levelValue: 900] [[
+  StandardWrapperValve[Faces Servlet]: Servlet.service() for servlet Faces Servlet threw exception
+com.sun.faces.application.view.ViewHandlingStrategyNotFoundException
+        at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+        at com.sun.faces.application.view.ViewHandlingStrategyManager.getStrategy(ViewHandlingStrategyManager.java:57)
+        at com.sun.faces.application.view.ViewDeclarationLanguageFactoryImpl.getViewDeclarationLanguage(ViewDeclarationLanguageFactoryImpl.java:45)
+        at com.sun.faces.application.view.MultiViewHandler.getViewDeclarationLanguage(MultiViewHandler.java:407)
+        at jakarta.faces.application.ViewHandlerWrapper.getViewDeclarationLanguage(ViewHandlerWrapper.java:335)
+        at jakarta.faces.application.ViewHandlerWrapper.getViewDeclarationLanguage(ViewHandlerWrapper.java:335)
+        at jakarta.faces.application.ViewHandlerWrapper.getViewDeclarationLanguage(ViewHandlerWrapper.java:335)
+        at com.sun.faces.lifecycle.RestoreViewPhase.execute(RestoreViewPhase.java:179)
+        at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)
+        at com.sun.faces.lifecycle.RestoreViewPhase.doPhase(RestoreViewPhase.java:95)
+        at com.sun.faces.lifecycle.LifecycleImpl.execute(LifecycleImpl.java:159)
+        at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:691)
+        at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)
+        at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)
+</code></pre></div>
+
+
+
+<a name="553395714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553395714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553395714">(Nov 03 2025 at 14:32)</a>:</h4>
+<p>Probably outbound rewriting of invalid URL sounds like something PrettyFaces would do.</p>
+
+
+
+<a name="553396015"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553396015" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553396015">(Nov 03 2025 at 14:33)</a>:</h4>
+<p>Okay, I'll add the SAXParser back in and see if those types of errors go away.  I'll keep you posted.</p>
+
+
+
+<a name="553406217"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553406217" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553406217">(Nov 03 2025 at 15:12)</a>:</h4>
+<p>Does this mean anything significant?  They are SEVERE level : </p>
+<p>[2025-11-03T15:11:38.416+0000] [Payara 6.2023.8] [SEVERE] [] [jakarta.faces.component] [tid: _ThreadID=106 _ThreadName=http-thread-pool::jk-connector(3)] [timeMillis: 1762182698416] [levelValue: 1000] [[<br>
+  the component(jakarta.faces.component.html.HtmlDoctype@65f97a2a) is the head component of the stack, but it's _isPushedAsCurrentRefCount &lt; 1]]</p>
+<p>[2025-11-03T15:11:47.659+0000] [Payara 6.2023.8] [SEVERE] [] [jakarta.faces.component] [tid: _ThreadID=108 _ThreadName=http-thread-pool::jk-connector(5)] [timeMillis: 1762182707659] [levelValue: 1000] [[<br>
+  the component(jakarta.faces.component.html.HtmlDoctype@65f97a2a) is the head component of the stack, but it's _isPushedAsCurrentRefCount &lt; 1]]</p>
+<p>This is after I added in SAX Parser, but I think I've seen them even before that.</p>
+
+
+
+<a name="553410194"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553410194" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553410194">(Nov 03 2025 at 15:27)</a>:</h4>
+<p>Oddly enough, restarting made it go away.</p>
+
+
+
+<a name="553411794"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553411794" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553411794">(Nov 03 2025 at 15:32)</a>:</h4>
+<p>Huh, I'm really not sure. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="553486440"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553486440" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553486440">(Nov 03 2025 at 21:46)</a>:</h4>
+<p>Yeah, it's odd.  I can't tell if adding back in the SAXParser makes a difference yet. It doesn't appear to have hurt.   Should I create an issue for the SAXParser on github so it can be discussed there?</p>
+
+
+
+<a name="553491165"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20and%20SAX%20Parser/near/553491165" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20and.20SAX.20Parser.html#553491165">(Nov 03 2025 at 22:18)</a>:</h4>
+<p>Yes, please!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

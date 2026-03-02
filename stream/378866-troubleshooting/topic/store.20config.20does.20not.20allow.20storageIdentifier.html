@@ -1,0 +1,197 @@
+<html>
+<head><meta charset="utf-8"><title>store config does not allow storageIdentifier · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html">store config does not allow storageIdentifier</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="435216372"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435216372" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435216372">(Apr 24 2024 at 15:19)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> <a href="#narrow/stream/377090-python/topic/Dataverse.20filesystem-like.20extension/near/433749793">said</a>:</p>
+<blockquote>
+<p>I receive the following message every time I try to add a remote file:</p>
+<p><code>{"status":"ERROR","message":"Dataset store configuration does not allow provided storageIdentifier."}</code></p>
+<p>The storage identifier follows the base URL scheme but does not match.</p>
+</blockquote>
+<p>Did you find the proper configuration to make it work ?<br>
+I have the same error.<br>
+Thanks</p>
+
+
+
+<a name="435216776"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435216776" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435216776">(Apr 24 2024 at 15:21)</a>:</h4>
+<p>Not yet, unfortunately.  Shall we open a new topic to talk about the issue?</p>
+
+
+
+<a name="435218520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435218520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435218520">(Apr 24 2024 at 15:29)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> I moved this message to a new topic.</p>
+<p><span class="user-mention" data-user-id="712615">@uclr17</span> are you using pyDataverse?</p>
+
+
+
+<a name="435335280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435335280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435335280">(Apr 25 2024 at 08:11)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> thank you for your feedback</p>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> i am not using pyDataverse, i use an http client (insomnia).<br>
+The generated client code for Curl is:</p>
+<div class="codehilite"><pre><span></span><code>curl --request POST \
+--url &#39;http://localhost:8080/api/datasets/:persistentId/add?persistentId=perma%3A10.5072LRU%2FFSJ3BJ&#39; \
+--header &#39;Content-Type: multipart/form-data&#39; \
+--header &#39;User-Agent: insomnia/8.6.1&#39; \
+--header &#39;X-Dataverse-key: XXXXX&#39; \
+--form &#39;jsonData={&quot;description&quot;:&quot;My description cat.&quot;,&quot;storageIdentifier&quot;:&quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,&quot;checksumType&quot;:&quot;MD5&quot;,&quot;md5Hash&quot;:&quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,&quot;label&quot;:&quot;testlogo.png&quot;,&quot;fileName&quot;:&quot;testlogo.png&quot;,&quot;mimeType&quot;:&quot;image/png&quot;}&#39;
+</code></pre></div>
+<p>My config in my docker compose (i follow this doc to run my local dataverse <a href="https://guides.dataverse.org/en/latest/container/running/demo.html">https://guides.dataverse.org/en/latest/container/running/demo.html</a> ):</p>
+<div class="codehilite"><pre><span></span><code>JVM_ARGS: -Ddataverse.files.storage-driver-id=file
+-Ddataverse.files.file.type=file
+-Ddataverse.files.file.label=Filesystem
+-Ddataverse.files.file.directory=${STORAGE_DIR}/store
+-Ddataverse.files.trsa.type=remote
+-Ddataverse.files.trsa.label=RemoteTest
+-Ddataverse.files.trsa.base-url=https://qdr.syr.edu
+-Ddataverse.files.trsa.base-store=file
+-Ddataverse.files.trsa.download-redirect=true
+-Ddataverse.files.trsa.public=true
+-Ddataverse.files.trsa.ingestsizelimit=0
+</code></pre></div>
+<p>The error message seems to come from the DataAccess.uploadToDatasetAllowed method:<br>
+<a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L357">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L357</a><br>
+called in addFileToDataset method:<br>
+<a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L2500">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L2500</a></p>
+<p>I tried all the storage services in my collection, the error message is the same.<br>
+No error message in dataverse logs, only info message:</p>
+<div class="codehilite"><pre><span></span><code>dataverse           | [#|2024-04-25T07:38:09.854+0000|INFO|Payara 6.2023.8||_ThreadID=99;_ThreadName=http-thread-pool::http-listener-1(4);_TimeMillis=1714030689854;_LevelValue=800;|
+dataverse           |   jsonData: {&quot;description&quot;:&quot;My description cat.&quot;,&quot;storageIdentifier&quot;:&quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,&quot;checksumType&quot;:&quot;MD5&quot;,&quot;md5Hash&quot;:&quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,&quot;label&quot;:&quot;testlogo.png&quot;,&quot;fileName&quot;:&quot;testlogo.png&quot;,&quot;mimeType&quot;:&quot;image/png&quot;}|#]
+</code></pre></div>
+<p>Thank you for the help.</p>
+
+
+
+<a name="435354761"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435354761" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435354761">(Apr 25 2024 at 10:04)</a>:</h4>
+<p>I am unsure, but according to the documentation, the <code>storageIdentifier</code> URL should start with the <code>base-url</code> specified within the JVM Args. I tried that, but still received the same error message. Is this the intended way of doing that, <span class="user-mention" data-user-id="598112">@Philip Durbin</span> ?</p>
+
+
+
+<a name="435364330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435364330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435364330">(Apr 25 2024 at 11:06)</a>:</h4>
+<p>I follow the JVM options and JSON input in this test class:<br>
+<a href="https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L48">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L48</a><br>
+<a href="https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L58">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L58</a></p>
+
+
+
+<a name="435373382"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435373382" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435373382">(Apr 25 2024 at 12:02)</a>:</h4>
+<p>Ok, type=remote. Hmm.</p>
+<p><span class="user-mention" data-user-id="712615">@uclr17</span> can you please point me to the section of the API Guide you are using? Is it <a href="https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type">https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type</a> ?</p>
+
+
+
+<a name="435381072"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435381072" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435381072">(Apr 25 2024 at 12:45)</a>:</h4>
+<p>I am using 4 sources of documentation:<br>
+<a href="https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api">https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api</a><br>
+<a href="https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type">https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type</a><br>
+<a href="https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage">https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage</a><br>
+<a href="https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java</a></p>
+
+
+
+<a name="435595956"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435595956" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435595956">(Apr 26 2024 at 14:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> to make it work, you need to add the JVM_ARGS:<br>
+<code>-Ddataverse.files.trsa.upload-out-of-band=true</code><br>
+and in the collection where your dataset will be updated, edit the storage to select the remote store (RemoteTest with my config).</p>
+<p>Final config:</p>
+<div class="codehilite"><pre><span></span><code>JVM_ARGS: -Ddataverse.files.storage-driver-id=file1
+  -Ddataverse.files.file1.type=file
+  -Ddataverse.files.file1.label=Filesystem
+  -Ddataverse.files.file1.directory=${STORAGE_DIR}/store
+  -Ddataverse.files.trsa.type=remote
+  -Ddataverse.files.trsa.label=RemoteTest
+  -Ddataverse.files.trsa.base-url=https://qdr.syr.edu
+  -Ddataverse.files.trsa.base-store=file1
+  -Ddataverse.files.trsa.download-redirect=true
+  -Ddataverse.files.trsa.public=true
+  -Ddataverse.files.trsa.ingestsizelimit=0
+  -Ddataverse.files.trsa.upload-out-of-band=true
+</code></pre></div>
+<p>You don't need to add <code>-Ddataverse.files.trsa.upload-out-of-band=true</code> and select the remote store for the collection if you create with the native API a new dataset with "files" metadatas:<br>
+<a href="https://guides.dataverse.org/en/latest/api/native-api.html#submit-dataset">https://guides.dataverse.org/en/latest/api/native-api.html#submit-dataset</a></p>
+<div class="codehilite"><pre><span></span><code>    &quot;metadataBlocks&quot;: {
+       ...
+    },
+    &quot;files&quot;: [
+      {
+        &quot;label&quot;: &quot;cb47471c-42bd-4ad6-8268-04a0109b2b85.png&quot;,
+        &quot;restricted&quot;: false,
+        &quot;dataFile&quot;: {
+          &quot;filename&quot;: &quot;cb47471c-42bd-4ad6-8268-04a0109b2b85.png&quot;,
+          &quot;contentType&quot;: &quot;image/png&quot;,
+          &quot;friendlyType&quot;: &quot;PNG Image&quot;,
+          &quot;storageIdentifier&quot;: &quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,
+          &quot;md5&quot;: &quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,
+          &quot;checksum&quot;: {
+            &quot;type&quot;: &quot;MD5&quot;,
+            &quot;value&quot;: &quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;
+          },
+          &quot;tabularData&quot;: false
+        }
+      }
+    ],
+</code></pre></div>
+
+
+
+<a name="435603828"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435603828" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435603828">(Apr 26 2024 at 15:01)</a>:</h4>
+<p><span class="user-mention" data-user-id="712615">@uclr17</span> you got it working? That's great!</p>
+
+
+
+<a name="435613869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435613869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435613869">(Apr 26 2024 at 15:56)</a>:</h4>
+<p><span class="user-mention" data-user-id="712615">@uclr17</span> that is great to hear! Thanks for sharing, will try to replicate it with my instance <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="435614578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435614578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435614578">(Apr 26 2024 at 16:00)</a>:</h4>
+<p>Do we need more docs?</p>
+
+
+
+<a name="435643722"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435643722" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> uclr17 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435643722">(Apr 26 2024 at 19:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> yes, it works after some debugging sessions to understand the DataAccess.uploadToDatasetAllowed method.</p>
+<p><code>upload-out-of-band</code>option is for s3 storage type: <br>
+<a href="https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a> <br>
+not for remote storage type: <br>
+<a href="https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage">https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage</a><br>
+this option is used in StorageIO.isDirectUploadEnabled method called there: <br>
+<a href="https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L378">https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L378</a></p>
+
+
+
+<a name="435643841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435643841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435643841">(Apr 26 2024 at 19:07)</a>:</h4>
+<p>Cool. Where in the docs should we add more info?</p>
+
+
+
+<a name="435643898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/store%20config%20does%20not%20allow%20storageIdentifier/near/435643898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/store.20config.20does.20not.20allow.20storageIdentifier.html#435643898">(Apr 26 2024 at 19:08)</a>:</h4>
+<p>I know you were looking at a lot of docs! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

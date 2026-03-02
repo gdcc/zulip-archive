@@ -1,0 +1,292 @@
+<html>
+<head><meta charset="utf-8"><title>OIDC or SAML authentication for API · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html">OIDC or SAML authentication for API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="418286983"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418286983" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418286983">(Jan 26 2024 at 14:32)</a>:</h4>
+<p>Hey everyone, at a particular Dataverse instance (<a href="https://ssh.datastations.nl">https://ssh.datastations.nl</a>) users are able to login with an institutional account (SURFconext, which supports both OIDC and SAML). For a service I'm developing for this DV instance I want to use this institutional account to make API calls for that user (mainly: does user have access to this data? If so, allow to download). I understand the user can do this himself using the API-key (generated via a webinterface).</p>
+<p>I want to avoid my service having any knowledge of the API-key and instead use the (federative) institutional login to authenticate the service to fetch data from this DV instance on his behalf. AFAICT from the docs, this is not possible.</p>
+<p>Two questions: 1) is there a way to do this currently in DV (have their been use cases before perhaps?), 2) If not, there must be some link between the institutional account &lt;-&gt; DV internal account. Is there a way to programmatically get a handle this?</p>
+
+
+
+<a name="418287324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418287324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418287324">(Jan 26 2024 at 14:34)</a>:</h4>
+<p>To give a bit of context: this service is a collaborative effort between the hosting DV party and the institute I work at. If there needs to be consensus on what this service is allowed to do on behalf of the user; that can be agreed upon</p>
+
+
+
+<a name="418288776"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418288776" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418288776">(Jan 26 2024 at 14:42)</a>:</h4>
+<p>Hmm, would bearer tokens help here? <a href="https://guides.dataverse.org/en/6.1/api/auth.html#bearer-tokens">https://guides.dataverse.org/en/6.1/api/auth.html#bearer-tokens</a></p>
+
+
+
+<a name="418288819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418288819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418288819">(Jan 26 2024 at 14:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="617722">@Johannes D</span> or <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> know more about them than I do. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="418290144"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418290144" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418290144">(Jan 26 2024 at 14:49)</a>:</h4>
+<p>Yap, that  more or less our use case. We enabled only OIDC signup (ensure that each user is an OIDC user); enabled OIDC bearer tokens via feature flag and can happily interact with dataverse using access tokens from our IdP. The open challenges are signup (the user must create an account via dataverse UI), and propagation of property changes within the IdP (they are only read once during account creation...). Besides those issues it works really great :).</p>
+
+
+
+<a name="418291602"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418291602" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418291602">(Jan 26 2024 at 14:58)</a>:</h4>
+<p>Very cool, Johannes! That sounds very much like what I was looking for. So as long as the OIDC user has signed in once in Dataverse (i.e. registered) through the IdP, any service that support that same OIDC user can make requests to DV on behalf of that user?</p>
+
+
+
+<a name="418291848"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418291848" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418291848">(Jan 26 2024 at 14:59)</a>:</h4>
+<p>Yes.</p>
+
+
+
+<a name="418292386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418292386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418292386">(Jan 26 2024 at 15:02)</a>:</h4>
+<p>Cool! That's already very useful. Do you know if there as a way to make the registration part of the authentication process: "if a user doesn't already have a dataverse account, click here to make the link". That would save a user to separately go to the DV portal, log in again with OIDC and go back to the 'on-behalf service'</p>
+
+
+
+<a name="418295849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418295849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418295849">(Jan 26 2024 at 15:19)</a>:</h4>
+<p>You can use this <a href="http://preview.guides.gdcc.io/en/develop/api/native-api.html#create-an-authenticated-user">API</a> to create a user account . However, this call need admin rights and hence cannot be invoked by the user needing the account.</p>
+
+
+
+<a name="418296533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418296533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418296533">(Jan 26 2024 at 15:22)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> : We could extend the <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/auth/BearerTokenAuthMechanism.java">BearerTokenAuthMechanism</a> to create an account if not existing. Possible hiding the function behind a configuration flag. What do you think about that?</p>
+
+
+
+<a name="418297249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418297249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418297249">(Jan 26 2024 at 15:26)</a>:</h4>
+<p>I like the idea of hiding it behind a feature flag for now. <span class="user-mention" data-user-id="617722">@Johannes D</span> would you create a PR?</p>
+
+
+
+<a name="418298796"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418298796" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418298796">(Jan 26 2024 at 15:33)</a>:</h4>
+<p>Sure do, I have some free time this weekend :) Would that approach help you <span class="user-mention" data-user-id="686955">@Ahmad Hesam</span> ?</p>
+
+
+
+<a name="418298836"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418298836" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418298836">(Jan 26 2024 at 15:33)</a>:</h4>
+<p>I pointed Jim Myers to this thread and he indicated he's giving a talk at <a class="stream-topic" data-stream-id="375707" href="/#narrow/stream/375707-community/topic/.23dataverse2024">#community &gt; #dataverse2024</a> in Mexico entitled "Using OIDC to Support Dataverse Integrations in a Research Commons Environment"</p>
+
+
+
+<a name="418298899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418298899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418298899">(Jan 26 2024 at 15:33)</a>:</h4>
+<p>Here's the abstract: "Modern research environments, like research “commons”, allow users to combine data and compute resources to pursue their research goals. In these settings, the interaction between applications can occur asynchronously rather than only when the user is logged in. Dataverse’s API keys provide one mechanism for supporting asynchronous authentication by a trusted application to, for example, retrieve restricted data for use in a computation. However, API keys are non-standard and potentially insecure, and there is no automatic way to transfer a key. Offline tokens, as defined in the OpenID Connect (OIDC) standard, are a potential alternative. OIDC is one of the available options for authentication in Dataverse and is expected to become the preferred option when using the new single-page front-end. The Qualitative Data Repository (QDR) at Syracuse University already uses OIDC and the Keycloak OIDC Broker to support single-sign-on between Dataverse and QDR’s content management system. It is also now using OIDC’s offline token mechanism instead of API keys as a means of supporting long-term and asynchronous access to the QDR Dataverse instance from within a Gen3-based Data Commons environment developed to support the US National Institutes of Health (NIH) Helping to End Addiction Long-term® (HEAL) Initiative. Offline tokens allow a user to log into QDR from the HEAL platform and for the platform to request and store an offline token which can then be used as needed over time to allow the platform to access QDR data on behalf of the user. This talk will overview the OIDC offline token mechanism, describe how it has been configured and is being used by QDR to support HEAL use cases, and outline the usability and security benefits OIDC offline tokens have relative to API keys. We will also discuss how the combination of OIDC offline tokens and Dataverse’s ability to generate signed URLs for less trusted applications, may ultimately be a replacement for Dataverse’s API key mechanism."</p>
+
+
+
+<a name="418299247"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418299247" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418299247">(Jan 26 2024 at 15:35)</a>:</h4>
+<p>Good to here that more people are using the Tokens now!</p>
+
+
+
+<a name="418300426"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418300426" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418300426">(Jan 26 2024 at 15:41)</a>:</h4>
+<p>So just to be sure I understand the PR correctly: a Dataverse admin would be able to configure globally that any incoming requests through the OIDC bearer token will be executed, regardless if a user has an DV account, because the account will now be automatically created based on the user data coming from the IdP?</p>
+
+
+
+<a name="418301213"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418301213" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418301213">(Jan 26 2024 at 15:45)</a>:</h4>
+<p>Yes, the idea is: If a valid OIDC Token is presented to the system but no associated user account is present in dataverse (i.e valid IdP user that never used dataverse before). A dataverse account is generated for that users (identified by the Token) on the fly.</p>
+
+
+
+<a name="418301604"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418301604" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418301604">(Jan 26 2024 at 15:47)</a>:</h4>
+<p>Great, then we are talking about the same thing indeed! I believe the DV instance I work with also has a T&amp;A that a user needs to agree with. Would this then implicitly be accepted? Or is there a way to forward this to the 'on-behalf service'?</p>
+
+
+
+<a name="418302885"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418302885" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418302885">(Jan 26 2024 at 15:53)</a>:</h4>
+<p>Yes, every Dataverse instance has an <a href="https://guides.dataverse.org/en/6.1/installation/config.html#applicationtermsofuse">application-wide terms of use</a> and when you create an account via the web interface, you have to check a box to agree with it.</p>
+
+
+
+<a name="418303735"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418303735" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418303735">(Jan 26 2024 at 15:57)</a>:</h4>
+<p>Good point, implicit accepting the T&amp;C isn't a good idea. This means the sketched idea does not work as the user must actively accept the T&amp;C. Hence, we  need another approach...</p>
+
+
+
+<a name="418304533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418304533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418304533">(Jan 26 2024 at 16:01)</a>:</h4>
+<p>Hmm there must be a way to direct the user to a T&amp;C page before granting access to the API. It's similar to how I just made my Zulip account: Github asked me if I accept sharing information with Zulip (could've been a T&amp;C) and I had to accept it before my Zulip account could be made</p>
+
+
+
+<a name="418304631"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418304631" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418304631">(Jan 26 2024 at 16:01)</a>:</h4>
+<p>Well, that <a href="https://guides.dataverse.org/en/6.1/api/native-api.html#create-an-authenticated-user">Create an Authenticated User</a> API you pointed out also doesn't allow users to accept terms. It's morally equivalent.</p>
+
+
+
+<a name="418305431"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418305431" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418305431">(Jan 26 2024 at 16:05)</a>:</h4>
+<p>True.. although the registration request in that case would explicitly be coming from an admin if I understood Johannes correctly.</p>
+
+
+
+<a name="418305833"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418305833" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418305833">(Jan 26 2024 at 16:07)</a>:</h4>
+<p>Ideally ( I think) you'd want to keep a whitelist of approved services to auto-agree the T&amp;C step on the user's behalf, with the trust that the service offers the T&amp;C from their side to be accepted</p>
+
+
+
+<a name="418308854"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418308854" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418308854">(Jan 26 2024 at 16:23)</a>:</h4>
+<p><span class="user-mention" data-user-id="686955">@Ahmad Hesam</span> What you described is the <code>[promt=consent</code>](<a href="https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters">https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters</a>). Maybe its a good idea to integrate the flow into the API usecase...</p>
+
+
+
+<a name="418310171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418310171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418310171">(Jan 26 2024 at 16:29)</a>:</h4>
+<p>Ah nice, this is something Dataverse could impose on the auto-registration step indeed. I'm just not clear on how this consent would manifest itself on the service side. Would the user be directed to a 'consent page' that contains the T&amp;C statement and checkbox?</p>
+
+
+
+<a name="418311159"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418311159" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418311159">(Jan 26 2024 at 16:35)</a>:</h4>
+<p>It must be a common story. Lots of services have some sort of T&amp;C you must agree to.</p>
+
+
+
+<a name="418311583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418311583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418311583">(Jan 26 2024 at 16:37)</a>:</h4>
+<p>I never looked into this part, but <a href="https://www.keycloak.org/docs/latest/server_admin/#consent-related-settings">this</a> looks quite good. This at least means the user approved a screen in keycloack...</p>
+
+
+
+<a name="418313041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418313041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418313041">(Jan 26 2024 at 16:46)</a>:</h4>
+<p>What exactly is the role of keycloak in this case? Because keycloack can act as either an OIDC provider or as a kind of proxy to an OIDC client</p>
+
+
+
+<a name="418313966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418313966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418313966">(Jan 26 2024 at 16:52)</a>:</h4>
+<p>Sorry, we (my usecase) uses keycloak as a IdP in production. Similarly keycloak is used during testing/development of dataverse (<a href="https://github.com/IQSS/dataverse/tree/develop/conf/keycloak">see</a> and <a href="https://github.com/IQSS/dataverse/blob/develop/docker-compose-dev.yml">here</a>). Hence, I looked into the options of that ODIC implementation.</p>
+
+
+
+<a name="418314681"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418314681" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418314681">(Jan 26 2024 at 16:56)</a>:</h4>
+<p>Ah gotcha. But then wouldn't a solution to this T&amp;C prompt have to work for other IdPs as well? Or does the OIDC standard impose the same behavior across various IdPs?</p>
+
+
+
+<a name="418315204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418315204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ahmad Hesam <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418315204">(Jan 26 2024 at 16:59)</a>:</h4>
+<p>If the latter is true, then I see a nice way to facilitate this flow :)</p>
+
+
+
+<a name="418522537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418522537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418522537">(Jan 28 2024 at 18:02)</a>:</h4>
+<p>I've played around with the code and it could be implemented, but it's not as easy as I originally thought.</p>
+<p>However, we should not create an account without the explicit consent of the user.<br>
+The [OIDC spec] (<a href="https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters">https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters</a>) includes `promt=consent' for these use cases. We can easily build authentication requests, including the Promt parameter, using the<br>
+of the <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/oidc/OIDCAuthProvider.java#L175">builAuthzUrl method</a>.<br>
+The user is redirected to the IdP, has to agree to the use of properties for the registered client and we are done. At least the user has actively agreed. <br>
+The tricky part is handling the IdP response, which is implemented <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L94">here</a>. <br>
+The code flow is bound to the JSF pages and shows a special login page. We want a different behaviour for the API. <br>
+I'm not sure how to do this without changing or duplicating too much code....</p>
+
+
+
+<a name="418522776"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418522776" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418522776">(Jan 28 2024 at 18:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I believe you have an idea :)</p>
+
+
+
+<a name="418589309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418589309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418589309">(Jan 29 2024 at 08:57)</a>:</h4>
+<p>Nevermind, I got a PoC working. . For the PoC I used a dedicated URL to trigger the signup process.</p>
+
+
+
+<a name="418591111"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418591111" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418591111">(Jan 29 2024 at 09:06)</a>:</h4>
+<p><a href="/user_uploads/53090/MoXo4YDourWYYruAmydoMGWC/PoC_OIDC_signup.mov">PoC_OIDC_signup.mov</a><br>
+The code is <a href="https://github.com/IQSS/dataverse/pull/10278">here</a></p>
+
+
+
+<a name="418634254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418634254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418634254">(Jan 29 2024 at 13:15)</a>:</h4>
+<p>Not too much code, really. Nice.</p>
+
+
+
+<a name="418634381"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418634381" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418634381">(Jan 29 2024 at 13:15)</a>:</h4>
+<p>The video is great.</p>
+
+
+
+<a name="418634418"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418634418" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418634418">(Jan 29 2024 at 13:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> have you seen this?</p>
+
+
+
+<a name="418636480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418636480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418636480">(Jan 29 2024 at 13:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> : Sadly it's duplicated and security relevant code. Therefore, we should refactor the codebase a bit to avoid the duplication.</p>
+
+
+
+<a name="418642218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418642218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418642218">(Jan 29 2024 at 13:59)</a>:</h4>
+<p>Great to see more activity around OIDC here!<br>
+Just a few comments:<br>
+1) Note that OIDC bearer tokens are hidden behind a feature flag at the moment. They are not considered mature enough for production but enable delivery of feature previews, use at your own risk.<br>
+2) It's nice to initialize the code auth flow using the API endpoint. Yet, I am not sure it fully covers the intended goal: an API endpoint is also intended to be used with a service not running in a browser, right? (For example: some Python script)<br>
+3) I like that this code extension allows skipping the signup form. This can probably be useful in the non-API-endpoint "user clicks on login link" scenario as well.<br>
+4) This should be coordinated or at least brought to the attention of <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> as this certainly is SPA relevant</p>
+
+
+
+<a name="418660047"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418660047" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418660047">(Jan 29 2024 at 15:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="617722">@Johannes D</span> we just noticed in the docs that there are no docs for the API Bearer Token flag... Would you be able to provide a PR?</p>
+
+
+
+<a name="418778981"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418778981" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418778981">(Jan 30 2024 at 07:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> : Concerning 2) It't is the best we can do. The only alternative in the OAuth2/OIDC context would be a device auth flow. Do we really expect API clients that cannot open a browser and do we wan't them to create user accounts?  Besides, how can an API client authenticate users via OIDC if it cannot open a browser? The only options I know, are the device auth flow and resource owner credentials flow. The latter is deprecated and shall not be used according to <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#name-resource-owner-password-cre">this document.</a> and the former requires a browser session potentially on another device.</p>
+
+
+
+<a name="418782491"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OIDC%20or%20SAML%20authentication%20for%20API/near/418782491" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OIDC.20or.20SAML.20authentication.20for.20API.html#418782491">(Jan 30 2024 at 07:47)</a>:</h4>
+<p>I agree - best effort we can make. Just saying we should manage expectations and document the limitations.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

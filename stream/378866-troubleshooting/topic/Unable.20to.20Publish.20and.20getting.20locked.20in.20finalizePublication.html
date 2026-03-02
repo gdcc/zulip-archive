@@ -1,0 +1,114 @@
+<html>
+<head><meta charset="utf-8"><title>Unable to Publish and getting locked in finalizePublication · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html">Unable to Publish and getting locked in finalizePublication</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="536665435"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/536665435" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#536665435">(Aug 28 2025 at 18:44)</a>:</h4>
+<p>We have this dataset with a DRAFT version. When user is trying to Pubilsh via UI or API its getting locked with finalizePublication. In server logs I see the following error </p>
+<div class="codehilite"><pre><span></span><code>Caused by: Exception [EclipseLink-4002] (Eclipse Persistence Services - 4.0.1.payara-p2.v202310250827): org.eclipse.persistence.exceptions.DatabaseException
+Internal Exception: org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "unq_datasetversion_0"
+  Detail: Key (dataset_id, versionnumber, minorversionnumber)=(685036, 1, 0) already exists.
+Error Code: 0
+Call: UPDATE DATASETVERSION SET MINORVERSIONNUMBER = ?, VERSIONNUMBER = ?, VERSION = ? WHERE ((ID = ?) AND (VERSION = ?))
+        bind =&gt; [5 parameters bound]
+Query: UpdateObjectQuery([DatasetVersion id:51478])
+        at org.eclipse.persistence.exceptions.DatabaseException.sqlException(DatabaseException.java:343)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.processExceptionForCommError(DatabaseAccessor.java:1805)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:917)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.executeNoSelect(DatabaseAccessor.java:981)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.basicExecuteCall(DatabaseAccessor.java:642)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.executeCall(DatabaseAccessor.java:569)
+        at org.eclipse.persistence.internal.sessions.AbstractSession.basicExecuteCall(AbstractSession.java:2048)
+        at org.eclipse.persistence.sessions.server.ClientSession.executeCall(ClientSession.java:311)
+        at org.eclipse.persistence.internal.queries.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:280)
+        at org.eclipse.persistence.internal.queries.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:266)
+        at org.eclipse.persistence.internal.queries.DatasourceCallQueryMechanism.updateObject(DatasourceCallQueryMechanism.java:899)
+        at org.eclipse.persistence.internal.queries.StatementQueryMechanism.updateObject(StatementQueryMechanism.java:479)
+        at org.eclipse.persistence.internal.queries.DatabaseQueryMechanism.updateObjectForWriteWithChangeSet(DatabaseQueryMechanism.java:1161)
+        at org.eclipse.persistence.queries.UpdateObjectQuery.executeCommitWithChangeSet(UpdateObjectQuery.java:88)
+        at org.eclipse.persistence.internal.queries.DatabaseQueryMechanism.executeWriteWithChangeSet(DatabaseQueryMechanism.java:326)
+        at org.eclipse.persistence.queries.WriteObjectQuery.executeDatabaseQuery(WriteObjectQuery.java:61)
+        at org.eclipse.persistence.queries.DatabaseQuery.execute(DatabaseQuery.java:913)
+        at org.eclipse.persistence.queries.DatabaseQuery.executeInUnitOfWork(DatabaseQuery.java:812)
+        at org.eclipse.persistence.queries.ObjectLevelModifyQuery.executeInUnitOfWorkObjectLevelModifyQuery(ObjectLevelModifyQuery.java:109)
+        at org.eclipse.persistence.queries.ObjectLevelModifyQuery.executeInUnitOfWork(ObjectLevelModifyQuery.java:86)
+        at org.eclipse.persistence.internal.sessions.UnitOfWorkImpl.internalExecuteQuery(UnitOfWorkImpl.java:3008)
+        at org.eclipse.persistence.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:1841)
+        at org.eclipse.persistence.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:1823)
+        at org.eclipse.persistence.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:1773)
+        at org.eclipse.persistence.internal.sessions.CommitManager.commitChangedObjectsForClassWithChangeSet(CommitManager.java:294)
+        at org.eclipse.persistence.internal.sessions.CommitManager.commitAllObjectsWithChangeSet(CommitManager.java:152)
+        at org.eclipse.persistence.internal.sessions.AbstractSession.writeAllObjectsWithChangeSet(AbstractSession.java:4335)
+        at org.eclipse.persistence.internal.sessions.UnitOfWorkImpl.commitToDatabase(UnitOfWorkImpl.java:1507)
+        at org.eclipse.persistence.internal.sessions.UnitOfWorkImpl.commitToDatabaseWithChangeSet(UnitOfWorkImpl.java:1597)
+        at org.eclipse.persistence.internal.sessions.UnitOfWorkImpl.issueSQLbeforeCompletion(UnitOfWorkImpl.java:3305)
+        at org.eclipse.persistence.internal.sessions.RepeatableWriteUnitOfWork.issueSQLbeforeCompletion(RepeatableWriteUnitOfWork.java:368)
+        at org.eclipse.persistence.transaction.AbstractSynchronizationListener.beforeCompletion(AbstractSynchronizationListener.java:163)
+        ... 124 more
+Caused by: org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "unq_datasetversion_0"
+  Detail: Key (dataset_id, versionnumber, minorversionnumber)=(685036, 1, 0) already exists.
+        at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2733)
+        at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2420)
+        at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372)
+        at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:517)
+        at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:434)
+        at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:194)
+        at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:155)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+        at org.postgresql.ds.PGPooledConnection$StatementHandler.invoke(PGPooledConnection.java:447)
+        at jdk.proxy92/jdk.proxy92.$Proxy552.executeUpdate(Unknown Source)
+        at com.sun.gjc.spi.base.PreparedStatementWrapper.executeUpdate(PreparedStatementWrapper.java:127)
+        at org.eclipse.persistence.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:909)
+        ... 153 more
+]]
+</code></pre></div>
+<p>Following is output from datasetversion table with dataset_id of original dataset. <br>
+<code>DatasetVersion id:51478</code> is the DRAFT dataset in this image</p>
+<p><a href="/user_uploads/53090/gUenLvWCfwsRWtcO1SE4cau-/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/gUenLvWCfwsRWtcO1SE4cau-/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="3822x464" src="/user_uploads/thumbnail/53090/gUenLvWCfwsRWtcO1SE4cau-/image.png/840x560.webp"></a></div>
+
+
+
+<a name="536806533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/536806533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#536806533">(Aug 29 2025 at 14:55)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> <br>
+Any idea about this issue?</p>
+
+
+
+<a name="537554194"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/537554194" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#537554194">(Sep 03 2025 at 21:04)</a>:</h4>
+<p>Sorry, I was out a couple days but this is on my list!</p>
+
+
+
+<a name="537554408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/537554408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#537554408">(Sep 03 2025 at 21:06)</a>:</h4>
+<p><code>Key (dataset_id, versionnumber, minorversionnumber)=(685036, 1, 0) already exists</code> makes me think that version 1.0 of that dataset id already exists but a new draft is trying to be saved also as 1.0 instead of 1.1 or 1.2. Is that possible?</p>
+
+
+
+<a name="537686968"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/537686968" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#537686968">(Sep 04 2025 at 14:31)</a>:</h4>
+<p>Yes, that's what it looks like, its trying to publish new version with 1.0 rather than 2.0</p>
+
+
+
+<a name="537693428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20Publish%20and%20getting%20locked%20in%20finalizePublication/near/537693428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20Publish.20and.20getting.20locked.20in.20finalizePublication.html#537693428">(Sep 04 2025 at 15:00)</a>:</h4>
+<p>Hmm, is there anything exotic about this dataset that would put it in this strange state? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

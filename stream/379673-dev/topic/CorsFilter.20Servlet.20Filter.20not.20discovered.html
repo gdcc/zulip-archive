@@ -1,0 +1,495 @@
+<html>
+<head><meta charset="utf-8"><title>CorsFilter Servlet Filter not discovered · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html">CorsFilter Servlet Filter not discovered</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="572110249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572110249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572110249">(Feb 05 2026 at 10:30)</a>:</h4>
+<p>I'm not sure if it is container related, however it seems that the CorsFilter is not picked up automatically although the <code>@WebFilter("/*")</code> should do that:</p>
+<div class="codehilite"><pre><span></span><code>@WebFilter(&quot;/*&quot;)
+public class CorsFilter implements Filter
+</code></pre></div>
+<p>Instead I had to manually add to <code>web.xml</code> this:</p>
+<div class="codehilite"><pre><span></span><code>    &lt;filter&gt;
+        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-class&gt;
+    &lt;/filter&gt;
+    &lt;filter-mapping&gt;
+        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;
+        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+    &lt;/filter-mapping&gt;
+</code></pre></div>
+<p>I also checked in the debugger and without the explicit <code>web.xml</code> <code>doFilter()</code> is not get called.</p>
+
+
+
+<a name="572144046"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572144046" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572144046">(Feb 05 2026 at 13:12)</a>:</h4>
+<p>This topic was moved here from <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/CorsFilter.20problem">#containers &gt; CorsFilter problem</a> by <span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span>.</p>
+
+
+
+<a name="572144170"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572144170" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572144170">(Feb 05 2026 at 13:12)</a>:</h4>
+<p>As this is not purely container related, I moved this here <span class="user-mention" data-user-id="602497">@Balázs Pataki</span></p>
+
+
+
+<a name="572144281"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572144281" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572144281">(Feb 05 2026 at 13:13)</a>:</h4>
+<p>Are there any API tests for the filter?</p>
+
+
+
+<a name="572144339"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572144339" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572144339">(Feb 05 2026 at 13:13)</a>:</h4>
+<p>It would be good to have a reproducer.</p>
+
+
+
+<a name="572144600"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572144600" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572144600">(Feb 05 2026 at 13:14)</a>:</h4>
+<p>I just tried calling a DV endpoint from a browser component, but try to come up with a curl.</p>
+
+
+
+<a name="572147051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572147051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572147051">(Feb 05 2026 at 13:25)</a>:</h4>
+<p>It would be good to have an API test included in our regular suite, so we can also test this is in CI</p>
+
+
+
+<a name="572199338"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572199338" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572199338">(Feb 05 2026 at 16:39)</a>:</h4>
+<p>Actually, I don't know how to make curl fail with CORS, because it never does as it doesn't care, only browsers do, right? For now I just vibe coded a simple single page app which tries to create a dataset with POST and it does fail for me with stock develop branch DV (without manually adding the filter to webxml):</p>
+<p><a href="/user_uploads/53090/CIx9GN60LdG47ANe_sO3NKJ0/cors-tester.html">cors-tester.html</a></p>
+<p>Just open it in a browser, set the api token and press "POST JSON" to see if it fails or not. (It uses the dataset-finch1.json from the DV API guides)</p>
+
+
+
+<a name="572220936"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572220936" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572220936">(Feb 05 2026 at 18:23)</a>:</h4>
+<p>I was suggesting creating an IT test that checks for presence of the headers.</p>
+
+
+
+<a name="572221063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572221063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572221063">(Feb 05 2026 at 18:24)</a>:</h4>
+<p>(As you said - anything that's not a browser won't care. But we'd only want to verify the servlet filter is picked up)</p>
+
+
+
+<a name="572337995"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572337995" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572337995">(Feb 06 2026 at 10:13)</a>:</h4>
+<p>Ok, I created a CorsIT test checking for CORS headers. </p>
+<p>It turns out that the result is kind of random based on whether the server happens to pick up CorsFilter or not. </p>
+<p>Here's my actual test session: I run the app in docker. When it is started I run the test manually. Then I stop the server with ctrl+c and either start it again with run, or first do an explicit stop. None of these seem to matter, the result seems to be random:</p>
+<p>mvn -Pct docker:stop</p>
+<p>mvn -Pct docker:run --&gt; FAIL</p>
+<p>ctrl+c</p>
+<p>mvn -Pct docker:run --&gt; FAIL</p>
+<p>ctrl+c</p>
+<p>mvn -Pct docker:stop</p>
+<p>mvn -Pct docker:run --&gt; PASS</p>
+<p>ctrl+c</p>
+<p>mvn -Pct docker:run --&gt; PASS</p>
+<p>ctrl+c</p>
+<p>mvn -Pct docker:run --&gt; FAIL</p>
+<p>I don't know how to proceed from here. One thing is sure: If add the explicit web.xml filter and filter-mapping it works consistently.</p>
+
+
+
+<a name="572343754"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572343754" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572343754">(Feb 06 2026 at 10:40)</a>:</h4>
+<p>This is the test I run:</p>
+<p><a href="/user_uploads/53090/yopxGJpaX7jvCNARa9f2Vwei/CorsIT.java">CorsIT.java</a></p>
+<p>In the <code>docker-compose-dev.yml</code> I set these for <code>dev_dataverse</code> just to see if I get specific headers I configure:</p>
+<div class="codehilite"><pre><span></span><code>      DATAVERSE_CORS_ORIGIN: &quot;*&quot;
+      DATAVERSE_CORS_HEADERS_ALLOW: &quot;Accept,Content-Type,X-Dataverse-key,Authorization,cedar-client-session-id,cedar-debug&quot;
+``
+</code></pre></div>
+
+
+
+<a name="572348983"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572348983" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572348983">(Feb 06 2026 at 11:06)</a>:</h4>
+<p>In your test I see that you are targeting an API endpoint.</p>
+
+
+
+<a name="572349036"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349036" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349036">(Feb 06 2026 at 11:07)</a>:</h4>
+<p>Yes, /api/dataverses/root/datasets</p>
+
+
+
+<a name="572349045"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349045" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349045">(Feb 06 2026 at 11:07)</a>:</h4>
+<p>Are we sure the filter actually will correctly work with JAX-RS</p>
+
+
+
+<a name="572349165"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349165" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349165">(Feb 06 2026 at 11:07)</a>:</h4>
+<p>What happens when hitting JSF or other pure servlets?</p>
+
+
+
+<a name="572349200"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349200" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349200">(Feb 06 2026 at 11:08)</a>:</h4>
+<p>Yes, sometimes it does, sometimes it doesn't. I don't know what kind of race condition could<br>
+ it be.</p>
+
+
+
+<a name="572349336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349336">(Feb 06 2026 at 11:08)</a>:</h4>
+<p>What happens if we hit a 404 in a servlet</p>
+
+
+
+<a name="572349358"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349358" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349358">(Feb 06 2026 at 11:08)</a>:</h4>
+<p>I don't know about JSF, but I want to access api endpoints from a webapp</p>
+
+
+
+<a name="572349455"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349455" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349455">(Feb 06 2026 at 11:09)</a>:</h4>
+<p>What url do you suggest to test?</p>
+
+
+
+<a name="572349977"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572349977" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572349977">(Feb 06 2026 at 11:12)</a>:</h4>
+<p>Technically, JAX-RS is still a servlet, but it's special. We may be in trouble here due to filter ordering etc.</p>
+
+
+
+<a name="572350118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572350118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572350118">(Feb 06 2026 at 11:12)</a>:</h4>
+<p>Also, AI tells me there may be a problem with the mixed style of having web.xml registered filters and annotation based. Not sure if this really is a thing, but lets keep it in mind.</p>
+
+
+
+<a name="572350271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572350271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572350271">(Feb 06 2026 at 11:13)</a>:</h4>
+<p>Yes, I think it definitely affects it, although as I read about it should be still deterministic</p>
+
+
+
+<a name="572350550"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572350550" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572350550">(Feb 06 2026 at 11:15)</a>:</h4>
+<p>SwordFilter is the only one configured in web.xml. Maybe removing it from there and adding @WebFilter annotation on the class makes it clear.</p>
+
+
+
+<a name="572350612"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572350612" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572350612">(Feb 06 2026 at 11:15)</a>:</h4>
+<p>I try this.</p>
+
+
+
+<a name="572350922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572350922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572350922">(Feb 06 2026 at 11:17)</a>:</h4>
+<p>Technically for JAX-RS we should be using @ContainerRequestFilter to be within the consistent filter framework of JAX-RS</p>
+
+
+
+<a name="572351025"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572351025" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572351025">(Feb 06 2026 at 11:18)</a>:</h4>
+<p>See ApiBlockingFilter in api.filter package.</p>
+
+
+
+<a name="572351142"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572351142" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572351142">(Feb 06 2026 at 11:18)</a>:</h4>
+<p>So this may be another culprit, why things my go sideways - the servlet filter and the JAX-RS filter may conflict.</p>
+
+
+
+<a name="572351197"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572351197" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572351197">(Feb 06 2026 at 11:19)</a>:</h4>
+<p>At least if both are discovered by annotations scanning.</p>
+
+
+
+<a name="572351230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572351230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572351230">(Feb 06 2026 at 11:19)</a>:</h4>
+<p>Maybe making the filter explicit in web.xml makes it load before the other or sth</p>
+
+
+
+<a name="572352089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572352089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572352089">(Feb 06 2026 at 11:24)</a>:</h4>
+<p>Hmm coming to think about it: any servlet filters will be applied first, then the JAX-RS internal filters will apply. These two don't mix-n-match, they are at different layers. So should be nothing to worry about here.</p>
+
+
+
+<a name="572352666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572352666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572352666">(Feb 06 2026 at 11:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> could you please verify something for me...</p>
+
+
+
+<a name="572352714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572352714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572352714">(Feb 06 2026 at 11:27)</a>:</h4>
+<p>Yes, sure.</p>
+
+
+
+<a name="572352720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572352720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572352720">(Feb 06 2026 at 11:27)</a>:</h4>
+<p>Could you run the tests against /api/v1/...</p>
+
+
+
+<a name="572352907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572352907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572352907">(Feb 06 2026 at 11:28)</a>:</h4>
+<p>I had a look at all the filters we already have and ApiRouter popped up. Asking AI about it gave me this: </p>
+<blockquote>
+<p>The <code>ApiRouter</code> is doing an internal <code>RequestDispatcher.forward(...)</code> from:<br>
+<code>/api/...</code> → <code>/api/v1/...</code> (your JAX‑RS app is mounted at ) <code>@ApplicationPath("api/v1")</code></p>
+<p>That has a big side effect in Servlet-land: a forward is a second dispatch with dispatcher type FORWARD, and many servlet filters only apply to dispatcher type REQUEST unless explicitly configured.</p>
+</blockquote>
+
+
+
+<a name="572353160"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572353160" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572353160">(Feb 06 2026 at 11:30)</a>:</h4>
+<p>So let's rule out that the router may mess up our filter chain</p>
+
+
+
+<a name="572354030"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572354030" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572354030">(Feb 06 2026 at 11:34)</a>:</h4>
+<p>In the meantime I tested putting @WebFilter onto SwordFilter and removing the web.xml config --&gt; same random test behaviour</p>
+<p>I now try the /api/v1 behaviour</p>
+
+
+
+<a name="572354201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572354201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572354201">(Feb 06 2026 at 11:35)</a>:</h4>
+<p>Great to verify that! We doubted it would be related, glad to see it was indeed not.</p>
+
+
+
+<a name="572354251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572354251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572354251">(Feb 06 2026 at 11:36)</a>:</h4>
+<p>My money is on Router vs Cors, as both affect the same endpoints.</p>
+
+
+
+<a name="572354415"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572354415" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572354415">(Feb 06 2026 at 11:37)</a>:</h4>
+<p>Also, you might want to do the testing with the sword filter as well <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> Not sure if the order matters with those two. IMHO filters should avoid being dependent on order. But of course we'd need to take care of types (forward, request)</p>
+
+
+
+<a name="572355905"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572355905" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572355905">(Feb 06 2026 at 11:45)</a>:</h4>
+<p>Yep. So, when /api/dataverses/root/datasets fails /api/v1/dataverses/root/datasets passes the test.</p>
+
+
+
+<a name="572355993"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572355993" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572355993">(Feb 06 2026 at 11:46)</a>:</h4>
+<p>Now what? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="572356692"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572356692" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572356692">(Feb 06 2026 at 11:50)</a>:</h4>
+<p>In case of /api/v1 it first reaches CorsFilter then ApiBlockingFilter<br>
+In case of /api only reaches ApiBlockingFilter</p>
+<p>(doFilter(), I mean)</p>
+
+
+
+<a name="572356894"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572356894" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572356894">(Feb 06 2026 at 11:51)</a>:</h4>
+<p>Ha! So Api Router <em>is</em> the culprit</p>
+
+
+
+<a name="572357317"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357317" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357317">(Feb 06 2026 at 11:53)</a>:</h4>
+<p>But you're somewhat wrong. The chain is:<br>
+/api       -&gt; Router -&gt; forward -&gt; Cors -&gt; ApiBlocking (which breaks at Cors because forward)<br>
+/api/v1 -&gt; Router -&gt; Cors -&gt; ApiBlocking</p>
+
+
+
+<a name="572357488"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357488" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357488">(Feb 06 2026 at 11:54)</a>:</h4>
+<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>
+
+
+
+<a name="572357671"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357671" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357671">(Feb 06 2026 at 11:55)</a>:</h4>
+<p>So in case of</p>
+<p>RequestDispatcher dsp = request.getRequestDispatcher(newRequestUri);<br>
+dsp.forward(req, sr1);</p>
+<p>wherever it goes it won't always goes thro CorsFilter, it is not in that filter chain, or sg.</p>
+
+
+
+<a name="572357680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357680">(Feb 06 2026 at 11:55)</a>:</h4>
+<p>So what we need to do: add both "FORWARD" and "REQUEST" to CorsFilter:</p>
+<div class="codehilite" data-code-language="Java"><pre><span></span><code><span class="nd">@WebFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"/*"</span><span class="p">,</span><span class="w"> </span><span class="n">dispatcherTypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">DispatcherType</span><span class="p">.</span><span class="na">REQUEST</span><span class="p">,</span><span class="w"> </span><span class="n">DispatcherType</span><span class="p">.</span><span class="na">FORWARD</span><span class="p">})</span>
+</code></pre></div>
+<p>We should also look at the types ERROR and INCLUDE later on to avoid breaking CORS when serving error pages etc</p>
+
+
+
+<a name="572357817"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357817" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357817">(Feb 06 2026 at 11:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="602497">Balázs Pataki</span> <a href="#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/572357488">said</a>:</p>
+<blockquote>
+<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>
+</blockquote>
+<p>It goes there, but will not match because of dispatcher type forward!</p>
+
+
+
+<a name="572357922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572357922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572357922">(Feb 06 2026 at 11:56)</a>:</h4>
+<p>Ok, I check now adding DispatcherType.FORWARD</p>
+
+
+
+<a name="572358009"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572358009" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572358009">(Feb 06 2026 at 11:57)</a>:</h4>
+<p>Please make sure to use the above example, otherwise we'd break REQUEST <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="572358065"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572358065" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572358065">(Feb 06 2026 at 11:57)</a>:</h4>
+<p>yeah, i copy pasted that :-)</p>
+
+
+
+<a name="572359916"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572359916" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572359916">(Feb 06 2026 at 12:06)</a>:</h4>
+<p>Oh yeah, it works consistently now! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+<p>And the filter orders are as follows:</p>
+<p>/api<br>
+cors -&gt; router -&gt; cors -&gt; apiblocking</p>
+<p>/api/v1<br>
+cors -&gt; router -&gt; apiblocking</p>
+
+
+
+<a name="572364466"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572364466" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572364466">(Feb 06 2026 at 12:30)</a>:</h4>
+<p>Good morning. <span aria-label="coffee" class="emoji emoji-2615" role="img" title="coffee">:coffee:</span> You've been busy!</p>
+
+
+
+<a name="572369841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572369841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572369841">(Feb 06 2026 at 12:57)</a>:</h4>
+<p>Submitted a PR:</p>
+<p><a href="https://github.com/IQSS/dataverse/pull/12151">https://github.com/IQSS/dataverse/pull/12151</a></p>
+<p>Should we add anything else to it, <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> ?</p>
+
+
+
+<a name="572370001"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370001" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370001">(Feb 06 2026 at 12:58)</a>:</h4>
+<p>Can you test the error pages?</p>
+
+
+
+<a name="572370062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370062">(Feb 06 2026 at 12:58)</a>:</h4>
+<p>And SWORD maybe?</p>
+
+
+
+<a name="572370245"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370245" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370245">(Feb 06 2026 at 12:59)</a>:</h4>
+<p>You mean to add more URL-s to test in CorsIT, right?</p>
+
+
+
+<a name="572370295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370295">(Feb 06 2026 at 12:59)</a>:</h4>
+<p>Yeah, lets have more tests in there</p>
+
+
+
+<a name="572370356"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370356" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370356">(Feb 06 2026 at 13:00)</a>:</h4>
+<p>Might be an @Parameterized one or single ones.</p>
+
+
+
+<a name="572370419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572370419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572370419">(Feb 06 2026 at 13:00)</a>:</h4>
+<p>Not sure we can make RestAssured hit the other endpoints that easily.</p>
+
+
+
+<a name="572374168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572374168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572374168">(Feb 06 2026 at 13:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> this may be worth another backport to 6.9</p>
+
+
+
+<a name="572378744"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572378744" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572378744">(Feb 06 2026 at 13:40)</a>:</h4>
+<p>I made it ParameterizedTest and now it tests these endpoints</p>
+<p>"/api/dataverses/root/datasets",<br>
+"/api/v1/dataverses/root/datasets",<br>
+"/page_doesnt_exist",<br>
+"/dvn/api/data-deposit/v1.1/swordv2/collection/dataverse/root"</p>
+
+
+
+<a name="572386225"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572386225" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572386225">(Feb 06 2026 at 14:10)</a>:</h4>
+<p>You probably should add CorsIT to the list of tests at <a href="https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt">https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt</a></p>
+
+
+
+<a name="572386380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572386380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572386380">(Feb 06 2026 at 14:10)</a>:</h4>
+<p>I've always meant to refactor the API tests to properly use Maven Failsafe and JUnit 5 Suites, but didn't find the time so far...</p>
+
+
+
+<a name="572387366"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572387366" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572387366">(Feb 06 2026 at 14:14)</a>:</h4>
+<p>I left two comments on the PR</p>
+
+
+
+<a name="572390742"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572390742" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572390742">(Feb 06 2026 at 14:28)</a>:</h4>
+<p>Edit: added another one.</p>
+
+
+
+<a name="572395435"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572395435" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572395435">(Feb 06 2026 at 14:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> I've marked your PR as a draft for now and added all the necessary labels (put didn't put it on the board yet <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>). Keep them changes coming, I'll be the ambassador on including it in 6.10</p>
+
+
+
+<a name="572398158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CorsFilter%20Servlet%20Filter%20not%20discovered/near/572398158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered.html#572398158">(Feb 06 2026 at 14:59)</a>:</h4>
+<p>I'd say we can safely put it in the "Ready for Triage" column so it comes up on Triage Tuesday. Any objections? Thanks for the PR! <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

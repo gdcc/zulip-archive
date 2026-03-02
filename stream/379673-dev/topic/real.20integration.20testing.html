@@ -1,0 +1,404 @@
+<html>
+<head><meta charset="utf-8"><title>real integration testing · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html">real integration testing</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="360133977"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360133977" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360133977">(May 21 2023 at 23:59)</a>:</h4>
+<p>Here we are: I want to contribute the first real integration test. It is using Testcontainers (of course) and ensures that configurability of an OIDC provider via MPCONFIG as well as using that provider with a Keycloak instance in a container for a Bearer Token Access to the API <span class="user-mention" data-user-id="617722">@Johannes D</span></p>
+
+
+
+<a name="360134056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360134056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360134056">(May 22 2023 at 00:00)</a>:</h4>
+<p>Anyone feeling adventurous enough to try <code>mvn clean verify</code> on the PR branch? <a href="https://github.com/IQSS/dataverse/pull/9273">https://github.com/IQSS/dataverse/pull/9273</a> Only Docker, Java and Maven required!</p>
+
+
+
+<a name="360134109"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360134109" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360134109">(May 22 2023 at 00:01)</a>:</h4>
+<p>Here's the test code BTW <a href="https://github.com/IQSS/dataverse/pull/9273/files#diff-104cf13998a3494cd46bf6cd92eba934c96744f84d4330ae378fcbf222bf58ea">https://github.com/IQSS/dataverse/pull/9273/files#diff-104cf13998a3494cd46bf6cd92eba934c96744f84d4330ae378fcbf222bf58ea</a></p>
+
+
+
+<a name="360134292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360134292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360134292">(May 22 2023 at 00:03)</a>:</h4>
+<p>BTW <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> I have had a strange experience: when importing the realm you created to Keycloak 20 or 21, I could no longer access Keycloak userinfo endpoint with the retrieved access token. (Works perfectly fine with Keycloak 19) I'm a bit puzzled about that and wondering if we need to re-export or re-create our test realm from a more modern version. It says it was created with Keycloak 16, so maybe something is not right here?</p>
+
+
+
+<a name="360134520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360134520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360134520">(May 22 2023 at 00:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="598442">@Guillermo Portas</span> as this PR does (try to) add PKCE support for the OIDC provider, maybe we need to alter the realm anyway? I would like to add an integration test for that as well!</p>
+
+
+
+<a name="360178233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360178233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360178233">(May 22 2023 at 07:26)</a>:</h4>
+<p>Aaaand I have a working integration test with PKCE for the normal Auth Code Flow. Had to re-create the realm though. The exported realm from Keycloak 16 seems not be fully compatible with Keycloak 19. We'll see if that fixes the upgrade issue, too</p>
+
+
+
+<a name="360178438"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360178438" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360178438">(May 22 2023 at 07:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> I would like to create some more users in the realm. I'd go for some users following our role model if that is OK. (admin, curator, user)</p>
+
+
+
+<a name="360228298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360228298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360228298">(May 22 2023 at 10:43)</a>:</h4>
+<p><code>[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0</code></p>
+
+
+
+<a name="360228441"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360228441" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360228441">(May 22 2023 at 10:44)</a>:</h4>
+<p><code>INFO: STDOUT: 2023-05-22 10:39:16,653 INFO  [org.keycloak.services] (main) KC-SERVICES0009: Added user 'kcuser' to realm 'master'</code></p>
+
+
+
+<a name="360228654"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360228654" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360228654">(May 22 2023 at 10:45)</a>:</h4>
+<p>Seems promising!</p>
+
+
+
+<a name="360229079"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360229079" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360229079">(May 22 2023 at 10:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I would suggest making some noise in #dv-rearchitecture-auth as well.</p>
+
+
+
+<a name="360229819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360229819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360229819">(May 22 2023 at 10:50)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> sure, please go ahead and create users. You're using the default master realm instead of the realm we're adding with a JSON file?</p>
+
+
+
+<a name="360232309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360232309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360232309">(May 22 2023 at 11:01)</a>:</h4>
+<p>No, you shall (and cannot) use the master realm for that</p>
+
+
+
+<a name="360232342"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360232342" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360232342">(May 22 2023 at 11:01)</a>:</h4>
+<p>I created a new realm "test"</p>
+
+
+
+<a name="360232370"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360232370" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360232370">(May 22 2023 at 11:01)</a>:</h4>
+<p>And I'm loading it as JSON</p>
+
+
+
+<a name="360239192"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360239192" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360239192">(May 22 2023 at 11:29)</a>:</h4>
+<p>Gotcha. I wonder why we have that out above then. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> <code>Added user 'kcuser' to realm 'master'</code></p>
+
+
+
+<a name="360242797"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360242797" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360242797">(May 22 2023 at 11:44)</a>:</h4>
+<p>That is completely normal and fine</p>
+
+
+
+<a name="360242835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360242835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360242835">(May 22 2023 at 11:44)</a>:</h4>
+<p>Oh wait no it might not be</p>
+
+
+
+<a name="360242928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360242928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360242928">(May 22 2023 at 11:45)</a>:</h4>
+<p>That is the "normal" user...</p>
+
+
+
+<a name="360242971"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360242971" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360242971">(May 22 2023 at 11:45)</a>:</h4>
+<p>Anyway - I am setting up a nice and clean realm</p>
+
+
+
+<a name="360243069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360243069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360243069">(May 22 2023 at 11:45)</a>:</h4>
+<p>admin, user, curator and affiliate as users</p>
+
+
+
+<a name="360243212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360243212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360243212">(May 22 2023 at 11:46)</a>:</h4>
+<p>even created groups for them, although the OIDC provider doesn't support groups (yet!)</p>
+
+
+
+<a name="360243234"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360243234" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360243234">(May 22 2023 at 11:46)</a>:</h4>
+<p>That must change...</p>
+
+
+
+<a name="360243364"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360243364" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360243364">(May 22 2023 at 11:47)</a>:</h4>
+<p>We might need to edit the realm again later when we start testing things like attribute mapping for affiliatons etc</p>
+
+
+
+<a name="360255983"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360255983" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360255983">(May 22 2023 at 12:40)</a>:</h4>
+<p>Awesome. Go, go, go! <img alt=":dataverse_man:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png" title="dataverse man"></p>
+
+
+
+<a name="360285666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360285666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360285666">(May 22 2023 at 14:15)</a>:</h4>
+<p>There you go :-) Replaced the realm, added the third test and pushed the changes</p>
+
+
+
+<a name="360285696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360285696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360285696">(May 22 2023 at 14:15)</a>:</h4>
+<p>Even updated the docs :-D</p>
+
+
+
+<a name="360321147"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360321147" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360321147">(May 22 2023 at 16:27)</a>:</h4>
+<p>No longer a draft! Great!</p>
+
+
+
+<a name="360321277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360321277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360321277">(May 22 2023 at 16:28)</a>:</h4>
+<p>Now let's see if you're trigger happy again <span aria-label="stuck out tongue wink" class="emoji emoji-1f61c" role="img" title="stuck out tongue wink">:stuck_out_tongue_wink:</span></p>
+
+
+
+<a name="360326149"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360326149" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360326149">(May 22 2023 at 16:48)</a>:</h4>
+<p>Yes <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span>, It may be a version incompatibility by having exported the original realm json file with an older version of Keycloak. I see in your PR that you have included a new realm, I guess exporting a new one from the new version has fixed the problem.</p>
+
+
+
+<a name="360326686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360326686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360326686">(May 22 2023 at 16:51)</a>:</h4>
+<p>If I remember correctly, the PKCE configuration is exported to the realm file with the rest of the config values of the realm, so I guess that you have included the new PKCE config in the realm file as well.</p>
+
+
+
+<a name="360345257"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360345257" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360345257">(May 22 2023 at 18:14)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598442">Guillermo Portas</span> <a href="#narrow/stream/379673-dev/topic/real.20integration.20testing/near/360326686">said</a>:</p>
+<blockquote>
+<p>If I remember correctly, the PKCE configuration is exported to the realm file with the rest of the config values of the realm, so I guess that you have included the new PKCE config in the realm file as well.</p>
+</blockquote>
+<p>No, I didn't add any PKCE in the realm. I looked for it but could not find any option to enforce it. Maybe because I only added a confidential client so far and no public client?</p>
+
+
+
+<a name="360345323"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360345323" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360345323">(May 22 2023 at 18:14)</a>:</h4>
+<p>PKCE as an addendum works though - the integration test sends the challenge so that should be fine.</p>
+
+
+
+<a name="360345537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360345537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360345537">(May 22 2023 at 18:16)</a>:</h4>
+<p>If you happen to know where to enforce PKCE plz let me know! Happy to include it</p>
+
+
+
+<a name="360348626"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360348626" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360348626">(May 22 2023 at 18:32)</a>:</h4>
+<p>Ha I might just have found it... looks like you need to activate an enforcing policy.</p>
+
+
+
+<a name="360348659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360348659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360348659">(May 22 2023 at 18:32)</a>:</h4>
+<p>Will look I to that when back at desk</p>
+
+
+
+<a name="360350593"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360350593" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360350593">(May 22 2023 at 18:43)</a>:</h4>
+<p>What about real integration tests for S3 direct upload? Discuss here or in a new topic?</p>
+
+
+
+<a name="360357112"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360357112" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360357112">(May 22 2023 at 19:17)</a>:</h4>
+<p>Sounds like you got a taste for it now!</p>
+
+
+
+<a name="360357268"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360357268" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360357268">(May 22 2023 at 19:18)</a>:</h4>
+<p>What can I say... IIRC there is a LocalStack Testcontainers module, so it should be easy to use.</p>
+
+
+
+<a name="360368732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360368732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360368732">(May 22 2023 at 20:28)</a>:</h4>
+<p>Yeah, that's the one <span class="user-mention" data-user-id="598186">@Don Sizemore</span> keeps reminding me of. Or maybe we could use Minio.</p>
+
+
+
+<a name="360369508"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360369508" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360369508">(May 22 2023 at 20:33)</a>:</h4>
+<p>"real" integration testing? for when that fake integration testing just won't do?</p>
+
+
+
+<a name="360459932"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360459932" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360459932">(May 23 2023 at 08:15)</a>:</h4>
+<p>More like "cover more than just the API" <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="360498931"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360498931" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360498931">(May 23 2023 at 11:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> currently the title of your PR is this: 9268 mpconfig OIDC provider <a href="https://github.com/IQSS/dataverse/issues/9273">#9273</a></p>
+<p>It does more than that, though, right?</p>
+
+
+
+<a name="360499057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360499057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360499057">(May 23 2023 at 11:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="617722">@Johannes D</span> have you had a chance to take a look?</p>
+
+
+
+<a name="360499112"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360499112" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360499112">(May 23 2023 at 11:16)</a>:</h4>
+<p>Yes, it contains more.</p>
+
+
+
+<a name="360499179"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360499179" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360499179">(May 23 2023 at 11:16)</a>:</h4>
+<p>What should I write?</p>
+
+
+
+<a name="360499322"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360499322" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360499322">(May 23 2023 at 11:16)</a>:</h4>
+<p>"OIDC and OAuth refactor, MPCONFIG, more tests"?</p>
+
+
+
+<a name="360517201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360517201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360517201">(May 23 2023 at 12:32)</a>:</h4>
+<p>Hope ya like "9268 - OIDC auth: MPCONFIG provisioning, PKCE support and integration tests"</p>
+
+
+
+<a name="360526718"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360526718" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360526718">(May 23 2023 at 13:09)</a>:</h4>
+<p>Much better! Thanks!</p>
+
+
+
+<a name="360526823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360526823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360526823">(May 23 2023 at 13:09)</a>:</h4>
+<p>(We could probably drop 9268 since we have it under "closes".)</p>
+
+
+
+<a name="360532170"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360532170" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360532170">(May 23 2023 at 13:28)</a>:</h4>
+<p>But but but when I joined you lot in 2018 you wanted me to add the issue number! Is this yesterdays news?</p>
+
+
+
+<a name="360534183"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360534183" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360534183">(May 23 2023 at 13:36)</a>:</h4>
+<p>Oh, I love, love, love, the issue number in the name of the branch. <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span> But in the title it's a bit noisy if you ask me. Sorry for the miscommunication!</p>
+
+
+
+<a name="360543078"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360543078" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360543078">(May 23 2023 at 14:06)</a>:</h4>
+<p>D'Oh!</p>
+
+
+
+<a name="360641667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360641667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360641667">(May 23 2023 at 21:25)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> nice demo at tech hours! Thanks! <img alt=":dataverse_man:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png" title="dataverse man"></p>
+
+
+
+<a name="360641742"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360641742" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360641742">(May 23 2023 at 21:26)</a>:</h4>
+<p>Glad you liked it</p>
+
+
+
+<a name="360641770"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360641770" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360641770">(May 23 2023 at 21:26)</a>:</h4>
+<p>May it be an icebreaker for more!</p>
+
+
+
+<a name="360641802"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360641802" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360641802">(May 23 2023 at 21:26)</a>:</h4>
+<p>I'm hacking in this very moment on combined coverage reports...</p>
+
+
+
+<a name="360644791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360644791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360644791">(May 23 2023 at 21:49)</a>:</h4>
+<p>Pre: <br>
+<a href="/user_uploads/53090/QnKVqL6bzmYlKNMJEpGAeeBe/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/QnKVqL6bzmYlKNMJEpGAeeBe/image.png" title="image.png"><img src="/user_uploads/53090/QnKVqL6bzmYlKNMJEpGAeeBe/image.png"></a></div>
+
+
+
+<a name="360644886"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360644886" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360644886">(May 23 2023 at 21:50)</a>:</h4>
+<p>Post: <br>
+<a href="/user_uploads/53090/Hkd5LQGddDs8rzNFq-2pbigi/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/Hkd5LQGddDs8rzNFq-2pbigi/image.png" title="image.png"><img src="/user_uploads/53090/Hkd5LQGddDs8rzNFq-2pbigi/image.png"></a></div>
+
+
+
+<a name="360651371"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360651371" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360651371">(May 23 2023 at 22:42)</a>:</h4>
+<p>Nice! As usual, go, go, go!</p>
+
+
+
+<a name="360652170"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360652170" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360652170">(May 23 2023 at 22:49)</a>:</h4>
+<p>Waiting on CI.... <br>
+<a href="/user_uploads/53090/g40gqb5fPueLy5gdBXEGWGtU/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/g40gqb5fPueLy5gdBXEGWGtU/image.png" title="image.png"><img src="/user_uploads/53090/g40gqb5fPueLy5gdBXEGWGtU/image.png"></a></div>
+
+
+
+<a name="360653042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360653042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360653042">(May 23 2023 at 22:56)</a>:</h4>
+<p>Smooooooooth operator<br>
+<a href="/user_uploads/53090/88Ztx5RuH6roGnP5LzTieqrQ/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/88Ztx5RuH6roGnP5LzTieqrQ/image.png" title="image.png"><img src="/user_uploads/53090/88Ztx5RuH6roGnP5LzTieqrQ/image.png"></a></div>
+
+
+
+<a name="360759879"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/real%20integration%20testing/near/360759879" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/real.20integration.20testing.html#360759879">(May 24 2023 at 11:21)</a>:</h4>
+<p>Nice! If I'm reading Coveralls right, in develop OIDCAuthProvider.java has <a href="https://coveralls.io/builds/60189462/source?filename=src%2Fmain%2Fjava%2Fedu%2Fharvard%2Fiq%2Fdataverse%2Fauthorization%2Fproviders%2Foauth2%2Foidc%2FOIDCAuthProvider.java">1.3% coverage</a> but in the PR you're working on (<a href="https://github.com/IQSS/dataverse/issues/9273">#9273</a>), it now has <a href="https://coveralls.io/jobs/121991593/source_files/8929940614">69.5% coverage</a>.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

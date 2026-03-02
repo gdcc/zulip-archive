@@ -1,0 +1,1113 @@
+<html>
+<head><meta charset="utf-8"><title>✔ indexing problem · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html">✔ indexing problem</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="489429388"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489429388" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489429388">(Dec 17 2024 at 08:27)</a>:</h4>
+<p>We have a custom PID provider called perma1  set as the default. (we dont have datacite integration yet nor will we have it soon we want to use permalink (for now).. Our Payara JVM options include:</p>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.pid.providers=perma1
+-Ddataverse.pid.default-provider=perma1
+-Ddataverse.pid.perma1.type=perma
+-Ddataverse.pid.perma1.label=PermaLink
+-Ddataverse.pid.perma1.authority=TEST
+-Ddataverse.pid.perma1.shoulder=x/
+-Ddataverse.pid.perma1.permalink.base-url=https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:
+-Ddataverse.pid.perma1.permalink.separator=/
+In the Dataverse database (dvobject), our dataset row shows:
+</code></pre></div>
+<p>If we create a new dataset <br>
+In the Dataverse database (dvobject), our dataset row shows:</p>
+<div class="codehilite"><pre><span></span><code>id=501
+protocol=perma
+authority=TEST
+identifier=x/GEGNYK
+</code></pre></div>
+<p>We can access the dataset page directly at <a href="https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:TEST/x/GEGNYK">https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:TEST/x/GEGNYK</a><br>
+However, it never appears in Solr (numFound=0), and thus not in search results or dataset listings. Forced reindexing completes without errors, but the dataset is still missing from Solr. Logs show the custom PermaLinkPidProvider gets invoked (“Parsing in Perma...”), yet no dataset doc is created in Solr.</p>
+<p>We suspect the custom perma protocol isn’t being recognized by the indexing pipeline, possibly due to incomplete integration between PermaLinkPidProvider and Dataverse’s GlobalIdServiceBean or indexing logic. We removed :DoiProvider="Builtin" and confirmed the PID config is set to perma1 only. Still, the dataset never appears in Solr.</p>
+<p>We are looking for guidance on how to properly integrate a custom PID provider (“perma1”) so new “perma:…” datasets are fully indexed in Dataverse.</p>
+
+
+
+<a name="489476955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489476955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489476955">(Dec 17 2024 at 12:47)</a>:</h4>
+<p>Strange. Can you please show us your server.log?</p>
+
+
+
+<a name="489479952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489479952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489479952">(Dec 17 2024 at 13:00)</a>:</h4>
+<p><a href="/user_uploads/53090/MJw4nvELrS8YSR-Mx1J3kDSU/server.log">server.log</a></p>
+
+
+
+<a name="489479994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489479994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489479994">(Dec 17 2024 at 13:00)</a>:</h4>
+<p>Thanks!</p>
+
+
+
+<a name="489483482"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489483482" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489483482">(Dec 17 2024 at 13:17)</a>:</h4>
+<p>Interesting. Here's the error:</p>
+<div class="codehilite"><pre><span></span><code>Exception Description: Syntax error parsing [SELECT fm.id FROM FileMetadata fm, DvObject dvo WHERE fm.datasetVersion.id=(SELECT dv.id FROM DatasetVersion dv WHERE dv.dataset.id=dvo.owner.id and dv.versionState=edu.harvard.iq.dataverse.DatasetVersion.VersionState.RELEASED ORDER BY dv.versionNumber DESC, dv.minorVersionNumber DESC LIMIT 1) AND dvo.id=fm.dataFile.id AND fm.dataFile.id=:fid].
+[232, 232] The right parenthesis is missing from the sub-expression.
+[291, 292] The ORDER BY clause has &#39;dv.minorVersionNumber DESC &#39; and &#39;LIMIT 1&#39; that are not separated by a comma.
+[292, 299] The order by item is not a valid expression.
+[299, 350] The query contains a malformed ending.
+</code></pre></div>
+
+
+
+<a name="489483560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489483560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489483560">(Dec 17 2024 at 13:18)</a>:</h4>
+<p>Which <span class="user-mention" data-user-id="760290">@Omer M Fahim</span> saw in this issue: <a href="https://github.com/IQSS/dataverse/issues/11069">https://github.com/IQSS/dataverse/issues/11069</a></p>
+
+
+
+<a name="489483608"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489483608" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489483608">(Dec 17 2024 at 13:18)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/pull/11072">https://github.com/IQSS/dataverse/pull/11072</a> is the fix</p>
+
+
+
+<a name="489483633"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489483633" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489483633">(Dec 17 2024 at 13:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> which version of Dataverse are you running?</p>
+
+
+
+<a name="489484164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489484164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489484164">(Dec 17 2024 at 13:22)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/Custom.20.E2.80.9CPerma.E2.80.9D.20PID.20Setup.20.26.20Indexing.20Problem/near/489483633">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="671195">Simon Carroll</span> which version of Dataverse are you running?</p>
+</blockquote>
+<p>6.4</p>
+
+
+
+<a name="489484479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489484479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489484479">(Dec 17 2024 at 13:23)</a>:</h4>
+<p>Ok, the fix above is in 6.5 (<a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/Dataverse.206.2E5.20is.20here.21">#community &gt; Dataverse 6.5 is here!</a> )</p>
+
+
+
+<a name="489713866"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489713866" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489713866">(Dec 18 2024 at 09:27)</a>:</h4>
+<p>Hi Philip </p>
+<p>I can now create datasets and the permalink seems to work but nothing is indexed.  I dont really see any relevant errors. Any ideas what could be  happening</p>
+<p>Current config below :</p>
+
+
+
+<a name="489730313"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489730313" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489730313">(Dec 18 2024 at 10:57)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.files.archive.type=trs
+-Ddataverse.files.archive.base-url=https://transfer1.bsc.es/gpfs/archive/
+-Ddataverse.files.archive.ingestsizelimit=0
+-Ddataverse.files.archive.label=archive
+-Ddataverse.pid.datacite.username=testaccount
+-Ddataverse.pid.datacite.password=${ALIAS=doi_password_alias}
+-Ddataverse.pid.perma1.type=perma
+-Ddataverse.pid.perma1.label=PermaLink
+-Ddataverse.pid.perma1.authority=TEST
+-Ddataverse.pid.perma1.permalink.separator=/
+-Ddataverse.pid.default-provider=perma1
+-Ddataverse.pid.providers=perma1
+-Ddataverse.spi.pidproviders.directory=/usr/local/payara6/glassfish/domains/domain1/config/pidproviders
+-Ddataverse.pid.perma1.permalink.base-url=https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:
+</code></pre></div>
+
+
+
+<a name="489738978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489738978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489738978">(Dec 18 2024 at 11:46)</a>:</h4>
+<p><a href="/user_uploads/53090/Hq3Y5RvyIp2_phrzHqNgX_sg/server.log">server.log</a><br>
+I attach the relevant part of the log</p>
+
+
+
+<a name="489743266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489743266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489743266">(Dec 18 2024 at 12:09)</a>:</h4>
+<p>even doing this </p>
+<div class="codehilite"><pre><span></span><code>rocky@dataverse-test ~]$ curl http://localhost:8080/api/admin/index/dataset?persistentId=perma:TEST/JEZUF6
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Reindexed dataset perma:TEST/JEZUF6&quot;,&quot;id&quot;:517,&quot;persistentId&quot;:&quot;perma:TEST/JEZUF6&quot;,&quot;versions&quot;:[{&quot;semanticVersion&quot;:&quot;DRAFT&quot;,&quot;id&quot;:104}]}}
+</code></pre></div>
+<p>I still dont see it <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="489751238"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489751238" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489751238">(Dec 18 2024 at 12:53)</a>:</h4>
+<p>Hmm, what do you have in <code>/usr/local/payara6/glassfish/domains/domain1/config/pidproviders</code>?</p>
+
+
+
+<a name="489776177"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776177" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776177">(Dec 18 2024 at 15:01)</a>:</h4>
+<p>Hi philip. It is empty.</p>
+
+
+
+<a name="489776390"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776390" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776390">(Dec 18 2024 at 15:02)</a>:</h4>
+<p>Ok, could that line be causing you trouble? What if you remove it? This one: <code>-Ddataverse.spi.pidproviders.directory=/usr/local/payara6/glassfish/domains/domain1/config/pidproviders</code></p>
+
+
+
+<a name="489776492"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776492" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776492">(Dec 18 2024 at 15:02)</a>:</h4>
+<p>should I duplicate some of the config form the domain.xml to there</p>
+
+
+
+<a name="489776634"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776634" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776634">(Dec 18 2024 at 15:02)</a>:</h4>
+<p>Oh, wait, you started by saying you have a custom PID provider.</p>
+
+
+
+<a name="489776670"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776670" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776670">(Dec 18 2024 at 15:03)</a>:</h4>
+<p>In what way is it custom?</p>
+
+
+
+<a name="489776817"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776817" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776817">(Dec 18 2024 at 15:03)</a>:</h4>
+<p>it depends on the definition. We just want to like the PID to the url of the dataset in dataverse</p>
+
+
+
+<a name="489776973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489776973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489776973">(Dec 18 2024 at 15:04)</a>:</h4>
+<p>Ok, the regular perma provider should work fine for that.</p>
+
+
+
+<a name="489777237"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489777237" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489777237">(Dec 18 2024 at 15:05)</a>:</h4>
+<p>It's funny, right now for development and demos we use a weird FAKE DOI provider but we've talked about switching to the perma provider. Maybe we should go ahead and switch. Then you'd have a working config!</p>
+
+
+
+<a name="489778016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489778016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489778016">(Dec 18 2024 at 15:08)</a>:</h4>
+<p>just deleted that option and I still dont have new datasets<br>
+ indexed</p>
+
+
+
+<a name="489778844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489778844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489778844">(Dec 18 2024 at 15:12)</a>:</h4>
+<p>Here's what I'm thinking. Maybe I could convert the compose.yml in our tutorial at <a href="https://guides.dataverse.org/en/6.5/container/running/demo.html">https://guides.dataverse.org/en/6.5/container/running/demo.html</a> to use perma instead of FAKE. If it works, if datasets are indexed properly, maybe you can try it and compare to your config. How does that sound?</p>
+
+
+
+<a name="489789763"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489789763" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489789763">(Dec 18 2024 at 15:58)</a>:</h4>
+<p>It sounds great for us!</p>
+
+
+
+<a name="489789800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489789800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489789800">(Dec 18 2024 at 15:59)</a>:</h4>
+<p>Please, if we can help let us know.</p>
+
+
+
+<a name="489834981"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489834981" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489834981">(Dec 18 2024 at 20:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> please take a look at this: <a href="https://github.com/IQSS/dataverse/pull/11108">https://github.com/IQSS/dataverse/pull/11108</a></p>
+
+
+
+<a name="489898237"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489898237" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489898237">(Dec 19 2024 at 07:06)</a>:</h4>
+<p>Good morning!  Thanks a lot for the support. </p>
+<p>The config works nicely for us however, when I create a data set like this, <a href="https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:BSCTEST/VPJRN7">https://dataverse-test.bsc.es/dataset.xhtml?persistentId=perma:BSCTEST/VPJRN7</a> I dont see the new data set indexed. <br>
+<a href="/user_uploads/53090/9oRcyP_xNP9q0jlpMMJE-fzb/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/9oRcyP_xNP9q0jlpMMJE-fzb/image.png" title="image.png"><img data-original-dimensions="1544x893" src="/user_uploads/thumbnail/53090/9oRcyP_xNP9q0jlpMMJE-fzb/image.png/840x560.webp"></a></div><p>Even if I do this : </p>
+<div class="codehilite"><pre><span></span><code>curl http://localhost:8080/api/admin/index/dataset?persistentId=perma:BSCTEST/VPJRN7
+{"status":"OK","data":{"message":"Reindexed dataset perma:BSCTEST/VPJRN7","id":534,"persistentId":"perma:BSCTEST/VPJRN7","versions":[{"semanticVersion":"DRAFT","id":110}]}}[rocky@dataverse-test ~]$
+</code></pre></div>
+
+
+
+<a name="489952331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/489952331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#489952331">(Dec 19 2024 at 12:19)</a>:</h4>
+<p>Hmm, could you please show us a fresh copy of server.log?</p>
+
+
+
+<a name="490113778"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490113778" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490113778">(Dec 20 2024 at 08:19)</a>:</h4>
+<p><a href="/user_uploads/53090/ECA-v46Qi8WSTJTpSxeJ_ZAD/server.adddata.log">server.adddata.log</a><br>
+Good morning! I attach a log of creating a dataset  <a href="https://dataverse-test.bsc.es/citation?persistentId=perma:BSCTEST/0DBSEH">https://dataverse-test.bsc.es/citation?persistentId=perma:BSCTEST/0DBSEH</a>,</p>
+
+
+
+<a name="490114214"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490114214" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490114214">(Dec 20 2024 at 08:22)</a>:</h4>
+<p><a href="/user_uploads/53090/l_VBsgM1IsZ6EI4NCBjwrFuf/server.index.log">server.index.log</a> heres a couple of lines after manually indexing it</p>
+
+
+
+<a name="490114405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490114405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490114405">(Dec 20 2024 at 08:23)</a>:</h4>
+<p>and the full log in case its usefull <br>
+<a href="/user_uploads/53090/PxJaneTP27kiQs0vCwz-C1Dl/full.log">full.log</a></p>
+
+
+
+<a name="490174110"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490174110" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490174110">(Dec 20 2024 at 14:42)</a>:</h4>
+<p>Unfortunately, I can't find anything relevant in the logs. Should we do a "diff" between our two configs? I'm using the compose.yml from <a href="https://github.com/IQSS/dataverse/pull/11108">https://github.com/IQSS/dataverse/pull/11108</a> . What other settings are you using?</p>
+
+
+
+<a name="490177029"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490177029" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490177029">(Dec 20 2024 at 14:56)</a>:</h4>
+<p><a href="/user_uploads/53090/QhJkgKYhszTkTQI_wCwCav_C/jvmoptions.out">jvmoptions.out</a><br>
+I am not using docker in test atm but here is the jvm options out.</p>
+
+
+
+<a name="490177556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490177556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490177556">(Dec 20 2024 at 14:59)</a>:</h4>
+<p>very strange one . I do see in the logs something with the sholder "x" but we removed it the subsequent indexing should fix it anyway though ?</p>
+
+
+
+<a name="490178207"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490178207" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490178207">(Dec 20 2024 at 15:02)</a>:</h4>
+<p>Well, if a dataset was saved with a certain PID due to previous configurations it will still have that PID. Reconfiguring Dataverse won't change the dataset's PID.</p>
+
+
+
+<a name="490178314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490178314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490178314">(Dec 20 2024 at 15:02)</a>:</h4>
+<p>I wonder if we can have you start with a "known good" config that indexes datasets properly. Then add more config that you need. Does that make sense?</p>
+
+
+
+<a name="490178379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490178379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490178379">(Dec 20 2024 at 15:03)</a>:</h4>
+<p>Because it seems like you are starting with a config that isn't working well, at least for indexing datasets.</p>
+
+
+
+<a name="490178480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490178480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490178480">(Dec 20 2024 at 15:03)</a>:</h4>
+<p>yeah, well it worked beore switching to perma1</p>
+
+
+
+<a name="490178661"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490178661" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490178661">(Dec 20 2024 at 15:04)</a>:</h4>
+<p>what can i do, change the default provider ?</p>
+
+
+
+<a name="490179052"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179052" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179052">(Dec 20 2024 at 15:06)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.pid.providers=fake
+-Ddataverse.pid.fake.type=FAKE
+-Ddataverse.pid.fake.label=Fake DOI Provider
+-Ddataverse.pid.fake.authority=10.5072
+-Ddataverse.pid.fake.shoulder=FK2/
+</code></pre></div>
+
+
+
+<a name="490179083"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179083" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179083">(Dec 20 2024 at 15:07)</a>:</h4>
+<p>Interesting. So perma1 caused all the problems. <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="490179101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179101">(Dec 20 2024 at 15:07)</a>:</h4>
+<p>this worked before</p>
+
+
+
+<a name="490179214"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179214" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179214">(Dec 20 2024 at 15:07)</a>:</h4>
+<p>This is how I'm setting the default provider in the PR above:</p>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.pid.default-provider=perma1
+</code></pre></div>
+
+
+
+<a name="490179352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179352">(Dec 20 2024 at 15:08)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.pid.default-provider=perma1
+</code></pre></div>
+
+
+
+<a name="490179546"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179546" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179546">(Dec 20 2024 at 15:09)</a>:</h4>
+<p>we only differ on authority in the pid settings</p>
+
+
+
+<a name="490179759"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490179759" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490179759">(Dec 20 2024 at 15:10)</a>:</h4>
+<p>and of course the fact we switch form one to the other</p>
+<div class="codehilite"><pre><span></span><code>[root@dataverse-test rocky]# $PAYARA/bin/asadmin list-jvm-options | grep pid
+Picked up JAVA_TOOL_OPTIONS: -Djdk.util.zip.disableZip64ExtraFieldValidation=true --add-opens=java.base/java.io=ALL-UNNAMED
+-Ddataverse.pid.datacite.mds-api-url=https://mds.test.datacite.org/
+-Ddataverse.pid.datacite.rest-api-url=https://api.test.datacite.org
+-Ddataverse.pid.perma1.type=perma
+-Ddataverse.pid.perma1.label=Perma1
+-Ddataverse.pid.perma1.authority=BSCTEST
+-Ddataverse.pid.perma1.permalink.separator=/
+-Ddataverse.pid.default-provider=perma1
+-Ddataverse.pid.providers=perma1
+</code></pre></div>
+
+
+
+<a name="490180437"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490180437" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490180437">(Dec 20 2024 at 15:14)</a>:</h4>
+<p>Right.</p>
+
+
+
+<a name="490180456"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490180456" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490180456">(Dec 20 2024 at 15:14)</a>:</h4>
+<p>Could you please run this for me?</p>
+<p><code>curl http://localhost:8080/api/admin/index/status</code></p>
+
+
+
+<a name="490180514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490180514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490180514">(Dec 20 2024 at 15:14)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>[root@dataverse-test rocky]# curl http://localhost:8080/api/admin/index/status
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Index Status Batch Job initiated, check log for job status.&quot;}}
+</code></pre></div>
+
+
+
+<a name="490180858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490180858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490180858">(Dec 20 2024 at 15:16)</a>:</h4>
+<p>Great. Now can you please look at server.log? You should see output that looks something like this:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt;   Beginning indexStatus()|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.856+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722856;_LevelValue=800;|
+dev_dataverse&gt;   checking for stale or missing dataverses|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.868+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722868;_LevelValue=800;|
+dev_dataverse&gt;   checking for stale or missing datasets|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.870+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722870;_LevelValue=800;|
+dev_dataverse&gt;   completed check for stale or missing content.|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.870+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722870;_LevelValue=800;|
+dev_dataverse&gt;   checking for dataverses in Solr only|#]
+dev_dataverse&gt;
+dev_solr&gt; 2024-12-20 15:15:22.875 INFO  (qtp1331270134-57) [c: s: r: x:collection1 t:null-5] o.a.s.c.S.Request webapp=/solr path=/select params={q=*&amp;cursorMark=*&amp;sort=id+asc&amp;fq=dvObjectType:dataverses&amp;rows=100&amp;wt=javabin&amp;version=2} hits=0 status=0 QTime=2
+dev_dataverse&gt; [#|2024-12-20T15:15:22.878+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722878;_LevelValue=800;|
+dev_dataverse&gt;   checking for datasets in Solr only|#]
+dev_dataverse&gt;
+dev_solr&gt; 2024-12-20 15:15:22.882 INFO  (qtp1331270134-28) [c: s: r: x:collection1 t:null-6] o.a.s.c.S.Request webapp=/solr path=/select params={q=*&amp;cursorMark=*&amp;sort=id+asc&amp;fq=dvObjectType:datasets&amp;rows=100&amp;wt=javabin&amp;version=2} hits=0 status=0 QTime=1
+dev_dataverse&gt; [#|2024-12-20T15:15:22.883+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722883;_LevelValue=800;|
+dev_dataverse&gt;   checking for files in Solr only|#]
+dev_dataverse&gt;
+dev_solr&gt; 2024-12-20 15:15:22.884 INFO  (qtp1331270134-56) [c: s: r: x:collection1 t:null-7] o.a.s.c.S.Request webapp=/solr path=/select params={q=*&amp;cursorMark=*&amp;sort=id+asc&amp;fq=dvObjectType:files&amp;rows=100&amp;wt=javabin&amp;version=2} hits=0 status=0 QTime=0
+dev_dataverse&gt; [#|2024-12-20T15:15:22.885+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722885;_LevelValue=800;|
+dev_dataverse&gt;   completed check for content in Solr but not database|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.886+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722886;_LevelValue=800;|
+dev_dataverse&gt;   Checking for solr-only permissions|#]
+dev_dataverse&gt;
+dev_solr&gt; 2024-12-20 15:15:22.887 INFO  (qtp1331270134-57) [c: s: r: x:collection1 t:null-8] o.a.s.c.S.Request webapp=/solr path=/select params={q=definitionPointDvObjectId:*&amp;cursorMark=*&amp;sort=id+asc&amp;rows=1000&amp;wt=javabin&amp;version=2} hits=0 status=0 QTime=0
+dev_dataverse&gt; [#|2024-12-20T15:15:22.888+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722888;_LevelValue=800;|
+dev_dataverse&gt;   checking for permissions in database but stale or missing from Solr|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.890+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722890;_LevelValue=800;|
+dev_dataverse&gt;   completed checking for permissions in database but stale or missing from Solr|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.890+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722890;_LevelValue=800;|
+dev_dataverse&gt;   contentInDatabaseButStaleInOrMissingFromIndex: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[]}|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.890+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722890;_LevelValue=800;|
+dev_dataverse&gt;   contentInIndexButNotDatabase: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[],&quot;files&quot;:[]}|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.891+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722891;_LevelValue=800;|
+dev_dataverse&gt;   permissionsInDatabaseButStaleInOrMissingFromIndex: {&quot;dvobjects&quot;:[]}|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2024-12-20T15:15:22.891+0000|INFO|Payara 6.2024.6|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=493;_ThreadName=__ejb-thread-pool6;_TimeMillis=1734707722891;_LevelValue=800;|
+dev_dataverse&gt;   permissionsInIndexButNotDatabase: {&quot;permissions&quot;:[]}|#]
+dev_dataverse&gt;
+</code></pre></div>
+
+
+
+<a name="490181058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181058">(Dec 20 2024 at 15:17)</a>:</h4>
+<p><a href="/user_uploads/53090/9BQuZEjcjfuA9l1CrbhPvZOz/partial.log">partial.log</a></p>
+
+
+
+<a name="490181561"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181561" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181561">(Dec 20 2024 at 15:20)</a>:</h4>
+<p><a href="/user_uploads/53090/MXLZIMhKaqbzEvquN-ZEpyS2/server.log">server.log</a></p>
+
+
+
+<a name="490181598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181598">(Dec 20 2024 at 15:20)</a>:</h4>
+<p>Thanks. It's interesting. It's claiming that all the datasets in your database are in your Solr index:</p>
+<p><code>contentInDatabaseButStaleInOrMissingFromIndex: {"dataverses":[],"datasets":[]}</code></p>
+
+
+
+<a name="490181621"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181621" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181621">(Dec 20 2024 at 15:20)</a>:</h4>
+<p>full log the second I need to head out sorry I will get back to you later. <br>
+Thanks a lot!</p>
+
+
+
+<a name="490181726"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181726" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181726">(Dec 20 2024 at 15:21)</a>:</h4>
+<p>No worries. Next I would see what you can see from the API: <a href="http://localhost:8080/api/search?q=*">http://localhost:8080/api/search?q=*</a></p>
+
+
+
+<a name="490181812"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181812" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181812">(Dec 20 2024 at 15:21)</a>:</h4>
+<p>Or even <a href="http://localhost:8080/api/search?q=*&amp;per_page=1000">http://localhost:8080/api/search?q=*&amp;per_page=1000</a> (1000 is the max)</p>
+
+
+
+<a name="490181924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490181924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490181924">(Dec 20 2024 at 15:22)</a>:</h4>
+<p>That is, can you see more datasets etc from the Search API than you can see from the web interface? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="490479292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490479292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490479292">(Dec 23 2024 at 08:59)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>curl  http://localhost:8080/api/search?q=*
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;q&quot;:&quot;*&quot;,&quot;total_count&quot;:83,&quot;start&quot;:0,&quot;spelling_alternatives&quot;:{},&quot;items&quot;:[{&quot;name&quot;:&quot;flgomezc Sandbox Dataverse&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/flgomezcsandbox&quot;,&quot;identifier&quot;:&quot;flgomezcsandbox&quot;,&quot;description&quot;:&quot;This dataverse is created with testing purposes&quot;,&quot;published_at&quot;:&quot;2024-09-10T13:59:55Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;Simon Carroll Dataverse&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/test1&quot;,&quot;identifier&quot;:&quot;test1&quot;,&quot;published_at&quot;:&quot;2024-09-10T08:04:42Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;Dataverse Admin Dataverse&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/subverse&quot;,&quot;identifier&quot;:&quot;subverse&quot;,&quot;published_at&quot;:&quot;2024-09-10T08:05:38Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;Dataverse.org&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;Life Sciences&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/lifesciences&quot;,&quot;identifier&quot;:&quot;lifesciences&quot;,&quot;description&quot;:&quot;Computational Biology Life Sciences Group Dataverse&quot;,&quot;published_at&quot;:&quot;2024-11-05T12:04:33Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;cyCLONE&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/cyclone&quot;,&quot;identifier&quot;:&quot;cyclone&quot;,&quot;description&quot;:&quot;cyCLONE: CLimate change impacts on the Onset of diseases and Eco-anxiety in Catalonia Climate change is long known to have an impact on different aspects of human health. CLIMATICAT addresses the impacts of climate on the health of the Catalan population, focusing on mental health. We address this topic by integrating different kinds of data: temperature, air pollution, geographic movement, and health (diagnoses, exacerbations, deaths). Our analyses will lead to the identification of which groups of individuals are most vulnerable to climate change impacts, including anxiety caused by climate change existential threats (an estimation of the prevalence of eco-anxiety will be made), what diseases are the most expected to co-occur with mental health diseases, and how likely these co-occurring diseases are to be exacerbated by climate change events. All the results and data used in the analyses will be available through an interactive dashboard.&quot;,&quot;published_at&quot;:&quot;2024-11-05T12:05:01Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC&quot;,&quot;parentDataverseName&quot;:&quot;Life Sciences&quot;,&quot;parentDataverseIdentifier&quot;:&quot;lifesciences&quot;},{&quot;name&quot;:&quot;Computational Social Sciences &amp; Humanities&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/CSSH&quot;,&quot;image_url&quot;:&quot;https://dataverse-test.bsc.es/api/access/dvCardImage/344&quot;,&quot;identifier&quot;:&quot;CSSH&quot;,&quot;description&quot;:&quot;The BSC&#39;s newly created Computational Social Sciences programme a pioneering initiative in an European supercomputing centre, works to find new applications of data and supercomputing in social science research, including the fields of economics, political science, sociology, anthropology, geography, psychology and cognitive science, and in the digital humanities (an area of research where computing and the humanities converge, applied to fields such as history, literature, linguistics, archaeology and cultural heritage).&quot;,&quot;published_at&quot;:&quot;2024-11-05T12:21:31Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;Earth Sciences&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/earth_sciences&quot;,&quot;identifier&quot;:&quot;earth_sciences&quot;,&quot;description&quot;:&quot;Collection for the Earth Sciences department&quot;,&quot;published_at&quot;:&quot;2024-11-19T10:54:15Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;UncertAIR &quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/uncertair&quot;,&quot;identifier&quot;:&quot;uncertair&quot;,&quot;published_at&quot;:&quot;2024-11-21T14:59:16Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;BSC &quot;,&quot;parentDataverseName&quot;:&quot;Earth Sciences&quot;,&quot;parentDataverseIdentifier&quot;:&quot;earth_sciences&quot;},{&quot;name&quot;:&quot;AJC-Dataverse&quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/ajc-dv&quot;,&quot;image_url&quot;:&quot;https://dataverse-test.bsc.es/api/access/dvCardImage/396&quot;,&quot;identifier&quot;:&quot;ajc-dv&quot;,&quot;description&quot;:&quot;Lorem ipsum odor amet, consectetuer adipiscing elit. Porttitor quam curae mauris fames leo phasellus curae. Semper potenti ad feugiat primis montes dictumst augue magna. Pulvinar dolor eleifend ullamcorper adipiscing fringilla eu orci. Pellentesque praesent auctor netus sodales ultrices elit enim eget. Maximus nisi maecenas; duis amet ligula vel mattis. Est potenti cursus ac a sociosqu. Natoque hendrerit suspendisse ex cursus etiam dictumst. Conubia placerat ultrices fames lobortis nibh. Lorem nibh aptent tincidunt maecenas sed. Proin morbi viverra ullamcorper purus dui vitae risus. Urna consequat sagittis risus litora lacinia proin. Malesuada dui dictum vitae viverra est bibendum. Primis posuere curabitur duis auctor sociosqu platea porttitor leo suscipit. Pharetra iaculis senectus himenaeos aenean luctus ultrices. Risus malesuada non nisl praesent egestas nisl. Nibh per phasellus rutrum, suscipit duis mi? Velit congue nam montes elit cras venenatis sapien.&quot;,&quot;published_at&quot;:&quot;2024-11-21T10:34:38Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;Barcelona Supercomputing Center&quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;},{&quot;name&quot;:&quot;Paula Checchia Adell Dataverse TEST &quot;,&quot;type&quot;:&quot;dataverse&quot;,&quot;url&quot;:&quot;https://dataverse-test.bsc.es/dataverse/test_paula&quot;,&quot;identifier&quot;:&quot;test_paula&quot;,&quot;published_at&quot;:&quot;2024-11-21T10:59:11Z&quot;,&quot;publicationStatuses&quot;:[&quot;Published&quot;],&quot;affiliation&quot;:&quot;Barcelona Supercomputing Center &quot;,&quot;parentDataverseName&quot;:&quot;BSC&quot;,&quot;parentDataverseIdentifier&quot;:&quot;BSC&quot;}],&quot;count_in_response&quot;:10}}
+</code></pre></div>
+
+
+
+<a name="490479378"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490479378" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490479378">(Dec 23 2024 at 09:00)</a>:</h4>
+<p><a href="/user_uploads/53090/VK3bneC95kKE1c5g2VX0ny00/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/VK3bneC95kKE1c5g2VX0ny00/image.png" title="image.png"><img data-original-dimensions="513x270" src="/user_uploads/thumbnail/53090/VK3bneC95kKE1c5g2VX0ny00/image.png/840x560.webp"></a></div>
+
+
+
+<a name="490479455"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/490479455" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#490479455">(Dec 23 2024 at 09:00)</a>:</h4>
+<p>Im quite sure we are seeing less with the API if I am understanding well.</p>
+
+
+
+<a name="492295218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492295218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492295218">(Jan 07 2025 at 11:53)</a>:</h4>
+<p>Good morning! Merry Christmas and happy new year ! </p>
+<p>I am checking in what will be our production instance, and I am seeing the same, <br>
+<a href="/user_uploads/53090/W5vZu0k7LHJEQ56uKOZGRu1m/image.png">image.png</a><br>
+0 datasets but here in the admin panel :</p>
+<div class="message_inline_image"><a href="/user_uploads/53090/W5vZu0k7LHJEQ56uKOZGRu1m/image.png" title="image.png"><img data-original-dimensions="1366x922" src="/user_uploads/thumbnail/53090/W5vZu0k7LHJEQ56uKOZGRu1m/image.png/840x560.webp"></a></div>
+
+
+
+<a name="492295241"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492295241" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492295241">(Jan 07 2025 at 11:53)</a>:</h4>
+<p><a href="/user_uploads/53090/yLN8yB3TP5M5x35UC2P4rE9u/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/yLN8yB3TP5M5x35UC2P4rE9u/image.png" title="image.png"><img data-original-dimensions="552x290" src="/user_uploads/thumbnail/53090/yLN8yB3TP5M5x35UC2P4rE9u/image.png/840x560.webp"></a></div>
+
+
+
+<a name="492295341"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492295341" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492295341">(Jan 07 2025 at 11:53)</a>:</h4>
+<p>Could we be missing somethin fundemental <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="492300939"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492300939" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492300939">(Jan 07 2025 at 12:33)</a>:</h4>
+<p>Strange, If we restart solr everything indexes correctly</p>
+
+
+
+<a name="492522945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492522945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492522945">(Jan 08 2025 at 15:01)</a>:</h4>
+<p>Happy New Year! Restarting Solr fixed it?!? <span aria-label="mind blown" class="emoji emoji-1f92f" role="img" title="mind blown">:mind_blown:</span></p>
+
+
+
+<a name="492526560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492526560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492526560">(Jan 08 2025 at 15:21)</a>:</h4>
+<p>It clears the backlog but new entries are not indexed until it is restarted.</p>
+
+
+
+<a name="492526873"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492526873" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492526873">(Jan 08 2025 at 15:22)</a>:</h4>
+<p>We're seeing something similar in both our instances. I wonder if it relates the upgrade process seeing as the pod configuration is completely different</p>
+
+
+
+<a name="492527432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492527432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492527432">(Jan 08 2025 at 15:25)</a>:</h4>
+<p>Oh, I was hoping it's fixed. Drat. Sounds like progress toward understanding the problem, at least. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="492674477"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492674477" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492674477">(Jan 09 2025 at 09:34)</a>:</h4>
+<p>Any ideas how we can debug it a bit ? <br>
+<a href="/user_uploads/53090/H1u0BCiNwAEryqeghbDXJjBZ/solr.log">solr.log</a><br>
+Here is the solr log during and imediatly after uploading a dataset.</p>
+
+
+
+<a name="492675062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492675062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492675062">(Jan 09 2025 at 09:37)</a>:</h4>
+<p><a href="/user_uploads/53090/I2SsHM7N2JrFfTNblgweHP41/solr-restart.log">solr-restart.log</a><br>
+and here is the restart which indeed means the dataset is now visible in the service</p>
+
+
+
+<a name="492714187"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492714187" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492714187">(Jan 09 2025 at 12:51)</a>:</h4>
+<p>I'm really not sure. How would I reproduce the problem on my laptop?</p>
+
+
+
+<a name="492730154"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492730154" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492730154">(Jan 09 2025 at 14:03)</a>:</h4>
+<p>I guess it is difficult. I suppose the issue is coming from the upgrade as it was working well before. Could it help to provide the jvm options ? I suppose we have the same solr version </p>
+<div class="codehilite"><pre><span></span><code>[rocky@dataverse-test ~]$ curl http://localhost:8983/solr/admin/info/system?wt=json
+{
+  &quot;responseHeader&quot;:{
+    &quot;status&quot;:0,
+    &quot;QTime&quot;:47
+  },
+  &quot;mode&quot;:&quot;std&quot;,
+  &quot;solr_home&quot;:&quot;/usr/local/solr/server/solr&quot;,
+  &quot;core_root&quot;:&quot;/usr/local/solr/server/solr&quot;,
+  &quot;lucene&quot;:{
+    &quot;solr-spec-version&quot;:&quot;9.3.0&quot;,
+    &quot;solr-impl-version&quot;:&quot;9.3.0 de33f50ce79ec1d156faf204553012037e2bc1cb - houston - 2023-07-17 17:13:17&quot;,
+    &quot;lucene-spec-version&quot;:&quot;9.7.0&quot;,
+    &quot;lucene-impl-version&quot;:&quot;9.7.0 ccf4b198ec328095d45d2746189dc8ca633e8bcf - 2023-06-21 11:48:16&quot;
+  },
+</code></pre></div>
+
+
+
+<a name="492730299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492730299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492730299">(Jan 09 2025 at 14:04)</a>:</h4>
+<p>initially we deployed 6.2 via the ansible <a href="https://github.com/gdcc/dataverse-ansible">https://github.com/gdcc/dataverse-ansible</a> and worked our way up</p>
+
+
+
+<a name="492771131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492771131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492771131">(Jan 09 2025 at 17:02)</a>:</h4>
+<p>Ansible. So this is a "classic" installation? Not Docker?</p>
+
+
+
+<a name="492782056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492782056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492782056">(Jan 09 2025 at 17:51)</a>:</h4>
+<p>Yes! Exactly. We have a test and prod enviroment installed with ansible. </p>
+<div class="codehilite"><pre><span></span><code>&quot;[rocky@dataverse-test ~]$ /usr/local/solr/bin/solr -v
+9.3.0
+[rocky@dataverse-test ~]$ /usr/local/payara6/bin/asadmin version
+Picked up JAVA_TOOL_OPTIONS: -Djdk.util.zip.disableZip64ExtraFieldValidation=true --add-opens=java.base/java.io=ALL-UNNAMED
+Version = Payara Server 6.2023.8 #badassfish (build 920)
+Command version executed successfully.
+[rocky@dataverse-test ~]$ psql --version
+psql (PostgreSQL) 13.16
+[rocky@dataverse-test ~]$ httpd -v
+Server version: Apache/2.4.37 (Rocky Linux)
+Server built:   Aug 12 2024 08:13:30
+[rocky@dataverse-test ~]$
+&quot;
+</code></pre></div>
+
+
+
+<a name="492782425"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492782425" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492782425">(Jan 09 2025 at 17:53)</a>:</h4>
+<p>You started on Dataverse 6.2, you said. What version are you on now?</p>
+
+
+
+<a name="492810884"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492810884" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492810884">(Jan 09 2025 at 20:20)</a>:</h4>
+<p>6.5</p>
+
+
+
+<a name="492812162"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492812162" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492812162">(Jan 09 2025 at 20:28)</a>:</h4>
+<p>Thanks. You started this thread on Dec 17 and 6.5 was <a href="https://github.com/IQSS/dataverse/releases/tag/v6.5">released</a> on Dec 12. Did you start seeing this problem on 6.5? 6.4? 6.3?</p>
+
+
+
+<a name="492813937"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492813937" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492813937">(Jan 09 2025 at 20:39)</a>:</h4>
+<p>Dec 17 we were running 6.4 Im quite sure the dataset indexing was working.</p>
+
+
+
+<a name="492814129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492814129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492814129">(Jan 09 2025 at 20:40)</a>:</h4>
+<p>We thought maybe <a href="https://github.com/IQSS/dataverse/issues/11069">https://github.com/IQSS/dataverse/issues/11069</a> was stopping our permalink from working so we moved to 6.5</p>
+
+
+
+<a name="492814705"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492814705" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492814705">(Jan 09 2025 at 20:44)</a>:</h4>
+<p>Gotcha. Well, there's no harm in upgrading to 6.5.</p>
+
+
+
+<a name="492814899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492814899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492814899">(Jan 09 2025 at 20:45)</a>:</h4>
+<p>Do you want to go ahead and open an issue at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> ?</p>
+
+
+
+<a name="492815235"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492815235" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492815235">(Jan 09 2025 at 20:47)</a>:</h4>
+<p>Sure tomorrow ill try to to write it up. Thanks!</p>
+
+
+
+<a name="492815966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492815966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492815966">(Jan 09 2025 at 20:51)</a>:</h4>
+<p>Thanks. At least it will help us track it.</p>
+
+
+
+<a name="492815996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492815996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492815996">(Jan 09 2025 at 20:51)</a>:</h4>
+<p>Did you try completely reinstalling Solr?</p>
+
+
+
+<a name="492903302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492903302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492903302">(Jan 10 2025 at 08:53)</a>:</h4>
+<p>I just tried it  </p>
+<div class="codehilite"><pre><span></span><code>rocky@dataverse-test ~]$ curl http://localhost:8080/api/admin/index/status
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Index Status Batch Job initiated, check log for job status.&quot;}}[rocky@dataverse-test ~]$
+[rocky@dataverse-test ~]$ curl http://localhost:8080/api/admin/index/clear-orphans
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Clear Orphans Batch Job initiated, check log for job status.&quot;}}[rocky@dataverse-test ~]$
+[rocky@dataverse-test ~]$ curl http://localhost:8080/api/admin/index/clear
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;numRowsClearedByClearAllIndexTimes&quot;:238,&quot;message&quot;:&quot;Solr index and database index timestamps cleared.&quot;}}[rocky@dataverse-test ~]$
+[rocky@dataverse-test ~]$ curl http://localhost:8080/api/admin/index
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;availablePartitionIds&quot;:[0],&quot;args&quot;:{&quot;numPartitions&quot;:1,&quot;partitionIdToProcess&quot;:0},&quot;message&quot;:&quot;indexAllOrSubset has begun of 43 dataverses and 67 datasets.&quot;}}
+</code></pre></div>
+<p>after running that it is still required to restart solr to see the new records <span aria-label="mind blown" class="emoji emoji-1f92f" role="img" title="mind blown">:mind_blown:</span></p>
+
+
+
+<a name="492906999"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492906999" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492906999">(Jan 10 2025 at 09:14)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/11146">https://github.com/IQSS/dataverse/issues/11146</a> done!</p>
+
+
+
+<a name="492929323"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492929323" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492929323">(Jan 10 2025 at 11:23)</a>:</h4>
+<p>Thanks for opening that issue.</p>
+
+
+
+<a name="492929568"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492929568" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492929568">(Jan 10 2025 at 11:25)</a>:</h4>
+<p>And sorry, when I mean completely reinstalling Solr I mean stopping it, doing a <code>rm -rf</code> of the Solr directory (or move it aside), and then install fresh according to <a href="https://guides.dataverse.org/en/6.5/installation/prerequisites.html#installing-solr">https://guides.dataverse.org/en/6.5/installation/prerequisites.html#installing-solr</a></p>
+
+
+
+<a name="492935300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492935300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492935300">(Jan 10 2025 at 11:59)</a>:</h4>
+<p>Hey yes. I'll update the issue. I moved it aside and did a comprehensive reinstall.</p>
+
+
+
+<a name="492963858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492963858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492963858">(Jan 10 2025 at 14:39)</a>:</h4>
+<p>And the problem is still there. D'oh! <img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"></p>
+
+
+
+<a name="492964959"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492964959" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492964959">(Jan 10 2025 at 14:45)</a>:</h4>
+<p>Yes. I am trying to think what the restart of solr can trigger that is not triggered in the data set creation flow.</p>
+
+
+
+<a name="492965306"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965306" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965306">(Jan 10 2025 at 14:47)</a>:</h4>
+<p>You wrote "deploy 6.2 viable ansible and upgrade ? I think this will be hard to reproduce easily."</p>
+
+
+
+<a name="492965394"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965394" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965394">(Jan 10 2025 at 14:47)</a>:</h4>
+<p>I imagine a number of installations deployed initially with Ansible. It's very popular.</p>
+
+
+
+<a name="492965431"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965431" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965431">(Jan 10 2025 at 14:48)</a>:</h4>
+<p>Maybe not so many with 6.2 specifically.</p>
+
+
+
+<a name="492965600"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965600" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965600">(Jan 10 2025 at 14:48)</a>:</h4>
+<p>Sure, do you know of many installations already using 6.4/5 ?</p>
+
+
+
+<a name="492965669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965669">(Jan 10 2025 at 14:49)</a>:</h4>
+<p>We're running 6.5 at <a href="https://dataverse.harvard.edu">https://dataverse.harvard.edu</a></p>
+
+
+
+<a name="492965734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965734">(Jan 10 2025 at 14:49)</a>:</h4>
+<p>and I guess you have upgraded in, more or less, the same way</p>
+
+
+
+<a name="492965764"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965764" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965764">(Jan 10 2025 at 14:49)</a>:</h4>
+<p><a href="https://dataverse.org/metrics">https://dataverse.org/metrics</a> shows three on 6.5</p>
+
+
+
+<a name="492965917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492965917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492965917">(Jan 10 2025 at 14:50)</a>:</h4>
+<p>Yes, I imagine the upgrade was similar.</p>
+
+
+
+<a name="492966011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966011">(Jan 10 2025 at 14:50)</a>:</h4>
+<p>We still have "perma" in this Zulip topic. Do we suspect it might be related to the perma PID provider? We don't use the perma provider for Harvard Dataverse.</p>
+
+
+
+<a name="492966419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966419">(Jan 10 2025 at 14:53)</a>:</h4>
+<p>I'm just trying to think of what could be different in your setup.</p>
+
+
+
+<a name="492966659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966659">(Jan 10 2025 at 14:54)</a>:</h4>
+<p>yes maybe indexing problem is better</p>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin ☃️</span> <a href="#narrow/channel/378866-troubleshooting/topic/Custom.20.E2.80.9CPerma.E2.80.9D.20PID.20Setup.20.26.20Indexing.20Problem/near/492966011">said</a>:</p>
+<blockquote>
+<p>We still have "perma" in this Zulip topic. Do we suspect it might be related to the perma PID provider? We don't use the perma provider for Harvard Dataverse.</p>
+</blockquote>
+
+
+
+<a name="492966686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966686">(Jan 10 2025 at 14:54)</a>:</h4>
+<p>although, the it indexes fine if your restart solr</p>
+
+
+
+<a name="492966750"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966750" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966750">(Jan 10 2025 at 14:54)</a>:</h4>
+<p>Good idea. I renamed it to "indexing problem". Thanks.</p>
+
+
+
+<a name="492966929"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492966929" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492966929">(Jan 10 2025 at 14:55)</a>:</h4>
+<p>After you restart Solr, do you have to manually reindex the dataset for it to be visible in the GUI?</p>
+
+
+
+<a name="492967213"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492967213" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492967213">(Jan 10 2025 at 14:57)</a>:</h4>
+<p>nope not required</p>
+
+
+
+<a name="492967755"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492967755" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492967755">(Jan 10 2025 at 15:00)</a>:</h4>
+<p>Hmm, well, these days there is a delay when you create a dataset before it's indexed. But it should only be a delay of maybe 5 seconds? 10? Have you tried simply waiting a bit and then refreshing the page?</p>
+<p>This change was introduced in 6.3: IQSS/10559-2 Drop COMMIT_WITHIN which breaks autoSoftCommit by maxTime in solrconfig <a href="https://github.com/IQSS/dataverse/issues/10654">#10654</a></p>
+
+
+
+<a name="492967885"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492967885" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492967885">(Jan 10 2025 at 15:01)</a>:</h4>
+<p>And this PR: Solr: Try Soft Commit on Indexing <a href="https://github.com/IQSS/dataverse/issues/10547">#10547</a></p>
+
+
+
+<a name="492968187"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492968187" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492968187">(Jan 10 2025 at 15:02)</a>:</h4>
+<p>yes indeed we were testing for some days without seeing anything in the gui until we restarted solr <span aria-label="hurt" class="emoji emoji-1f915" role="img" title="hurt">:hurt:</span></p>
+
+
+
+<a name="492968540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492968540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492968540">(Jan 10 2025 at 15:04)</a>:</h4>
+<p>Maybe we should ask on the Solr mailing list. Do you think it could be a problem with Solr?</p>
+
+
+
+<a name="492968613"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492968613" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492968613">(Jan 10 2025 at 15:04)</a>:</h4>
+<p>What if we have you push some data into Solr outside of Dataverse. With curl or whatever?</p>
+
+
+
+<a name="492968685"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492968685" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492968685">(Jan 10 2025 at 15:05)</a>:</h4>
+<p>To see if it shows up right away or not.</p>
+
+
+
+<a name="492970160"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492970160" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492970160">(Jan 10 2025 at 15:13)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin ☃️</span> <a href="#narrow/channel/378866-troubleshooting/topic/indexing.20problem/near/492968613">said</a>:</p>
+<blockquote>
+<p>What if we have you push some data into Solr outside of Dataverse. With curl or whatever?</p>
+</blockquote>
+<p>good idea</p>
+
+
+
+<a name="492970188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492970188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492970188">(Jan 10 2025 at 15:13)</a>:</h4>
+<p>Do you need help with this?</p>
+
+
+
+<a name="492970224"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492970224" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492970224">(Jan 10 2025 at 15:13)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>2025-01-10 15:09:49.733 INFO  (searcherExecutor-12-thread-1-processing-collection1) [ x:collection1] o.a.s.c.SolrCore Registered new searcher autowarm time: 0 ms
+2025-01-10 15:10:15.291 INFO  (qtp240630125-27) [ x:collection1] o.a.s.c.S.Request webapp=/solr path=/select params={facet.field=dvObjectType&amp;facet.field=metadata_type_ss&amp;facet.field=datasetType&amp;facet.field=dvCategory&amp;facet.field=metadataSource&amp;facet.field=publicationDate&amp;facet.field=publicationStatus&amp;facet.field=license&amp;facet.field=authorName_ss&amp;facet.field=subject_ss&amp;facet.field=keywordValue_ss&amp;facet.field=dateOfDeposit_s&amp;facet.field=fileTypeGroupFacet&amp;facet.field=fileTag&amp;facet.field=fileAccess&amp;qt=/select&amp;hl=true&amp;fl=*,score&amp;start=0&amp;sort=dateSort+desc&amp;fq=dvObjectType:(dataverses+OR+datasets)&amp;rows=10&amp;version=2&amp;hl.simple.pre=&lt;span+class%3D&quot;search-term-match&quot;&gt;&amp;facet.query=*&amp;hl.snippets=1&amp;q=*&amp;hl.simple.post=&lt;/span&gt;&amp;hl.fl=dateOfCollectionStart&amp;hl.fl=software&amp;hl.fl=resolution.Temporal&amp;hl.fl=responseRate&amp;hl.fl=distributionDate&amp;hl.fl=geographicBoundingBox&amp;hl.fl=coverage.Redshift.MaximumValue&amp;hl.fl=contributorName&amp;hl.fl=affiliation_ss&amp;hl.fl=datasetContactName&amp;hl.fl=studyAssayOtherPlatform&amp;hl.fl=dsDescriptionDate&amp;hl.fl=coverage.Temporal&amp;hl.fl=socialScienceNotesText&amp;hl.fl=datasetContactAffiliation&amp;hl.fl=journalArticleType&amp;hl.fl=producerLogoURL&amp;hl.fl=datasetLevelErrorNotes&amp;hl.fl=state&amp;hl.fl=timePeriodCoveredStart&amp;hl.fl=otherIdValue&amp;hl.fl=dateOfCollectionEnd&amp;hl.fl=studyAssayOrganism&amp;hl.fl=socialScienceNotesType&amp;hl.fl=publicationIDType&amp;hl.fl=seriesName&amp;hl.fl=alternativeURL&amp;hl.fl=coverage.Spectral.Bandpass&amp;hl.fl=fileTypeDisplay&amp;hl.fl=producerURL&amp;hl.fl=authorAffiliation&amp;hl.fl=astroType&amp;hl.fl=redshiftType&amp;hl.fl=astroFacility&amp;hl.fl=producerAffiliation&amp;hl.fl=coverage.Depth&amp;hl.fl=authorName&amp;hl.fl=subtitle&amp;hl.fl=timeMethod&amp;hl.fl=depositor&amp;hl.fl=otherDataAppraisal&amp;hl.fl=authorIdentifierScheme&amp;hl.fl=coverage.Spectral.Wavelength&amp;hl.fl=softwareVersion&amp;hl.fl=coverage.SkyFraction&amp;hl.fl=actionsToMinimizeLoss&amp;hl.fl=city&amp;hl.fl=dsDescriptionValue&amp;hl.fl=characteristicOfSources&amp;hl.fl=coverage.Temporal.StopTime&amp;hl.fl=studyAssayOtherOrganism&amp;hl.fl=alternativeTitle&amp;hl.fl=topicClassVocabURI&amp;hl.fl=journalVolumeIssue&amp;hl.fl=distributorURL&amp;hl.fl=literalQuestion&amp;hl.fl=distributorName&amp;hl.fl=coverage.Spatial&amp;hl.fl=journalPubDate&amp;hl.fl=distributorAffiliation&amp;hl.fl=fileNameWithoutExtension&amp;hl.fl=topicClassVocab&amp;hl.fl=journalVolume&amp;hl.fl=topicClassValue&amp;hl.fl=distributorAbbreviation&amp;hl.fl=publicationRelationType&amp;hl.fl=originOfSources&amp;hl.fl=resolution.Spectral&amp;hl.fl=variableNotes&amp;hl.fl=westLongitude&amp;hl.fl=coverage.Polarization&amp;hl.fl=studyFactorType&amp;hl.fl=coverage.Spectral.CentralWavelength&amp;hl.fl=keywordTermURI&amp;hl.fl=dsPersistentId&amp;hl.fl=distributor&amp;hl.fl=dsPublicationDate&amp;hl.fl=topicClassification&amp;hl.fl=studyOtherDesignType&amp;hl.fl=series&amp;hl.fl=dsDescription&amp;hl.fl=dateOfDeposit&amp;hl.fl=coverage.Temporal.StartTime&amp;hl.fl=frequencyOfDataCollection&amp;hl.fl=socialScienceNotes&amp;hl.fl=astroObject&amp;hl.fl=coverage.Spectral.MinimumWavelength&amp;hl.fl=variableLabel&amp;hl.fl=timePeriodCovered&amp;hl.fl=studyAssayOtherTechnologyType&amp;hl.fl=country&amp;hl.fl=studyAssayPlatform&amp;hl.fl=subject&amp;hl.fl=studyAssayOtherMeasurmentType&amp;hl.fl=interviewInstructions&amp;hl.fl=accessToSources&amp;hl.fl=language&amp;hl.fl=controlOperations&amp;hl.fl=samplingProcedure&amp;hl.fl=keywordVocabulary&amp;hl.fl=coverage.ObjectCount&amp;hl.fl=otherReferences&amp;hl.fl=coverage.Redshift.MinimumValue&amp;hl.fl=eastLongitude&amp;hl.fl=producerAbbreviation&amp;hl.fl=publication&amp;hl.fl=unitOfAnalysis&amp;hl.fl=postQuestion&amp;hl.fl=keyword&amp;hl.fl=fileTags&amp;hl.fl=dataSources&amp;hl.fl=distributorLogoURL&amp;hl.fl=relatedMaterial&amp;hl.fl=filePersistentId&amp;hl.fl=variableUniverse&amp;hl.fl=otherIdAgency&amp;hl.fl=author&amp;hl.fl=targetSampleActualSize&amp;hl.fl=journalIssue&amp;hl.fl=publicationIDNumber&amp;hl.fl=coverage.ObjectDensity&amp;hl.fl=publicationCitation&amp;hl.fl=dataCollector&amp;hl.fl=productionPlace&amp;hl.fl=weighting&amp;hl.fl=softwareName&amp;hl.fl=grantNumberAgency&amp;hl.fl=name&amp;hl.fl=producer&amp;hl.fl=contributorType&amp;hl.fl=notesText&amp;hl.fl=publicationURL&amp;hl.fl=studyDesignType&amp;hl.fl=keywordValue&amp;hl.fl=geographicCoverage&amp;hl.fl=description&amp;hl.fl=resolution.Spatial&amp;hl.fl=title&amp;hl.fl=keywordVocabularyURI&amp;hl.fl=studyOtherFactorType&amp;hl.fl=productionDate&amp;hl.fl=contributor&amp;hl.fl=otherGeographicCoverage&amp;hl.fl=northLatitude&amp;hl.fl=collectorTraining&amp;hl.fl=kindOfData&amp;hl.fl=studyAssayCellType&amp;hl.fl=coverage.RedshiftValue&amp;hl.fl=timePeriodCoveredEnd&amp;hl.fl=southLatitude&amp;hl.fl=socialScienceNotesSubject&amp;hl.fl=variableName&amp;hl.fl=dataCollectionSituation&amp;hl.fl=otherId&amp;hl.fl=dateOfCollection&amp;hl.fl=collectionMode&amp;hl.fl=studyAssayTechnologyType&amp;hl.fl=deviationsFromSampleDesign&amp;hl.fl=producerName&amp;hl.fl=targetSampleSizeFormula&amp;hl.fl=coverage.Spectral.MaximumWavelength&amp;hl.fl=authorIdentifier&amp;hl.fl=relatedDatasets&amp;hl.fl=datasetContact&amp;hl.fl=researchInstrument&amp;hl.fl=samplingErrorEstimates&amp;hl.fl=astroInstrument&amp;hl.fl=seriesInformation&amp;hl.fl=datasetContactEmail&amp;hl.fl=studyAssayMeasurementType&amp;hl.fl=targetSampleSize&amp;hl.fl=geographicUnit&amp;hl.fl=universe&amp;hl.fl=resolution.Redshift&amp;hl.fl=grantNumberValue&amp;hl.fl=grantNumber&amp;hl.fl=cleaningOperations&amp;hl.fl=fileType&amp;facet=true&amp;wt=javabin} hits=6 status=0 QTime=181
+2025-01-10 15:10:15.344 INFO  (qtp240630125-19) [ x:collection1] o.a.s.c.S.Request webapp=/solr path=/select params={facet.query=*&amp;q=*&amp;facet.field=dvObjectType&amp;qt=/select&amp;fl=*,score&amp;start=0&amp;fq=dvObjectType:(files)&amp;rows=1&amp;facet=true&amp;wt=javabin&amp;version=2} hits=1 status=0 QTime=9
+</code></pre></div>
+<p>this appears after restart solr. I need to look a bit how solr works.</p>
+
+
+
+<a name="492970788"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492970788" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492970788">(Jan 10 2025 at 15:16)</a>:</h4>
+<p>It's a lot of output but it might be normal. I'm not sure.</p>
+
+
+
+<a name="492972475"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492972475" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492972475">(Jan 10 2025 at 15:25)</a>:</h4>
+<p>Here, please try this:</p>
+<p><code>bin/solr post -commit techproducts example/exampledocs/* -url "http://localhost:8983/solr/collection1/update?commit=true"</code></p>
+
+
+
+<a name="492972616"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492972616" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492972616">(Jan 10 2025 at 15:26)</a>:</h4>
+<p>It's adding Solr docs like this:</p>
+<div class="codehilite"><pre><span></span><code>{
+      &quot;id&quot;:&quot;viewsonic&quot;,
+      &quot;compName_s&quot;:&quot;ViewSonic Corp&quot;,
+      &quot;address_s&quot;:&quot;381 Brea Canyon Road Walnut, CA 91789-0708&quot;,
+      &quot;_version_&quot;:1820876012009816073
+}
+</code></pre></div>
+
+
+
+<a name="492972660"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492972660" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492972660">(Jan 10 2025 at 15:26)</a>:</h4>
+<p>I'm sort of following <a href="https://solr.apache.org/guide/solr/9_6/getting-started/tutorial-techproducts.html">https://solr.apache.org/guide/solr/9_6/getting-started/tutorial-techproducts.html</a></p>
+
+
+
+<a name="492972712"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/492972712" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#492972712">(Jan 10 2025 at 15:26)</a>:</h4>
+<p>-c isn't working but -commit does <span aria-label="shrug" class="emoji emoji-1f937" role="img" title="shrug">:shrug:</span> </p>
+<p>Maybe try it without -c as well.</p>
+
+
+
+<a name="493329070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493329070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493329070">(Jan 13 2025 at 11:43)</a>:</h4>
+<p><a href="/user_uploads/53090/oY50WTl8B-ZOXAE0NtFBXrKu/solrCreate.log">solrCreate.log</a><br>
+Good morning! It seems to work in both a new collection I created and in collection1 of dataverse</p>
+
+
+
+<a name="493329835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493329835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493329835">(Jan 13 2025 at 11:47)</a>:</h4>
+<p><a href="/user_uploads/53090/5k0vaSKayylbbafh2f5tzlbC/solrCreateBinSolr.log">solrCreateBinSolr.log</a><br>
+(in line with your suggested way).</p>
+
+
+
+<a name="493342924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493342924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493342924">(Jan 13 2025 at 12:49)</a>:</h4>
+<p>Great! But what is "it"? Are you talking about <code>bin/solr post -commit techproducts example/exampledocs/* -url "http://localhost:8983/solr/collection1/update?commit=true"</code>?</p>
+
+
+
+<a name="493544944"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493544944" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493544944">(Jan 14 2025 at 09:33)</a>:</h4>
+<p>Well, just to post something and see it in a collection (without having to restart solr). I didn't use the example docks as they dont see to match the scheme for collection1. Does it make sense or have I missed something ?</p>
+
+
+
+<a name="493555731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493555731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493555731">(Jan 14 2025 at 10:38)</a>:</h4>
+<p>I am going to add a solr debug level log just after adding a dataset. I am not able to make sense of it yet but perhaps it helps. <br>
+<a href="/user_uploads/53090/qSnmhz6BA--cC4jKgftFziew/solr_capture_20250114_101226.log">solr_capture_20250114_101226.log</a></p>
+
+
+
+<a name="493592853"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493592853" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493592853">(Jan 14 2025 at 14:04)</a>:</h4>
+<p>I have changed these settings in /var/solr/data/collection1/conf/solrconfig.xml and now it works! </p>
+<div class="codehilite"><pre><span></span><code>&lt;!--   &lt;autoCommit&gt;
+      &lt;maxTime&gt;${solr.autoCommit.maxTime:15000}&lt;/maxTime&gt;
+      &lt;openSearcher&gt;false&lt;/openSearcher&gt;
+    &lt;/autoCommit&gt; --&gt;
+
+
+
+  &lt;autoCommit&gt;
+    &lt;maxTime&gt;15000&lt;/maxTime&gt; &lt;!-- 15 seconds --&gt;
+    &lt;openSearcher&gt;true&lt;/openSearcher&gt; &lt;!-- Ensure the searcher is refreshed --&gt;
+  &lt;/autoCommit&gt;
+
+
+    &lt;!-- softAutoCommit is like autoCommit except it causes a
+         &#39;soft&#39; commit which only ensures that changes are visible
+         but does not ensure that data is synced to disk.  This is
+         faster and more near-realtime friendly than a hard commit.
+      --&gt;
+&lt;!--
+    &lt;autoSoftCommit&gt;
+      &lt;maxTime&gt;${solr.autoSoftCommit.maxTime:-1}&lt;/maxTime&gt;
+    &lt;/autoSoftCommit&gt;
+--&gt;
+
+  &lt;autoSoftCommit&gt;
+    &lt;maxTime&gt;2000&lt;/maxTime&gt; &lt;!-- 2 seconds for soft commits --&gt;
+  &lt;/autoSoftCommit&gt;
+</code></pre></div>
+
+
+
+<a name="493597994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493597994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493597994">(Jan 14 2025 at 14:30)</a>:</h4>
+<p>Great! So you changed it to 2 seconds?</p>
+
+
+
+<a name="493598786"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493598786" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493598786">(Jan 14 2025 at 14:34)</a>:</h4>
+<p>yes and openSearcher true</p>
+
+
+
+<a name="493599282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493599282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493599282">(Jan 14 2025 at 14:36)</a>:</h4>
+<p>Is this a bug in Dataverse? Again, we changed these values in this pull request: Solr: Try Soft Commit on Indexing <a href="https://github.com/IQSS/dataverse/issues/10547">#10547</a></p>
+
+
+
+<a name="493621602"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493621602" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493621602">(Jan 14 2025 at 16:20)</a>:</h4>
+<p>well it seems it doesn't work with the old configuration of solr so maybe just advisory in the upgrades ? Then again, if nobdy else has seen the issue with 6.4 <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="493622381"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493622381" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493622381">(Jan 14 2025 at 16:24)</a>:</h4>
+<p>You've been good about updating <a href="https://github.com/IQSS/dataverse/issues/11146">https://github.com/IQSS/dataverse/issues/11146</a></p>
+<p>Can you please leave another comment about your latest discoveries?</p>
+
+
+
+<a name="493905774"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493905774" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493905774">(Jan 15 2025 at 11:39)</a>:</h4>
+<p>Sure just added it! I guess we can resolve this one ? If somenoes needed address it there. Many Thanks for all the help!</p>
+
+
+
+<a name="493916751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493916751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493916751">(Jan 15 2025 at 12:39)</a>:</h4>
+<p>Thanks. Let me try to understand the situation. Your initial installation was with Ansible of Dataverse 6.2. Then you went through some upgrades. As part of those upgrades you should have been told to update your Solr config but this information wasn't in the release notes? Is it something like that?</p>
+
+
+
+<a name="493927468"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493927468" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493927468">(Jan 15 2025 at 13:32)</a>:</h4>
+<p>Hi! Yes, unless I have missed something. I think if someone has a installation deployed via ansible  from anything pre 6.4 they would have machine solr configuration to us that required changing ?</p>
+
+
+
+<a name="493958217"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493958217" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493958217">(Jan 15 2025 at 15:49)</a>:</h4>
+<p>Let's see. The autocommit change was introduced in <a href="https://github.com/IQSS/dataverse/issues/10547">#10547</a> which landed in Dataverse 6.3. The release notes at <a href="https://github.com/IQSS/dataverse/releases/tag/v6.3">https://github.com/IQSS/dataverse/releases/tag/v6.3</a> say to stop the Solr 9.3.0 installation and install Solr 9.4.1 fresh. And it says to use certain config files with Solr 9.4.1 that include the autocommit changes.</p>
+<p>Also, under the first bullet of the release notes it says, "Dataverse now relies on the autoCommit and autoSoftCommit settings in the Solr configuration instead of explicitly committing documents to the Solr index. This improves indexing speed."</p>
+<p>So I think the release notes are in decent shape. Do you happen to recall switching from Solr 9.3.0 to 9.4.1?</p>
+
+
+
+<a name="493964184"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493964184" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493964184">(Jan 15 2025 at 16:16)</a>:</h4>
+<p>Ah ha! I didn't handle the upgrade myself (only 6.4 - 6.5)  so completely missed that. We are running 9.3.0 still infact but it runs fine with the new conf. I also tested 9.7.0 out of frustration and it works !</p>
+
+
+
+<a name="493965290"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493965290" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493965290">(Jan 15 2025 at 16:21)</a>:</h4>
+<p>Easy to miss.</p>
+
+
+
+<a name="493975827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493975827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493975827">(Jan 15 2025 at 17:04)</a>:</h4>
+<p>so, again many thanks! Atleast it is here in case someone else makes the same mistake :).</p>
+
+
+
+<a name="493978018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/493978018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#493978018">(Jan 15 2025 at 17:17)</a>:</h4>
+<p>Yes, exactly. Do you want to go ahead and close <a href="https://github.com/IQSS/dataverse/issues/11146">https://github.com/IQSS/dataverse/issues/11146</a> and point to this Zulip thread?</p>
+
+
+
+<a name="495004310"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20indexing%20problem/near/495004310" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20indexing.20problem.html#495004310">(Jan 21 2025 at 09:33)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="671195">Simon Carroll</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

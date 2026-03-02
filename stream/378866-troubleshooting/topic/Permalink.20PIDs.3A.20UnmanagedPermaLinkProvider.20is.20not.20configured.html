@@ -1,0 +1,112 @@
+<html>
+<head><meta charset="utf-8"><title>Permalink PIDs: UnmanagedPermaLinkProvider is not configured · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html">Permalink PIDs: UnmanagedPermaLinkProvider is not configured</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="494167248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494167248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494167248">(Jan 16 2025 at 14:57)</a>:</h4>
+<p>Hi there. I am having some trouble setting up a Permalink pid provider on a new Dataverse 6.5. I installed dataverse using the Ansible Playbook, which configures a FAKE doi provider and then manually configured an additional perma pid provider as follows:</p>
+<div class="codehilite"><pre><span></span><code># Default set during installation
+-Ddataverse.pid.fake.type=FAKE
+-Ddataverse.pid.fake.label=Fake DOI Provider
+-Ddataverse.pid.fake.authority=10.5072
+-Ddataverse.pid.fake.shoulder=FK2/
+# My permalink provider
+-Ddataverse.pid.perma1.type=perma
+-Ddataverse.pid.perma1.label=PermaLink
+-Ddataverse.pid.perma1.authority=abc1234
+-Ddataverse.pid.perma1.permalink.separator=-
+-Ddataverse.pid.perma1.shoulder=ds-
+-Ddataverse.pid.perma1.permalink.identifier-generation-style=randomString
+-Ddataverse.pid.perma1.permalink.base-url=https://dataverse.abc1234.uni-due.de/
+# I overwrote these settings to make perma1 the default provider, but to offer both.
+-Ddataverse.pid.providers=fake,perma1
+-Ddataverse.pid.default-provider=perma1
+</code></pre></div>
+<p>Then I removed all PID-related settings via the <code>/api/admin/settings</code> API and restarted payara. Both providers show up in the user interface. Using the FAKE provider works, but when I switch to the perma provider I get the following error in <code>server.log</code>:</p>
+<div class="codehilite"><pre><span></span><code>CommandException, when attempting to update the dataset: PID Provider UnmanagedPermaLinkProvider is not configured.
+edu.harvard.iq.dataverse.engine.command.exception.IllegalCommandException: PID Provider UnmanagedPermaLinkProvider is not configured.
+        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDatasetCommand.handlePid(CreateNewDatasetCommand.java:100)
+        at edu.harvard.iq.dataverse.engine.command.impl.AbstractCreateDatasetCommand.execute(AbstractCreateDatasetCommand.java:134)
+        at edu.harvard.iq.dataverse.engine.command.impl.AbstractCreateDatasetCommand.execute(AbstractCreateDatasetCommand.java:26)
+        at edu.harvard.iq.dataverse.EjbDataverseEngineInner.submit(EjbDataverseEngineInner.java:36)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+        at org.glassfish.ejb.security.application.EJBSecurityManager.runMethod(EJBSecurityManager.java:588)
+        at org.glassfish.ejb.security.application.EJBSecurityManager.invoke(EJBSecurityManager.java:408)
+[...]
+</code></pre></div>
+<p>Does anyone have an idea what is going wrong here?</p>
+
+
+
+<a name="494175863"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494175863" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494175863">(Jan 16 2025 at 15:34)</a>:</h4>
+<p>Hmm, does this PR help? <a href="https://github.com/IQSS/dataverse/pull/11108/files">https://github.com/IQSS/dataverse/pull/11108/files</a></p>
+
+
+
+<a name="494177483"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494177483" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494177483">(Jan 16 2025 at 15:42)</a>:</h4>
+<p>Unfortunately not :( I tried the way I posted above, the way shown in the PR, and as a legacy provider with only one provider as per the config page. The first two resulted in the error I posted, the latter (<a href="https://guides.dataverse.org/en/latest/installation/config.html#configuring-your-dataverse-installation-for-a-single-permalink-provider">https://guides.dataverse.org/en/latest/installation/config.html#configuring-your-dataverse-installation-for-a-single-permalink-provider</a>) resulted in payara crashing on startup with an error similar to the one shown <a href="https://github.com/IQSS/dataverse/issues/10557">here</a>.</p>
+
+
+
+<a name="494178515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494178515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494178515">(Jan 16 2025 at 15:46)</a>:</h4>
+<p>It's weird that you're getting <code>UnmanagedPermaLinkProvider</code>. It must be coming from this class: <a href="https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/pidproviders/perma/UnmanagedPermaLinkPidProvider.java">https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/pidproviders/perma/UnmanagedPermaLinkPidProvider.java</a></p>
+
+
+
+<a name="494178666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494178666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494178666">(Jan 16 2025 at 15:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="601943">@Henning Timm</span> the person who knows the most about this is Jim Myers but he's not in Zulip. Can you please post to <a href="https://groups.google.com/g/dataverse-community">https://groups.google.com/g/dataverse-community</a> ?</p>
+
+
+
+<a name="494183407"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494183407" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494183407">(Jan 16 2025 at 16:08)</a>:</h4>
+<p>I wrote to the mailing list. Thanks for the help <span class="user-mention" data-user-id="598112">@Philip Durbin ☃️</span></p>
+
+
+
+<a name="494183575"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494183575" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494183575">(Jan 16 2025 at 16:09)</a>:</h4>
+<p><a href="https://groups.google.com/g/dataverse-community/c/1Ec6iT5OKio/m/MbcKyHbuCgAJ">https://groups.google.com/g/dataverse-community/c/1Ec6iT5OKio/m/MbcKyHbuCgAJ</a> looks great. Thanks!</p>
+
+
+
+<a name="494334556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494334556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494334556">(Jan 17 2025 at 10:58)</a>:</h4>
+<p>I also opened an issue, including a possible mitigation (for new setups): <a href="https://github.com/IQSS/dataverse/issues/11165">https://github.com/IQSS/dataverse/issues/11165</a></p>
+
+
+
+<a name="494366457"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494366457" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494366457">(Jan 17 2025 at 13:56)</a>:</h4>
+<p>Thanks. So from that issue, it looks like you got a certain config working?</p>
+
+
+
+<a name="494427664"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494427664" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494427664">(Jan 17 2025 at 19:40)</a>:</h4>
+<p>Yes, leaving out the shoulder solved the problem. This is perfectly fine for our setup. Thanks for the help!</p>
+
+
+
+<a name="494428140"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Permalink%20PIDs%3A%20UnmanagedPermaLinkProvider%20is%20not%20configured/near/494428140" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Permalink.20PIDs.3A.20UnmanagedPermaLinkProvider.20is.20not.20configured.html#494428140">(Jan 17 2025 at 19:43)</a>:</h4>
+<p>Sure. In <a href="https://github.com/IQSS/dataverse/pull/11108/files">https://github.com/IQSS/dataverse/pull/11108/files</a> I switched from using a shoulder for the FAKE DOI provider to using a separator for the Permalinks provider.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

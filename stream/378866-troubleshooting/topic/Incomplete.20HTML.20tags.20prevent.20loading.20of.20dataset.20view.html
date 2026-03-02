@@ -1,0 +1,854 @@
+<html>
+<head><meta charset="utf-8"><title>Incomplete HTML tags prevent loading of dataset view · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html">Incomplete HTML tags prevent loading of dataset view</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="525844508"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525844508" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525844508">(Jun 26 2025 at 07:56)</a>:</h4>
+<p>I recently stumbled upon a dataset on our instance that failed to load, throwing a server-side 500 error:</p>
+<div class="codehilite"><pre><span></span><code>HTTP Status 500 - Internal Server Error
+type Exception report
+
+messageInternal Server Error
+
+descriptionThe server encountered an internal error that prevented it from fulfilling this request.
+
+exception
+
+jakarta.servlet.ServletException: Unexpected char -1 at (line no=1, column no=33321, offset=33320)
+root cause
+
+jakarta.json.stream.JsonParsingException: Unexpected char -1 at (line no=1, column no=33321, offset=33320)
+note The full stack traces of the exception and its root causes are available in the Payara Server 6.2024.6 #badassfish logs.
+
+Payara Server 6.2024.6 #badassfish
+</code></pre></div>
+<p><strong>Payara log</strong></p>
+<div class="codehilite"><pre><span></span><code>[#|2025-06-25T13:52:41.637+0200|SEVERE|Payara 6.2024.6|jakarta.enterprise.resource.webcontainer.faces.application|_ThreadID=92;_ThreadName=http-thread-pool::jk-connector(3);_TimeMillis=1750852361637;_LevelValue=1000;|
+  Error Rendering View[/dataset.xhtml]
+jakarta.el.ELException: /dataset.xhtml @76,78 value=&quot;#{DatasetPage.jsonLd}&quot;: jakarta.json.stream.JsonParsingException: Unexpected char -1 at (line no=1, column no=33321, offset=33320)
+    at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:77)
+    at jakarta.faces.component.ComponentStateHelper.eval(ComponentStateHelper.java:207)
+    at jakarta.faces.component.ComponentStateHelper.eval(ComponentStateHelper.java:176)
+    at jakarta.faces.component.UIOutput.getValue(UIOutput.java:134)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicInputRenderer.getValue(HtmlBasicInputRenderer.java:163)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicRenderer.getCurrentValue(HtmlBasicRenderer.java:303)
+    at com.sun.faces.renderkit.html_basic.HtmlBasicRenderer.encodeEnd(HtmlBasicRenderer.java:135)
+    at jakarta.faces.component.UIComponentBase.encodeEnd(UIComponentBase.java:586)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1442)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at org.primefaces.renderkit.HeadRenderer.encodeBegin(HeadRenderer.java:83)
+    at jakarta.faces.component.UIComponentBase.encodeBegin(UIComponentBase.java:531)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1432)
+    at jakarta.faces.component.UIComponent.encodeAll(UIComponent.java:1438)
+    at com.sun.faces.application.view.FaceletViewHandlingStrategy.renderView(FaceletViewHandlingStrategy.java:442)
+    at com.sun.faces.application.view.MultiViewHandler.renderView(MultiViewHandler.java:162)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at jakarta.faces.application.ViewHandlerWrapper.renderView(ViewHandlerWrapper.java:125)
+    at org.omnifaces.viewhandler.OmniViewHandler.renderView(OmniViewHandler.java:151)
+    at com.sun.faces.lifecycle.RenderResponsePhase.execute(RenderResponsePhase.java:93)
+    at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)
+    at com.sun.faces.lifecycle.LifecycleImpl.render(LifecycleImpl.java:178)
+    at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:692)
+    at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)
+    at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:83)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)
+    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)
+    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:166)
+    at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)
+    at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)
+    at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)
+    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)
+    at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:372)
+    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)
+    at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)
+    at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)
+    at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:174)
+    at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:153)
+    at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:196)
+    at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:88)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:178)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:118)
+    at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:96)
+    at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:51)
+    at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:510)
+    at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:82)
+    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)
+    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)
+    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)
+    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)
+    at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: jakarta.el.ELException: jakarta.json.stream.JsonParsingException: Unexpected char -1 at (line no=1, column no=33321, offset=33320)
+    at jakarta.el.BeanELResolver.getValue(BeanELResolver.java:351)
+    at com.sun.faces.el.DemuxCompositeELResolver._getValue(DemuxCompositeELResolver.java:139)
+    at com.sun.faces.el.DemuxCompositeELResolver.getValue(DemuxCompositeELResolver.java:164)
+    at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:302)
+    at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:144)
+    at org.glassfish.expressly.ValueExpressionImpl.getValue(ValueExpressionImpl.java:138)
+    at org.jboss.weld.module.web.el.WeldValueExpression.getValue(WeldValueExpression.java:50)
+    at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:73)
+    ... 60 more
+Caused by: jakarta.json.stream.JsonParsingException: Unexpected char -1 at (line no=1, column no=33321, offset=33320)
+    at org.eclipse.parsson.JsonTokenizer.unexpectedChar(JsonTokenizer.java:593)
+    at org.eclipse.parsson.JsonTokenizer.readString(JsonTokenizer.java:166)
+    at org.eclipse.parsson.JsonTokenizer.nextToken(JsonTokenizer.java:356)
+    at org.eclipse.parsson.JsonParserImpl$ObjectContext.getNextEvent(JsonParserImpl.java:486)
+    at org.eclipse.parsson.JsonParserImpl.next(JsonParserImpl.java:363)
+    at org.eclipse.parsson.JsonParserImpl.getObject(JsonParserImpl.java:327)
+    at org.eclipse.parsson.JsonParserImpl.getValue(JsonParserImpl.java:161)
+    at org.eclipse.parsson.JsonParserImpl.getArray(JsonParserImpl.java:307)
+    at org.eclipse.parsson.JsonParserImpl.getValue(JsonParserImpl.java:159)
+    at org.eclipse.parsson.JsonParserImpl.getObject(JsonParserImpl.java:328)
+    at org.eclipse.parsson.JsonParserImpl.getObject(JsonParserImpl.java:152)
+    at org.eclipse.parsson.JsonReaderImpl.readObject(JsonReaderImpl.java:85)
+    at edu.harvard.iq.dataverse.util.json.JsonUtil.getJsonObject(JsonUtil.java:79)
+    at edu.harvard.iq.dataverse.export.InternalExportDataProvider.getDatasetSchemaDotOrg(InternalExportDataProvider.java:55)
+    at edu.harvard.iq.dataverse.export.SchemaDotOrgExporter.exportDataset(SchemaDotOrgExporter.java:79)
+    at edu.harvard.iq.dataverse.export.ExportService.cacheExport(ExportService.java:387)
+    at edu.harvard.iq.dataverse.export.ExportService.exportFormat(ExportService.java:324)
+    at edu.harvard.iq.dataverse.export.ExportService.getExport(ExportService.java:195)
+    at edu.harvard.iq.dataverse.export.ExportService.getExportAsString(ExportService.java:214)
+    at edu.harvard.iq.dataverse.DatasetPage.getJsonLd(DatasetPage.java:5974)
+    at jdk.internal.reflect.GeneratedMethodAccessor1509.invoke(Unknown Source)
+    at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+    at jakarta.el.BeanELResolver.getValue(BeanELResolver.java:346)
+    ... 67 more
+|#]
+</code></pre></div>
+<p>I could however access the complete dataset using API calls and verify it's integrity - just the web-based view was affected. A dump of the metadata JSON revealed that it contained over 60000 characters, while the error message reported an unexpected EOF already after position 33320.</p>
+<p>The metadata contained some very elaborate file descriptions which I modified to be more concise. After that, the dataset view could be successfully loaded again.</p>
+<p>My question now is: Is there a size limit that payara is able to ingest successfully as json stream? Is it even configurable?</p>
+
+
+
+<a name="525879401"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525879401" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525879401">(Jun 26 2025 at 11:11)</a>:</h4>
+<p>Hmm, great question. I'm not aware of a size limit.</p>
+<p>I'm not seeing an EOF. Rather, I see <code>JsonParsingException: Unexpected char</code></p>
+<p>And it's being thrown from <code>InternalExportDataProvider.getDatasetSchemaDotOrg(InternalExportDataProvider.java:55)</code></p>
+<p>I wonder if we can reproduce this somehow? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> What version of Dataverse are you on, please?</p>
+
+
+
+<a name="525880019"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880019" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880019">(Jun 26 2025 at 11:15)</a>:</h4>
+<p>I digged into the Eclipse Parsson code already to see if there is a buffer size limit we might be hitting here.</p>
+
+
+
+<a name="525880156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880156">(Jun 26 2025 at 11:15)</a>:</h4>
+<p>I'm on v.6.5. Yeah it's not strictly an EOF, but the <code>Unexpected char -1</code> imho hints to a stream truncation. What I forgot to mention is that the metadata when dumped via API passes linting as valid JSON. I also do not see any suspicious character at the given position.</p>
+<p>I can reliably reproduce the issue once I create a dataset with metadata exceeding this character count.</p>
+
+
+
+<a name="525880200"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880200" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880200">(Jun 26 2025 at 11:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> do you have the old descriptions around? It might be very interesting to try to manually find what the chars at position 33270 are. This might be a bad UTF-8 char thing.</p>
+
+
+
+<a name="525880268"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880268" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880268">(Jun 26 2025 at 11:16)</a>:</h4>
+<p>Oh so this is not related to one specific string, but with any string that size?</p>
+
+
+
+<a name="525880360"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880360" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880360">(Jun 26 2025 at 11:16)</a>:</h4>
+<p>So we should be able to create a unit test that blows up, right?</p>
+
+
+
+<a name="525880465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880465">(Jun 26 2025 at 11:17)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525880200">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="867821">Alexander Minges</span> do you have the old descriptions around? It might be very interesting to try to manually find what the chars at position 33270 are. This might be a bad UTF-8 char thing.</p>
+<p>Oh so this is not related to one specific string, but with any string that size?</p>
+</blockquote>
+<p>Seems so. However I do have the original JSON if you are interested to have a look.</p>
+
+
+
+<a name="525880632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880632">(Jun 26 2025 at 11:18)</a>:</h4>
+<p>I also want to highlight that you are talking about two different things here. Retrieving the JSON via the API is different to using the API to retrieve the <a href="http://Schema.org">Schema.org</a> JSON-LD, which does JSON-P parsing first!</p>
+
+
+
+<a name="525880837"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525880837" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525880837">(Jun 26 2025 at 11:19)</a>:</h4>
+<p>Does it blow up if you're using the Export API as well? <a href="https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats">https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats</a></p>
+<p>So you'd use sth like <a href="https://demo.dataverse.org/api/datasets/export?exporter=schema.org&amp;persistentId=doi:10.70122/FK2/WRYRT4">https://demo.dataverse.org/api/datasets/export?exporter=schema.org&amp;persistentId=doi:10.70122/FK2/WRYRT4</a></p>
+
+
+
+<a name="525881057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525881057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525881057">(Jun 26 2025 at 11:21)</a>:</h4>
+<p>I'll check that.</p>
+
+
+
+<a name="525881988"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525881988" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525881988">(Jun 26 2025 at 11:26)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> did you try to blow things up with some other random, very long thing to see if the culprit is indeed the specific dataset or if we are in bigger trouble?</p>
+
+
+
+<a name="525882352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882352">(Jun 26 2025 at 11:28)</a>:</h4>
+<p>BTW <span class="user-mention" data-user-id="598112">@Philip Durbin</span> <span class="user-mention" data-user-id="637063">@Leo Andreev</span> I did not expect that the <a href="http://schema.org">schema.org</a> exporter is called every time a dataset page is loaded - shouldn't it use the cached export?</p>
+
+
+
+<a name="525882353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882353">(Jun 26 2025 at 11:28)</a>:</h4>
+<p>Not yet, but I more or less randomly removed metadata to shrink the size. But I can check that as well with some very long random stuff in a fresh dataset.</p>
+
+
+
+<a name="525882603"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882603" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882603">(Jun 26 2025 at 11:30)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> was the <a href="http://schema.org">schema.org</a> export ever successfully cached?</p>
+
+
+
+<a name="525882656"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882656" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882656">(Jun 26 2025 at 11:30)</a>:</h4>
+<p>I wasn't aware it would not be cached!</p>
+
+
+
+<a name="525882848"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882848" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882848">(Jun 26 2025 at 11:31)</a>:</h4>
+<p>If no exception is thrown, it should be cached and re-used.</p>
+
+
+
+<a name="525882999"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525882999" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525882999">(Jun 26 2025 at 11:32)</a>:</h4>
+<p>That's how the rest of the exports work, at least.</p>
+
+
+
+<a name="525883006"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883006" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883006">(Jun 26 2025 at 11:32)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525882848">schrieb</a>:</p>
+<blockquote>
+<p>If no exception is thrown, it should be cached and re-used.</p>
+</blockquote>
+<p>But I would only see that in the logs, once a dataset is published, right?</p>
+
+
+
+<a name="525883103"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883103" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883103">(Jun 26 2025 at 11:33)</a>:</h4>
+<p>Maybe? I'm not sure if you'd see "export successful" or whatever.</p>
+
+
+
+<a name="525883205"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883205" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883205">(Jun 26 2025 at 11:34)</a>:</h4>
+<p>I agree that having this case in a unit test would be nice. For now, maybe we could throw it it <a href="https://github.com/IQSS/dataverse-sample-data">https://github.com/IQSS/dataverse-sample-data</a></p>
+
+
+
+<a name="525883219"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883219" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883219">(Jun 26 2025 at 11:34)</a>:</h4>
+<p>But at least the initial caching would happen only if you hit publish. (Except from re-exports triggered from new versions, API, etc)</p>
+
+
+
+<a name="525883307"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883307" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883307">(Jun 26 2025 at 11:34)</a>:</h4>
+<p>There is a unit test for a very very long description, <a href="https://github.com/IQSS/dataverse/pull/9085">Jim did that</a>.</p>
+
+
+
+<a name="525883381"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883381" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883381">(Jun 26 2025 at 11:35)</a>:</h4>
+<p>Digging through the code when some field may be truncated.</p>
+
+
+
+<a name="525883517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883517">(Jun 26 2025 at 11:35)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> I'd be curious to know if switching to Croissant helps. We put it in the <code>&lt;head&gt;</code> if that exporter is enabled: <a href="https://guides.dataverse.org/en/6.6/admin/discoverability.html#schema-org-json-ld-croissant-metadata">https://guides.dataverse.org/en/6.6/admin/discoverability.html#schema-org-json-ld-croissant-metadata</a></p>
+
+
+
+<a name="525883839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883839">(Jun 26 2025 at 11:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> could you upload the original JSON here as a file? Only "description" of the dataset get's truncated, so maybe we need to extend that.</p>
+
+
+
+<a name="525883870"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525883870" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525883870">(Jun 26 2025 at 11:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span>  I'll try that as well, but first I'll check whether something in this specific dataset blows up the <a href="http://schema.org">schema.org</a> export and I just deleted that party by chance when trying to lower the size.</p>
+
+
+
+<a name="525884033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525884033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525884033">(Jun 26 2025 at 11:39)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525883839">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="867821">Alexander Minges</span> could you upload the original JSON here as a file? Only "description" of the dataset get's truncated, so maybe we need to extend that.</p>
+</blockquote>
+<p>You mean the <a href="http://schema.org">schema.org</a> JSON-LD or the Dataverse JSON?</p>
+
+
+
+<a name="525884504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525884504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525884504">(Jun 26 2025 at 11:42)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="867821">Alexander Minges</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525884033">said</a>:</p>
+<blockquote>
+<p>You mean the <a href="http://schema.org">schema.org</a> JSON-LD or the Dataverse JSON?</p>
+</blockquote>
+<p>The Dataverse JSON</p>
+
+
+
+<a name="525887388"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525887388" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525887388">(Jun 26 2025 at 11:59)</a>:</h4>
+<p>So I extend the unit test for SchemaDotOrgExporter to test with a file description using 2^18 chars (<code>testExportVeryLongFileDescription</code>, see attached). Didn't blow up. Would be good to see your metadata <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span> <br>
+<a href="/user_uploads/53090/bQCQHVXwkkQkabyo4yONzETb/SchemaDotOrgExporterTest.java">SchemaDotOrgExporterTest.java</a></p>
+
+
+
+<a name="525889783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525889783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525889783">(Jun 26 2025 at 12:11)</a>:</h4>
+<p>Wow even if I smuggle in a "-1" character, I can't break it! Something very very very weird must be going on here!</p>
+
+
+
+<a name="525890609"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525890609" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525890609">(Jun 26 2025 at 12:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I've sent you the JSON as direct message. Btw the <a href="http://schema.org">schema.org</a> export blows up as well using the API. When I remove the descriptions of the attached files the export is generated without issues.</p>
+
+
+
+<a name="525890927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525890927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525890927">(Jun 26 2025 at 12:17)</a>:</h4>
+<p>I will try to rope the JSON into the unit test and see if I can reproduce it locally.</p>
+
+
+
+<a name="525899544"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525899544" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525899544">(Jun 26 2025 at 13:01)</a>:</h4>
+<p>Man have I ever mentioned what a bloody mess it is when you try to parse a dataset JSON into a testcase? Our testing infrastructure is way to complicated. Too many implicits, etc...</p>
+
+
+
+<a name="525900722"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525900722" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525900722">(Jun 26 2025 at 13:07)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> maybe you should warm up this thread with <span class="user-mention" data-user-id="690603">@Gustavo Durand</span> about automated testing: <a href="https://groups.google.com/g/dataverse-dev/c/k6nZ_icK9fw/m/Qf6f2-NJEgAJ">https://groups.google.com/g/dataverse-dev/c/k6nZ_icK9fw/m/Qf6f2-NJEgAJ</a> (or start a new topic in <a class="stream" data-stream-id="379673" href="/#narrow/channel/379673-dev">#dev</a>, or both <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> )</p>
+
+
+
+<a name="525902247"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525902247" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525902247">(Jun 26 2025 at 13:15)</a>:</h4>
+<p>Wow. Our JSON Parser does not parse the releasedDate if presented. Man not using JSON-B for all of this sux</p>
+
+
+
+<a name="525903212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525903212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525903212">(Jun 26 2025 at 13:19)</a>:</h4>
+<p>I just discovered a long lasting bug in Dataverse. And another occasion of "why use JSON-B if doing it all manually is so much more fun!!!!!!!!!!11111111"</p>
+
+
+
+<a name="525903316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525903316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525903316">(Jun 26 2025 at 13:20)</a>:</h4>
+<p>In JsonPrinter, the release time of a dataset version is <a href="https://github.com/poikilotherm/dataverse/blob/cce40c43cb082b98f9ee62d74f22b01e23d27a19/src/main/java/edu/harvard/iq/dataverse/util/json/JsonPrinter.java#L490-L490">set as "releaseTime"</a>.</p>
+
+
+
+<a name="525903599"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525903599" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525903599">(Jun 26 2025 at 13:21)</a>:</h4>
+<p>Guess what it is in JsonParser...?</p>
+
+
+
+<a name="525903725"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525903725" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525903725">(Jun 26 2025 at 13:21)</a>:</h4>
+<p><a href="https://github.com/poikilotherm/dataverse/blob/cce40c43cb082b98f9ee62d74f22b01e23d27a19/src/main/java/edu/harvard/iq/dataverse/util/json/JsonParser.java#L444-L444">YES YOU'RE RIGHT IT'S FRICKIN' <code>releaseDate</code>!!!11!11122345</a></p>
+
+
+
+<a name="525904559"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525904559" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525904559">(Jun 26 2025 at 13:25)</a>:</h4>
+<p>So, I <strong>finally</strong> <span aria-label="trumpet" class="emoji emoji-1f3ba" role="img" title="trumpet">:trumpet:</span> are able to verify the issue locally!!!</p>
+
+
+
+<a name="525904660"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525904660" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525904660">(Jun 26 2025 at 13:26)</a>:</h4>
+<p>I see <code>jakarta.json.stream.JsonParsingException: Unexpected char -1 at (line no=1, column no=33239, offset=33238)</code> in the test output!</p>
+
+
+
+<a name="525905408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525905408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525905408">(Jun 26 2025 at 13:29)</a>:</h4>
+<p>So the file description length is really the culprit?</p>
+
+
+
+<a name="525905637"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525905637" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525905637">(Jun 26 2025 at 13:30)</a>:</h4>
+<p>Not sure yet - I tested the length with a 2^18 char string and it was fine. I still suspect a bad char and now I can finally check out where exactly the problem is!</p>
+
+
+
+<a name="525908356"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525908356" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525908356">(Jun 26 2025 at 13:43)</a>:</h4>
+<p>When I extract the text surrounding the failing location, I see nothing special...</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code>$<span class="w"> </span><span class="nv">TEXT</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span>src/test/resources/json/dataset-breaking-desc-pretty.json<span class="k">)</span>
+$
+$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">'%q\n'</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">TEXT</span><span class="p">[33000,34000]</span><span class="si">}</span><span class="s2">"</span>
+<span class="se">\ </span>their<span class="se">\ </span>designated<span class="se">\ </span>target<span class="se">\ </span>LC3<span class="se">\ </span>using<span class="se">\ </span>a<span class="se">\ </span>diversity<span class="se">\ </span>of<span class="se">\ </span>biophysical<span class="se">\ </span>methods.<span class="se">\ </span>Intrigued<span class="se">\ </span>by<span class="se">\ </span>the<span class="se">\ </span>idea<span class="se">\ </span>of<span class="se">\ </span>developing<span class="se">\ </span>ATTECs,<span class="se">\ </span>we<span class="se">\ </span>evaluated<span class="se">\ </span>the<span class="se">\ </span>ligandability<span class="se">\ </span>of<span class="se">\ </span>LC3/GABARAP<span class="se">\ </span>by<span class="se">\ </span><span class="k">in</span><span class="se">\ </span>silico<span class="se">\ </span>docking<span class="se">\ </span>and<span class="se">\ </span>large-scale<span class="se">\ </span>crystallographic<span class="se">\ </span>fragment<span class="se">\ </span>screening.<span class="se">\ </span>Data<span class="se">\ </span>based<span class="se">\ </span>on<span class="se">\ </span>approximately<span class="se">\ </span><span class="m">1000</span><span class="se">\ </span>crystal<span class="se">\ </span>structures<span class="se">\ </span>revealed<span class="se">\ </span>that<span class="se">\ </span>most<span class="se">\ </span>fragments<span class="se">\ </span>bound<span class="se">\ </span>to<span class="se">\ </span>the<span class="se">\ </span>HP2<span class="se">\ </span>but<span class="se">\ </span>not<span class="se">\ </span>to<span class="se">\ </span>the<span class="se">\ </span>HP1<span class="se">\ </span>pocket<span class="se">\ </span>within<span class="se">\ </span>the<span class="se">\ </span>LIR<span class="se">\ </span>docking<span class="se">\ </span>site,<span class="se">\ </span>suggesting<span class="se">\ </span>a<span class="se">\ </span>favorable<span class="se">\ </span>ligandability<span class="se">\ </span>of<span class="se">\ </span>HP2.<span class="se">\ </span>Through<span class="se">\ </span>this<span class="se">\ </span>study,<span class="se">\ </span>we<span class="se">\ </span>identified<span class="se">\ </span>diverse<span class="se">\ </span>validated<span class="se">\ </span>LC3/GABARAP<span class="se">\ </span>ligands<span class="se">\ </span>and<span class="se">\ </span>fragments<span class="se">\ </span>as<span class="se">\ </span>starting<span class="se">\ </span>points<span class="se">\ </span><span class="k">for</span><span class="se">\ </span>chemical<span class="se">\ </span>probe<span class="se">\ </span>and<span class="se">\ </span>ATTEC<span class="se">\ </span>development.<span class="se">\&lt;</span>/p<span class="se">\&gt;\"</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \]</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \}</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \{</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>typeName<span class="se">\"</span>:<span class="se">\ \"</span>subject<span class="se">\"</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>multiple<span class="se">\"</span>:<span class="se">\ </span>true,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>typeClass<span class="se">\"</span>:<span class="se">\ \"</span>controlledVocabulary<span class="se">\"</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>value<span class="se">\"</span>:<span class="se">\ \[</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \ \ \"</span>Medicine,<span class="se">\ </span>Health<span class="se">\ </span>and<span class="se">\ </span>Life<span class="se">\ </span>Sciences<span class="se">\"</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \]</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \}</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \{</span><span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>typeName<span class="se">\"</span>:<span class="se">\ \"</span>keyword<span class="se">\"</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>multiple<span class="se">\"</span>:<span class="se">\ </span>true,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>typeClass<span class="se">\"</span>:<span class="se">\ \"</span>compound<span class="se">\"</span>,<span class="s1">$'\n'</span><span class="se">\ \ \ \ \ \ \ \ \ \ \ \ \"</span>v
+$
+$<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">'%q\n'</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">TEXT</span><span class="p">[33230,33250]</span><span class="si">}</span><span class="s2">"</span>
+ing.<span class="se">\ </span>Data<span class="se">\ </span>based<span class="se">\ </span>on<span class="se">\ </span>ap
+</code></pre></div>
+
+
+
+<a name="525909978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525909978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525909978">(Jun 26 2025 at 13:52)</a>:</h4>
+<p>So the problem must be within the transformed JSON the exporter uses. Let me extract that...</p>
+
+
+
+<a name="525910039"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525910039" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525910039">(Jun 26 2025 at 13:52)</a>:</h4>
+<p>go go go!</p>
+
+
+
+<a name="525912062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525912062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525912062">(Jun 26 2025 at 14:02)</a>:</h4>
+<p>So. Figure 4 is the culprit... Let's see if I can find any bad chars in the source file...</p>
+
+
+
+<a name="525912805"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525912805" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525912805">(Jun 26 2025 at 14:05)</a>:</h4>
+<p>I also dug a bit deeper and found some Unicode chars depicting alternate dashes (such as <code>U+2013</code>). But replacing all of them doesn't fix the issue. I also tried adding the file descriptions one by one and for me it blows up at Fig 2 already...</p>
+
+
+
+<a name="525913858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525913858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525913858">(Jun 26 2025 at 14:10)</a>:</h4>
+<p>I don't see any particularly problematic things in the source file at the position where things blow up...</p>
+
+
+
+<a name="525914116"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914116" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914116">(Jun 26 2025 at 14:11)</a>:</h4>
+<p>Can you reproduce the original bug if you create a dataset via API based on the JSON?</p>
+
+
+
+<a name="525914228"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914228" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914228">(Jun 26 2025 at 14:12)</a>:</h4>
+<p>Wait a minute!</p>
+
+
+
+<a name="525914306"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914306" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914306">(Jun 26 2025 at 14:12)</a>:</h4>
+<p><del>But it's definitely not directly related to the length of the json. Adding description for Fig. 1 is fine... Fig1 + Fig 2 blows up, but descriptions for Fig 1 + Fig 3 are fine, however the resulting json is much larger than the the 33200 chars we hit in the errors</del></p>
+<p>Forget it, I opened the old version by accident. 1 + 3 also does not work.</p>
+
+
+
+<a name="525914326"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914326" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914326">(Jun 26 2025 at 14:12)</a>:</h4>
+<p>I think I just made progress. The JSON-LD string simply ENDS at this place!</p>
+
+
+
+<a name="525914345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914345">(Jun 26 2025 at 14:12)</a>:</h4>
+<p>So the -1 is indeed the EOF marker!</p>
+
+
+
+<a name="525914425"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914425" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914425">(Jun 26 2025 at 14:13)</a>:</h4>
+<p>So there must be a problem during the <em>generation</em> of the JSON-LD!</p>
+
+
+
+<a name="525914583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914583">(Jun 26 2025 at 14:14)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>(line no=1, column no=33239, offset=33238)
+(length=33239)
+ing of the CSP values. Residues with small (CSP &lt; SD), intermediate (SD &lt; CSP &lt;2xSD) or strong (2xS
+
+jakarta.json.stream.JsonParsingException: Invalid token=EOF at (line no=1, column no=0, offset=-1). Expected tokens are: [CURLYOPEN, SQUAREOPEN, STRING, NUMBER, TRUE, FALSE, NULL]
+</code></pre></div>
+
+
+
+<a name="525914746"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914746" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914746">(Jun 26 2025 at 14:14)</a>:</h4>
+<p>I'm not sure what upsets it, as I tested it with way longer strings and all was fine.</p>
+
+
+
+<a name="525914904"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525914904" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525914904">(Jun 26 2025 at 14:15)</a>:</h4>
+<p>And the next char there would be a <code>D</code> again, so nothing spectacular: <code>or strong (2xSD &lt;CSP) CSP</code></p>
+
+
+
+<a name="525915591"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525915591" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525915591">(Jun 26 2025 at 14:18)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525914425">schrieb</a>:</p>
+<blockquote>
+<p>So there must be a problem during the <em>generation</em> of the JSON-LD!</p>
+</blockquote>
+<p>And because this fails during initial publication, it is tried again and again when trying to view the dataset because no cached version exists. Once I get it into a non-broken state (e.g. by just deleting the files, thus creating a new DRAFT version), I can access all the older (published) and presumably broken versions from the version history just fine. What <em>still</em> fails for them is exporting to JSON-LD from the frontend:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"ERROR"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Export Failed"</span><span class="p">}</span>
+</code></pre></div>
+
+
+
+<a name="525915954"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525915954" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525915954">(Jun 26 2025 at 14:20)</a>:</h4>
+<p>So, it fails to add all the bits for the files. We know where that is in the code.</p>
+
+
+
+<a name="525915993"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525915993" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525915993">(Jun 26 2025 at 14:20)</a>:</h4>
+<p>So are we leaning toward certain characters being a problem? Not the length?</p>
+
+
+
+<a name="525916031"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525916031" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525916031">(Jun 26 2025 at 14:20)</a>:</h4>
+<p>I'm not sure yet</p>
+
+
+
+<a name="525916092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525916092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525916092">(Jun 26 2025 at 14:21)</a>:</h4>
+<p>Smells like we might be opening a can of worms here.</p>
+
+
+
+<a name="525918293"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918293" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918293">(Jun 26 2025 at 14:30)</a>:</h4>
+<p>Yep. The <code>MarkupChecker.stripAllTags(jsonLd)</code> strips too much of the JSON-LD.<br>
+Before:<br>
+<a href="/user_uploads/53090/oZKyDi1ep28uAcfJbENffTHa/image.png">image.png</a><br>
+After:<br>
+<a href="/user_uploads/53090/SCMTQrFwZmC7kutOEKmD0JJW/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/oZKyDi1ep28uAcfJbENffTHa/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1262x638" src="/user_uploads/thumbnail/53090/oZKyDi1ep28uAcfJbENffTHa/image.png/840x560.webp"></a></div><div class="message_inline_image"><a href="/user_uploads/53090/SCMTQrFwZmC7kutOEKmD0JJW/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1262x638" src="/user_uploads/thumbnail/53090/SCMTQrFwZmC7kutOEKmD0JJW/image.png/840x560.webp"></a></div>
+
+
+
+<a name="525918455"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918455" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918455">(Jun 26 2025 at 14:31)</a>:</h4>
+<p>The test executed successfully if I remove the markupchecker from the equation</p>
+
+
+
+<a name="525918518"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918518" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918518">(Jun 26 2025 at 14:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> would you mind creating an issue?</p>
+
+
+
+<a name="525918585"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918585" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918585">(Jun 26 2025 at 14:32)</a>:</h4>
+<p>This is where things go wrong: <a href="https://github.com/poikilotherm/dataverse/blob/cce40c43cb082b98f9ee62d74f22b01e23d27a19/src/main/java/edu/harvard/iq/dataverse/DatasetVersion.java#L2150-L2150">https://github.com/poikilotherm/dataverse/blob/cce40c43cb082b98f9ee62d74f22b01e23d27a19/src/main/java/edu/harvard/iq/dataverse/DatasetVersion.java#L2150-L2150</a></p>
+
+
+
+<a name="525918642"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918642" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918642">(Jun 26 2025 at 14:32)</a>:</h4>
+<p>I need to attend to kids logistics now.</p>
+
+
+
+<a name="525918705"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525918705" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525918705">(Jun 26 2025 at 14:32)</a>:</h4>
+<p>It's not you, it's us <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="525919617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525919617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525919617">(Jun 26 2025 at 14:37)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/Large.20metadata.20prevents.20loading.20of.20dataset.20view/near/525918518">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="867821">Alexander Minges</span> would you mind creating an issue?</p>
+</blockquote>
+<p>Sure, I'll create one. Not sure if I'll get to do it today (leaving the office right now), but latest tomorrow morning. <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> Thanks for digging through this mess of mine <span aria-label="innocent" class="emoji emoji-1f607" role="img" title="innocent">:innocent:</span></p>
+
+
+
+<a name="525920365"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525920365" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525920365">(Jun 26 2025 at 14:40)</a>:</h4>
+<p>So I guess something like <code>&lt;CSP</code> in <code>(2xSD &lt;CSP)</code> might be mistaken for an open HTML tag and due to a "missing" closing bracket, everything afterwards gets cut off?</p>
+
+
+
+<a name="525923704"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525923704" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525923704">(Jun 26 2025 at 14:55)</a>:</h4>
+<p>Gotcha. I hope we can find a small case that exercises the bug.</p>
+
+
+
+<a name="525925720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525925720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525925720">(Jun 26 2025 at 15:03)</a>:</h4>
+<p>I will look into creating a minimal test case as a reproducer to also verify the root cause is mitigated with the fix.</p>
+
+
+
+<a name="525925758"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525925758" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525925758">(Jun 26 2025 at 15:03)</a>:</h4>
+<p>But not today <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span></p>
+
+
+
+<a name="525925827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525925827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525925827">(Jun 26 2025 at 15:04)</a>:</h4>
+<p>Can't even create a branch yet - no issue number <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="525933436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/525933436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#525933436">(Jun 26 2025 at 15:41)</a>:</h4>
+<p>I did create an issue just now for the releaseTime vs releaseDate snag. <a href="https://github.com/IQSS/dataverse/issues/11594">https://github.com/IQSS/dataverse/issues/11594</a></p>
+
+
+
+<a name="526025081"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/526025081" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#526025081">(Jun 27 2025 at 07:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I'm currently creating the issue. To trigger the bug, it's sufficient to add <code>&lt;CSP</code> to the file description. Something arbitrary like <code>&lt;test</code> did not blow up though.</p>
+
+
+
+<a name="526026622"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/526026622" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#526026622">(Jun 27 2025 at 07:27)</a>:</h4>
+<p>Issue is created: <a href="https://github.com/IQSS/dataverse/issues/11597">https://github.com/IQSS/dataverse/issues/11597</a></p>
+
+
+
+<a name="526066011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/526066011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#526066011">(Jun 27 2025 at 11:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> thanks! <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span></p>
+
+
+
+<a name="526840181"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/526840181" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#526840181">(Jul 02 2025 at 16:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> thanks for PR <a href="https://github.com/IQSS/dataverse/issues/11600">#11600</a>! I just left a comment there.</p>
+
+
+
+<a name="527119714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/527119714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#527119714">(Jul 04 2025 at 07:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> You're welcome! If I can help in any way to add a test for this, please let me know.</p>
+
+
+
+<a name="527456727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/527456727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#527456727">(Jul 07 2025 at 11:22)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> sure! Have you run any API tests yet? Maybe you could try running <code>mvn test -Dtest=UsersIT</code> from <a href="https://guides.dataverse.org/en/6.6/developers/testing.html#writing-api-tests-with-rest-assured">https://guides.dataverse.org/en/6.6/developers/testing.html#writing-api-tests-with-rest-assured</a></p>
+
+
+
+<a name="528610991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/528610991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#528610991">(Jul 14 2025 at 08:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Not yet. I'll probably have time to do this end of this week.</p>
+
+
+
+<a name="528666889"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/528666889" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#528666889">(Jul 14 2025 at 13:47)</a>:</h4>
+<p>No rush, thanks.</p>
+
+
+
+<a name="530495386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/530495386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#530495386">(Jul 24 2025 at 07:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  Test is available, see my comment in the PR: <a href="https://github.com/IQSS/dataverse/pull/11600#issuecomment-3112181778">https://github.com/IQSS/dataverse/pull/11600#issuecomment-3112181778</a></p>
+
+
+
+<a name="530544963"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/530544963" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#530544963">(Jul 24 2025 at 12:06)</a>:</h4>
+<p>Fantastic! Thanks! I'll take a look.</p>
+
+
+
+<a name="530545145"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/530545145" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#530545145">(Jul 24 2025 at 12:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> oh, it's in a different branch. Please go ahead and put it in the branch for your PR.</p>
+
+
+
+<a name="531576997"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531576997" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531576997">(Jul 29 2025 at 10:58)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view/near/530545145">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="867821">Alexander Minges</span> oh, it's in a different branch. Please go ahead and put it in the branch for your PR.</p>
+</blockquote>
+<p>Done. No idea what jenkins is complaining about though as I cannot access the respective CI details.</p>
+
+
+
+<a name="531587779"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531587779" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531587779">(Jul 29 2025 at 11:50)</a>:</h4>
+<p>Yeah, that's what this is about, sadly:</p>
+<p>Let contributors know why tests are failing <a href="https://github.com/IQSS/dataverse/issues/9916">#9916</a></p>
+
+
+
+<a name="531587892"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531587892" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531587892">(Jul 29 2025 at 11:51)</a>:</h4>
+<p>I've been a bit heads down on a new notifications API (<a class="stream-topic" data-stream-id="379673" href="/#narrow/channel/379673-dev/topic/Notifications.20API.20usage.20and.20future/with/531389398">#dev &gt; Notifications API usage and future</a>) but I'll try to look at your PR soon. Thanks for adding tests!</p>
+
+
+
+<a name="531601915"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531601915" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531601915">(Jul 29 2025 at 12:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> here's the complaint:</p>
+<div class="codehilite"><pre><span></span><code>Error
+1 expectation failed.
+Expected status code &lt;200&gt; but was &lt;403&gt;.
+Stacktrace
+java.lang.AssertionError:
+1 expectation failed.
+Expected status code &lt;200&gt; but was &lt;403&gt;.
+    at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+    at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+    at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+    at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+    at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:481)
+    at org.codehaus.groovy.reflection.CachedConstructor.invoke(CachedConstructor.java:73)
+    at org.codehaus.groovy.runtime.callsite.ConstructorSite$ConstructorSiteNoUnwrapNoCoerce.callConstructor(ConstructorSite.java:108)
+    at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor(CallSiteArray.java:57)
+    at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:263)
+    at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor(AbstractCallSite.java:277)
+    at io.restassured.internal.ResponseSpecificationImpl$HamcrestAssertionClosure.validate(ResponseSpecificationImpl.groovy:512)
+    at io.restassured.internal.ResponseSpecificationImpl$HamcrestAssertionClosure$validate$1.call(Unknown Source)
+    at io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired(ResponseSpecificationImpl.groovy:696)
+    at io.restassured.internal.ResponseSpecificationImpl.this$2$validateResponseIfRequired(ResponseSpecificationImpl.groovy)
+    at jdk.internal.reflect.GeneratedMethodAccessor144.invoke(Unknown Source)
+    at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+    at org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke(PlainObjectMetaMethodSite.java:43)
+    at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite$PogoCachedMethodSiteNoUnwrapNoCoerce.invoke(PogoMetaMethodSite.java:198)
+    at org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent(PogoMetaMethodSite.java:62)
+    at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent(AbstractCallSite.java:185)
+    at io.restassured.internal.ResponseSpecificationImpl.statusCode(ResponseSpecificationImpl.groovy:135)
+    at io.restassured.specification.ResponseSpecification$statusCode$0.callCurrent(Unknown Source)
+    at io.restassured.internal.ResponseSpecificationImpl.statusCode(ResponseSpecificationImpl.groovy:143)
+    at io.restassured.internal.ValidatableResponseOptionsImpl.statusCode(ValidatableResponseOptionsImpl.java:89)
+    at edu.harvard.iq.dataverse.api.JsonLDExportIT.testJsonLDExportWithIncompleteHtmlTagsInFileDescription(JsonLDExportIT.java:88)
+    at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+    at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Standard Error
+Jul 28, 2025 1:02:23 PM edu.harvard.iq.dataverse.api.UtilIT getRestAssuredBaseUri
+INFO: Base URL for tests: http://localhost:8080
+Jul 28, 2025 1:02:23 PM edu.harvard.iq.dataverse.api.UtilIT createRandomUser
+INFO: Creating random test user user3614cf35
+Jul 28, 2025 1:02:24 PM edu.harvard.iq.dataverse.api.UtilIT getApiTokenFromResponse
+INFO: API token found in create user response: 1dc8f8a1-73c8-4dda-9e86-25e9dd6d01e0
+Jul 28, 2025 1:02:24 PM edu.harvard.iq.dataverse.api.UtilIT getUsernameFromResponse
+INFO: Username found in create user response: user3614cf35
+Jul 28, 2025 1:02:24 PM edu.harvard.iq.dataverse.api.UtilIT getAliasFromResponse
+INFO: Alias found in create dataverse response: dv1edbd9e9
+Jul 28, 2025 1:02:24 PM edu.harvard.iq.dataverse.api.UtilIT getDatasetIdFromResponse
+INFO: Id found in create dataset response: 317
+Jul 28, 2025 1:02:24 PM edu.harvard.iq.dataverse.api.UtilIT getDatasetPersistentIdFromResponse
+INFO: Persistent id found in create dataset response: doi:10.5072/FK2/YFGBI7
+</code></pre></div>
+
+
+
+<a name="531672472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531672472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531672472">(Jul 29 2025 at 18:15)</a>:</h4>
+<p>Ah, this is why:</p>
+<p>"This dataset is locked. Reason: Ingest. Please try publishing later."</p>
+
+
+
+<a name="531674780"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531674780" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531674780">(Jul 29 2025 at 18:28)</a>:</h4>
+<p><span class="user-mention" data-user-id="867821">@Alexander Minges</span> ok, I pushed a fix: <a href="https://github.com/IQSS/dataverse/pull/11600/commits/767a191455e22550944c23f616eb6302da0a5fa5">https://github.com/IQSS/dataverse/pull/11600/commits/767a191455e22550944c23f616eb6302da0a5fa5</a></p>
+
+
+
+<a name="531674844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531674844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531674844">(Jul 29 2025 at 18:29)</a>:</h4>
+<p>I'll wait for the API tests to pass before moving it to QA.</p>
+
+
+
+<a name="531677872"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531677872" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531677872">(Jul 29 2025 at 18:49)</a>:</h4>
+<p>Crap, I was trying to get fancy by following <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally</a> instead of adding a remote with <code>git remote add Athemis git@github.com:Athemis/dataverse.git</code> like I usually do. But now I'm worried I screwed up your branch, <span class="user-mention" data-user-id="867821">@Alexander Minges</span> </p>
+<p><a href="https://github.com/IQSS/dataverse/actions/runs/16604285701/job/46972337687?pr=11600">https://github.com/IQSS/dataverse/actions/runs/16604285701/job/46972337687?pr=11600</a> says "Error: fatal: couldn't find remote ref refs/heads/fix-json-ld" <span aria-label="scream" class="emoji emoji-1f631" role="img" title="scream">:scream:</span> </p>
+<p>Sorry! Do you think we can fix it? Or should you create a fresh PR?</p>
+
+
+
+<a name="531678674"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531678674" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531678674">(Jul 29 2025 at 18:54)</a>:</h4>
+<p>Ok, I force pushed to your branch. Fingers crossed! <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="531679218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/531679218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#531679218">(Jul 29 2025 at 18:58)</a>:</h4>
+<p>Ok, good, it's getting farther.</p>
+
+
+
+<a name="534933294"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/534933294" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alexander Minges <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#534933294">(Aug 18 2025 at 11:52)</a>:</h4>
+<p>Anything else I can do to help with this PR? I've seen tha it's been iterating over several Sprints now.</p>
+
+
+
+<a name="534947406"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/534947406" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#534947406">(Aug 18 2025 at 13:02)</a>:</h4>
+<p>Let's see, <a href="https://github.com/IQSS/dataverse/issues/11600">#11600</a> is in QA. <span class="user-mention" data-user-id="760290">@Omer M Fahim</span> do you have any questions about it?</p>
+
+
+
+<a name="534952490"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incomplete%20HTML%20tags%20prevent%20loading%20of%20dataset%20view/near/534952490" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Omer M Fahim <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incomplete.20HTML.20tags.20prevent.20loading.20of.20dataset.20view.html#534952490">(Aug 18 2025 at 13:27)</a>:</h4>
+<p>This PR's good to go, going to merge shortly.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

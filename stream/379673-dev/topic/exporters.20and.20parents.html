@@ -1,0 +1,204 @@
+<html>
+<head><meta charset="utf-8"><title>exporters and parents · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html">exporters and parents</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="568415174"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568415174" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568415174">(Jan 16 2026 at 11:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="928391">@Sjaak Derksen</span> let's discuss here - doing this the SLOPI way (I'll leave it to <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> to explain SLOPI) is much better for future reference.</p>
+<p><span class="user-mention" data-user-id="928391">@Sjaak Derksen</span> pointed me to <a href="https://github.com/gdcc/exporter-dcat3/actions/runs/21062443230/job/60571742458#step:7:854">https://github.com/gdcc/exporter-dcat3/actions/runs/21062443230/job/60571742458#step:7:854</a>, where the releasing fails because he is trying to use a JDK 11 but targeting Java 17 (as instructed to the compiler).</p>
+
+
+
+<a name="568416384"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568416384" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568416384">(Jan 16 2026 at 11:51)</a>:</h4>
+<p>Looking at the <a href="https://github.com/gdcc/exporter-dcat3/blob/70c1e18e6d44a4bdc0839bbdfea1e5917d6c37d8/pom.xml#L189">DCAT3 POM</a>, that's an easy fix. Just drop the <code>&lt;release&gt;17&lt;/release&gt;</code> line and add a property <code>jdk.version=17</code>, so the compiler plugin get's correct config and the CI job knows the right JDK version as well.</p>
+
+
+
+<a name="568416411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568416411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568416411">(Jan 16 2026 at 11:51)</a>:</h4>
+<p>But there's more here!</p>
+
+
+
+<a name="568416541"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568416541" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568416541">(Jan 16 2026 at 11:52)</a>:</h4>
+<p>And this makes me wonder if we shouldn't put some useful things in the <a href="https://github.com/gdcc/dataverse-exporters/blob/main/pom.xml">exporters-parent</a> so much of this stuff is prompty autoconfigured for plugin developers.</p>
+
+
+
+<a name="568416589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568416589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568416589">(Jan 16 2026 at 11:52)</a>:</h4>
+<p>Also: lot's of interesting stuff <span class="user-mention" data-user-id="928391">@Sjaak Derksen</span> added here! Much I didn't know!</p>
+
+
+
+<a name="568416760"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568416760" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568416760">(Jan 16 2026 at 11:53)</a>:</h4>
+<p>I also suggest we add a Maven profile activating on JDK23+ that adds the <code>&lt;proc&gt;full&lt;/proc&gt;</code> bit. It's not available before that release and will topple any build using JDK 17-22:</p>
+<div class="codehilite" data-code-language="XML"><pre><span></span><code><span class="nt">&lt;profiles&gt;</span>
+<span class="w">    </span><span class="nt">&lt;profile&gt;</span>
+<span class="w">      </span><span class="nt">&lt;id&gt;</span>jdk23+<span class="nt">&lt;/id&gt;</span>
+<span class="w">      </span><span class="nt">&lt;activation&gt;</span>
+<span class="w">        </span><span class="nt">&lt;jdk&gt;</span>[23,)<span class="nt">&lt;/jdk&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/activation&gt;</span>
+<span class="w">      </span><span class="nt">&lt;build&gt;</span>
+<span class="w">        </span><span class="nt">&lt;plugins&gt;</span>
+<span class="w">          </span><span class="nt">&lt;plugin&gt;</span>
+<span class="w">            </span><span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;configuration&gt;</span>
+<span class="w">              </span><span class="nt">&lt;proc&gt;</span>full<span class="nt">&lt;/proc&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/configuration&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/plugin&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/plugins&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/build&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/profile&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/profiles&gt;</span>
+</code></pre></div>
+<p>Again something that could just sit in the exporter parent!</p>
+
+
+
+<a name="568419840"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568419840" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568419840">(Jan 16 2026 at 12:11)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/379673-dev/topic/exporters.20and.20parents/near/568415174">said</a>:</p>
+<blockquote>
+<p>let's discuss here - doing this the SLOPI way</p>
+</blockquote>
+<p>Here's my canonical writeup of SLOPI: <a href="https://blog.greptilian.com/2020/01/25/slopi-communication/">https://blog.greptilian.com/2020/01/25/slopi-communication/</a> (Searchable Linkable Open Public Indexed (SLOPI) Communication or Why open source projects should avoid Slack)</p>
+
+
+
+<a name="568420199"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568420199" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568420199">(Jan 16 2026 at 12:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I'm having a little trouble following what change you want to make, but I trust you. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="568440498"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568440498" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568440498">(Jan 16 2026 at 13:58)</a>:</h4>
+<p>I think <code>-proc</code> is required from java 23 and onwards but it was available as optional earlier. Now: i need the annotation processor - so <code>-proc:full</code> - for the @AutoService annotation. That generates the SPI entry in src/main/resources</p>
+
+
+
+<a name="568440968"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568440968" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568440968">(Jan 16 2026 at 14:00)</a>:</h4>
+<p>For JDK 17 I got this error message when "just having it", so I suspect CI will fail with this, too: <code>Fatal error compiling: error: invalid flag: -proc:full</code>.</p>
+<p>Looking at the allowed values via <code>javac --help</code> (for 17.0.9-tem): <code>only,none</code>. In JDK23 they changed the former default "full" to "none", which is why the allowed values then became <code>only,none,full</code>. (I do understand why you want full proc <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> )</p>
+<div class="codehilite"><pre><span></span><code>$ sdk use java 17.0.9-tem &amp;&amp; javac --help | grep &#39;\-proc:&#39;
+Using java version 17.0.9-tem in this shell.
+  -proc:{none,only}
+
+$ sdk use java 21.0.7-tem &amp;&amp; javac --help | grep &#39;\-proc:&#39;
+Using java version 21.0.7-tem in this shell.
+  -proc:{none,only,full}
+
+$ sdk use java 23.0.2-tem &amp;&amp; javac --help | grep &#39;\-proc:&#39;
+Using java version 23.0.2-tem in this shell.
+  -proc:{none,only,full}
+
+$sdk use java 25.0.1-tem &amp;&amp; javac --help | grep &#39;\-proc:&#39;
+Using java version 25.0.1-tem in this shell.
+  -proc:{none,only,full}
+</code></pre></div>
+
+
+
+<a name="568441281"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568441281" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568441281">(Jan 16 2026 at 14:02)</a>:</h4>
+<p>Using the Maven profile, activated when a newer javac (23+) is in action will just make it work for all. At least that's what I hope to see <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="568442492"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568442492" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568442492">(Jan 16 2026 at 14:08)</a>:</h4>
+<p>I added some more testing above. Maybe we should even activate the profile for Java 21+, so we have it going forward from this previous TLS, which may be around on quite some dev machines. (Also: I suspect this will be helpful for Dataverse core when moving to Jakarta EE 11)</p>
+
+
+
+<a name="568450605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568450605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568450605">(Jan 16 2026 at 14:43)</a>:</h4>
+<ul>
+<li>
+<p>Use <strong><code>-proc:only</code></strong> when you:</p>
+<ul>
+<li>split <strong>code generation</strong> and <strong>compilation</strong> into distinct build steps,</li>
+<li>want to inspect or cache generated sources/resources before compiling,</li>
+<li>run processors that produce artifacts consumed by other tools. <a href="https://learn.microsoft.com/en-us/power-platform/admin/wp-security-cds">[learn.microsoft.com]</a></li>
+</ul>
+</li>
+<li>
+<p>Use <strong><code>-proc:full</code></strong> when you:</p>
+<ul>
+<li>want the classic <strong>process‑then‑compile</strong> pipeline in one go,</li>
+<li>need processors’ outputs to be compiled immediately,</li>
+<li>aim to preserve pre‑JDK‑23 behavior explicitly. <a href="https://learn.microsoft.com/en-us/power-platform/admin/wp-security-cds">[learn.microsoft.com]</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+<a name="568450998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568450998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568450998">(Jan 16 2026 at 14:44)</a>:</h4>
+<p>it is strange.. I added the processor path block to control which annotation processor to trigger. I checked. It looks like I can remove the complete setting. I do have some background in annotation processing <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span> .. but never experienced issues with this flag.</p>
+
+
+
+<a name="568451041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568451041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568451041">(Jan 16 2026 at 14:45)</a>:</h4>
+<p>anyway... lets see if this works.</p>
+
+
+
+<a name="568453459"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568453459" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568453459">(Jan 16 2026 at 14:56)</a>:</h4>
+<p>don't believe the flag <code>-proc:full</code> is to blame.. removed it and still the same issue.</p>
+
+
+
+<a name="568453807"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568453807" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568453807">(Jan 16 2026 at 14:57)</a>:</h4>
+<p>move on the change the jdk setting</p>
+
+
+
+<a name="568456773"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568456773" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568456773">(Jan 16 2026 at 15:10)</a>:</h4>
+<p>Okay. succesful this time: </p>
+<div class="codehilite"><pre><span></span><code>[INFO] Waiting until Deployment 2b2d06e1-ab7b-4c8b-9bbb-948556f99df3 is validated
+
+[](https://github.com/gdcc/exporter-dcat3/actions/runs/21070944017/job/60600209816#step:7:3647)[INFO] Deployment 2b2d06e1-ab7b-4c8b-9bbb-948556f99df3 has been validated. To finish publishing visit https://central.sonatype.com/publishing/deployments
+</code></pre></div>
+<p>I guess that I can't finish it (it does not accept my github credentials)</p>
+
+
+
+<a name="568474769"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568474769" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568474769">(Jan 16 2026 at 16:30)</a>:</h4>
+<p><span class="user-mention" data-user-id="928391">@Sjaak Derksen</span> you're getting me wrong. I am not arguing about removing the flag at all! I'm just saying it will break compiling with a JDK 17 javac, while it's a must on JDK23+ javac. The way to work  around this problem is highlighted above. Just trying to make everybody, independent of their installed JDK (well not &lt;17), able to compile!</p>
+
+
+
+<a name="568475208"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568475208" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568475208">(Jan 16 2026 at 16:32)</a>:</h4>
+<p>no worries.. the flag does not seem to add anything if you also explicitly specify the maven coordinates of the used annotation processor. So it is not your comment as such, I think that we should not over-specify configuration and neither code. Fit for purpose is the keyword here <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span></p>
+
+
+
+<a name="568475343"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/exporters%20and%20parents/near/568475343" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sjaak Derksen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/exporters.20and.20parents.html#568475343">(Jan 16 2026 at 16:32)</a>:</h4>
+<p>the property though did fix the issue.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

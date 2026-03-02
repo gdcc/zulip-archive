@@ -1,0 +1,416 @@
+[
+    {
+        "content": "<p>If we were to use GitHub Actions to build the war file and upload it as an artifact (to GitHub Actions), where would we add it to the workflow?</p>\n<p>In our \"build with Maven\" step, we do a <code>mvn install</code> rather than a <code>mvn package</code>: <a href=\"https://github.com/IQSS/dataverse/blob/1c356b44f5f190d5da0c2dfd3ef42590accd5db1/.github/workflows/maven_unit_test.yml#L50\">https://github.com/IQSS/dataverse/blob/1c356b44f5f190d5da0c2dfd3ef42590accd5db1/.github/workflows/maven_unit_test.yml#L50</a></p>",
+        "id": 385647489,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692269135
+    },
+    {
+        "content": "<p>I'm interested in adding this to the Java 17 pull request, if possible.</p>",
+        "id": 385647538,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692269158
+    },
+    {
+        "content": "<p>The install is necessary because of the SPI module</p>",
+        "id": 385653507,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271445
+    },
+    {
+        "content": "<p>It will build and install the WAR file in the local Maven repo as well</p>",
+        "id": 385653544,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271463
+    },
+    {
+        "content": "<p>Do you want to have the WAR as an artifact independent of any integration tests running?</p>",
+        "id": 385653701,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271540
+    },
+    {
+        "content": "<p>(Or maybe even use it externally to feed an integration test?)</p>",
+        "id": 385653736,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271555
+    },
+    {
+        "content": "<p>If it should be uploaded after unit tests but before integration tests, that step needs to be in the maven_unit_test.yml workflow</p>",
+        "id": 385653847,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271589
+    },
+    {
+        "content": "<p>Otherwise in container_app_push.yml</p>",
+        "id": 385653883,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271603
+    },
+    {
+        "content": "<p>You probably see this line here: <a href=\"https://github.com/poikilotherm/dataverse/blob/1c356b44f5f190d5da0c2dfd3ef42590accd5db1/.github/workflows/maven_unit_test.yml#L70-L70\">https://github.com/poikilotherm/dataverse/blob/1c356b44f5f190d5da0c2dfd3ef42590accd5db1/.github/workflows/maven_unit_test.yml#L70-L70</a></p>",
+        "id": 385653956,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271644
+    },
+    {
+        "content": "<p>That's were I delete the WAR file from the local Maven repo so it won't be infecting the cache</p>",
+        "id": 385654010,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271673
+    },
+    {
+        "content": "<p>Uploading an artifact should happen just before that step</p>",
+        "id": 385654089,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271690
+    },
+    {
+        "content": "<p>I did notice that \"We don't want to cache the WAR file, so delete it\" comment. Make sense to have the artifact upload just before.</p>",
+        "id": 385654202,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692271744
+    },
+    {
+        "content": "<p>... if you want to upload before you know integration / E2E test results</p>",
+        "id": 385654292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271782
+    },
+    {
+        "content": "<p>well... <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 385654312,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692271795
+    },
+    {
+        "content": "<p>maybe we upload two versions: tested and untested <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 385654418,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692271817
+    },
+    {
+        "content": "<p>I'm confused though. The war is in <code>~/.m2/repository/edu/harvard/iq/dataverse</code> rather than <code>target</code>?</p>",
+        "id": 385654485,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692271843
+    },
+    {
+        "content": "<p>It probably is in both</p>",
+        "id": 385654508,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271855
+    },
+    {
+        "content": "<p>The <code>install</code> step will copy it from <code>target</code> to <code>.m2</code></p>",
+        "id": 385654561,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692271871
+    },
+    {
+        "content": "<p>Ok, cool. Now I'm wondering to myself why I always type <code>mvn package</code> instead of <code>mvn install</code>. Both seem to create the war file.</p>",
+        "id": 385655131,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272097
+    },
+    {
+        "content": "<p>Please be aware that the CI command always uses the parent module</p>",
+        "id": 385655212,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272135
+    },
+    {
+        "content": "<p>This way, the SPI package (or any other future modules we might add) is in the reactor</p>",
+        "id": 385655262,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272156
+    },
+    {
+        "content": "<p>We must use the install target for Maven, as package would invoke that target, but then the submodules would not be around when the main app is being built</p>",
+        "id": 385655406,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272202
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> do you feel like making a PR into <a href=\"https://github.com/IQSS/dataverse/pull/9764\">https://github.com/IQSS/dataverse/pull/9764</a> to push the war file to GitHub Artifacts (or whatever it's called).</p>",
+        "id": 385655421,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272208
+    },
+    {
+        "content": "<p>This is not critical as long as the SPI module did not change, as it can be pulled from Maven Central. But then the workflow breaks for PRs to the SPI module</p>",
+        "id": 385655512,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272251
+    },
+    {
+        "content": "<p>Maybe we could prototype the war upload with this tiny app: <a href=\"https://github.com/IQSS/dataverse-people\">https://github.com/IQSS/dataverse-people</a></p>",
+        "id": 385656500,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272678
+    },
+    {
+        "content": "<p>Or we could go straight to the Java 17 branch <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 385656551,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272705
+    },
+    {
+        "content": "<p><span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span> J17</p>",
+        "id": 385656620,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272714
+    },
+    {
+        "content": "<p>Cool. Do you want to make a PR?</p>",
+        "id": 385656702,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272735
+    },
+    {
+        "content": "<p>OK</p>",
+        "id": 385656732,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272744
+    },
+    {
+        "content": "<p>Oh wait</p>",
+        "id": 385656746,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272747
+    },
+    {
+        "content": "<p>PR or push?</p>",
+        "id": 385656776,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272755
+    },
+    {
+        "content": "<p>PR onto J17 branch?</p>",
+        "id": 385656858,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272765
+    },
+    {
+        "content": "<p>I think I'd like to look at it. It's already in QA. So PR please if you don't mind.</p>",
+        "id": 385656895,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272778
+    },
+    {
+        "content": "<p>So PR for develop, aye?</p>",
+        "id": 385656936,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272796
+    },
+    {
+        "content": "<p>Oh, I was thinking PR into the Java 17 PR.</p>",
+        "id": 385656960,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272811
+    },
+    {
+        "content": "<p>But it's in QA?</p>",
+        "id": 385656992,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272822
+    },
+    {
+        "content": "<p>Is that OK to add?</p>",
+        "id": 385657003,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272827
+    },
+    {
+        "content": "<p>What's driving this is that we'd like to be able to point QA at a Java 17 war artifact.</p>",
+        "id": 385657017,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272833
+    },
+    {
+        "content": "<p>Well, if it's a PR. I'll look at it and communicate with QA about merge it or not. The timing, basically.</p>",
+        "id": 385657114,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272875
+    },
+    {
+        "content": "<p>Roger roger</p>",
+        "id": 385657180,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272885
+    },
+    {
+        "content": "<p>Phew. Sorry so complicated.</p>",
+        "id": 385657200,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272893
+    },
+    {
+        "content": "<p>If it was earlier (PR still in progress), I'd say just push directly to the branch.</p>",
+        "id": 385657253,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692272916
+    },
+    {
+        "content": "<p>Do you want an issue first?</p>",
+        "id": 385657269,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692272922
+    },
+    {
+        "content": "<p>Oh! If you want. Might be nice for tracking.</p>",
+        "id": 385657645,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692273076
+    },
+    {
+        "content": "<p>Maybe this will be the start of cutting releases with GitHub Actions. <span aria-label=\"stuck out tongue wink\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"stuck out tongue wink\">:stuck_out_tongue_wink:</span></p>",
+        "id": 385657725,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692273117
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I've always been told to do a <code>package</code> so I've always done a <code>package</code> - should I update all the Jenkins jobs (and Ansible, and whatever else) to <code>install</code> instead?</p>",
+        "id": 385657850,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1692273156
+    },
+    {
+        "content": "<p>Retention days?</p>",
+        "id": 385657859,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273159
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/379673-dev/topic/war.20file.20artifact.20from.20GitHub.20Actions/near/385657859\">said</a>:</p>\n<blockquote>\n<p>Retention days?</p>\n</blockquote>\n<p>1, or 2, or 7 or whatever. This is for Kevin's benefit.</p>",
+        "id": 385657936,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1692273191
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> that depends on what you are trying to do. If you want to properly build the SPI along with the rest, see that job for the command to use</p>",
+        "id": 385657984,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273218
+    },
+    {
+        "content": "<p>OK I'll make it 7 days.</p>",
+        "id": 385658080,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273246
+    },
+    {
+        "content": "<p>7 sounds fine</p>",
+        "id": 385658103,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692273258
+    },
+    {
+        "content": "<p>I'll name the artifact dataverse-java$jdk.war so it's easier to keep them apart if we ever use the matrix again</p>",
+        "id": 385658222,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273303
+    },
+    {
+        "content": "<p>(Same name = overwrite)</p>",
+        "id": 385658285,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273325
+    },
+    {
+        "content": "<p>Sure, sounds fine.</p>",
+        "id": 385658445,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692273374
+    },
+    {
+        "content": "<p>We're aware of <a href=\"https://github.com/actions/upload-artifact#zipped-artifact-downloads\">https://github.com/actions/upload-artifact#zipped-artifact-downloads</a> rihgt?</p>",
+        "id": 385658604,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273448
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/379673-dev/topic/war.20file.20artifact.20from.20GitHub.20Actions/near/385658604\">said</a>:</p>\n<blockquote>\n<p>We're aware of <a href=\"https://github.com/actions/upload-artifact#zipped-artifact-downloads\">https://github.com/actions/upload-artifact#zipped-artifact-downloads</a> rihgt?</p>\n</blockquote>\n<p>that's minor.</p>",
+        "id": 385658817,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1692273513
+    },
+    {
+        "content": "<p>No worries</p>",
+        "id": 385658836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692273521
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> here's the PR but there no code change so it won't run now. <a href=\"https://github.com/IQSS/dataverse/pull/9789\">https://github.com/IQSS/dataverse/pull/9789</a></p>",
+        "id": 385659810,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273849
+    },
+    {
+        "content": "<p>Should I push some small code change to test?</p>",
+        "id": 385659861,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692273877
+    },
+    {
+        "content": "<p>Yes, please</p>",
+        "id": 385660585,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692274152
+    },
+    {
+        "content": "<p>Walking the dog. Back soon.</p>",
+        "id": 385660603,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692274163
+    },
+    {
+        "content": "<p>Run is a success: <a href=\"https://github.com/IQSS/dataverse/actions/runs/5890761815?pr=9789\">https://github.com/IQSS/dataverse/actions/runs/5890761815?pr=9789</a><br>\nArtifact here: <a href=\"https://github.com/IQSS/dataverse/suites/15187396659/artifacts/867845145\">https://github.com/IQSS/dataverse/suites/15187396659/artifacts/867845145</a></p>",
+        "id": 385662444,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692274894
+    },
+    {
+        "content": "<p>Perfect. Merged! Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> !! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 385663752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692275400
+    },
+    {
+        "content": "<p>Wasn't very complicated.</p>",
+        "id": 385663878,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692275427
+    },
+    {
+        "content": "<p>Will impact build times though - takes ~44s to upload the data</p>",
+        "id": 385663920,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692275442
+    },
+    {
+        "content": "<p>Meh, it's worth the extra time.</p>",
+        "id": 385670612,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692277889
+    },
+    {
+        "content": "<p>I just summarized what we did here: <a href=\"https://github.com/IQSS/dataverse/pull/9764#issuecomment-1682261825\">https://github.com/IQSS/dataverse/pull/9764#issuecomment-1682261825</a></p>",
+        "id": 385670628,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692277897
+    },
+    {
+        "content": "<p>Thanks again!</p>",
+        "id": 385670636,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692277900
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 385672764,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1692278718
+    }
+]

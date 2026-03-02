@@ -1,0 +1,78 @@
+<html>
+<head><meta charset="utf-8"><title>Direct Upload to Immutable S3 Buckets · large-data · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/index.html">large-data</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html">Direct Upload to Immutable S3 Buckets</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="545402904"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545402904" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545402904">(Oct 16 2025 at 16:56)</a>:</h4>
+<p>Hi folks, hope this is the right place to ask (and happy to relay elsewhere). We're testing Dataverse with direct uploads to a CloudianS3 bucket with immutability enabled, which in their implementation requires that the Content-MD5 header is sent when PUTing an object to the backend. My understanding is that the presigned URL would need to include Content-MD5 as one of the signed headers and incorporate that into its signature, in addition to the client separately sending that header in the direct PUT request. I don't think that's possible without the UI prompting the user or otherwise calculating the MD5 before submitting the Dataverse API request that generates the presigned URL. But I just wanted to throw it out there in case anyone else had run into this specific issue! Any thoughts would be appreciated.</p>
+
+
+
+<a name="545417095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545417095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545417095">(Oct 16 2025 at 18:03)</a>:</h4>
+<p>Hmm. Could you please open an issue about this at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> ?</p>
+
+
+
+<a name="545418591"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545418591" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545418591">(Oct 16 2025 at 18:11)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Will do! I'll file that later today.</p>
+
+
+
+<a name="545434870"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545434870" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545434870">(Oct 16 2025 at 19:53)</a>:</h4>
+<p>Ok, submitted —&gt; <a href="https://github.com/IQSS/dataverse/issues/11901">https://github.com/IQSS/dataverse/issues/11901</a> Hope that's clear. This is not a big ask for us, as we're going to use a workaround, but given that it touches on data integrity I think it's useful for you (us?) all to ponder even if it doesn't make it into Dataverse.</p>
+
+
+
+<a name="545435146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545435146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545435146">(Oct 16 2025 at 19:55)</a>:</h4>
+<p>As for our workaround(s):</p>
+<ol>
+<li>For integrity checking, it looks like we're going to have to do something out of band with the ComputeChecksum bucket-side feature. I.e. we'll upload without checksums, compute checksums on the bucket, then compare that with our metadata in Dataverse before publishing.</li>
+<li>For immutability, in our case it's possible to disable ObjectLock in the application bucket but enable it in our replicated bucket. That gets us the security protections we want. There aren't a lot of downsides, either—if we need to failover to the replicated bucket, it's possible in a pinch to temporarily disable ObjectLock.</li>
+</ol>
+
+
+
+<a name="545435464"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545435464" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545435464">(Oct 16 2025 at 19:58)</a>:</h4>
+<p>Looks great. Thanks! Have you looked at <a href="https://guides.dataverse.org/en/6.8/developers/s3-direct-upload-api.html">https://guides.dataverse.org/en/6.8/developers/s3-direct-upload-api.html</a></p>
+<p>You'll find md5Hash in there.</p>
+
+
+
+<a name="545435983"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545435983" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545435983">(Oct 16 2025 at 20:01)</a>:</h4>
+<p>We have, but unless I'm mistaken that doesn't solve this problem. We're not able to upload files at all to S3 buckets with ObjectLock enabled b/c the Content-MD5 header needs to be submitted at upload time. That's true whether it goes through Dataverse (direct-upload=false) or from the client (direct-upload=true, in which case the pre-signed URL would also need to contain the header+value). Does that make sense?</p>
+
+
+
+<a name="545436146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545436146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Daniel C Schmidt <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545436146">(Oct 16 2025 at 20:03)</a>:</h4>
+<p>It brings up a related question — how are folks verifying file integrity when using S3 backends? Is that all out-of-band? If we're not validating checksums on submission, then the obvious answer would be to audit buckets by comparing metadata in Dataverse with the results of a ComputeChecksum job on the bucket.</p>
+
+
+
+<a name="545438481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545438481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545438481">(Oct 16 2025 at 20:21)</a>:</h4>
+<p>Hmm, I see what you mean, I think. That md5Hash I mentioned is what you tell Dataverse the md5 is for the file. But Dataverse is just trusting you on that, right?</p>
+
+
+
+<a name="545438775"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Direct%20Upload%20to%20Immutable%20S3%20Buckets/near/545438775" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Direct.20Upload.20to.20Immutable.20S3.20Buckets.html#545438775">(Oct 16 2025 at 20:23)</a>:</h4>
+<p>Anyway, I think Jim is on his way to the <a href="https://en.wikipedia.org/wiki/Head_of_the_Charles_Regatta">Head of the Charles</a> but he'll probably see your issue and get back to you next week. He implemented most of this. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

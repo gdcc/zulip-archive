@@ -1,0 +1,416 @@
+[
+    {
+        "content": "<p>I'm not sure if it is container related, however it seems that the CorsFilter is not picked up automatically although the <code>@WebFilter(\"/*\")</code> should do that:</p>\n<div class=\"codehilite\"><pre><span></span><code>@WebFilter(&quot;/*&quot;)\npublic class CorsFilter implements Filter\n</code></pre></div>\n<p>Instead I had to manually add to <code>web.xml</code> this:</p>\n<div class=\"codehilite\"><pre><span></span><code>    &lt;filter&gt;\n        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;\n        &lt;filter-class&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-class&gt;\n    &lt;/filter&gt;\n    &lt;filter-mapping&gt;\n        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;\n        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;\n    &lt;/filter-mapping&gt;\n</code></pre></div>\n<p>I also checked in the debugger and without the explicit <code>web.xml</code> <code>doFilter()</code> is not get called.</p>",
+        "id": 572110249,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770287401
+    },
+    {
+        "content": "<p>This topic was moved here from <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/CorsFilter.20problem\">#containers &gt; CorsFilter problem</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 572144046,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1770297136
+    },
+    {
+        "content": "<p>As this is not purely container related, I moved this here <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span></p>",
+        "id": 572144170,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297173
+    },
+    {
+        "content": "<p>Are there any API tests for the filter?</p>",
+        "id": 572144281,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297203
+    },
+    {
+        "content": "<p>It would be good to have a reproducer.</p>",
+        "id": 572144339,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297219
+    },
+    {
+        "content": "<p>I just tried calling a DV endpoint from a browser component, but try to come up with a curl.</p>",
+        "id": 572144600,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770297295
+    },
+    {
+        "content": "<p>It would be good to have an API test included in our regular suite, so we can also test this is in CI</p>",
+        "id": 572147051,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297915
+    },
+    {
+        "content": "<p>Actually, I don't know how to make curl fail with CORS, because it never does as it doesn't care, only browsers do, right? For now I just vibe coded a simple single page app which tries to create a dataset with POST and it does fail for me with stock develop branch DV (without manually adding the filter to webxml):</p>\n<p><a href=\"/user_uploads/53090/CIx9GN60LdG47ANe_sO3NKJ0/cors-tester.html\">cors-tester.html</a></p>\n<p>Just open it in a browser, set the api token and press \"POST JSON\" to see if it fails or not. (It uses the dataset-finch1.json from the DV API guides)</p>",
+        "id": 572199338,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770309598
+    },
+    {
+        "content": "<p>I was suggesting creating an IT test that checks for presence of the headers.</p>",
+        "id": 572220936,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770315823
+    },
+    {
+        "content": "<p>(As you said - anything that's not a browser won't care. But we'd only want to verify the servlet filter is picked up)</p>",
+        "id": 572221063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770315859
+    },
+    {
+        "content": "<p>Ok, I created a CorsIT test checking for CORS headers. </p>\n<p>It turns out that the result is kind of random based on whether the server happens to pick up CorsFilter or not. </p>\n<p>Here's my actual test session: I run the app in docker. When it is started I run the test manually. Then I stop the server with ctrl+c and either start it again with run, or first do an explicit stop. None of these seem to matter, the result seems to be random:</p>\n<p>mvn -Pct docker:stop</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:stop</p>\n<p>mvn -Pct docker:run --&gt; PASS</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; PASS</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>I don't know how to proceed from here. One thing is sure: If add the explicit web.xml filter and filter-mapping it works consistently.</p>",
+        "id": 572337995,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770372808
+    },
+    {
+        "content": "<p>This is the test I run:</p>\n<p><a href=\"/user_uploads/53090/yopxGJpaX7jvCNARa9f2Vwei/CorsIT.java\">CorsIT.java</a></p>\n<p>In the <code>docker-compose-dev.yml</code> I set these for <code>dev_dataverse</code> just to see if I get specific headers I configure:</p>\n<div class=\"codehilite\"><pre><span></span><code>      DATAVERSE_CORS_ORIGIN: &quot;*&quot;\n      DATAVERSE_CORS_HEADERS_ALLOW: &quot;Accept,Content-Type,X-Dataverse-key,Authorization,cedar-client-session-id,cedar-debug&quot;\n``\n</code></pre></div>",
+        "id": 572343754,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770374454
+    },
+    {
+        "content": "<p>In your test I see that you are targeting an API endpoint.</p>",
+        "id": 572348983,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376012
+    },
+    {
+        "content": "<p>Yes, /api/dataverses/root/datasets</p>",
+        "id": 572349036,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376028
+    },
+    {
+        "content": "<p>Are we sure the filter actually will correctly work with JAX-RS</p>",
+        "id": 572349045,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376030
+    },
+    {
+        "content": "<p>What happens when hitting JSF or other pure servlets?</p>",
+        "id": 572349165,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376071
+    },
+    {
+        "content": "<p>Yes, sometimes it does, sometimes it doesn't. I don't know what kind of race condition could<br>\n it be.</p>",
+        "id": 572349200,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376081
+    },
+    {
+        "content": "<p>What happens if we hit a 404 in a servlet</p>",
+        "id": 572349336,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376122
+    },
+    {
+        "content": "<p>I don't know about JSF, but I want to access api endpoints from a webapp</p>",
+        "id": 572349358,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376129
+    },
+    {
+        "content": "<p>What url do you suggest to test?</p>",
+        "id": 572349455,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376156
+    },
+    {
+        "content": "<p>Technically, JAX-RS is still a servlet, but it's special. We may be in trouble here due to filter ordering etc.</p>",
+        "id": 572349977,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376331
+    },
+    {
+        "content": "<p>Also, AI tells me there may be a problem with the mixed style of having web.xml registered filters and annotation based. Not sure if this really is a thing, but lets keep it in mind.</p>",
+        "id": 572350118,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376374
+    },
+    {
+        "content": "<p>Yes, I think it definitely affects it, although as I read about it should be still deterministic</p>",
+        "id": 572350271,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376423
+    },
+    {
+        "content": "<p>SwordFilter is the only one configured in web.xml. Maybe removing it from there and adding @WebFilter annotation on the class makes it clear.</p>",
+        "id": 572350550,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376537
+    },
+    {
+        "content": "<p>I try this.</p>",
+        "id": 572350612,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376556
+    },
+    {
+        "content": "<p>Technically for JAX-RS we should be using @ContainerRequestFilter to be within the consistent filter framework of JAX-RS</p>",
+        "id": 572350922,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376655
+    },
+    {
+        "content": "<p>See ApiBlockingFilter in api.filter package.</p>",
+        "id": 572351025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376692
+    },
+    {
+        "content": "<p>So this may be another culprit, why things my go sideways - the servlet filter and the JAX-RS filter may conflict.</p>",
+        "id": 572351142,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376736
+    },
+    {
+        "content": "<p>At least if both are discovered by annotations scanning.</p>",
+        "id": 572351197,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376754
+    },
+    {
+        "content": "<p>Maybe making the filter explicit in web.xml makes it load before the other or sth</p>",
+        "id": 572351230,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376771
+    },
+    {
+        "content": "<p>Hmm coming to think about it: any servlet filters will be applied first, then the JAX-RS internal filters will apply. These two don't mix-n-match, they are at different layers. So should be nothing to worry about here.</p>",
+        "id": 572352089,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377067
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> could you please verify something for me...</p>",
+        "id": 572352666,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377254
+    },
+    {
+        "content": "<p>Yes, sure.</p>",
+        "id": 572352714,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770377264
+    },
+    {
+        "content": "<p>Could you run the tests against /api/v1/...</p>",
+        "id": 572352720,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377265
+    },
+    {
+        "content": "<p>I had a look at all the filters we already have and ApiRouter popped up. Asking AI about it gave me this: </p>\n<blockquote>\n<p>The <code>ApiRouter</code> is doing an internal <code>RequestDispatcher.forward(...)</code> from:<br>\n<code>/api/...</code> → <code>/api/v1/...</code> (your JAX‑RS app is mounted at ) <code>@ApplicationPath(\"api/v1\")</code></p>\n<p>That has a big side effect in Servlet-land: a forward is a second dispatch with dispatcher type FORWARD, and many servlet filters only apply to dispatcher type REQUEST unless explicitly configured.</p>\n</blockquote>",
+        "id": 572352907,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377327
+    },
+    {
+        "content": "<p>So let's rule out that the router may mess up our filter chain</p>",
+        "id": 572353160,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377404
+    },
+    {
+        "content": "<p>In the meantime I tested putting @WebFilter onto SwordFilter and removing the web.xml config --&gt; same random test behaviour</p>\n<p>I now try the /api/v1 behaviour</p>",
+        "id": 572354030,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770377694
+    },
+    {
+        "content": "<p>Great to verify that! We doubted it would be related, glad to see it was indeed not.</p>",
+        "id": 572354201,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377759
+    },
+    {
+        "content": "<p>My money is on Router vs Cors, as both affect the same endpoints.</p>",
+        "id": 572354251,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377778
+    },
+    {
+        "content": "<p>Also, you might want to do the testing with the sword filter as well <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> Not sure if the order matters with those two. IMHO filters should avoid being dependent on order. But of course we'd need to take care of types (forward, request)</p>",
+        "id": 572354415,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377832
+    },
+    {
+        "content": "<p>Yep. So, when /api/dataverses/root/datasets fails /api/v1/dataverses/root/datasets passes the test.</p>",
+        "id": 572355905,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378354
+    },
+    {
+        "content": "<p>Now what? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 572355993,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378378
+    },
+    {
+        "content": "<p>In case of /api/v1 it first reaches CorsFilter then ApiBlockingFilter<br>\nIn case of /api only reaches ApiBlockingFilter</p>\n<p>(doFilter(), I mean)</p>",
+        "id": 572356692,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378602
+    },
+    {
+        "content": "<p>Ha! So Api Router <em>is</em> the culprit</p>",
+        "id": 572356894,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378667
+    },
+    {
+        "content": "<p>But you're somewhat wrong. The chain is:<br>\n/api       -&gt; Router -&gt; forward -&gt; Cors -&gt; ApiBlocking (which breaks at Cors because forward)<br>\n/api/v1 -&gt; Router -&gt; Cors -&gt; ApiBlocking</p>",
+        "id": 572357317,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378809
+    },
+    {
+        "content": "<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>",
+        "id": 572357488,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378865
+    },
+    {
+        "content": "<p>So in case of</p>\n<p>RequestDispatcher dsp = request.getRequestDispatcher(newRequestUri);<br>\ndsp.forward(req, sr1);</p>\n<p>wherever it goes it won't always goes thro CorsFilter, it is not in that filter chain, or sg.</p>",
+        "id": 572357671,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378923
+    },
+    {
+        "content": "<p>So what we need to do: add both \"FORWARD\" and \"REQUEST\" to CorsFilter:</p>\n<div class=\"codehilite\" data-code-language=\"Java\"><pre><span></span><code><span class=\"nd\">@WebFilter</span><span class=\"p\">(</span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">\"/*\"</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"n\">dispatcherTypes</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">{</span><span class=\"n\">DispatcherType</span><span class=\"p\">.</span><span class=\"na\">REQUEST</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"n\">DispatcherType</span><span class=\"p\">.</span><span class=\"na\">FORWARD</span><span class=\"p\">})</span>\n</code></pre></div>\n<p>We should also look at the types ERROR and INCLUDE later on to avoid breaking CORS when serving error pages etc</p>",
+        "id": 572357680,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378928
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"602497\">Balázs Pataki</span> <a href=\"#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/572357488\">said</a>:</p>\n<blockquote>\n<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>\n</blockquote>\n<p>It goes there, but will not match because of dispatcher type forward!</p>",
+        "id": 572357817,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378978
+    },
+    {
+        "content": "<p>Ok, I check now adding DispatcherType.FORWARD</p>",
+        "id": 572357922,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379015
+    },
+    {
+        "content": "<p>Please make sure to use the above example, otherwise we'd break REQUEST <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 572358009,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770379042
+    },
+    {
+        "content": "<p>yeah, i copy pasted that :-)</p>",
+        "id": 572358065,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379058
+    },
+    {
+        "content": "<p>Oh yeah, it works consistently now! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>\n<p>And the filter orders are as follows:</p>\n<p>/api<br>\ncors -&gt; router -&gt; cors -&gt; apiblocking</p>\n<p>/api/v1<br>\ncors -&gt; router -&gt; apiblocking</p>",
+        "id": 572359916,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379568
+    },
+    {
+        "content": "<p>Good morning. <span aria-label=\"coffee\" class=\"emoji emoji-2615\" role=\"img\" title=\"coffee\">:coffee:</span> You've been busy!</p>",
+        "id": 572364466,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770381052
+    },
+    {
+        "content": "<p>Submitted a PR:</p>\n<p><a href=\"https://github.com/IQSS/dataverse/pull/12151\">https://github.com/IQSS/dataverse/pull/12151</a></p>\n<p>Should we add anything else to it, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ?</p>",
+        "id": 572369841,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770382659
+    },
+    {
+        "content": "<p>Can you test the error pages?</p>",
+        "id": 572370001,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382706
+    },
+    {
+        "content": "<p>And SWORD maybe?</p>",
+        "id": 572370062,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382721
+    },
+    {
+        "content": "<p>You mean to add more URL-s to test in CorsIT, right?</p>",
+        "id": 572370245,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770382774
+    },
+    {
+        "content": "<p>Yeah, lets have more tests in there</p>",
+        "id": 572370295,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382787
+    },
+    {
+        "content": "<p>Might be an @Parameterized one or single ones.</p>",
+        "id": 572370356,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382803
+    },
+    {
+        "content": "<p>Not sure we can make RestAssured hit the other endpoints that easily.</p>",
+        "id": 572370419,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382824
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> this may be worth another backport to 6.9</p>",
+        "id": 572374168,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770383948
+    },
+    {
+        "content": "<p>I made it ParameterizedTest and now it tests these endpoints</p>\n<p>\"/api/dataverses/root/datasets\",<br>\n\"/api/v1/dataverses/root/datasets\",<br>\n\"/page_doesnt_exist\",<br>\n\"/dvn/api/data-deposit/v1.1/swordv2/collection/dataverse/root\"</p>",
+        "id": 572378744,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770385227
+    },
+    {
+        "content": "<p>You probably should add CorsIT to the list of tests at <a href=\"https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt\">https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt</a></p>",
+        "id": 572386225,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387007
+    },
+    {
+        "content": "<p>I've always meant to refactor the API tests to properly use Maven Failsafe and JUnit 5 Suites, but didn't find the time so far...</p>",
+        "id": 572386380,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387046
+    },
+    {
+        "content": "<p>I left two comments on the PR</p>",
+        "id": 572387366,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387295
+    },
+    {
+        "content": "<p>Edit: added another one.</p>",
+        "id": 572390742,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770388131
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> I've marked your PR as a draft for now and added all the necessary labels (put didn't put it on the board yet <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>). Keep them changes coming, I'll be the ambassador on including it in 6.10</p>",
+        "id": 572395435,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770389319
+    },
+    {
+        "content": "<p>I'd say we can safely put it in the \"Ready for Triage\" column so it comes up on Triage Tuesday. Any objections? Thanks for the PR! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 572398158,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770389974
+    }
+]

@@ -1,0 +1,82 @@
+<html>
+<head><meta charset="utf-8"><title>File storage and upload on SPA · ui-dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/index.html">ui-dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html">File storage and upload on SPA</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="533059653"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533059653" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533059653">(Aug 06 2025 at 09:19)</a>:</h4>
+<p>The developer documentation suggest that you need S3 credentials to be able to upload a file. And indeed, when trying to upload it fails with : <code>FileJSDataverseRepository.ts:299 
+ PUT https://beta-dataverse-direct.s3.us-east-1.amazonaws.com/10.5072/FK2/HWDGFW…Signature=286e552… 403 (Forbidden)</code>.<br>
+It seems that the amazonaws is hardwired, which does not work wel for non-IQSS developers. <br>
+It would be better if the develop enviromment used a minio docker container. </p>
+<p>But futhermore, it might be that the Dataverse backend also must use this same S3 as its file storage for the upload to work?</p>
+
+
+
+<a name="533098658"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533098658" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533098658">(Aug 06 2025 at 13:06)</a>:</h4>
+<p>I'm confused. In development we do use MinIO and LocalStack. In this test, for example: <a href="https://github.com/IQSS/dataverse/blob/v6.7.1/src/test/java/edu/harvard/iq/dataverse/api/S3AccessIT.java">https://github.com/IQSS/dataverse/blob/v6.7.1/src/test/java/edu/harvard/iq/dataverse/api/S3AccessIT.java</a></p>
+<p>So there shouldn't be any dependence on AWS. Do we need to fix the developer docs? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="533099296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533099296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533099296">(Aug 06 2025 at 13:09)</a>:</h4>
+<p>I am looking at the docs: <a href="https://github.com/IQSS/dataverse-frontend/blob/develop/DEVELOPER_GUIDE.md#running-the-project-locally">https://github.com/IQSS/dataverse-frontend/blob/develop/DEVELOPER_GUIDE.md#running-the-project-locally</a><br>
+If I run the SPA locally, I get that error. <br>
+Sorry for the confusion, I added 'on SPA' to the topic.</p>
+
+
+
+<a name="533100613"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533100613" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533100613">(Aug 06 2025 at 13:16)</a>:</h4>
+<p>thanks</p>
+
+
+
+<a name="533101180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533101180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533101180">(Aug 06 2025 at 13:19)</a>:</h4>
+<p>I see what you mean:</p>
+<div class="codehilite"><pre><span></span><code># /dev-env/ directory
+
+# copy the .env.example file to .env
+# To test file upload, update the .env file with S3 credentials
+$ cp .env.example .env
+</code></pre></div>
+<p>Yes, my <code>.env.</code>file has these:</p>
+<div class="codehilite"><pre><span></span><code>S3_ACCESS_KEY=REDACTED
+S3_SECRET_KEY=REDACTED
+</code></pre></div>
+<p>I agree this is suboptimal. I assumed it was using MinIO or LocalStack rather than actual AWS S3. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="533101635"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533101635" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533101635">(Aug 06 2025 at 13:21)</a>:</h4>
+<p>Ha, I see from my Slack history that <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> shared those secrets with me about a year ago.</p>
+<p><span class="user-mention" data-user-id="598442">@Guillermo Portas</span> I forget the details on this. Is the frontend dev environment dependent on AWS S3? Can developers use MinIO or LocalStack instead?</p>
+
+
+
+<a name="533125520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533125520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533125520">(Aug 06 2025 at 15:17)</a>:</h4>
+<p>The original idea was to use MinIO / LocalStack, but we ultimately discarded that approach due to difficulties getting it to work with direct uploads.<br>
+To speed up development, we decided to switch to a real S3 bucket instead.<br>
+We're happy to transition to a fully containerized solution using MinIO / LocalStack in the future, as long as we can get a working setup.</p>
+
+
+
+<a name="533126408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/File%20storage%20and%20upload%20on%20SPA/near/533126408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/File.20storage.20and.20upload.20on.20SPA.html#533126408">(Aug 06 2025 at 15:22)</a>:</h4>
+<p>Great, I added this to our "Roadmap - Technical Brainstorming" doc.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

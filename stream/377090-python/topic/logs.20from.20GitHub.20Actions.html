@@ -1,0 +1,173 @@
+<html>
+<head><meta charset="utf-8"><title>logs from GitHub Actions · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html">logs from GitHub Actions</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="541250718"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541250718" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541250718">(Sep 24 2025 at 14:56)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> see <a href="https://github.com/gdcc/api-test-runner">https://github.com/gdcc/api-test-runner</a></p>
+
+
+
+<a name="541250810"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541250810" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541250810">(Sep 24 2025 at 14:56)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+        with:
+          dest: &#39;./logs&#39;
+      - name: Tar logs
+        if: failure()
+        run: tar cvzf ./logs.tgz ./logs
+      - name: Upload logs to GitHub
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: logs.tgz
+          path: ./logs.tgz
+</code></pre></div>
+
+
+
+<a name="541281657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541281657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541281657">(Sep 24 2025 at 16:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> I have added the log saves to the script in pyDataverse. Will add it to the action as well now</p>
+
+
+
+<a name="541306316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541306316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541306316">(Sep 24 2025 at 18:50)</a>:</h4>
+<p>Looking at the GitHub Action, adding the log step as a post-step will be difficult. Since we are using a composite action, all steps defined will be run in sequence, and only then the next steps in any CI will be taken. Either we rewrite the action in JavaScript, which allows both pre- and post-runs, or we simply document how one can retrieve the logs in the CI. What are your thoughts?</p>
+
+
+
+<a name="541319751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541319751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541319751">(Sep 24 2025 at 19:51)</a>:</h4>
+<p>Okay, I went down the Node actions rabbit hole with a little help from Claude, and I think I am almost there. Only thing missing is that the logs are pushed as artifacts, but they are present in the action runs now <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+<p><a href="https://github.com/gdcc/dataverse-action/actions/runs/17987836304/job/51170398822">https://github.com/gdcc/dataverse-action/actions/runs/17987836304/job/51170398822</a></p>
+
+
+
+<a name="541320424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541320424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541320424">(Sep 24 2025 at 19:53)</a>:</h4>
+<p>Oh! That's better, i think, to be able to just see the logs instead of having to download a tarball. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="541322642"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541322642" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541322642">(Sep 24 2025 at 20:06)</a>:</h4>
+<p>Awesome! I also like that it is within the run logs. At first I thought it may be cluttered, but it actually looks nice <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="541322728"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541322728" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541322728">(Sep 24 2025 at 20:06)</a>:</h4>
+<p>I'd still try to get the logs as an artifact. Maybe there is a use case for it <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+
+
+
+<a name="541323138"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541323138" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541323138">(Sep 24 2025 at 20:09)</a>:</h4>
+<p>Belt and suspenders. Sure.</p>
+
+
+
+<a name="541324004"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541324004" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541324004">(Sep 24 2025 at 20:15)</a>:</h4>
+<p>Logs are now uploaded <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+<p><a href="https://github.com/gdcc/dataverse-action/actions/runs/17988383629">https://github.com/gdcc/dataverse-action/actions/runs/17988383629</a></p>
+
+
+
+<a name="541326192"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541326192" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541326192">(Sep 24 2025 at 20:31)</a>:</h4>
+<p>It's definitely nice to have both.</p>
+
+
+
+<a name="541326222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541326222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541326222">(Sep 24 2025 at 20:31)</a>:</h4>
+<p>Now we just need something to break! <span aria-label="bomb" class="emoji emoji-1f4a3" role="img" title="bomb">:bomb:</span></p>
+
+
+
+<a name="541326526"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541326526" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541326526">(Sep 24 2025 at 20:34)</a>:</h4>
+<p>We will catch all the bugs! <span aria-label="smiling devil" class="emoji emoji-1f608" role="img" title="smiling devil">:smiling_devil:</span></p>
+
+
+
+<a name="541326558"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541326558" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541326558">(Sep 24 2025 at 20:34)</a>:</h4>
+<p>Today is the day of pull requests <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="541326562"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541326562" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541326562">(Sep 24 2025 at 20:34)</a>:</h4>
+<p><a href="https://github.com/gdcc/dataverse-action/pull/18">https://github.com/gdcc/dataverse-action/pull/18</a></p>
+
+
+
+<a name="541327122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327122">(Sep 24 2025 at 20:39)</a>:</h4>
+<p>Husky? <span aria-label="dog" class="emoji emoji-1f415" role="img" title="dog">:dog:</span></p>
+
+
+
+<a name="541327210"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327210" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327210">(Sep 24 2025 at 20:39)</a>:</h4>
+<p>this? <a href="https://github.com/typicode/husky">https://github.com/typicode/husky</a></p>
+
+
+
+<a name="541327229"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327229" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327229">(Sep 24 2025 at 20:40)</a>:</h4>
+<p>Yes, exactly this!</p>
+
+
+
+<a name="541327289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327289">(Sep 24 2025 at 20:40)</a>:</h4>
+<p>Git hooks made easy <span aria-label="puppy" class="emoji emoji-1f436" role="img" title="puppy">:puppy:</span> woof!</p>
+
+
+
+<a name="541327423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327423">(Sep 24 2025 at 20:41)</a>:</h4>
+<p>Love the name <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="541327451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327451">(Sep 24 2025 at 20:41)</a>:</h4>
+<p>Just recently found it and it is quite cool</p>
+
+
+
+<a name="541327647"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541327647" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541327647">(Sep 24 2025 at 20:43)</a>:</h4>
+<p>My daughter is a Husky: <a href="https://en.wikipedia.org/wiki/Northeastern_Huskies">https://en.wikipedia.org/wiki/Northeastern_Huskies</a></p>
+
+
+
+<a name="541401434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541401434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541401434">(Sep 25 2025 at 08:42)</a>:</h4>
+<p>Cool! All disciplines or specific ones like hockey?</p>
+
+
+
+<a name="541420661"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/logs%20from%20GitHub%20Actions/near/541420661" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/logs.20from.20GitHub.20Actions.html#541420661">(Sep 25 2025 at 10:15)</a>:</h4>
+<p>Well, she was a rower <span aria-label="woman rowing boat" class="emoji emoji-1f6a3-200d-2640" role="img" title="woman rowing boat">:woman_rowing_boat:</span> in high school but she just joined the rugby team. <span aria-label="rugby" class="emoji emoji-1f3c9" role="img" title="rugby">:rugby:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

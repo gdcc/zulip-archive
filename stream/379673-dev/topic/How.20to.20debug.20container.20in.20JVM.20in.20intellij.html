@@ -1,0 +1,80 @@
+<html>
+<head><meta charset="utf-8"><title>How to debug container in JVM in intellij · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html">How to debug container in JVM in intellij</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="430868637"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430868637" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jose Lucas Cordeiro <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430868637">(Apr 02 2024 at 20:33)</a>:</h4>
+<p>Hey all! I'm trying to put some breakpoints in my environment (Intellij 2023.3)  to do some debugging. I noticed the containers don't expose the 5005 port.  Is there a flag or something like that i could use to achieve this and plug my debugger? or should i change the docker-compose file directly?</p>
+
+
+
+<a name="430870203"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430870203" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jose Lucas Cordeiro <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430870203">(Apr 02 2024 at 20:44)</a>:</h4>
+<p>Update after exposing the 5005 port on docker-compose-dev in the dataverse service: </p>
+<ul>
+<li>I tried to plug to 5005 directly without changing the running command (<code>mvn -Pct clean package docker:run</code>)</li>
+<li>I tried plug in again on 5005 with some additional flags (command:  <code>mvn -Pct clean package docker:run -Dexec.args="-classpath %classpath -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"</code>)</li>
+</ul>
+<p>Both of them resulted the same connection reset error<br>
+<a href="/user_uploads/53090/usy6FYogi-gONdnfIZxn7KmG/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/usy6FYogi-gONdnfIZxn7KmG/image.png" title="image.png"><img src="/user_uploads/53090/usy6FYogi-gONdnfIZxn7KmG/image.png"></a></div>
+
+
+
+<a name="430871816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430871816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430871816">(Apr 02 2024 at 20:54)</a>:</h4>
+<p>We ask people to configure IntelliJ (and other IDEs) to use port 9009. Please see <a href="https://guides.dataverse.org/en/6.2/container/dev-usage.html#ide-trigger-code-deploy">https://guides.dataverse.org/en/6.2/container/dev-usage.html#ide-trigger-code-deploy</a></p>
+
+
+
+<a name="430877470"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430877470" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jose Lucas Cordeiro <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430877470">(Apr 02 2024 at 21:31)</a>:</h4>
+<p>Unfortunely i don't have the ultimate edition <span aria-label="smile cat" class="emoji emoji-1f638" role="img" title="smile cat">:smile_cat:</span>. So I wont be able to do the hot reload. But i was able to connect directly on the 9009 :D Thanks</p>
+
+
+
+<a name="430889784"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430889784" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430889784">(Apr 02 2024 at 23:06)</a>:</h4>
+<p>That exec arg thing won't do anything. It's a Maven property you define and it's not used anywhere.</p>
+
+
+
+<a name="430890009"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430890009" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430890009">(Apr 02 2024 at 23:08)</a>:</h4>
+<p>The port 9009 is in line with upstream Payara docs. I'm not sure how easy it would be to change it.</p>
+
+
+
+<a name="430890961"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430890961" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430890961">(Apr 02 2024 at 23:18)</a>:</h4>
+<p>Also note that JDWP already gives you limited options to change method bodies even without DCEVM (JEP159). Not sure how to use do that in IntelliJ though. Might be good enough for adding some debugging statements etc.</p>
+
+
+
+<a name="430891020"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430891020" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430891020">(Apr 02 2024 at 23:19)</a>:</h4>
+<p>If you want to give HotSwapAgent and DCEVM a shot, feel free to modify the base image and use a different JDK/JRE.</p>
+
+
+
+<a name="430891067"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/430891067" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#430891067">(Apr 02 2024 at 23:19)</a>:</h4>
+<p><a href="https://medium.com/javarevisited/jdk-17-with-dcevm-and-hotswapagent-4fee7095617a">https://medium.com/javarevisited/jdk-17-with-dcevm-and-hotswapagent-4fee7095617a</a></p>
+
+
+
+<a name="431363792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/How%20to%20debug%20container%20in%20JVM%20in%20intellij/near/431363792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jose Lucas Cordeiro <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/How.20to.20debug.20container.20in.20JVM.20in.20intellij.html#431363792">(Apr 04 2024 at 17:09)</a>:</h4>
+<p>Thanks!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

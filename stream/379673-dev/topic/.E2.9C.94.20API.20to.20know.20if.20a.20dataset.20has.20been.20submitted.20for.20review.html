@@ -1,0 +1,79 @@
+<html>
+<head><meta charset="utf-8"><title>✔ API to know if a dataset has been submitted for review · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html">✔ API to know if a dataset has been submitted for review</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="435368393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435368393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435368393">(Apr 25 2024 at 11:32)</a>:</h4>
+<p>Hey <span class="user-mention" data-user-id="598112">@Philip Durbin</span>, whats the smarted way to find out via API if a dataset is "Submitted for Review”? Sadly, its not one of the <a href="https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/DatasetVersion.java#L109">VersionStates</a> .</p>
+
+
+
+<a name="435371555"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435371555" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435371555">(Apr 25 2024 at 11:52)</a>:</h4>
+<p>Do I need to replicate <a href="https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/DatasetVersion.java#L344">this method</a> within my client and use  <a href="https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L2761">the lock API</a> to obtain the needed information?</p>
+
+
+
+<a name="435371905"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435371905" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435371905">(Apr 25 2024 at 11:54)</a>:</h4>
+<p>Hmm, here I look for a notification called SUBMITTEDDS: <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/InReviewWorkflowIT.java#L139C62-L139C73">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/InReviewWorkflowIT.java#L139C62-L139C73</a></p>
+
+
+
+<a name="435372108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435372108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435372108">(Apr 25 2024 at 11:55)</a>:</h4>
+<p>Ha, you probably don't to try an edit and look for this error (further down): <code>Couldn't update dataset edu.harvard.iq.dataverse.engine.command.exception.IllegalCommandException: Dataset cannot be edited due to In Review dataset lock</code></p>
+
+
+
+<a name="435372188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435372188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435372188">(Apr 25 2024 at 11:56)</a>:</h4>
+<p>Yeah, you might be on the right track with locks. Check for an "in review" lock?</p>
+
+
+
+<a name="435372414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435372414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435372414">(Apr 25 2024 at 11:57)</a>:</h4>
+<p>"Currently implemented lock types are <code>Ingest</code>, <code>Workflow</code>, <code>InReview</code>, <code>DcmUpload</code>, <code>finalizePublication</code>, <code>EditInProgress</code> and <code>FileValidationFailed</code>." -- <a href="https://guides.dataverse.org/en/6.2/api/native-api.html#dataset-locks">https://guides.dataverse.org/en/6.2/api/native-api.html#dataset-locks</a></p>
+
+
+
+<a name="435372423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435372423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435372423">(Apr 25 2024 at 11:57)</a>:</h4>
+<p>Yeah, I'd check for a lock ^^</p>
+
+
+
+<a name="435372701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435372701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435372701">(Apr 25 2024 at 11:59)</a>:</h4>
+<p>Yup, there is one. Sadly this needs another API request to obtain the information.  I hoped for some hidden feature to get this information with the inital getDataset one...</p>
+
+
+
+<a name="435373519"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435373519" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435373519">(Apr 25 2024 at 12:03)</a>:</h4>
+<p>Hmm, I can't think of one off the top of my head.</p>
+
+
+
+<a name="435373625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435373625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435373625">(Apr 25 2024 at 12:04)</a>:</h4>
+<p>A dataset can only be in one state. I guess it's in draft state when it's in review.</p>
+
+
+
+<a name="435380387"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/%E2%9C%94%20API%20to%20know%20if%20a%20dataset%20has%20been%20submitted%20for%20review/near/435380387" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/.E2.9C.94.20API.20to.20know.20if.20a.20dataset.20has.20been.20submitted.20for.20review.html#435380387">(Apr 25 2024 at 12:41)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="617722">Johannes D</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

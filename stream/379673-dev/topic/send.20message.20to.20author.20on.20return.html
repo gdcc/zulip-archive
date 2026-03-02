@@ -1,0 +1,81 @@
+<html>
+<head><meta charset="utf-8"><title>send message to author on return · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html">send message to author on return</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="461955451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/send%20message%20to%20author%20on%20return/near/461955451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan López <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html#461955451">(Aug 12 2024 at 20:48)</a>:</h4>
+<p>Hi! I'm trying to set a step in my workflow to let the Curator of a dataset, send a message to the author when they return the dataset in question. So far I've used this workflow.json: </p>
+<blockquote>
+<p>{<br>
+    "name": "Internal steps with pause",<br>
+    "steps": [<br>
+        {<br>
+            "provider":":internal",<br>
+            "stepType":"log",<br>
+            "parameters": {<br>
+                "step":1,<br>
+                "stepName":"first step"<br>
+            }<br>
+        },<br>
+        {<br>
+            "provider":":internal",<br>
+            "stepType":"pause/message",<br>
+            "parameters": {<br>
+                "paramName":"parameter value with a longer name."<br>
+            }<br>
+        },<br>
+        {<br>
+            "provider":":internal",<br>
+            "stepType":"log",<br>
+            "parameters": {<br>
+                "number":42,<br>
+                "anotherMessage": "This is the last step before releasing."<br>
+            }<br>
+        }<br>
+    ]<br>
+}<br>
+</p>
+</blockquote>
+<p>I've set the workflow with this: &nbsp;curl -X PUT -H "Content-Type: application/json" --upload-file workflow.json &nbsp;<a href="https://papyrus-datos.co/api/admin/workflows">https://papyrus-datos.co/api/admin/workflows</a></p>
+<p>And then assigned that workflow to "PrePublishDataset" like this: curl -X PUT -d 1 <a href="http://localhost:8080/api/admin/workflows/default/PrePublishDataset">http://localhost:8080/api/admin/workflows/default/PrePublishDataset</a></p>
+<p>When I do a &nbsp;"curl <a href="http://localhost:8080/api/admin/workflows/default">http://localhost:8080/api/admin/workflows/default</a>" I get the following: {"status":"OK","data":{"PrePublishDataset":{"id":1,"name":"Internal steps with pause"},"PostPublishDataset":null}}</p>
+<p>But when I'm trying to return the dataset to the author... Dataverse doesn't show the modal with the message textbox:<br>
+<a href="/user_uploads/53090/I0iwhbA9SnNzmtf5aSJ4ggx1/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/I0iwhbA9SnNzmtf5aSJ4ggx1/image.png" title="image.png"><img data-original-dimensions="716x177" src="/user_uploads/thumbnail/53090/I0iwhbA9SnNzmtf5aSJ4ggx1/image.png/840x560.webp"></a></div><p>Can anyone help me a little bit? What am I doing wrong?</p>
+
+
+
+<a name="461957396"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/send%20message%20to%20author%20on%20return/near/461957396" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html#461957396">(Aug 12 2024 at 21:03)</a>:</h4>
+<p><span class="user-mention" data-user-id="651393">@Juan López</span> what version of Dataverse are you running? If you upgrade to 6.2, this feature is included.</p>
+<p>Please see "When Returning Datasets to Authors, Reviewers Can Add a Note to the Author" at <a href="https://github.com/IQSS/dataverse/releases/tag/v6.2">https://github.com/IQSS/dataverse/releases/tag/v6.2</a></p>
+
+
+
+<a name="461957878"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/send%20message%20to%20author%20on%20return/near/461957878" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan López <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html#461957878">(Aug 12 2024 at 21:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span>  Hi Philip... I'm running Dataverse 6.0. Is upgrading to 6.2 the only way to have this feature?</p>
+
+
+
+<a name="461958347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/send%20message%20to%20author%20on%20return/near/461958347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html#461958347">(Aug 12 2024 at 21:10)</a>:</h4>
+<p>Well, with 6.0 your curators can send a message via API. See <code>reasonForReturn</code> at <a href="https://guides.dataverse.org/en/6.0/api/native-api.html#return-a-dataset-to-author">https://guides.dataverse.org/en/6.0/api/native-api.html#return-a-dataset-to-author</a></p>
+
+
+
+<a name="461960802"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/send%20message%20to%20author%20on%20return/near/461960802" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan López <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/send.20message.20to.20author.20on.20return.html#461960802">(Aug 12 2024 at 21:28)</a>:</h4>
+<p>Ok... that works! Thank you Philip</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

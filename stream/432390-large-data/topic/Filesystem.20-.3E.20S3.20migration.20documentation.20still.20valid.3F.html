@@ -1,0 +1,62 @@
+<html>
+<head><meta charset="utf-8"><title>Filesystem -&gt; S3 migration documentation still valid? · large-data · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/index.html">large-data</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html">Filesystem -&gt; S3 migration documentation still valid?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="537628253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537628253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537628253">(Sep 04 2025 at 09:23)</a>:</h4>
+<p>I noticed that to get filesystem to S3 migration work, <code>file://</code> prefix in <code>dvobject.storageidentifier</code> needs to be replaced to configured storage ID instead of  <code>s3://</code>as currently instructed  in <a href="https://guides.dataverse.org/en/latest/developers/deployment.html">https://guides.dataverse.org/en/latest/developers/deployment.html</a> . So, the protocol part in <code>dvobject.storageidentifier</code>will look like <code>&lt;storage_id&gt;://</code> </p>
+<p>We are using CEPH S3 instead of Amazon S3, so perhaps this is related to that (?).  Dataverse version is 6.7.1.</p>
+
+
+
+<a name="537646156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537646156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537646156">(Sep 04 2025 at 11:07)</a>:</h4>
+<p>Hmm. It looks like <span class="user-mention" data-user-id="626369">@Don Sizemore</span> added those docs in <a href="https://github.com/IQSS/dataverse/issues/6789">#6789</a>. Any comment, Don?</p>
+
+
+
+<a name="537648799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537648799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537648799">(Sep 04 2025 at 11:23)</a>:</h4>
+<p>the prefix you're seeing isn't the protocol but the identifier of the datastore in use. you're essentially copying the files outside of Dataverse, then updating the location pointer within the database.</p>
+
+
+
+<a name="537657301"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537657301" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537657301">(Sep 04 2025 at 12:11)</a>:</h4>
+<p>Would it make sense to change the example SQL update queries so they don’t use <code>s3://</code> as the datastore identifier, and use something like <code>&lt;datastore_identifier&gt;://</code> instead?</p>
+
+
+
+<a name="537660024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537660024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537660024">(Sep 04 2025 at 12:25)</a>:</h4>
+<p>absolutely. I think what you're seeing is that, in the early days, everybody called theirs <code>s3</code> <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="537695359"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/537695359" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#537695359">(Sep 04 2025 at 15:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="713909">@mjlassila</span> great idea. If you'd like to make a pull request, I'm happy to help!</p>
+
+
+
+<a name="538189512"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/538189512" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#538189512">(Sep 08 2025 at 10:42)</a>:</h4>
+<p>I made a pull request, I'm happy to tweak it more if it needs improvement: <a href="https://github.com/IQSS/dataverse/pull/11795">https://github.com/IQSS/dataverse/pull/11795</a></p>
+
+
+
+<a name="538202616"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/Filesystem%20-%3E%20S3%20migration%20documentation%20still%20valid%3F/near/538202616" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/Filesystem.20-.3E.20S3.20migration.20documentation.20still.20valid.3F.html#538202616">(Sep 08 2025 at 11:47)</a>:</h4>
+<p>Looks great! Merged! Thanks, <span class="user-mention" data-user-id="713909">@mjlassila</span>! <img alt=":dataverse_man:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/c7b94a03.png" title="dataverse man"></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

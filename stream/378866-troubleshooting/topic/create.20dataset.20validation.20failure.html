@@ -1,0 +1,95 @@
+<html>
+<head><meta charset="utf-8"><title>create dataset validation failure · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html">create dataset validation failure</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="570117371"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570117371" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570117371">(Jan 26 2026 at 15:09)</a>:</h4>
+<p>A user wanted to create a new dataset draft via API with incomplete metadata. I did enable <code>dataverse.api.allow-incomplete-metadata</code>. </p>
+<p><code>curl -H "X-Dataverse-key:$API_TOKEN" -X POST "$SERVER_URL/api/dataverses/$PARENT/datasets?doNotValidate=true" -H 'Content-type:application/json' --upload-file test.json</code> </p>
+<p>This is the response we get:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ERROR"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Command [DatasetCreate dataset:null] failed: Exception thrown from bean: jakarta.validation.ConstraintViolationException: One or more Bean Validation constraints were violated while executing Automatic Bean Validation on callback event: prePersist for class: edu.harvard.iq.dataverse.DatasetFieldValue. Please refer to the embedded constraint violations for details."</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This is what I see in the logs:  <a href="/user_uploads/53090/UvU3CdmKO4WPbCI-QRNNJcpn/PastedText.txt">server.log</a><br>
+Here's the JSON file: <a href="/user_uploads/53090/oeCEoAg1YaNUaH9ahUSYNVU-/test.json">test.json</a></p>
+<p>A) This response doesn't make much sense. This looks like a bug to me, as we should catch the exception and unwrap it before sending a response.<br>
+B) I don't see any obvious reasons why this should fail and the logs aren't helping. Ideas?</p>
+
+
+
+<a name="570118191"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570118191" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570118191">(Jan 26 2026 at 15:12)</a>:</h4>
+<p>Ah if we do validate (drop the parameter), I think the reason may be a bug in the URL parsing for "alternativeUrl":</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ERROR"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Validation Failed: Data Source is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Institute is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Storage Location URL is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), PoF IV topic is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Alternative URL http://localhost:5000/objects/8  is not a valid URL. (Invalid value:edu.harvard.iq.dataverse.DatasetFieldValueValue[ id=null ]).java.util.stream.ReferencePipeline$3@55dfb73c"</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+<a name="570118317"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570118317" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570118317">(Jan 26 2026 at 15:12)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> looks like 2 issues to me, right?</p>
+
+
+
+<a name="570120461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570120461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570120461">(Jan 26 2026 at 15:21)</a>:</h4>
+<p>The user created an issue for us: <a href="https://github.com/IQSS/dataverse/issues/12114">https://github.com/IQSS/dataverse/issues/12114</a></p>
+
+
+
+<a name="570120583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570120583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570120583">(Jan 26 2026 at 15:22)</a>:</h4>
+<p>I'm not sure if this should be split into two - these are two very independent problems.</p>
+
+
+
+<a name="570122121"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570122121" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570122121">(Jan 26 2026 at 15:27)</a>:</h4>
+<p>Two issues is probably better.</p>
+
+
+
+<a name="570122209"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570122209" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570122209">(Jan 26 2026 at 15:28)</a>:</h4>
+<p>There may even be a third. I see he gets an error 403.</p>
+
+
+
+<a name="570122384"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570122384" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570122384">(Jan 26 2026 at 15:28)</a>:</h4>
+<p>Yeah me too</p>
+
+
+
+<a name="570122411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570122411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570122411">(Jan 26 2026 at 15:28)</a>:</h4>
+<p>So it's three issues.</p>
+
+
+
+<a name="570123433"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570123433" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570123433">(Jan 26 2026 at 15:32)</a>:</h4>
+<p>The error 403 was also reported by <span class="user-mention" data-user-id="616555">@Vera Clemens</span> in a different issue: <a href="https://github.com/IQSS/dataverse/issues/12113">https://github.com/IQSS/dataverse/issues/12113</a></p>
+
+
+
+<a name="570125166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/create%20dataset%20validation%20failure/near/570125166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/create.20dataset.20validation.20failure.html#570125166">(Jan 26 2026 at 15:40)</a>:</h4>
+<p>Yeah, I just replied on that one.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

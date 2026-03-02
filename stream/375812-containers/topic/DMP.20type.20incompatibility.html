@@ -1,0 +1,52 @@
+<html>
+<head><meta charset="utf-8"><title>DMP type incompatibility · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DMP.20type.20incompatibility.html">DMP type incompatibility</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="411190572"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DMP%20type%20incompatibility/near/411190572" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DMP.20type.20incompatibility.html#411190572">(Jan 04 2024 at 13:39)</a>:</h4>
+<p>Weird. I'm not sure why I'm seeing this error:</p>
+<p>[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.4:run (default-cli) on project dataverse: A type incompatibility occurred while executing io.fabric8:docker-maven-plugin:0.43.4:run: class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')</p>
+
+
+
+<a name="411193062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DMP%20type%20incompatibility/near/411193062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DMP.20type.20incompatibility.html#411193062">(Jan 04 2024 at 13:57)</a>:</h4>
+<p>Oh, this was my own doing. I had added this (no quotes):</p>
+<div class="codehilite"><pre><span></span><code>      # to get HarvestingServerIT to pass
+      dataverse_oai_server_maxidentifiers: 2
+      dataverse_oai_server_maxrecords: 2
+</code></pre></div>
+<p>But it needs to be this (with quotes):</p>
+<div class="codehilite"><pre><span></span><code>      # to get HarvestingServerIT to pass
+      dataverse_oai_server_maxidentifiers: &quot;2&quot;
+      dataverse_oai_server_maxrecords: &quot;2&quot;
+</code></pre></div>
+<p>In GitHub Actions the version without quotes works. Not sure why it's different on my M2 Mac.</p>
+
+
+
+<a name="474658958"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DMP%20type%20incompatibility/near/474658958" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DMP.20type.20incompatibility.html#474658958">(Oct 03 2024 at 18:30)</a>:</h4>
+<p>Now I'm seeing the same thing with <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span>'s PR at <a href="https://github.com/IQSS/dataverse/pull/10905">https://github.com/IQSS/dataverse/pull/10905</a> but I don't see any integers to quote. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="474659835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DMP%20type%20incompatibility/near/474659835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DMP.20type.20incompatibility.html#474659835">(Oct 03 2024 at 18:36)</a>:</h4>
+<p>Found it:</p>
+<div class="codehilite"><pre><span></span><code>     environment:
+-      KC_HTTP_PORT: 9080
++      KC_HTTP_PORT: &quot;9080&quot;
+</code></pre></div>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

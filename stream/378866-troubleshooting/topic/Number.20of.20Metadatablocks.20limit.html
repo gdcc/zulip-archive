@@ -1,0 +1,113 @@
+<html>
+<head><meta charset="utf-8"><title>Number of Metadatablocks limit · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html">Number of Metadatablocks limit</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="566330652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566330652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566330652">(Jan 05 2026 at 11:25)</a>:</h4>
+<p>Hi all, I hope you're doing well, <br>
+just have one question regarding the metadata block number, is there a limit to how many metadata can we have ? cauz in our case we are testing with a large number (currently at 42 with many fields) and we are hitting a header too large issue from dataverse, I tried many of the workarounds: </p>
+<ul>
+<li>increasing the header from both solr and dataverse (tried with env variables, as well as a custom jetty.xml file for solr), env variable from dataverse side..</li>
+<li>switched to http1..<br>
+nothing seems to fix the issue :/<br>
+thank you and best regards.<br>
+Oussama</li>
+</ul>
+
+
+
+<a name="566339050"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566339050" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566339050">(Jan 05 2026 at 12:11)</a>:</h4>
+<p>You've changed <code>requestHeaderSize</code> already (<a href="https://guides.dataverse.org/en/6.9/installation/prerequisites.html#installing-solr">docs</a>)? To what value?</p>
+<p>Do the logs indicated how big the header is?</p>
+
+
+
+<a name="566340528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566340528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566340528">(Jan 05 2026 at 12:20)</a>:</h4>
+<p>I've set it to 1024000 in the solr container: </p>
+<ul>
+<li>SOLR_OPTS=-Dsolr.jetty.request.header.size=1024000 -Dsolr.jetty.response.header.size=1024000<br>
+it doesn't show how long the header is, but it's a long string, <br>
+the exact error is : </li>
+</ul>
+<div class="codehilite"><pre><span></span><code>Could not hpack encode GET{u=http://solr:8983/solr/collection1/select?q=*.....
+</code></pre></div>
+<p>ps : <br>
+I deployed dataverse with Docker, and im using version v6.6 for dataverse and 9.8.0 for solr.</p>
+
+
+
+<a name="566365420"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566365420" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566365420">(Jan 05 2026 at 14:28)</a>:</h4>
+<p>Ok, so 100 times the number we recommend in the docs. That should be enough!</p>
+<p>Do you want to go ahead and open an issue at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> ?</p>
+
+
+
+<a name="566390171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566390171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566390171">(Jan 05 2026 at 16:12)</a>:</h4>
+<p>thank you Philip for the replies.<br>
+even setting that to a larger value couldn't solve the issue, the only work around I could find was removing some of the older blocks, <br>
+I just create an <a href="https://github.com/IQSS/dataverse/issues/12069">issue</a> for the error. <br>
+best. <br>
+oussama.</p>
+
+
+
+<a name="566392994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566392994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566392994">(Jan 05 2026 at 16:24)</a>:</h4>
+<p>Thanks! I edited the issue to add a link to this topic in Zulip.</p>
+
+
+
+<a name="566523555"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566523555" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566523555">(Jan 06 2026 at 11:10)</a>:</h4>
+<p>Thanks, Philip. I just have one additional general question:</p>
+<p>If the problem with this header is caused by the large number of searchable items, then logically, limiting or decreasing the number should make the header smaller or make it work. However, it didn’t work for me (unless I did it incorrectly).</p>
+
+
+
+<a name="566540289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566540289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566540289">(Jan 06 2026 at 13:07)</a>:</h4>
+<p>Right, but how are you decreasing the number of searchable items? I'm pretty sure that number is determined by how many fields are available in the database (that were added by loading a metadata block tsv file, I mean).</p>
+
+
+
+<a name="566548273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/566548273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#566548273">(Jan 06 2026 at 13:57)</a>:</h4>
+<p>... which is probably a bug</p>
+
+
+
+<a name="569458779"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/569458779" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#569458779">(Jan 22 2026 at 10:54)</a>:</h4>
+<p>update: <br>
+because that error was coming mostly from the facets, <br>
+I reduced the number of facets and the facetable items. and it solved the issue. <br>
+However I still think it's still a limitation. <br>
+best.</p>
+
+
+
+<a name="569478314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/569478314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#569478314">(Jan 22 2026 at 12:36)</a>:</h4>
+<p>Thanks for the update. I copy/pasted it here: <a href="https://github.com/IQSS/dataverse/issues/12069#issuecomment-3784167204">https://github.com/IQSS/dataverse/issues/12069#issuecomment-3784167204</a></p>
+
+
+
+<a name="569548804"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Number%20of%20Metadatablocks%20limit/near/569548804" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Number.20of.20Metadatablocks.20limit.html#569548804">(Jan 22 2026 at 17:23)</a>:</h4>
+<p>Good to know that this may be a problem. One of our users was asking for usage of Dataverse in the context of electric grid research and they have some really huge metadata structures.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

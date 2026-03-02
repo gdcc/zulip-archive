@@ -1,0 +1,179 @@
+<html>
+<head><meta charset="utf-8"><title>✔ MyData API · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html">✔ MyData API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="435150104"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435150104" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435150104">(Apr 24 2024 at 09:37)</a>:</h4>
+<p>Using the following API I could fetch dataverses:</p>
+<p>export API_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx<br>
+export SERVER_URL=https://demo.dataverse.org<br>
+export ROLE_IDS=6<br>
+export DVOBJECT_TYPES=Dataverse<br>
+export PUBLISHED_STATES=Unpublished<br>
+export PER_PAGE=10</p>
+<p>curl -H "X-Dataverse-key:$API_TOKEN" "$SERVER_URL/api/mydata/retrieve?role_ids=$ROLE_IDS&amp;dvobject_types=$DVOBJECT_TYPES&amp;published_states=$PUBLISHED_STATES&amp;per_page=$PER_PAGE"</p>
+<p>However, I am curious if it is possible to say to this API that I need only those dataverses that the user is the Admin or Member of.</p>
+<p>Also, Is it possible to say those dataverses that are Published or Unpublished or Draft?</p>
+
+
+
+<a name="435163622"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435163622" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435163622">(Apr 24 2024 at 11:02)</a>:</h4>
+<p>Hmm, I'm looking at <a href="https://guides.dataverse.org/en/6.2/api/native-api.html#mydata">https://guides.dataverse.org/en/6.2/api/native-api.html#mydata</a></p>
+<p>What if you pass ROLE_IDS=1 for Admin?</p>
+
+
+
+<a name="435164030"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435164030" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435164030">(Apr 24 2024 at 11:05)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435163622">said</a>:</p>
+<blockquote>
+<p>Hmm, I'm looking at <a href="https://guides.dataverse.org/en/6.2/api/native-api.html#mydata">https://guides.dataverse.org/en/6.2/api/native-api.html#mydata</a></p>
+<p>What if you pass ROLE_IDS=1 for Admin?</p>
+</blockquote>
+<p>That works, but I need to define more than just one role_id.</p>
+
+
+
+<a name="435166995"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435166995" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435166995">(Apr 24 2024 at 11:25)</a>:</h4>
+<p>Hmm <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="435167499"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435167499" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435167499">(Apr 24 2024 at 11:28)</a>:</h4>
+<p>I looks like the API accepts a list: <code>@QueryParam("role_ids") List&lt;Long&gt; roleIds</code></p>
+
+
+
+<a name="435167962"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435167962" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435167962">(Apr 24 2024 at 11:31)</a>:</h4>
+<p>In a Java test we do this: <code>ArrayList&lt;Long&gt; emptyRoleIdsList = new ArrayList&lt;&gt;();</code></p>
+
+
+
+<a name="435168005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435168005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435168005">(Apr 24 2024 at 11:31)</a>:</h4>
+<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>
+
+
+
+<a name="435320556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435320556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435320556">(Apr 25 2024 at 06:27)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435168005">said</a>:</p>
+<blockquote>
+<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>
+</blockquote>
+<p>I will check and let you know.</p>
+
+
+
+<a name="435407012"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435407012" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435407012">(Apr 25 2024 at 14:46)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> <a href="#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435320556">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435168005">said</a>:</p>
+<blockquote>
+<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>
+</blockquote>
+<p>I will check and let you know.</p>
+</blockquote>
+<p>Could you share the line of code in GitHub for this endpoint, please?</p>
+
+
+
+<a name="435416808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435416808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435416808">(Apr 25 2024 at 15:36)</a>:</h4>
+<p><span class="user-mention" data-user-id="698782">@Mohsen Jafari</span> I think this is what you are asking for:<br>
+<a href="https://github.com/IQSS/dataverse/blob/2f6d3aafaf75cf7b23ae4a9fd7865fbe681841ae/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java">https://github.com/IQSS/dataverse/blob/2f6d3aafaf75cf7b23ae4a9fd7865fbe681841ae/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java</a></p>
+
+
+
+<a name="435417328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435417328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435417328">(Apr 25 2024 at 15:39)</a>:</h4>
+<p>Yes, thank you. This line is the entry point: <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java#L271">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java#L271</a></p>
+
+
+
+<a name="435424138"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435424138" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435424138">(Apr 25 2024 at 16:16)</a>:</h4>
+<p>Thanks, <span class="user-mention" data-user-id="598112">@Philip Durbin</span> I guess the link I have is the currently being worked on branch? You sent the branch for the current release 6.2? Still trying to understand github.......</p>
+
+
+
+<a name="435439572"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435439572" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435439572">(Apr 25 2024 at 17:52)</a>:</h4>
+<p><span class="user-mention" data-user-id="599826">@Sherry Lake</span> ha. There's nothing wrong with your link. I just prefer putting version numbers (e.g. v6.2) in the URL when I can so it's clear which version we're talking about.</p>
+
+
+
+<a name="435439667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435439667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435439667">(Apr 25 2024 at 17:53)</a>:</h4>
+<p>When you do a search on GitHub the results are always commits rather than versions. I'm not sure why.</p>
+
+
+
+<a name="435521835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435521835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435521835">(Apr 26 2024 at 06:22)</a>:</h4>
+<p>I have those requests in my local history... <code>http://localhost:8080/api/mydata/retrieve?dvobject_types=Dataset&amp;role_ids=6&amp;role_ids=34&amp;published_states=In+Review&amp;published_states=Published&amp;published_states=Unpublished&amp;published_states=Draft&amp;selected_page=1</code></p>
+
+
+
+<a name="435545568"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435545568" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435545568">(Apr 26 2024 at 09:04)</a>:</h4>
+<p>Oh! Duplicate them! Thanks!</p>
+
+
+
+<a name="435548895"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435548895" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435548895">(Apr 26 2024 at 09:24)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> has marked this topic as resolved.</p>
+
+
+
+<a name="435548926"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435548926" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435548926">(Apr 26 2024 at 09:24)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> has marked this topic as unresolved.</p>
+
+
+
+<a name="435550300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435550300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435550300">(Apr 26 2024 at 09:33)</a>:</h4>
+<p>Should we add a note to the docs? Does anyone want to create an issue?</p>
+
+
+
+<a name="435552428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435552428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435552428">(Apr 26 2024 at 09:46)</a>:</h4>
+<p>I think this way of sending params to the endpoint should be added to the existing documentation, so other people also know about it.</p>
+
+
+
+<a name="435554213"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435554213" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435554213">(Apr 26 2024 at 09:57)</a>:</h4>
+<p>Right. Me too. Do you mind creating an issue?</p>
+
+
+
+<a name="435555051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435555051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435555051">(Apr 26 2024 at 10:02)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> has marked this topic as resolved.</p>
+
+
+
+<a name="435559561"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20MyData%20API/near/435559561" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20MyData.20API.html#435559561">(Apr 26 2024 at 10:31)</a>:</h4>
+<p>Thanks for creating this issue! Add more information to the documentation about how api/mydata/retrieve is called <a href="https://github.com/IQSS/dataverse/issues/10530">#10530</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

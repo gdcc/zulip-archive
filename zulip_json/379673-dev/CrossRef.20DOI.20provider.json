@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Hello, I want to add the ability to add CrossRef as a new DOI provider. I wrote some code (mainly inspired by the DataCite code), but I encountered one problem - after creating the dataset, Dataverse calls the 'reserveIdentifier' method, which in the case of DataCite reserves the DOI number, which is impossible in the case of CrossRef (CrossRef does not provide the option to reserve DOI). How can I deal with this problem?<br>\nI would also like to ask if I should create some kind of draft pull request where I can show my code?</p>",
+        "id": 395835920,
+        "sender_full_name": "Konrad Perłowski",
+        "timestamp": 1696927872
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"657847\">@Konrad Perłowski</span> and welcome! <span aria-label=\"wave\" class=\"emoji emoji-1f44b\" role=\"img\" title=\"wave\">:wave:</span></p>",
+        "id": 395836298,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928021
+    },
+    {
+        "content": "<p>Heads up that there are plans to make PID providers pluggable as we now enabled for exporters. How urgent is your development? Are you fine with sticking to a fork for now? (I somewhat doubt a PR to add a CrossRef provider would make it into upstream soon, but let's ask <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> to verify that)</p>",
+        "id": 395836747,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928169
+    },
+    {
+        "content": "<p>Back to your original problem (and please let's stick to that in this topic, please create a new topic for the fork vs plugin thing):</p>\n<blockquote>\n<p>Dataverse calls the 'reserveIdentifier' method</p>\n</blockquote>\n<p>Are  you referring to <a href=\"https://github.com/IQSS/dataverse/blob/a209f43d3f7fa44d5e8f06809ad16783ef63ee68/src/main/java/edu/harvard/iq/dataverse/DOIDataCiteServiceBean.java#L64-L80\">DOIDataCiteServiceBean.createIdentifier(DvObject dvObject)</a> here? I'm not aware of a \"reserveIdentifier\" method coming from the interface <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/GlobalIdServiceBean.java#L14-L14\">GlobalIdServiceBean</a>.</p>",
+        "id": 395837333,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928361
+    },
+    {
+        "content": "<p>Maybe better examples to learn from are <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/PermaLinkPidProviderServiceBean.java\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/PermaLinkPidProviderServiceBean.java</a> and <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/FakePidProviderServiceBean.java\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/FakePidProviderServiceBean.java</a></p>",
+        "id": 395837975,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928563
+    },
+    {
+        "content": "<p>The DataCite Provider is quite messy... <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 395838058,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928589
+    },
+    {
+        "content": "<p>Yes, that is the method calling reserveIdentifier. The problem is if I don't post any doi to CrossRef after creating new draft dataset, this doi could be taken later on by some other dataset, but I can't post draft dataset as published one</p>",
+        "id": 395838529,
+        "sender_full_name": "Konrad Perłowski",
+        "timestamp": 1696928757
+    },
+    {
+        "content": "<p>Who would take that?</p>",
+        "id": 395838673,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928797
+    },
+    {
+        "content": "<p>Which way of PID generation are you planning to use?</p>",
+        "id": 395838707,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928815
+    },
+    {
+        "content": "<p>Dataverse will take care of not creating a PID again for two different entities for you.</p>",
+        "id": 395838788,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928840
+    },
+    {
+        "content": "<p>(For a very long time, you could not reserve DOIs at DataCite as well.)</p>",
+        "id": 395838910,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696928884
+    },
+    {
+        "content": "<p>Yes, we should check with Jim Myers (qqmyers) about refactoring the PID code. He has made a lot of progress recently and I just left a comment about this here: <a href=\"https://github.com/IQSS/dataverse/issues/8581#issuecomment-1755100912\">https://github.com/IQSS/dataverse/issues/8581#issuecomment-1755100912</a></p>",
+        "id": 395860167,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696936669
+    },
+    {
+        "content": "<p>I guess that we can handle it with Konrad our problem (the discussion helped me to better understand the issue). But we are very interested in pluggable PID's since we are hosting repositories for 6 Universities, and were forced by DataCite policy to use 6 different doi's - so we have to run 6 instances, and then harvest them. But still, DV only supports DataCite as a provider, so support for Crossref should be useful. </p>\n<p>What is the roadmap for these plugged PID providers?</p>",
+        "id": 395879770,
+        "sender_full_name": "Andrzej Zemla",
+        "timestamp": 1696943243
+    },
+    {
+        "content": "<p>I'm not sure. I don't see anything on the roadmap or the backlog board.</p>",
+        "id": 395881092,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696943698
+    },
+    {
+        "content": "<p>Well it will probably not be this year... And probably putting money in the game will push things forward...</p>",
+        "id": 395882187,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1696944053
+    },
+    {
+        "content": "<p>I feel like there's an issue about multiple DOI authorities in a single installation.</p>",
+        "id": 395882668,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696944211
+    },
+    {
+        "content": "<p>Ah ha. Found it: Support flexible option for DOI and Handle registration, in same installation <a href=\"https://github.com/IQSS/dataverse/issues/3623\">#3623</a></p>",
+        "id": 395885779,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696945185
+    },
+    {
+        "content": "<p>And it's currently tagged as a 6.1 proposal.</p>",
+        "id": 395885888,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696945206
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"657879\">@Andrzej Zemla</span> I left a comment with your use case.</p>",
+        "id": 395886573,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696945397
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"657847\">@Konrad Perłowski</span> hi! We've been leaving comments on your PR <a href=\"https://github.com/IQSS/dataverse/issues/10235\">#10235</a>. It has merge conflicts and we created a new PR <a href=\"https://github.com/IQSS/dataverse/issues/10803\">#10803</a>. We'd love to hear what you think. Also, we'd like to make sure you get credit somehow, if you want it, for kicking this off!</p>",
+        "id": 465518470,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724781027
+    }
+]

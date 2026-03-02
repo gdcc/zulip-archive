@@ -1,0 +1,106 @@
+<html>
+<head><meta charset="utf-8"><title>✔ DB migration issues on upgrade from 6.1 to 6.2 · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html">✔ DB migration issues on upgrade from 6.1 to 6.2</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="532288732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532288732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532288732">(Aug 01 2025 at 11:46)</a>:</h4>
+<p>Hi, I am trying to upgrade from version 6.1 to 6.2 using  a custom war file and I am getting a lot of sql exceptions from asadmin deploy dataverse.war and in server.log I found the following messages, the last one is about a sql file for db migration that seems to be missing:</p>
+<p><a href="/user_uploads/53090/S3t0Tdz7l6R2dHYO7asXC-m6/PastedText.txt">PastedText.txt</a></p>
+<p>I checked the war file with the following command and the sql file is there. Any ideas for the cause of this problem and how I can solve it?</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code>jar<span class="w"> </span>tf<span class="w"> </span>dataverse.war<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql"</span>
+WEB-INF/classes/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql
+</code></pre></div>
+
+
+
+<a name="532292302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532292302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532292302">(Aug 01 2025 at 12:06)</a>:</h4>
+<p>Hmm...</p>
+<div class="codehilite"><pre><span></span><code>Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V6.1.0.4__5645-geospatial-fieldname-fix.sql failed
+------------------------------------------------------------
+SQL State  : 23505
+Error Code : 0
+Message    : ERROR: duplicate key value violates unique constraint &quot;datasetfieldtype_name_key&quot;
+  Detail: Key (name)=(northLatitude) already exists.
+Location   : db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql (/usr/local/payara6/glassfish/domains/domain1/applications/dataverse/WEB-INF/classes/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql)
+Line       : 1
+Statement  : UPDATE datasetfieldtype
+SET name = &#39;northLatitude&#39;
+WHERE name = &#39;northLongitude&#39;
+</code></pre></div>
+
+
+
+<a name="532292511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532292511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532292511">(Aug 01 2025 at 12:07)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/5645">#5645</a> was fixed by <span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> in PR <a href="https://github.com/IQSS/dataverse/issues/10306">#10306</a> in 6.2.</p>
+<p>And yes, that PR is where <code>src/main/resources/db/migration/V6.1.0.3__5645-geospatial-fieldname-fix.sql</code> comes from. (The version got bumped to .4 in <a href="https://github.com/IQSS/dataverse/issues/10346">#10346</a>.)</p>
+
+
+
+<a name="532294136"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532294136" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532294136">(Aug 01 2025 at 12:17)</a>:</h4>
+<p>This is all the script is doing...</p>
+<div class="codehilite"><pre><span></span><code>UPDATE datasetfieldtype
+SET name = &#39;northLatitude&#39;
+WHERE name = &#39;northLongitude&#39;;
+
+UPDATE datasetfieldtype
+SET name = &#39;southLatitude&#39;
+WHERE name = &#39;southLongitude&#39;;
+</code></pre></div>
+<p>... from <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/main/resources/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql">https://github.com/IQSS/dataverse/blob/v6.2/src/main/resources/db/migration/V6.1.0.4__5645-geospatial-fieldname-fix.sql</a></p>
+
+
+
+<a name="532294298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532294298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532294298">(Aug 01 2025 at 12:18)</a>:</h4>
+<p>I'm not sure why this result in the error you're seeing: <code>Message    : ERROR: duplicate key value violates unique constraint "datasetfieldtype_name_key"  Detail: Key (name)=(northLatitude) already exists.</code></p>
+
+
+
+<a name="532294417"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532294417" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532294417">(Aug 01 2025 at 12:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="622863">@César Ferreira</span> does "northLatitude" already exist in your pre-6.2 database?</p>
+
+
+
+<a name="532295629"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532295629" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532295629">(Aug 01 2025 at 12:26)</a>:</h4>
+<p>Yes, I already have these fields, maybe it is because I already updated the metadata blocks from the tsv files?</p>
+
+
+
+<a name="532296554"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532296554" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532296554">(Aug 01 2025 at 12:31)</a>:</h4>
+<p>If you applied the new TSVs to an instance running an older version, that would make things break, yes.</p>
+
+
+
+<a name="532296769"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532296769" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532296769">(Aug 01 2025 at 12:32)</a>:</h4>
+<p>The easiest way to go around this is probably to edit your database before you restart Dataverse and remove any such failing entries.</p>
+
+
+
+<a name="532297436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532297436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532297436">(Aug 01 2025 at 12:36)</a>:</h4>
+<p>Thank you, that fixed the problem.</p>
+
+
+
+<a name="532302106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DB%20migration%20issues%20on%20upgrade%20from%206.1%20to%206.2/near/532302106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DB.20migration.20issues.20on.20upgrade.20from.206.2E1.20to.206.2E2.html#532302106">(Aug 01 2025 at 13:01)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="622863">César Ferreira</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

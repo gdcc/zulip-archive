@@ -1,0 +1,187 @@
+<html>
+<head><meta charset="utf-8"><title>EZID: dataset publication failing on updateIdentifierStatus · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html">EZID: dataset publication failing on updateIdentifierStatus</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="471307693"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471307693" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471307693">(Sep 18 2024 at 17:01)</a>:</h4>
+<p>we're trying to debug an issue in our production dataverse related to publication of metadata-only datasets. when we try to publish, we're seeing in the logs something like the following (when the log levels are set to FINE for the EZIdDOIProvider):</p>
+<div class="codehilite"><pre><span></span><code>[2024-09-18T10:04:51.504-0700] [Payara 6.2024.7] [INFO] [] [edu.harvard.iq.dataverse.engine.command.impl.FinalizeDatasetPublicationCommand] [tid: _ThreadID=243 _ThreadName=__ejb-thread-pool12] [timeMillis: 1726679091504] [levelValue: 800] [[
+  Finalizing publication of the dataset doi:10.60503/D3/EEKRZR]]
+
+[2024-09-18T10:04:51.532-0700] [Payara 6.2024.7] [FINE] [] [edu.harvard.iq.dataverse.pidproviders.doi.ezid.EZIdDOIProvider] [tid: _ThreadID=243 _ThreadName=__ejb-thread-pool12] [timeMillis: 1726679091532] [levelValue: 500] [CLASSNAME: edu.harvard.iq.dataverse.pidproviders.doi.ezid.EZIdDOIProvider] [METHODNAME: publicizeIdentifier] [[
+  publicizeIdentifier - dvObject]]
+
+[2024-09-18T10:04:51.533-0700] [Payara 6.2024.7] [FINE] [] [edu.harvard.iq.dataverse.pidproviders.doi.ezid.EZIdDOIProvider] [tid: _ThreadID=243 _ThreadName=__ejb-thread-pool12] [timeMillis: 1726679091533] [levelValue: 500] [CLASSNAME: edu.harvard.iq.dataverse.pidproviders.doi.ezid.EZIdDOIProvider] [METHODNAME: updateIdentifierStatus] [[
+  updateIdentifierStatus]]
+
+[2024-09-18T10:04:51.533-0700] [Payara 6.2024.7] [WARNING] [] [edu.harvard.iq.dataverse.engine.command.impl.FinalizeDatasetPublicationCommand] [tid: _ThreadID=243 _ThreadName=__ejb-thread-pool12] [timeMillis: 1726679091533] [levelValue: 900] [[
+  Failed to register the identifier doi:10.60503/D3/EEKRZR, or to register a file in the dataset; notifying the user(s), unlocking the dataset]]
+</code></pre></div>
+<p>are there further suggestions about how to dig into this? it seems isolated to a couple of records right now.</p>
+
+
+
+<a name="471313836"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471313836" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471313836">(Sep 18 2024 at 17:36)</a>:</h4>
+<p>Hmm, it would help to print out this Throwable to see what the problem was: <a href="https://github.com/IQSS/dataverse/blob/v6.3/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/FinalizeDatasetPublicationCommand.java#L424">https://github.com/IQSS/dataverse/blob/v6.3/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/FinalizeDatasetPublicationCommand.java#L424</a></p>
+
+
+
+<a name="471327867"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471327867" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471327867">(Sep 18 2024 at 19:00)</a>:</h4>
+<p>okay, this is is strange - saving is now failing on new datasets too:</p>
+<div class="codehilite"><pre><span></span><code>2024-09-18T11:59:39.788-0700] [Payara 6.2024.7] [WARNING] [] [jakarta.enterprise.resource.webcontainer.faces.lifecycle] [tid: _ThreadID=110 _ThreadName=http-thread-pool::jk-connector(5)] [timeMillis: 1726685979788] [levelValue: 900] [[
+  #{DatasetPage.save}: /dataset.xhtml @992,44 action=&quot;#{DatasetPage.save}&quot;: java.lang.NullPointerException: Cannot invoke &quot;edu.harvard.iq.dataverse.GlobalId.asString()&quot; because the return value of &quot;edu.harvard.iq.dataverse.Dataset.getGlobalId()&quot; is null
+jakarta.faces.FacesException: #{DatasetPage.save}: /dataset.xhtml @992,44 action=&quot;#{DatasetPage.save}&quot;: java.lang.NullPointerException: Cannot invoke &quot;edu.harvard.iq.dataverse.GlobalId.asString()&quot; because the return value of &quot;edu.harvard.iq.dataverse.Dataset.getGlobalId()&quot; is null
+</code></pre></div>
+
+
+
+<a name="471328526"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471328526" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471328526">(Sep 18 2024 at 19:03)</a>:</h4>
+<p>(this is an upgraded install from 6.1 to the patched 6.3)</p>
+
+
+
+<a name="471328711"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471328711" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471328711">(Sep 18 2024 at 19:04)</a>:</h4>
+<p>null global id (PID), yuck</p>
+
+
+
+<a name="471328803"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471328803" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471328803">(Sep 18 2024 at 19:05)</a>:</h4>
+<p>as far as i know, our EZID credentials are set up in the jvm config, and that shouldn't have changed</p>
+
+
+
+<a name="471329106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471329106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471329106">(Sep 18 2024 at 19:07)</a>:</h4>
+<p>In <a href="https://github.com/IQSS/dataverse/pull/10234">https://github.com/IQSS/dataverse/pull/10234</a> for 6.2 we did a fairly major refactoring of the PID provider code. I hope we didn't break EZID.</p>
+
+
+
+<a name="471329133"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471329133" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471329133">(Sep 18 2024 at 19:07)</a>:</h4>
+<p>We used to use EZID ourselves, before it became California only.</p>
+
+
+
+<a name="471329696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471329696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471329696">(Sep 18 2024 at 19:10)</a>:</h4>
+<p>i gather from the discussion on that pr and  <a href="https://github.com/IQSS/dataverse/issues/10557">#10557</a> that the configuration format may have changed? is that the case?</p>
+
+
+
+<a name="471329792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471329792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471329792">(Sep 18 2024 at 19:11)</a>:</h4>
+<p>Yes, it's certainly possible!</p>
+
+
+
+<a name="471329914"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471329914" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471329914">(Sep 18 2024 at 19:11)</a>:</h4>
+<p>I'm not sure how helpful this is, but in dev I use these FAKE settings: <a href="https://github.com/IQSS/dataverse/blob/v6.3/docker-compose-dev.yml#L54-L59">https://github.com/IQSS/dataverse/blob/v6.3/docker-compose-dev.yml#L54-L59</a></p>
+
+
+
+<a name="471330119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471330119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471330119">(Sep 18 2024 at 19:12)</a>:</h4>
+<p>This might help: <a class="stream-topic" data-stream-id="446770" href="/#narrow/stream/446770-docs/topic/domain.2Exml.20example.20for.20configuring.20DataCite.20PID.20provider">#docs &gt; domain.xml example for configuring DataCite PID provider</a></p>
+
+
+
+<a name="471330172"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471330172" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471330172">(Sep 18 2024 at 19:13)</a>:</h4>
+<p>(I know you're on EZID, but it might help.)</p>
+
+
+
+<a name="471330387"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471330387" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471330387">(Sep 18 2024 at 19:14)</a>:</h4>
+<p>okay. yes, our configuration probably needs to look different. we'll probably need to do some testing on our side and coordinate with our devops folks.</p>
+
+
+
+<a name="471330505"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471330505" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471330505">(Sep 18 2024 at 19:15)</a>:</h4>
+<p>we currently only have <code>dataverse.pid.ezid.username</code>, <code>dataverse.pid.ezid.password</code>, and <code>dataverse.pid.ezid.api-url</code> set</p>
+
+
+
+<a name="471331345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471331345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471331345">(Sep 18 2024 at 19:19)</a>:</h4>
+<p>Ok. If you have any suggestions for the guides or release notes, please let us know!</p>
+
+
+
+<a name="471339993"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471339993" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471339993">(Sep 18 2024 at 20:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> will do. i think the big thing is that if configuration structure for Dataverse changes in a breaking way, that should be called out very clearly in the upgrade procedures.</p>
+
+
+
+<a name="471340331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471340331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471340331">(Sep 18 2024 at 20:12)</a>:</h4>
+<p><span class="user-mention" data-user-id="735407">@María A. Matienzo</span> I absolutely agree. <a href="https://github.com/IQSS/dataverse/releases/tag/v6.2">https://github.com/IQSS/dataverse/releases/tag/v6.2</a> says "While backward compatibility for installations using a single PID Provider account is provided, updating to use the new microprofile settings is highly recommended and will be required in a future version."</p>
+<p>But it sounds like you aren't seeing the promised backward compatibility. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="471340438"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471340438" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471340438">(Sep 18 2024 at 20:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> yeah, that seems to be the case <span aria-label="face with diagonal mouth" class="emoji emoji-1fae4" role="img" title="face with diagonal mouth">:face_with_diagonal_mouth:</span></p>
+
+
+
+<a name="471341325"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471341325" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471341325">(Sep 18 2024 at 20:18)</a>:</h4>
+<p>I guess I would try following the DataCite pattern I showed in <a class="stream-topic" data-stream-id="446770" href="/#narrow/stream/446770-docs/topic/domain.2Exml.20example.20for.20configuring.20DataCite.20PID.20provider">#docs &gt; domain.xml example for configuring DataCite PID provider</a></p>
+
+
+
+<a name="471341346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471341346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471341346">(Sep 18 2024 at 20:18)</a>:</h4>
+<p>yup, we'll try that next</p>
+
+
+
+<a name="471341353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471341353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471341353">(Sep 18 2024 at 20:18)</a>:</h4>
+<p>great</p>
+
+
+
+<a name="471343212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471343212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471343212">(Sep 18 2024 at 20:31)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> is * <a href="https://guides.dataverse.org/en/6.2/installation/config.html#dataverse-spi-pidproviders-directory">dataverse.spi.pidproviders.directory</a> not needed? I don't see it in your examples.</p>
+
+
+
+<a name="471344267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471344267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471344267">(Sep 18 2024 at 20:38)</a>:</h4>
+<p>Not needed. Someday it will be useful, if people create their own PID providers. They'll drop their own jar file in, like we have for exporters, if you're familiar with that. It's for extensibility. Modularity.</p>
+
+
+
+<a name="471349486"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471349486" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471349486">(Sep 18 2024 at 21:13)</a>:</h4>
+<p>Thanks again <span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> we got it working now.</p>
+
+
+
+<a name="471460453"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/EZID%3A%20dataset%20publication%20failing%20on%20updateIdentifierStatus/near/471460453" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/EZID.3A.20dataset.20publication.20failing.20on.20updateIdentifierStatus.html#471460453">(Sep 19 2024 at 11:01)</a>:</h4>
+<p>Phew! Should we add something to the release notes and the docs? Suggestions and pull requests welcome!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

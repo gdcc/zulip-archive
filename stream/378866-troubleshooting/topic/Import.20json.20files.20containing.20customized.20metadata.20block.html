@@ -1,0 +1,107 @@
+<html>
+<head><meta charset="utf-8"><title>Import json files containing customized metadata block · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html">Import json files containing customized metadata block</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="466042758"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/466042758" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#466042758">(Aug 29 2024 at 15:07)</a>:</h4>
+<p>Hi Everyone, I added a customized metadata block and can add metadata to the new fields at the front end, but failed to import Json files containing the customized metadata. It seems the new block need to be added to ImportDDIServiceBean.java and ImportGenericServiceBean.java to make the API work. Is it the right way to do it? Are there easier solutions? Thanks!</p>
+
+
+
+<a name="467325357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467325357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467325357">(Sep 03 2024 at 17:51)</a>:</h4>
+<p>Huh. It should work! Here's what I'd suggest...</p>
+<ul>
+<li>Using the front end, create a dataset that contains fields in your custom metadata block.</li>
+<li>Save and publish.</li>
+<li>Download the metadata as JSON.</li>
+<li>Try creating a new dataset from the JSON.</li>
+</ul>
+
+
+
+<a name="467325562"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467325562" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467325562">(Sep 03 2024 at 17:51)</a>:</h4>
+<p>Of course, you might be talking about importing a new dataset rather than importing. But I'd start with creating first to make sure it's working.</p>
+
+
+
+<a name="467330860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467330860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467330860">(Sep 03 2024 at 18:14)</a>:</h4>
+<p>Hi Philip, Thanks for your great recommendations. I will give it a try. One thing I want to mention is that I decompiled and looked at the import class file after adding the custom metadata block, but did not see any of the custom metadata fields. Is that what it supposed to be?</p>
+
+
+
+<a name="467336906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467336906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467336906">(Sep 03 2024 at 18:47)</a>:</h4>
+<p>Well, it should all be written generically. I wouldn't expect you to see specific fields in the decompiled output.</p>
+
+
+
+<a name="467342423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467342423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467342423">(Sep 03 2024 at 19:16)</a>:</h4>
+<p>We have a custom metadata block and have been creating datasets with the customization fields via API. I have not touched any of the "ServiceBean" files.</p>
+<p>To set up our custom metadata block we followed the instructions here:<br>
+<a href="https://guides.dataverse.org/en/latest/admin/metadatacustomization.html">https://guides.dataverse.org/en/latest/admin/metadatacustomization.html</a></p>
+<p>Once you have created a ".tsv" file (properly formatted), then you 1) enable the metadata block, 2) update the Solr schema with the "<a href="http://update-fields.sh">update-fields.sh</a>" script, 3) reload your Solr schema.</p>
+<p>If you can add metadata via the UI, then seems you have done the above steps.</p>
+<p>I would do what <span class="user-mention" data-user-id="598112">@Philip Durbin</span> suggests above - <br>
+I would export the dataset you created via the UI to see how the json is rendered and use that json as an example to create a new dataset via the API.</p>
+<p><code>curl "$SERVER/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi:$DOI"</code></p>
+
+
+
+<a name="467343305"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467343305" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467343305">(Sep 03 2024 at 19:22)</a>:</h4>
+<p>I just tried with an exported Json containing the metadata block. It seems the import worked with this message: {"status":"OK","data":{"id":17,"persistentId":"doi:10.5072/FK2/VRXQQ2"}}. But the dataset does not show up in the app. I did the import again and  it says the dataset already exists.</p>
+
+
+
+<a name="467344361"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467344361" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467344361">(Sep 03 2024 at 19:30)</a>:</h4>
+<p>If the dataset exists, it should just make a "draft", right <span class="user-mention" data-user-id="598112">@Philip Durbin</span> <br>
+<span class="user-mention" data-user-id="728331">@Hansen Zhang</span> if you go to the dataset, in the UI, do you see other versions? Click the "Versions" tab. You should see something like this:<br>
+<a href="/user_uploads/53090/jB9-NLsnVkX66lXukvrcrCsk/Screenshot-2024-09-03-at-3.29.42PM.png">Screenshot-2024-09-03-at-3.29.42PM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/jB9-NLsnVkX66lXukvrcrCsk/Screenshot-2024-09-03-at-3.29.42PM.png" title="Screenshot-2024-09-03-at-3.29.42PM.png"><img data-original-dimensions="2074x636" src="/user_uploads/thumbnail/53090/jB9-NLsnVkX66lXukvrcrCsk/Screenshot-2024-09-03-at-3.29.42PM.png/840x560.webp"></a></div>
+
+
+
+<a name="467344606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467344606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467344606">(Sep 03 2024 at 19:31)</a>:</h4>
+<p>Also who "owns" the dataset? If you are not logged in (and it was your token that created the dataset), you will not be able to see the dataset - until it is published.</p>
+
+
+
+<a name="467344883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467344883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467344883">(Sep 03 2024 at 19:34)</a>:</h4>
+<p>I am doing it in a development environment. The imported dataset did not show up at all, although status was OK.</p>
+
+
+
+<a name="467345106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467345106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467345106">(Sep 03 2024 at 19:35)</a>:</h4>
+<p>I am doing it as the Admin and I logged in.</p>
+
+
+
+<a name="467347582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467347582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Hansen Zhang <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467347582">(Sep 03 2024 at 19:49)</a>:</h4>
+<p>Hi Philip and Sherry, I tried to upload the exported Json file to Dataverse in production. It worked. I have no idea what's wrong with my local installation. Thank you for your help!</p>
+
+
+
+<a name="467349091"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Import%20json%20files%20containing%20customized%20metadata%20block/near/467349091" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Import.20json.20files.20containing.20customized.20metadata.20block.html#467349091">(Sep 03 2024 at 19:57)</a>:</h4>
+<p>Oh, great! I'm glad it worked in prod.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

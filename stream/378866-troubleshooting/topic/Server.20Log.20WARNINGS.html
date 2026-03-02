@@ -1,0 +1,73 @@
+<html>
+<head><meta charset="utf-8"><title>Server Log WARNINGS · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html">Server Log WARNINGS</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="504112500"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504112500" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504112500">(Mar 07 2025 at 14:47)</a>:</h4>
+<p>I sent the following to the Dataverse Google group. One WARNING is about the zippreviewer, which I think Jim can help with. But the other is an "offending code" warning.<br>
+<a href="https://groups.google.com/g/dataverse-community/c/Sewgonwd_HM">https://groups.google.com/g/dataverse-community/c/Sewgonwd_HM</a><br>
+====================</p>
+<p>We are getting this error in our server.log:</p>
+<blockquote>
+<p>[2025-03-07T13:59:43.727+0000] [Payara 6.2024.6] [WARNING] [] [edu.harvard.iq.dataverse.util.BundleUtil] [tid: _ThreadID=88 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1741355983727] [levelValue: 900] [[<br>
+  Could not find key "externaltools.zipPreviewer.displayname" in bundle file: ]]</p>
+</blockquote>
+<p>We do have zipPreviewer installed as an external previewer. I looked at the <a href="http://Bundle.properties">Bundle.properties</a> file and see this line for Data Curation Tool:<br>
+<strong>external</strong>tools.dct.displayname=Data Curation Tool</p>
+<p>Do I need to add a similar one for zipPreviewer? To get rid of the warnings?</p>
+<p>We are also getting LOTS of these warnings causing our server.log file to rollover many times a day - so we have about 10 or so server log files for a day. Here's that Warning:</p>
+<blockquote>
+<p>[2025-03-07T14:21:47.495+0000] [Payara 6.2024.6] [WARNING] [] [] [tid: _ThreadID=88 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1741357307495] [levelValue: 900] [[<br>
+  Response has already been committed, and further write operations are not permitted. This may result in an IllegalStateException being triggered by the underlying application. To avoid this situation, consider adding a Rule <code>.when(Direction.isInbound().and(Response.isCommitted())).perform(Lifecycle.abort())</code>, or figure out where the response is being incorrectly committed and correct the bug in the offending code.]]</p>
+</blockquote>
+
+
+
+<a name="504114285"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504114285" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504114285">(Mar 07 2025 at 14:55)</a>:</h4>
+<p>Thanks for posting on the google group as well! It looks like Jim already replied and I agree with his take.</p>
+
+
+
+<a name="504124062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504124062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504124062">(Mar 07 2025 at 15:38)</a>:</h4>
+<p>Fixed the zipPreviewer warning by adding this line to our <a href="http://Bundle.properties">Bundle.properties</a> file:<br>
+<code>externaltools.zipPreviewer.displayname=Zip Previewer</code></p>
+
+
+
+<a name="504124846"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504124846" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504124846">(Mar 07 2025 at 15:41)</a>:</h4>
+<p>Great. I wonder... do we document this somewhere? If not, we probably should!</p>
+
+
+
+<a name="504127534"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504127534" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504127534">(Mar 07 2025 at 15:53)</a>:</h4>
+<p>I couldn't find it documented. Plus this was the only Previewer that is giving WARNINGS. I have other preveiwers installed, but only a warning  for zipPreviewer was in the log file. I'm not sure why this one previewer needed a bundle property? <span aria-label="shrug" class="emoji emoji-1f937" role="img" title="shrug">:shrug:</span> </p>
+<p>Maybe it just needs to be added to the core <a href="http://Bundle.properties">Bundle.properties</a> file. There is an #externaltools section in that file that comes with definitions for the Data Curation Tool:</p>
+<blockquote>
+<p>#externaltools<br>
+externaltools.dct.displayname=Data Curation Tool<br>
+externaltools.dct.description=Data Curation Tool for curation of variables<br>
+externaltools.explorer.displayname=Data Explorer<br>
+externaltools.explorer.description=The Data Explorer provides a GUI which lists the variables in a tabular data file allowing searching, charting and cross tabulation analysis.</p>
+</blockquote>
+
+
+
+<a name="504129069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Server%20Log%20WARNINGS/near/504129069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Server.20Log.20WARNINGS.html#504129069">(Mar 07 2025 at 16:00)</a>:</h4>
+<p>Right, it's a bit messy. I wonder if we should remove <code>externaltools.dct.displayname=Data Curation Tool</code> and the rest and treat all tools the same way. That is, if you add a tool, you have to edit <code>Bundle.properties</code>.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

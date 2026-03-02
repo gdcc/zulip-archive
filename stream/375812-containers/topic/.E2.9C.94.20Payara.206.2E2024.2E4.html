@@ -1,0 +1,320 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Payara 6.2024.4 · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html">✔ Payara 6.2024.4</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="418983372"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/418983372" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#418983372">(Jan 31 2024 at 07:47)</a>:</h4>
+<p>OMG I tried 6.2024.1 just now... Payara's quality is dwindling IMO... First I have to maneuver around them not releasing payara-api packages for month. And now this:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt; Caused by: java.lang.NullPointerException: Cannot invoke &quot;fish.payara.nucleus.microprofile.config.spi.ConfigValueImpl.getSourceOrdinal()&quot; because &quot;resultWithoutProfile&quot; is null
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.resolve(ConfigExpressionResolver.java:112)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.resolveExpression(ConfigExpressionResolver.java:227)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.resolveExpression(ConfigExpressionResolver.java:153)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.getValue(ConfigExpressionResolver.java:135)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.resolve(ConfigExpressionResolver.java:108)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.ConfigExpressionResolver.resolve(ConfigExpressionResolver.java:91)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.searchConfigSources(PayaraConfig.java:352)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.getConfigValue(PayaraConfig.java:251)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.getConfigValue(PayaraConfig.java:229)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.getValue(PayaraConfig.java:224)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.getValueInternal(PayaraConfig.java:200)
+dev_dataverse&gt;  at fish.payara.nucleus.microprofile.config.spi.PayaraConfig.getOptionalValue(PayaraConfig.java:173)
+dev_dataverse&gt;  at edu.harvard.iq.dataverse.settings.JvmSettings.lookupOptional(JvmSettings.java:382)
+dev_dataverse&gt;  at edu.harvard.iq.dataverse.settings.JvmSettings.lookupOptional(JvmSettings.java:341)
+dev_dataverse&gt;  at edu.harvard.iq.dataverse.util.SystemConfig.getDataverseSiteUrlStatic(SystemConfig.java:265)
+dev_dataverse&gt;  at edu.harvard.iq.dataverse.DatasetVersion.&lt;init&gt;(DatasetVersion.java:197)
+</code></pre></div>
+<p>It's causing the whole deployment to fail!!! (Without even giving a non-profiled value)</p>
+
+
+
+<a name="419028230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419028230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419028230">(Jan 31 2024 at 12:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I hope you don't mind... I moved this to its own topic.</p>
+
+
+
+<a name="419039577"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419039577" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419039577">(Jan 31 2024 at 13:30)</a>:</h4>
+<p>Great. I was able to reproduce the problem with a simple unit test...</p>
+
+
+
+<a name="419041688"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419041688" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419041688">(Jan 31 2024 at 13:42)</a>:</h4>
+<p>woof</p>
+
+
+
+<a name="419041873"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419041873" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419041873">(Jan 31 2024 at 13:43)</a>:</h4>
+<p>Writing a bug report just now and probably will create a PR to Payara... <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="419058014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058014">(Jan 31 2024 at 14:56)</a>:</h4>
+<p><a href="https://github.com/payara/Payara/pull/6550">https://github.com/payara/Payara/pull/6550</a></p>
+
+
+
+<a name="419058079"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058079" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058079">(Jan 31 2024 at 14:56)</a>:</h4>
+<p>In the end, an easy fix. And once more showing the importance of doing proper unit testing</p>
+
+
+
+<a name="419058129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058129">(Jan 31 2024 at 14:56)</a>:</h4>
+<p>Nice.</p>
+
+
+
+<a name="419058208"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058208" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058208">(Jan 31 2024 at 14:57)</a>:</h4>
+<p>By the way if you change <code>Fixes #6549</code> to <code>- Fixes #6549</code> you get a nice preview of the title of the issue.</p>
+
+
+
+<a name="419058421"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058421" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058421">(Jan 31 2024 at 14:58)</a>:</h4>
+<p>Badger? Mushroom? These tests are great. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="419058669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419058669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419058669">(Jan 31 2024 at 14:59)</a>:</h4>
+<p>I didn't write those. I suppose these are references to some comic / cartoon I'm not familiar with</p>
+
+
+
+<a name="419079993"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419079993" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419079993">(Jan 31 2024 at 16:36)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/Payara.206.2E2024.2E1/near/419058421">said</a>:</p>
+<blockquote>
+<p>Badger? Mushroom? These tests are great. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+</blockquote>
+<p>It might be a reference to <a href="https://en.wikipedia.org/wiki/Badgers_(animation)">https://en.wikipedia.org/wiki/Badgers_(animation)</a></p>
+
+
+
+<a name="419082928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419082928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419082928">(Jan 31 2024 at 16:52)</a>:</h4>
+<p>British. Yes, probably. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="419278789"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/419278789" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#419278789">(Feb 01 2024 at 16:04)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/375812-containers/topic/Payara.206.2E2024.2E1/near/419079993">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/Payara.206.2E2024.2E1/near/419058421">said</a>:</p>
+<blockquote>
+<p>Badger? Mushroom? These tests are great. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+</blockquote>
+<p>It might be a reference to <a href="https://en.wikipedia.org/wiki/Badgers_(animation)">https://en.wikipedia.org/wiki/Badgers_(animation)</a></p>
+</blockquote>
+<p>Who wrote those tests then? <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span> GPT?</p>
+
+
+
+<a name="428388125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/428388125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#428388125">(Mar 22 2024 at 18:27)</a>:</h4>
+<p>Woo-hoo my PR was just merged!</p>
+
+
+
+<a name="428388188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/428388188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#428388188">(Mar 22 2024 at 18:28)</a>:</h4>
+<p>I suppose it will be in 6.2024.4 then</p>
+
+
+
+<a name="428388363"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/428388363" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#428388363">(Mar 22 2024 at 18:29)</a>:</h4>
+<p>Congrats! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="432496252"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432496252" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432496252">(Apr 10 2024 at 12:48)</a>:</h4>
+<p>6.2024.4 has been released today</p>
+
+
+
+<a name="432496292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432496292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432496292">(Apr 10 2024 at 12:48)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> has marked this topic as resolved.</p>
+
+
+
+<a name="432563158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432563158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432563158">(Apr 10 2024 at 18:31)</a>:</h4>
+<p>To test if this release solves the issues with OpenAPI how can we get an image for testing <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="432563289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432563289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432563289">(Apr 10 2024 at 18:32)</a>:</h4>
+<p>Let me hack on stuff some more and it will be served <span aria-label="stuck out tongue" class="emoji emoji-1f61b" role="img" title="stuck out tongue">:stuck_out_tongue:</span></p>
+
+
+
+<a name="432563864"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432563864" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432563864">(Apr 10 2024 at 18:36)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as unresolved.</p>
+
+
+
+<a name="432572297"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432572297" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432572297">(Apr 10 2024 at 19:33)</a>:</h4>
+<p>Kids embedded, will hack on stuff now</p>
+
+
+
+<a name="432572480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432572480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432572480">(Apr 10 2024 at 19:34)</a>:</h4>
+<p>Will probably attend to the base image versioning first though</p>
+
+
+
+<a name="432575450"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432575450" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432575450">(Apr 10 2024 at 19:56)</a>:</h4>
+<p>I wish I could embed my kids. They stay up all night. Teenagers. <span aria-label="rolling eyes" class="emoji emoji-1f644" role="img" title="rolling eyes">:rolling_eyes:</span></p>
+
+
+
+<a name="432575927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432575927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432575927">(Apr 10 2024 at 19:59)</a>:</h4>
+<p><a href="https://www.youtube.com/watch?v=HBmIJFtn_qQ">https://www.youtube.com/watch?v=HBmIJFtn_qQ</a></p>
+<div class="youtube-video message_inline_image"><a data-id="HBmIJFtn_qQ" href="https://www.youtube.com/watch?v=HBmIJFtn_qQ"><img src="https://uploads.zulipusercontent.net/3aebfd35f138b3789783702e69dc4e60a2876407/68747470733a2f2f692e7974696d672e636f6d2f76692f48426d494a46746e5f71512f64656661756c742e6a7067"></a></div>
+
+
+
+<a name="432581694"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/432581694" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#432581694">(Apr 10 2024 at 20:41)</a>:</h4>
+<p>The lyrics are below... <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> You might need to put it through DeepL though <span aria-label="smile cat" class="emoji emoji-1f638" role="img" title="smile cat">:smile_cat:</span></p>
+
+
+
+<a name="433295868"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/433295868" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#433295868">(Apr 15 2024 at 13:47)</a>:</h4>
+<p>Created the upgrade PR: <a href="https://github.com/IQSS/dataverse/pull/10495">https://github.com/IQSS/dataverse/pull/10495</a></p>
+
+
+
+<a name="433296012"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/433296012" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#433296012">(Apr 15 2024 at 13:48)</a>:</h4>
+<p>I can confirm that my patch does indeed fix the issue during deployment!</p>
+
+
+
+<a name="433296058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/433296058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#433296058">(Apr 15 2024 at 13:48)</a>:</h4>
+<p>So we can make our move <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="434061927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434061927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434061927">(Apr 18 2024 at 14:33)</a>:</h4>
+<p>In the description for this... Upgrade to Payara 6.2024.4+ <a href="https://github.com/IQSS/dataverse/issues/10494">#10494</a></p>
+<p>I just added this: In containers, can't set DATAVERSE_SITEURL using documented methods <a href="https://github.com/IQSS/dataverse/issues/10285">#10285</a></p>
+
+
+
+<a name="434062100"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062100" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062100">(Apr 18 2024 at 14:34)</a>:</h4>
+<p>You beat me to it! I was typing the same thing!</p>
+
+
+
+<a name="434062142"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062142" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062142">(Apr 18 2024 at 14:34)</a>:</h4>
+<p><span aria-label="racecar" class="emoji emoji-1f3ce" role="img" title="racecar">:racecar:</span></p>
+
+
+
+<a name="434062143"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062143" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062143">(Apr 18 2024 at 14:34)</a>:</h4>
+<p>I'm going to add a "closes" to the PR</p>
+
+
+
+<a name="434062165"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062165" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062165">(Apr 18 2024 at 14:35)</a>:</h4>
+<p>Perfect!</p>
+
+
+
+<a name="434062612"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062612" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062612">(Apr 18 2024 at 14:36)</a>:</h4>
+<p>As <span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> doesn't need 2024.4 for OpenAPI anymore, and as long as <span class="user-mention" data-user-id="626369">@Don Sizemore</span> doesn't tell me the sec issues are really bad ass - should we make the PR to apply the upgrade to the containers only? Just encourage people to upgrade?</p>
+
+
+
+<a name="434062735"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062735" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062735">(Apr 18 2024 at 14:37)</a>:</h4>
+<p>(On the other hand: it's been a year without a Payara update for people, so maybe it's good to make them?)</p>
+
+
+
+<a name="434062982"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434062982" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434062982">(Apr 18 2024 at 14:38)</a>:</h4>
+<p>I'm just saying: this doesn't look good.<br>
+<a href="/user_uploads/53090/UHnTt0mgutKACTMpNI5Mj3mK/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/UHnTt0mgutKACTMpNI5Mj3mK/image.png" title="image.png"><img src="/user_uploads/53090/UHnTt0mgutKACTMpNI5Mj3mK/image.png"></a></div>
+
+
+
+<a name="434063007"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434063007" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434063007">(Apr 18 2024 at 14:38)</a>:</h4>
+<p>(rev2 has 6.2024.4)</p>
+
+
+
+<a name="434063120"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434063120" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434063120">(Apr 18 2024 at 14:39)</a>:</h4>
+<p>Most of the yellow and light yellow ones are caused by Ubuntu 22.04 having an old imagemagick...</p>
+
+
+
+<a name="434063158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434063158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434063158">(Apr 18 2024 at 14:39)</a>:</h4>
+<p><a href="/user_uploads/53090/U_YKxDHAMg8wedMNfKgyHCIY/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/U_YKxDHAMg8wedMNfKgyHCIY/image.png" title="image.png"><img src="/user_uploads/53090/U_YKxDHAMg8wedMNfKgyHCIY/image.png"></a></div>
+
+
+
+<a name="434063271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434063271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434063271">(Apr 18 2024 at 14:40)</a>:</h4>
+<p>This will be resolved once 24.04 is out and we can finally upgrade the Temurin images</p>
+
+
+
+<a name="434090549"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/434090549" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#434090549">(Apr 18 2024 at 14:52)</a>:</h4>
+<p>Hmm, I think I'd like to upgrade Payara everywhere at once: containers, production, etc.</p>
+<p>Mostly I'm just thinking that developers should stay on the same version as production.</p>
+
+
+
+<a name="448951071"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/448951071" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#448951071">(Jul 03 2024 at 21:15)</a>:</h4>
+<p>This is done now with 6.3.</p>
+
+
+
+<a name="448951090"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Payara%206.2024.4/near/448951090" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Payara.206.2E2024.2E4.html#448951090">(Jul 03 2024 at 21:15)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

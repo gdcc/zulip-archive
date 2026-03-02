@@ -1,0 +1,139 @@
+<html>
+<head><meta charset="utf-8"><title>issue with solr indexing messages · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html">issue with solr indexing messages</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="510750912"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510750912" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510750912">(Apr 07 2025 at 19:28)</a>:</h4>
+<p>Hello .. I've noticed lately that when I initiate a reindex in all three of our Dataverse installations, the following is occurring:</p>
+<p>When I type " curl <a href="http://localhost:8080/api/admin/index/clear">http://localhost:8080/api/admin/index/clear</a>" .. the log shows "attempting to delete all Solr documents before a complete re-index" and the console shows "{"status":"OK","data":{"numRowsClearedByClearAllIndexTimes":3,"message":"Solr index and database index timestamps cleared."}}"</p>
+<p>.. however, the log never comes back with an "All cleared" message .. </p>
+<p>.. then, if I type "curl <a href="http://localhost:8080/api/admin/index">http://localhost:8080/api/admin/index</a>" .. the console shows "{"status":"OK","data":{"availablePartitionIds":[0],"args":{"numPartitions":1,"partitionIdToProcess":0},"message":"indexAllOrSubset has begun of 1 dataverses and 1 datasets."}}" .... and the log goes through the indexing of all the dataverses and datasets (in this case there is only one) .. and then shows this message "1 dataverses and 1 datasets indexed. index all took 249 milliseconds. <em>Solr index was not cleared before indexing.</em>" </p>
+<p>.. the console never comes back with a "completed" message</p>
+<p>.. the datasets all appear on the UI and seem to be indexed .. ?</p>
+<p>I did find a few issues related to this, but they were from 7 years ago. There were some similar ones more recently, but in those cases there was an exception error and failures of some of the datasets indexing. I did reinstall solr and this particular installation is brand new. And then created one dataset. =)  </p>
+<p>We are running v6.6 on our dev site (the one above with 1 dataset), which was a complete new install. QA and prod are running v6.5 and both experience the same thing, QA has 0 datasets currently and prod has almost 100. </p>
+<p>.. all of the "checks" messages in the logs seem normal when i check the status or timestamps  ..</p>
+<p>Appreciate any thoughts or ideas!</p>
+
+
+
+<a name="510751395"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510751395" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510751395">(Apr 07 2025 at 19:31)</a>:</h4>
+<p>Hmm, any errors in server logs?</p>
+
+
+
+<a name="510751722"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510751722" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510751722">(Apr 07 2025 at 19:32)</a>:</h4>
+<p>no nothing .. the "index was not cleared is the last message" .. until i check the status and then i get all the normal status  messages</p>
+
+
+
+<a name="510752314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752314">(Apr 07 2025 at 19:36)</a>:</h4>
+<p>maybe i need to set the log level higher .. i think it is just at the default</p>
+
+
+
+<a name="510752680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752680">(Apr 07 2025 at 19:38)</a>:</h4>
+<p>This is what I see (I'm using Docker and only have the root collection and running the latest in the "develop" branch):</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt;   indexing dataverse 1 of 1 (id=1, persistentId=root)|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2025-04-07T19:37:53.336+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673336;_LevelValue=800;|
+dev_dataverse&gt;   done iterating through all datasets|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2025-04-07T19:37:53.336+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673336;_LevelValue=800;|
+dev_dataverse&gt;   index all took 5 milliseconds|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2025-04-07T19:37:53.337+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673337;_LevelValue=800;|
+dev_dataverse&gt;   1 dataverses and 0 datasets indexed. index all took 5 milliseconds. Solr index was not cleared before indexing.
+dev_dataverse&gt; |#]
+</code></pre></div>
+
+
+
+<a name="510752747"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752747" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752747">(Apr 07 2025 at 19:39)</a>:</h4>
+<p>Can you find "milliseconds" in your log? Or "index all"?</p>
+
+
+
+<a name="510752792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752792">(Apr 07 2025 at 19:39)</a>:</h4>
+<p>mine looks like this: </p>
+<p>[#|2025-04-07T19:37:48.763+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668763;_LevelValue=800;|<br>
+  done iterating through all datasets|#]</p>
+<p>[#|2025-04-07T19:37:48.764+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668764;_LevelValue=800;|<br>
+  index all took 290 milliseconds|#]</p>
+<p>[#|2025-04-07T19:37:48.764+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668764;_LevelValue=800;|<br>
+  1 dataverses and 1 datasets indexed. index all took 290 milliseconds. Solr index was not cleared before indexing.<br>
+|#]</p>
+<p>.. lol well increasing logging level gave a LOT of detail for each indexed dataset, but same result on the "not cleared" message .. that is the last message</p>
+
+
+
+<a name="510752855"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752855" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752855">(Apr 07 2025 at 19:40)</a>:</h4>
+<p>I guess we're saying the same thing, sorry. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="510752915"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752915" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752915">(Apr 07 2025 at 19:40)</a>:</h4>
+<p>oh sorry .. i looked at yours and for some reason thought it said it was cleared</p>
+
+
+
+<a name="510752971"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510752971" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510752971">(Apr 07 2025 at 19:41)</a>:</h4>
+<p>so yea, maybe it's normal?</p>
+
+
+
+<a name="510753010"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753010" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753010">(Apr 07 2025 at 19:41)</a>:</h4>
+<p>When you say the console doesn't come back... you mean it hangs? It should spit out some JSON and give you your prompt back.</p>
+
+
+
+<a name="510753087"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753087" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753087">(Apr 07 2025 at 19:41)</a>:</h4>
+<p>yes, on the console it gives the "index has begun" message, but never comes back and says it was complete</p>
+
+
+
+<a name="510753190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753190">(Apr 07 2025 at 19:42)</a>:</h4>
+<p>curl <a href="http://localhost:8080/api/admin/index">http://localhost:8080/api/admin/index</a><br>
+{"status":"OK","data":{"availablePartitionIds":[0],"args":{"numPartitions":1,"partitionIdToProcess":0},"message":"indexAllOrSubset has begun of 1 dataverses and 1 datasets."}}</p>
+
+
+
+<a name="510753449"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753449" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753449">(Apr 07 2025 at 19:44)</a>:</h4>
+<p>maybe it doesn't</p>
+
+
+
+<a name="510753504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753504">(Apr 07 2025 at 19:44)</a>:</h4>
+<p>i just need constant verification <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="510753527"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/issue%20with%20solr%20indexing%20messages/near/510753527" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/issue.20with.20solr.20indexing.20messages.html#510753527">(Apr 07 2025 at 19:45)</a>:</h4>
+<p>ha</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

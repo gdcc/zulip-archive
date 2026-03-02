@@ -1,0 +1,497 @@
+<html>
+<head><meta charset="utf-8"><title>OAI feed missing dataset identifiers · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html">OAI feed missing dataset identifiers</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="499084106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499084106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499084106">(Feb 11 2025 at 19:31)</a>:</h4>
+<p>Hello .. me again with a probably stupid question .. I admit I set up our dataverse harvesting server when I first installed the site and really haven't touched it since. I only have the DEFAULT no name set that doesn't have a "setspec" set and should be all published datasets right? Anyway, I've noticed recently that <a href="https://dataverse.asu.edu/oai?verb=ListIdentifiers&amp;metadataPrefix=oai_dc">the feed</a> is missing some datasets .. specifically there should be 83 and there are only 79. I've recently upgraded to v6.5 and did a full index of the site at that time. Should I delete/recreate the set and/or create a set that is explicitly defined? Or, any ideas why else datasets would be missing or how I can fix?</p>
+
+
+
+<a name="499084532"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499084532" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499084532">(Feb 11 2025 at 19:34)</a>:</h4>
+<p>when i try to re-run the default export i see these messages in the log (and it just hangs forever and never completes):</p>
+<p>[[setService, findAllNamedSets; query: select object(o) from OAISet as o where o.spec != '' order by o.spec]]<br>
+[[ 0 results found.]]</p>
+
+
+
+<a name="499084605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499084605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499084605">(Feb 11 2025 at 19:35)</a>:</h4>
+<p>What have I completely messed up?</p>
+
+
+
+<a name="499084629"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499084629" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499084629">(Feb 11 2025 at 19:35)</a>:</h4>
+<p>Hmm, yep, should be all. I'm not sure why a few are missing. I'm also not sure if Solr is involved or not. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="499085253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085253">(Feb 11 2025 at 19:39)</a>:</h4>
+<p>Yeah, it does look like Solr is involved.</p>
+
+
+
+<a name="499085289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085289">(Feb 11 2025 at 19:39)</a>:</h4>
+<p>Do you see something like this in your logs?</p>
+<p>"set query expanded to " + datasetIds.size() + " datasets."</p>
+
+
+
+<a name="499085423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085423">(Feb 11 2025 at 19:40)</a>:</h4>
+<p>I think harvesting might have its own log, apart from server.log I mean.</p>
+
+
+
+<a name="499085541"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085541" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085541">(Feb 11 2025 at 19:41)</a>:</h4>
+<p>Actually, I take it back. I don't think Solr is involved for the default set.</p>
+
+
+
+<a name="499085571"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085571" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085571">(Feb 11 2025 at 19:41)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>if (!oaiSet.isDefaultSet()) {
+    datasetIds = expandSetQuery(query);
+    exportLogger.info(&quot;set query expanded to &quot; + datasetIds.size() + &quot; datasets.&quot;);
+} else {
+    // The default set includes all the local, published datasets.
+    // findAllLocalDatasetIds() finds the ids of all the local datasets -
+    // including the unpublished drafts and deaccessioned ones.
+    // Those will be filtered out further down the line.
+    datasetIds = datasetService.findAllLocalDatasetIds();
+    databaseLookup = true;
+}
+</code></pre></div>
+
+
+
+<a name="499085660"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085660" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085660">(Feb 11 2025 at 19:42)</a>:</h4>
+<p>yes, i do see that .. and it looked like it was recreating the missing datasets, and maybe i just didn't wait long enough .. <br>
+.. i also created a new set and used the example for pulling the identifier .. and it looked like it was going to export 83 records as well .. <br>
+.. so wonder why the original set stopped updating?</p>
+
+
+
+<a name="499085777"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499085777" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499085777">(Feb 11 2025 at 19:43)</a>:</h4>
+<p>Not sure. Strange. Please feel free to open a issue if you think it's a bug.</p>
+
+
+
+<a name="499086069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086069">(Feb 11 2025 at 19:45)</a>:</h4>
+<p>ohhh okay, so the new set i created says "83 datasets (79 records exported, 0 marked as deleted)" .. so it is not exporting 4 for some reason</p>
+
+
+
+<a name="499086255"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086255" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086255">(Feb 11 2025 at 19:46)</a>:</h4>
+<p>the actual OAI log just says "Calling OAI Record Service to re-export 93 datasets."</p>
+
+
+
+<a name="499086282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086282">(Feb 11 2025 at 19:46)</a>:</h4>
+<p>Weird. I wonder if we'll be able to reproduce it, though. It is particular to your database? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="499086288"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086288" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086288">(Feb 11 2025 at 19:46)</a>:</h4>
+<p>93? that would include the unpublished ones i think</p>
+
+
+
+<a name="499086537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086537">(Feb 11 2025 at 19:47)</a>:</h4>
+<p>i just don't know how to figure out why it isn't exporting those 4 .. they are from various time periods and don't seem to have weird formatting .. although there are some differences in all of them</p>
+
+
+
+<a name="499086838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499086838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499086838">(Feb 11 2025 at 19:49)</a>:</h4>
+<p>What if you make a set with one of the missing datasets? Does it work?</p>
+
+
+
+<a name="499087203"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499087203" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499087203">(Feb 11 2025 at 19:51)</a>:</h4>
+<p>trying now ..</p>
+
+
+
+<a name="499088097"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499088097" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499088097">(Feb 11 2025 at 19:57)</a>:</h4>
+<p>it says "1 dataset (0 records exported, 0 marked as deleted)"</p>
+
+
+
+<a name="499088286"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499088286" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499088286">(Feb 11 2025 at 19:58)</a>:</h4>
+<p>it finds the dataset but can't export those particular ones for some reason</p>
+
+
+
+<a name="499088354"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499088354" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499088354">(Feb 11 2025 at 19:59)</a>:</h4>
+<p>And if you create a set for a working dataset? Does it say 1 exported?</p>
+
+
+
+<a name="499089955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499089955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499089955">(Feb 11 2025 at 20:08)</a>:</h4>
+<p>yes it worked</p>
+
+
+
+<a name="499090553"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499090553" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499090553">(Feb 11 2025 at 20:12)</a>:</h4>
+<p>ok, so something is wrong with those few, hmm <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="499090571"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499090571" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499090571">(Feb 11 2025 at 20:12)</a>:</h4>
+<p>anything in server.log?</p>
+
+
+
+<a name="499091034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499091034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499091034">(Feb 11 2025 at 20:15)</a>:</h4>
+<p>the only thing that i'm seeing in server.log are messages like this:</p>
+<p>[2025-02-11T20:09:02.324+0000] [Payara 6.2024.7] [INFO] [] [edu.harvard.iq.dataverse.harvest.server.OAISetServiceBean] [tid: _ThreadID=93 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1739304542324] [levelValue: 800] [[<br>
+  setService, findAllNamedSets; query: select object(o) from OAISet as o where o.spec != '' order by o.spec]]</p>
+<p>[2025-02-11T20:09:02.325+0000] [Payara 6.2024.7] [INFO] [] [edu.harvard.iq.dataverse.harvest.server.OAISetServiceBean] [tid: _ThreadID=93 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1739304542325] [levelValue: 800] [[<br>
+  3 results found.]]</p>
+
+
+
+<a name="499091141"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499091141" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499091141">(Feb 11 2025 at 20:16)</a>:</h4>
+<p>but that looks like the "all published" set and not sure why it just says "3 results found"??</p>
+
+
+
+<a name="499091382"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499091382" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499091382">(Feb 11 2025 at 20:17)</a>:</h4>
+<p>Hi, <br>
+Yes, "83 datasets (79 records exported ..." would almost certainly indicate that the search query has found 83 published datasets, but only 79 of them have been successfully exported, so, the remaining 4 were not included in the OAI set advertised to the clients. <br>
+You already know the actual DOIs of the 4 missing/un-unexported datasets, correct? (ok, it looks like you know at least one - the one you've tried creating a set with...)<br>
+First step would be to identify which of the metadata formats is failing to export. (So, yes, this is a limitation of our export system - it's kind of binary/all-or-nothing; it's enough for just one format out of 10+ to fail, for the dataset to end up being "unexported". Which is a bit counter-productive, for the purposes of OAI especially - since the 3 formats needed for that are somewhat less likely to fail...)<br>
+Take a look at the storage folder for the dataset in question, on the filesystem or on S3, whichever is the case, and look for the files with the names like <code>export_*.cached</code> - for example, <code>export_oai_dc.cached</code> etc., and see which ones are missing, when compared to one of the successfully exported datasets. <br>
+Once you see which formats are missing, try exporting them individually via </p>
+<div class="codehilite"><pre><span></span><code>curl &quot;http://localhost:8080/api/datasets/export?exporter=xxx&amp;persistentId=yyy&quot;
+</code></pre></div>
+<p>while watching the server log; and hopefully there will be some errors/exceptions that will tell us what Dataverse doesn't like in the metadata. (during a bulk export of an OAI set error messages are suppressed, I believe). <br>
+This is pretty time-consuming, unfortunately. (but maybe someone can chime in with something easier in mind)</p>
+
+
+
+<a name="499092924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499092924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499092924">(Feb 11 2025 at 20:28)</a>:</h4>
+<p>for one of the datasets, in the storage location I see "export_Datacite.cache", "export_oai_dc.cache" and "export_OAI_ORE.cache" ..</p>
+<p>I tried the curl command for all three exporters for a dataset id that did export and for one that did not, and they all seemed to work .. nothing appears in server.log</p>
+
+
+
+<a name="499093057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499093057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499093057">(Feb 11 2025 at 20:29)</a>:</h4>
+<p>these curl commands: <br>
+curl "<a href="http://localhost:8080/api/datasets/export?exporter=oai_dc&amp;persistentId=doi:&lt;ours&gt;/C1CWX9">http://localhost:8080/api/datasets/export?exporter=oai_dc&amp;persistentId=doi:&lt;ours&gt;/C1CWX9</a>"<br>
+curl "<a href="http://localhost:8080/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi:&lt;ours&gt;/C1CWX9">http://localhost:8080/api/datasets/export?exporter=OAI_ORE&amp;persistentId=doi:&lt;ours&gt;/C1CWX9</a>"<br>
+curl "<a href="http://localhost:8080/api/datasets/export?exporter=Datacite&amp;persistentId=doi:&lt;ours&gt;/C1CWX9">http://localhost:8080/api/datasets/export?exporter=Datacite&amp;persistentId=doi:&lt;ours&gt;/C1CWX9</a>"</p>
+
+
+
+<a name="499093196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499093196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499093196">(Feb 11 2025 at 20:30)</a>:</h4>
+<p>all of those seemed to generate results for the non-exported dataset</p>
+
+
+
+<a name="499094162"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499094162" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499094162">(Feb 11 2025 at 20:37)</a>:</h4>
+<p>looking at one of the datasets that is working, it has  more "export" files in the storage location .. ie: ddi, dcterms, dc, <a href="http://schema.org">schema.org</a>, etc</p>
+
+
+
+<a name="499094248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499094248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499094248">(Feb 11 2025 at 20:38)</a>:</h4>
+<p>Yes, so, the next step should be to try the export API for the formats that are NOT there/not cached. <br>
+Note that if there are a few formats that are missing, it does NOT mean that all of them have failed to export; it may just mean that the exporter stopped once it encountered the first format it wasn't able to produce.</p>
+
+
+
+<a name="499094809"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499094809" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499094809">(Feb 11 2025 at 20:42)</a>:</h4>
+<p>so try each of these?:<br>
+<a href="https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats">https://guides.dataverse.org/en/latest/api/native-api.html#export-metadata-of-a-dataset-in-various-formats</a></p>
+
+
+
+<a name="499095479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499095479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499095479">(Feb 11 2025 at 20:47)</a>:</h4>
+<p>the oai_datacite one failed (but the Datacite one worked)</p>
+
+
+
+<a name="499095690"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499095690" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499095690">(Feb 11 2025 at 20:49)</a>:</h4>
+<p>and this in the log: <br>
+ IllegalStateException caught when exporting oai_datacite for dataset doi:10.48349/ASU/C1CWX9; may or may not be due to a mismatch between an exporter code and a metadata block update.</p>
+
+
+
+<a name="499095724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499095724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499095724">(Feb 11 2025 at 20:49)</a>:</h4>
+<p>how do i fix it? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="499095844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499095844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499095844">(Feb 11 2025 at 20:50)</a>:</h4>
+<p>we dont' have any custom metadata blocks .. other than the computational workflow one that I accidentally installed</p>
+
+
+
+<a name="499096225"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096225" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096225">(Feb 11 2025 at 20:52)</a>:</h4>
+<p>"may or may not"</p>
+<p>just tell me!</p>
+
+
+
+<a name="499096249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096249">(Feb 11 2025 at 20:53)</a>:</h4>
+<p>haha yea!</p>
+
+
+
+<a name="499096277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096277">(Feb 11 2025 at 20:53)</a>:</h4>
+<p>Yes! Except you _may_ have more metadata formats configured, on top of the 9 listed in the guide. (for example, we also have "croissant" added). So, comparing to what's cached in one of the known exported datasets directories may be the safest... <br>
+OK, sounds like you have already found one that is failing. The error message in the log is not super helpful, unfortunately... if you haven't yet, could you please try all the remaining formats too, and _maybe_ we'll see something more interesting in the log?</p>
+
+
+
+<a name="499096282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096282">(Feb 11 2025 at 20:53)</a>:</h4>
+<p>and tell me what it is and how to fix it <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="499096456"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096456" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096456">(Feb 11 2025 at 20:54)</a>:</h4>
+<p>The comment above the error is not very promising: <a href="https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L340">https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/export/ExportService.java#L340</a></p>
+
+
+
+<a name="499096481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096481">(Feb 11 2025 at 20:54)</a>:</h4>
+<p>i tried all of these: <code>ddi</code>, <code>oai_ddi</code>, <code>dcterms</code>, <code>oai_dc</code>, <code>schema.org</code> , <code>OAI_ORE</code> , <code>Datacite</code>, <code>oai_datacite</code> and <code>dataverse_json</code></p>
+<p>and the only one that failed was the oai_datacite one</p>
+
+
+
+<a name="499096814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096814">(Feb 11 2025 at 20:57)</a>:</h4>
+<p>Which dataset is failing? Can you please give us the doi or landing page?</p>
+
+
+
+<a name="499096828"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096828" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096828">(Feb 11 2025 at 20:57)</a>:</h4>
+<p>... Another (also very time-consuming) way of going about it is to open the full metadata edit form for this dataset, next to one for one of the known "good" datasets, and then stare at the two looking for any visible differences. Some obscure field of which you have 2 populated entries in the former, but only one in the latter, etc.</p>
+
+
+
+<a name="499096846"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499096846" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499096846">(Feb 11 2025 at 20:57)</a>:</h4>
+<p>(I'm wondering if this fix will help: Openaire fix for multiple productionPlaces <a href="https://github.com/IQSS/dataverse/issues/11194">#11194</a> )</p>
+
+
+
+<a name="499097065"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097065" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097065">(Feb 11 2025 at 20:58)</a>:</h4>
+<p>Finally, since the formats that the OAI server _actually needs_ have been exported successfully,  let me think of a way to cheat and mark the dataset as "exported", for the purposes of adding it to the OAI set.</p>
+
+
+
+<a name="499097148"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097148" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097148">(Feb 11 2025 at 20:59)</a>:</h4>
+<p>okay, i will start working on comparing the metadata .. i was doing that and didn't really see anything but i understand better now what i am looking for</p>
+
+
+
+<a name="499097156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097156">(Feb 11 2025 at 20:59)</a>:</h4>
+<p>Multiple productionPlace:</p>
+<div class="codehilite"><pre><span></span><code>          {
+            &quot;typeName&quot;: &quot;productionPlace&quot;,
+            &quot;multiple&quot;: true,
+            &quot;typeClass&quot;: &quot;primitive&quot;,
+            &quot;value&quot;: [
+              &quot;Phoenix, Arizona, USA&quot;,
+              &quot;Los Angeles, California, USA&quot;,
+              &quot;Santa Barbara, California, USA&quot;,
+              &quot;Austin, Texas, USA&quot;
+            ]
+          },
+</code></pre></div>
+<p>At <a href="https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/C1CWX9">https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/C1CWX9</a></p>
+
+
+
+<a name="499097175"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097175" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097175">(Feb 11 2025 at 20:59)</a>:</h4>
+<p>thank you both!</p>
+
+
+
+<a name="499097251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097251">(Feb 11 2025 at 20:59)</a>:</h4>
+<p>So for that dataset, <a href="https://github.com/IQSS/dataverse/issues/11194">#11194</a> should help. (Thank you, <span class="user-mention" data-user-id="671970">@Florian Fritze</span> !)</p>
+
+
+
+<a name="499097311"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499097311" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499097311">(Feb 11 2025 at 21:00)</a>:</h4>
+<p>yay! okay have to go to a meeting then will read/try it</p>
+
+
+
+<a name="499098707"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499098707" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499098707">(Feb 11 2025 at 21:08)</a>:</h4>
+<p>The fix in the PR above will only be added in 6.6.<br>
+If you are willing to resort to hacks, you could try and set the <code>lastexporttime</code> to some time today in the <code>dataset</code> table for this dataset, and re-export the OAI set again. (I would only try that with datasets for which at least the <code>oai_dc</code> format exports successfully). May or may not work, no promises. :)</p>
+
+
+
+<a name="499103998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499103998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499103998">(Feb 11 2025 at 21:46)</a>:</h4>
+<p>oh got it .. i will try updating the table .. that sounds like a good solution for now if it works!</p>
+
+
+
+<a name="499104108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499104108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499104108">(Feb 11 2025 at 21:47)</a>:</h4>
+<p>looking at the rest of the datasets that won't export to see if it is the same thing</p>
+
+
+
+<a name="499104325"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499104325" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499104325">(Feb 11 2025 at 21:49)</a>:</h4>
+<p>they do all have multiple production locations</p>
+
+
+
+<a name="499107811"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499107811" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499107811">(Feb 11 2025 at 22:15)</a>:</h4>
+<p>the db hack worked at least for that one dataset .. trying the rest</p>
+
+
+
+<a name="499107837"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499107837" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499107837">(Feb 11 2025 at 22:15)</a>:</h4>
+<p>THANK YOU!! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="499108220"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499108220" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499108220">(Feb 11 2025 at 22:18)</a>:</h4>
+<p>well, it worked for the new oai set that i created with the persistent id set, but not for the default dataset .. it still says 79 .. wonder why? we will probably need to change our primo feed to point to the new one i guess</p>
+
+
+
+<a name="499109028"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499109028" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499109028">(Feb 11 2025 at 22:25)</a>:</h4>
+<p>and it worked for 2 of the datasets but not the other 2 .. <span aria-label="confused" class="emoji emoji-1f615" role="img" title="confused">:confused:</span></p>
+
+
+
+<a name="499110592"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499110592" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499110592">(Feb 11 2025 at 22:37)</a>:</h4>
+<p>when i point to one of the "fixed" ones it says it has been deleted<br>
+<a href="https://dataverse.asu.edu/oai?verb=GetRecord&amp;identifier=doi%3A10.48349%2FASU%2FC1CWX9&amp;metadataPrefix=oai_dc">https://dataverse.asu.edu/oai?verb=GetRecord&amp;identifier=doi%3A10.48349%2FASU%2FC1CWX9&amp;metadataPrefix=oai_dc</a></p>
+
+
+
+<a name="499242694"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499242694" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499242694">(Feb 12 2025 at 14:05)</a>:</h4>
+<p>I'm sorry I sent you on this hacky path!<br>
+Let's try and erase and rebuild the default set from scratch; but if these datasets are still left out of it after that, I think the sensible thing to do will be to wait for 6.6 to fix it properly<br>
+So, first, please erase all the records in the default set: <br>
+<code>DELETE FROM oairecord WHERE setname = '';</code><br>
+(please be super careful! deleting things from the database directly is inherently risky...)<br>
+After that, the control panel should be showing "no active records" for the default set. Then re-export the set, and see what happens.</p>
+
+
+
+<a name="499255652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499255652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499255652">(Feb 12 2025 at 15:01)</a>:</h4>
+<p>ha no worries I always learn things that I didn't know doing hacky things! <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span>  I would like to clean up that default set anyway. Will do this morning.</p>
+
+
+
+<a name="499258720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499258720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499258720">(Feb 12 2025 at 15:13)</a>:</h4>
+<p>well, it's better, it is now showing 81 rows .. so it included 2 of the ones that were missing before but 2 are still missing .. I'll figure out which ones are still missing and look at the metadata and see if there is anything else that could be causing this .. otherwise we will wait for the fix! <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="499258807"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499258807" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499258807">(Feb 12 2025 at 15:13)</a>:</h4>
+<p>thanks so much for your help! <span aria-label="glowing star" class="emoji emoji-1f31f" role="img" title="glowing star">:glowing_star:</span></p>
+
+
+
+<a name="499271115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499271115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499271115">(Feb 12 2025 at 16:03)</a>:</h4>
+<p>Well, we are 2 datasets better off than we were yesterday, so I'll call it progress :)</p>
+
+
+
+<a name="499277060"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499277060" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499277060">(Feb 12 2025 at 16:29)</a>:</h4>
+<p>ha yes for sure! <br>
+The 2 datasets still not showing are:<br>
+<a href="https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/7DCWIK">https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/7DCWIK</a><br>
+<a href="https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/C1CWX9">https://dataverse.asu.edu/dataset.xhtml?persistentId=doi:10.48349/ASU/C1CWX9</a></p>
+<p>They both have multiple production locations. I tried changing the lastexporttime for both to an earlier date (most of them show november '24) .. but it didn't make a difference, still didn't show in the feed after re-export. </p>
+<p>I guess we could try deleting all but one of the production locations until the fix is released and see if that works, and then add them back after the fix.</p>
+
+
+
+<a name="499279156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499279156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499279156">(Feb 12 2025 at 16:38)</a>:</h4>
+<p>Should work, unless that exporter is failing for more reasons than just Production Place.</p>
+
+
+
+<a name="499282816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499282816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499282816">(Feb 12 2025 at 16:55)</a>:</h4>
+<p>And maybe double-check the <code>lastexporttime</code> in the <code>dataset</code> table for these 2, that it is actually something later than the <code>releasetime</code> on their latest datasetversions - ?</p>
+
+
+
+<a name="499293949"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20missing%20dataset%20identifiers/near/499293949" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20missing.20dataset.20identifiers.html#499293949">(Feb 12 2025 at 17:49)</a>:</h4>
+<p>ohhhhhh that was it! The release date on those 2 was blank again (maybe because I tried to set it earlier?) .. idk .. but i made sure the lastexportdate was later than the release date, and now everything is showing as exported! I swear, yesterday when i did this I set them all to yesterday's date and it didn't work .. but for some reason those had to be set again. THANK YOU! We are good for now but will wait for the fix!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

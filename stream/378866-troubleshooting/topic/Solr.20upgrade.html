@@ -1,0 +1,424 @@
+<html>
+<head><meta charset="utf-8"><title>Solr upgrade · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html">Solr upgrade</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="396927069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396927069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396927069">(Oct 16 2023 at 15:23)</a>:</h4>
+<p>Hi all .. recently I upgraded our QA site to v6.0 following the given instructions for java, payara, and solr. We have Dataverse running on an application server, and Solr and Rserve running on a separate server in AWS. All went well, it seemed, solr was running the new version and I could see all the datasets in Dataverse. Then, I restarted the Solr server, and now I'm getting a "connection refused" on the Dataverse landing page. I've seen this before, but I don't remember how to fix it. I verified that my solr.service isn't using the “-D jetty.host=127.0.0.1" option and made sure to upgrade java on the services server to v17. I see the server listening on port 8983 but don't see any connections. Any ideas what I missed?</p>
+
+
+
+<a name="396927432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396927432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396927432">(Oct 16 2023 at 15:24)</a>:</h4>
+<p>Do you see fields on the equivalent of <a href="http://localhost:8983/solr/collection1/schema/fields">http://localhost:8983/solr/collection1/schema/fields</a> ?</p>
+
+
+
+<a name="396927965"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396927965" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396927965">(Oct 16 2023 at 15:26)</a>:</h4>
+<p>yes, but "curl <a href="http://localhost:8080/api/info/version">http://localhost:8080/api/info/version</a>" doesn't work</p>
+
+
+
+<a name="396928347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396928347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396928347">(Oct 16 2023 at 15:28)</a>:</h4>
+<p>Huh. /info/version doesn't work but you're seeing a Solr error on the collection/home page?</p>
+
+
+
+<a name="396929263"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396929263" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396929263">(Oct 16 2023 at 15:33)</a>:</h4>
+<p>oops sorry, ignore that .. i copied the wrong command .. this one works "curl <a href="http://localhost:8983/solr/collection1/schema/fields">http://localhost:8983/solr/collection1/schema/fields</a>"</p>
+
+
+
+<a name="396929405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396929405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396929405">(Oct 16 2023 at 15:33)</a>:</h4>
+<p>but still getting "Server refused connection at: http://&lt;IP address&gt;:8983/solr/collection1"</p>
+
+
+
+<a name="396929493"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396929493" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396929493">(Oct 16 2023 at 15:34)</a>:</h4>
+<p>on the webserver</p>
+
+
+
+<a name="396930003"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396930003" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396930003">(Oct 16 2023 at 15:37)</a>:</h4>
+<p>You're doing that "fields" curl test from the Payara server, right? Across the wire to the Solr server?</p>
+
+
+
+<a name="396930156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396930156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396930156">(Oct 16 2023 at 15:38)</a>:</h4>
+<p>nope .. doesn't work on the web server</p>
+
+
+
+<a name="396930212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396930212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396930212">(Oct 16 2023 at 15:38)</a>:</h4>
+<p>connection refused</p>
+
+
+
+<a name="396930621"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396930621" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396930621">(Oct 16 2023 at 15:40)</a>:</h4>
+<p>Is there a firewall blocking it?</p>
+
+
+
+<a name="396930912"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396930912" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396930912">(Oct 16 2023 at 15:42)</a>:</h4>
+<p>there shouldn't be .. i just upgraded the currently running instance .. and the current security group allows that port .. i didn't change that .. and didn't install any other firewall or add any rules</p>
+
+
+
+<a name="396931302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396931302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396931302">(Oct 16 2023 at 15:44)</a>:</h4>
+<p>SolrHostColonPort is set correctly still</p>
+
+
+
+<a name="396931442"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396931442" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396931442">(Oct 16 2023 at 15:45)</a>:</h4>
+<p>I'd stick with curl. If you can't curl the fields from the Payara server to the Solr server, we should fix that first. This has nothing to do with Dataverse.</p>
+
+
+
+<a name="396931849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396931849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396931849">(Oct 16 2023 at 15:47)</a>:</h4>
+<p>ah so maybe something actually went wrong with the payara install?</p>
+
+
+
+<a name="396932996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396932996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396932996">(Oct 16 2023 at 15:54)</a>:</h4>
+<p>Sorry, no, I'm saying it's probably a firewall.</p>
+
+
+
+<a name="396933262"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396933262" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396933262">(Oct 16 2023 at 15:56)</a>:</h4>
+<p>okay checking all that out again .. my security groups seem fine .. server IPs didn't change .. if i change it back to old solr it works</p>
+
+
+
+<a name="396933679"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396933679" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396933679">(Oct 16 2023 at 15:58)</a>:</h4>
+<p>Huh, old Solr works...</p>
+
+
+
+<a name="396934415"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396934415" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396934415">(Oct 16 2023 at 16:02)</a>:</h4>
+<p>no now it isn't .. it did last night .. or if I change back to the volume where the old solr was running it works</p>
+
+
+
+<a name="396934560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396934560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396934560">(Oct 16 2023 at 16:02)</a>:</h4>
+<p>going to revert the instances back to the old versions and try this again in a dev environment .. i must have messed something up</p>
+
+
+
+<a name="396935254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396935254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396935254">(Oct 16 2023 at 16:05)</a>:</h4>
+<p>yea, so i reverted back to the volume (for the solr server) that had solr 8 running but kept the payara server the same (upgraded) and it works .. i am just detaching/attaching volumes and not changing any security groups</p>
+
+
+
+<a name="396935369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396935369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396935369">(Oct 16 2023 at 16:06)</a>:</h4>
+<p>but, my webserver instance now is upgraded, but the solr instance is still running v8 .. will try the upgrade again</p>
+
+
+
+<a name="396935538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396935538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396935538">(Oct 16 2023 at 16:07)</a>:</h4>
+<p>or . if it's okay to leave solr 8 running with upgraded payara and java .. will try the solr upgrade in a temp dev env</p>
+
+
+
+<a name="396937125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/396937125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#396937125">(Oct 16 2023 at 16:18)</a>:</h4>
+<p>what's weird is .. after doing the upgrade initially .. it was running fine on new solr and the webserver was connecting .. but i must not have restarted the solr server after that .. that was a couple of weeks ago .. i restarted it this weekend, and after that it wouldn't connect</p>
+
+
+
+<a name="397554425"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554425" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554425">(Oct 19 2023 at 18:13)</a>:</h4>
+<p>i created a dev environment and am trying this upgrade again .. at the end of the payara upgrade, i get a message that the deploy of dataverse-6.0.war failed .. however the site loads and shows that it is at v6.0 .. and the only errors that i see in the sql statements that display when upgrading are related to things already existing .. is this normal? is there a way for me to see why it failed? i can't remember if i've gotten a "failed" message on deploy before .. i do always see the "already exists" messages though</p>
+
+
+
+<a name="397554630"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554630" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554630">(Oct 19 2023 at 18:14)</a>:</h4>
+<p>Yeah, unfortunately some of that noise is normal. <span aria-label="disappointed" class="emoji emoji-1f61e" role="img" title="disappointed">:disappointed:</span></p>
+
+
+
+<a name="397554680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554680">(Oct 19 2023 at 18:15)</a>:</h4>
+<p>Since this is a dev env I assume it's safe for you to post the output here.</p>
+
+
+
+<a name="397554841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554841">(Oct 19 2023 at 18:16)</a>:</h4>
+<p>oh oops, i guess this time it really failed .. the first time i did this it said it failed but it actually deployed .. this time not <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="397554877"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554877" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554877">(Oct 19 2023 at 18:16)</a>:</h4>
+<p>oh i did it again and it worked</p>
+
+
+
+<a name="397554973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397554973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397554973">(Oct 19 2023 at 18:17)</a>:</h4>
+<p>well, it says "Deploy completed with warnings" which is what i usually see .. but the site isn't coming up .. wow this upgrade is a bear</p>
+
+
+
+<a name="397555175"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397555175" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397555175">(Oct 19 2023 at 18:19)</a>:</h4>
+<p>yea going to the site just shows payara admin page .. something messed up</p>
+
+
+
+<a name="397555364"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397555364" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397555364">(Oct 19 2023 at 18:20)</a>:</h4>
+<p>It's like hitting the TV with a stick until it works.</p>
+
+
+
+<a name="397556203"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397556203" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397556203">(Oct 19 2023 at 18:28)</a>:</h4>
+<p><span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="397556244"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397556244" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397556244">(Oct 19 2023 at 18:28)</a>:</h4>
+<p>haven't even tried the solr upgrade yet!</p>
+
+
+
+<a name="397558237"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397558237" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397558237">(Oct 19 2023 at 18:43)</a>:</h4>
+<p>fun times ahead! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="397566839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397566839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397566839">(Oct 19 2023 at 19:42)</a>:</h4>
+<p>interesting, the payara site was showing because the load balancer registered my instance as unhealthy .. i must have taken too long to upgrade! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> <br>
+As for upgrading solr, one question that i have is .. the instructions say to su - as the solr user, but that user is unprivileged, so doesn't have permission to wget or unzip in /usr/local/solr, or to copy files as indicated in the instructions. Do you have your solr user in sudoers? Or special permissions?  The main installation instructions say to chown to solr for /usr/local/solr but that is not recursive.</p>
+
+
+
+<a name="397570740"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397570740" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397570740">(Oct 19 2023 at 20:11)</a>:</h4>
+<p>Huh. Not recursive? I thought it was.</p>
+
+
+
+<a name="397570969"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397570969" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397570969">(Oct 19 2023 at 20:13)</a>:</h4>
+<p>I'm looking at this:</p>
+<div class="codehilite"><pre><span></span><code>useradd solr
+mkdir /usr/local/solr
+chown solr:solr /usr/local/solr
+</code></pre></div>
+
+
+
+<a name="397571004"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397571004" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397571004">(Oct 19 2023 at 20:13)</a>:</h4>
+<p>From <a href="https://guides.dataverse.org/en/6.0/installation/prerequisites.html#installing-solr">https://guides.dataverse.org/en/6.0/installation/prerequisites.html#installing-solr</a></p>
+
+
+
+<a name="397571098"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397571098" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397571098">(Oct 19 2023 at 20:14)</a>:</h4>
+<p>So /usr/local/solr should be owned by the solr user. Right?</p>
+
+
+
+<a name="397572667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397572667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397572667">(Oct 19 2023 at 20:27)</a>:</h4>
+<p>yes, but nothing under that directory is .. that would be chown -R solr:solr /usr/local/solr</p>
+
+
+
+<a name="397572753"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397572753" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397572753">(Oct 19 2023 at 20:28)</a>:</h4>
+<p>i did the full upgrade again .. solr won't start .. eegads what am i doing wrong?</p>
+
+
+
+<a name="397572902"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397572902" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397572902">(Oct 19 2023 at 20:29)</a>:</h4>
+<p>if i point the solr.service file back to the old solr (/usr/local/solr) it works fine using the old version</p>
+
+
+
+<a name="397573330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397573330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397573330">(Oct 19 2023 at 20:32)</a>:</h4>
+<p>I would chown -R it to the solr user.</p>
+
+
+
+<a name="397573680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397573680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397573680">(Oct 19 2023 at 20:35)</a>:</h4>
+<p>okay just wasn't sure if some things needed to stay as root .. going to do that and go through the steps again .. thanks!</p>
+
+
+
+<a name="397573869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397573869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397573869">(Oct 19 2023 at 20:37)</a>:</h4>
+<p>Basically, Solr should be running as the solr user. So that user needs to own the files.</p>
+
+
+
+<a name="397573886"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397573886" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397573886">(Oct 19 2023 at 20:37)</a>:</h4>
+<p>You know, a service user.</p>
+
+
+
+<a name="397574331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397574331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397574331">(Oct 19 2023 at 20:41)</a>:</h4>
+<p>yea i thought so and actually tried changing the ownership of everything before but that still doesn't fix it .. solr still won't start .. back to banging the stick</p>
+
+
+
+<a name="397574351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397574351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397574351">(Oct 19 2023 at 20:41)</a>:</h4>
+<p>heh</p>
+
+
+
+<a name="397576211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397576211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397576211">(Oct 19 2023 at 20:55)</a>:</h4>
+<p>fixed .. deleted the solr-9.3.0 directory and started all over, after chown -R /usr/local/solr and doing the entire install as solr user and now it works .. i must not have done that correctly before although i thought i did .. omg .. sorry to bother you .. thanks for your help!</p>
+
+
+
+<a name="397576510"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397576510" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397576510">(Oct 19 2023 at 20:58)</a>:</h4>
+<p>No problem! Should we fix the release notes?</p>
+
+
+
+<a name="397576658"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397576658" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397576658">(Oct 19 2023 at 20:59)</a>:</h4>
+<p>agh .. and i restarted the server and now solr doesn't start! this is what happened originally .. i upgraded everything but didn't restart the server, and everything was running, but about 2 weeks later i restarted the server and solr wouldn't start .. well i know it CAN work</p>
+
+
+
+<a name="397577128"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397577128" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397577128">(Oct 19 2023 at 21:03)</a>:</h4>
+<p>not sure about the release notes .. i'm really an ubuntu person .. just have rocky linux for this .. although i think it is the same, most folks probably know and don't follow each line so specifically <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="397578021"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397578021" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397578021">(Oct 19 2023 at 21:10)</a>:</h4>
+<p>The release notes could certainly be off. I wrote most of it. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="397578314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397578314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397578314">(Oct 19 2023 at 21:12)</a>:</h4>
+<p>the are great! immensely helpful!</p>
+
+
+
+<a name="397578433"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397578433" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397578433">(Oct 19 2023 at 21:14)</a>:</h4>
+<p>i can't figure out why solr would start fine after upgrading, but not start after a reboot</p>
+
+
+
+<a name="397587751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397587751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397587751">(Oct 19 2023 at 22:49)</a>:</h4>
+<p>well, it is working .. not sure what fixed it .. i just wiped out and reinstalled about 4 more times .. i restart the instance and solr service starts .. i can see my datasets and add new from the console, etc .. but the last weird thing is that .. although solr starts, and the reindex command works from the web server .. the curl command to show the schema fields still gets a connection refused error .. i have a SG rule in place allowing port 8983 from the webserver and i just added a rule to allow everything from the webserver .. idk</p>
+
+
+
+<a name="397739766"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397739766" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397739766">(Oct 20 2023 at 15:58)</a>:</h4>
+<p>Yeah, we've got to get that curl command working. You can do it! <img alt=":dataverse_woman:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44206.png" title="dataverse woman"></p>
+
+
+
+<a name="397768079"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397768079" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397768079">(Oct 20 2023 at 19:53)</a>:</h4>
+<p>if anyone else deals with this .. <span class="user-mention" data-user-id="626369">@Don Sizemore</span> found an alert in the solr docs indicating that "Solr now binds to localhost network interface by default for better out of the box security." We have to add our server IP to the "SOLR JETTY HOST" to allow external solr servers. YAY THANK YOU!!!! I was pretty focused on my installation being wrong and didn't consider actually looking at the solr docs.</p>
+
+
+
+<a name="397768258"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397768258" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397768258">(Oct 20 2023 at 19:54)</a>:</h4>
+<p>Yes, I noticed he just opened <a href="https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328</a> about removing <a href="http://jetty.host">jetty.host</a> in the future.</p>
+
+
+
+<a name="397769434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397769434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397769434">(Oct 20 2023 at 20:04)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/Solr.20upgrade/near/397768258">said</a>:</p>
+<blockquote>
+<p>Yes, I noticed he just opened <a href="https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328</a> about removing <a href="http://jetty.host">jetty.host</a> in the future.</p>
+</blockquote>
+<p>I also opened number 10030! Will submit PR.</p>
+
+
+
+<a name="397769708"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397769708" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397769708">(Oct 20 2023 at 20:06)</a>:</h4>
+<p>/me looks at <a href="https://github.com/IQSS/dataverse/issues/10030">#10030</a></p>
+
+
+
+<a name="397769731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397769731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397769731">(Oct 20 2023 at 20:06)</a>:</h4>
+<p>nice</p>
+
+
+
+<a name="397769748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397769748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397769748">(Oct 20 2023 at 20:07)</a>:</h4>
+<p>Don, thanks again. You two are so immensely helpful to me (and everyone else). As I've said often before, ASU wouldn't have a dataverse installation without you all!</p>
+
+
+
+<a name="397769820"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397769820" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397769820">(Oct 20 2023 at 20:07)</a>:</h4>
+<p>Aw. Such a nice way to go into the weekend. Thanks, Deirdre.</p>
+
+
+
+<a name="397770305"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/397770305" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#397770305">(Oct 20 2023 at 20:12)</a>:</h4>
+<p><span aria-label="glowing star" class="emoji emoji-1f31f" role="img" title="glowing star">:glowing_star:</span></p>
+
+
+
+<a name="398339054"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Solr%20upgrade/near/398339054" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Solr.20upgrade.html#398339054">(Oct 24 2023 at 18:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> just made a pull request for the issue above: document localhost-only behavior of Solr-9.3.0 and later <a href="https://github.com/IQSS/dataverse/issues/10037">#10037</a> (thanks!)</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

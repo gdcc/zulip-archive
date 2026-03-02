@@ -1,0 +1,87 @@
+<html>
+<head><meta charset="utf-8"><title>Incorrect Storage Identifier · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html">Incorrect Storage Identifier</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="528327985"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528327985" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tim Stevens <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528327985">(Jul 11 2025 at 12:22)</a>:</h4>
+<p>Morning All,</p>
+<p>I have been using the following guide</p>
+<p><a href="https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a> </p>
+<p>to add some big data files that failed validation to a dataset. I accidentally transposed one with the wrong storage identifier and md5 that belong to a different file.</p>
+<p>How do I safely edit/delete this so I can get everyting added to dataset.</p>
+<p>Sherry left us some great notes but this is not  covered.</p>
+<p>Tim</p>
+
+
+
+<a name="528671032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528671032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528671032">(Jul 14 2025 at 14:08)</a>:</h4>
+<p>Well, I don't think you want to simply delete the file from the Dataverse UI. From a quick test, it'll delete the file from S3. <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="528671133"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528671133" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528671133">(Jul 14 2025 at 14:08)</a>:</h4>
+<p>I'm playing around with this test: <code>mvn test -Dtest=S3AccessIT#testDirectUpload</code></p>
+<p>And seeing what shows up in LocalStack at <a href="http://localhost:4566/mybucket">http://localhost:4566/mybucket</a></p>
+
+
+
+<a name="528671469"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528671469" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528671469">(Jul 14 2025 at 14:10)</a>:</h4>
+<p>Jim Myers is the expert here but he isn't on Zulip.</p>
+<p><span class="user-mention" data-user-id="935523">@Tim Stevens</span> would you mind posting to <a href="https://groups.google.com/g/dataverse-community">https://groups.google.com/g/dataverse-community</a> ?</p>
+
+
+
+<a name="528679664"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528679664" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tim Stevens <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528679664">(Jul 14 2025 at 14:50)</a>:</h4>
+<p>Morning Phil. Sherry's notes indicated that deleting it from within the UI would require a re-upload of the file so will try to avoid that since the person uploading this 3D data is so far behind I dont want them to have to backtrack with a re-upload. Would updating the persistent identifier and md5 in the DB table and re-indexing also be a workable solution? Seem low friction unless there is another element that needs updating that I am not aware of...</p>
+
+
+
+<a name="528680856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528680856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528680856">(Jul 14 2025 at 14:56)</a>:</h4>
+<p>If you can find the right table, yes, I think that would work.</p>
+
+
+
+<a name="528680971"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528680971" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528680971">(Jul 14 2025 at 14:56)</a>:</h4>
+<p>Is some sort of API needed here? Seems like an honest mistake that should be correct-able somehow. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="528683988"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528683988" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tim Stevens <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528683988">(Jul 14 2025 at 15:11)</a>:</h4>
+<p>The API may not be a bad idea. If the deletion within the Admin UI gave the option to remove the DB record and if desired keep the physical file in S3 that would also work.</p>
+
+
+
+<a name="528687017"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528687017" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528687017">(Jul 14 2025 at 15:25)</a>:</h4>
+<p>Well, please feel free to make a feature request if you like. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="528688399"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528688399" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tim Stevens <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528688399">(Jul 14 2025 at 15:32)</a>:</h4>
+<p>OK, will do. I am a command line guy but the folks they are interviewing to replace Sherry are not so it seems like its worth requesting.</p>
+
+
+
+<a name="528689168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Incorrect%20Storage%20Identifier/near/528689168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Incorrect.20Storage.20Identifier.html#528689168">(Jul 14 2025 at 15:36)</a>:</h4>
+<p>I'm a command line guy too <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

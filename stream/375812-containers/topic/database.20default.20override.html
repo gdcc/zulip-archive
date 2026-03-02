@@ -1,0 +1,146 @@
+<html>
+<head><meta charset="utf-8"><title>database default override · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html">database default override</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="406786029"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406786029" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406786029">(Dec 08 2023 at 15:51)</a>:</h4>
+<p>Being a newbie to the Dataverse code, it seems that Payara or some other service is configuring the default postgres database, is that correct?</p>
+
+
+
+<a name="406786644"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406786644" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406786644">(Dec 08 2023 at 15:55)</a>:</h4>
+<p>I am trying alter the database when Docker is setting up the postgres container but it seems the database may already be in use by the time Docker compose tries to attach the volume. For instance I have tried telling Docker compose to execute SQL on initialization of the container (such as running SQL scripts from within my local <code>/postgres/apiCleanCreate</code> directory for instance):</p>
+<blockquote>
+<p>volumes:</p>
+<div class="codehilite"><pre><span></span><code>  - ./postgres/apiCleanCreate:/docker-entrypoint-initdb.d
+</code></pre></div>
+
+</blockquote>
+<p>I have tried using data-only database dumps and full create/clean database dumps, but they all fail since the database is already open. I'm guessing other services may be already using the database at this point, so I am trying to get some ideas as to how to achieve a database alteration on initialization. Any thoughts?</p>
+
+
+
+<a name="406788892"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406788892" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406788892">(Dec 08 2023 at 16:03)</a>:</h4>
+<p>I don't know if this helps or not, but here's an example or running a SQL script after the containers have been started: <a href="https://github.com/gdcc/api-test-runner/blob/5ee081923cf5f53d2f27b5f6918925ec6ebbecef/.github/workflows/develop.yml#L58">https://github.com/gdcc/api-test-runner/blob/5ee081923cf5f53d2f27b5f6918925ec6ebbecef/.github/workflows/develop.yml#L58</a> (It's necessary to get certain API tests to pass.)</p>
+
+
+
+<a name="406789980"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406789980" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406789980">(Dec 08 2023 at 16:07)</a>:</h4>
+<p>It seems like you're operating at an earlier and lower level, though?</p>
+
+
+
+<a name="406790942"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406790942" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406790942">(Dec 08 2023 at 16:12)</a>:</h4>
+<p>Hmm. That script does not alter any existing tables or data so I'm not sure if it would work.</p>
+
+
+
+<a name="406791325"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406791325" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406791325">(Dec 08 2023 at 16:13)</a>:</h4>
+<p>Sure, but one should be able to run a SQL script against a running database. <code>psql -f update.sql</code> or whatever.</p>
+
+
+
+<a name="406791467"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406791467" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406791467">(Dec 08 2023 at 16:13)</a>:</h4>
+<p>Typically we do this stuff in Flyway these days, but it should work.</p>
+
+
+
+<a name="406793382"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406793382" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406793382">(Dec 08 2023 at 16:20)</a>:</h4>
+<p>Let me head back to the drawing board. I guess I need to figure out if I can use insert statements or if I need to upsert everything, and where foreign-keys will be a problem.</p>
+
+
+
+<a name="406793927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406793927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406793927">(Dec 08 2023 at 16:22)</a>:</h4>
+<p>Ok. I hope I'm not leading you astray. What does your SQL script do? What tables does it touch?</p>
+
+
+
+<a name="406794598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406794598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406794598">(Dec 08 2023 at 16:25)</a>:</h4>
+<p>I guess, I'm thinking.... let's get the script working with <code>psql -f</code> first and then figure out where to put it longer term.</p>
+
+
+
+<a name="406800421"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406800421" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406800421">(Dec 08 2023 at 16:53)</a>:</h4>
+<p>Question, when I dump the database (using <code>pg_dump --inserts...</code>) that Docker throws together, I get statements like <code>INSERT INTO public.dvobject </code>. However when I try t recompose a fresh build Docker using the data dumped (insert statements), Docker says <code>public.dvobject</code> does not exist.</p>
+
+
+
+<a name="406801206"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406801206" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406801206">(Dec 08 2023 at 16:58)</a>:</h4>
+<p>I'm probably confused, but wouldn't you restore with something like <code>psql mydb -f dump.sql</code>?</p>
+<p>I'm not sure what recompose means in this context.</p>
+<p>You've taken a dump of your database. Now you want to restore that dump to a fresh database? In our Docker setup?</p>
+
+
+
+<a name="406811417"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406811417" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406811417">(Dec 08 2023 at 17:56)</a>:</h4>
+<p>Sorry, I am trying to use the Docker volume insert point within the Docker compose script (if possible). By recompose I mean clear out/delete the existing Docker containers and volumes and initiate a fresh compose. So at the moment I am not using the postgres restore command. My last test was to simply execute some insert statements (again through the compose volumes command) but for some reason the compose logs say <code>public.dvobject</code> (from the postgres insert statement) does not exist. I guess part of the problem is I do not know where the postgres database gets the default configuration from or when that executes in the Docker compose process. I'm assuming some other service (Payara?) is configuring the database?</p>
+
+
+
+<a name="406820701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406820701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406820701">(Dec 08 2023 at 18:59)</a>:</h4>
+<p>I'm not sure how it works in our containers, off the top of my head. In a classic installation, our Python script creates the database.</p>
+
+
+
+<a name="406821865"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/406821865" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#406821865">(Dec 08 2023 at 19:05)</a>:</h4>
+<p>In our containers I'm pretty sure there's a fair amount of magic going on. MicroProfile Config stuff. I'm not exactly sure when or how the database gets created.</p>
+
+
+
+<a name="407233695"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/407233695" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#407233695">(Dec 11 2023 at 12:49)</a>:</h4>
+<p>I have tried running database restore commands after the Dataverse bootstrapping is complete but they all fail. Since other services are attached to the database I don't believe the restore commands will work. Ideally this would happen within the postgres container before any other services attach to postgres. I'm not sure how I could go about decoupling the database setup from the bootstrapping so the database can be setup entirely within the postgres service.</p>
+
+
+
+<a name="407240543"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/407240543" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#407240543">(Dec 11 2023 at 13:31)</a>:</h4>
+<p>Would it be easy for me to reproduce what you're seeing? Would you like to provide scripts or specific commands?</p>
+
+
+
+<a name="407243349"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/407243349" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#407243349">(Dec 11 2023 at 13:47)</a>:</h4>
+<p>Thanks <span class="user-mention" data-user-id="598112">@Philip Durbin</span>, I don't think it is worth it to try to duplicate the approach I was trying because it would not seem productive. Again, the database needs to be configured before services attach to it. The most useful thing would be to know is how the database is being created and configured by the bootstrapping service (or whichever service is handling it).</p>
+
+
+
+<a name="407244164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/407244164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#407244164">(Dec 11 2023 at 13:52)</a>:</h4>
+<p>Ok. Let's see if <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> can offer some insight into the Docker side.</p>
+
+
+
+<a name="407903552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/database%20default%20override/near/407903552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/database.20default.20override.html#407903552">(Dec 14 2023 at 07:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/database.20default.20override/near/406821865">said</a>:</p>
+<blockquote>
+<p>In our containers I'm pretty sure there's a fair amount of magic going on. MicroProfile Config stuff. I'm not exactly sure when or how the database gets created.</p>
+</blockquote>
+<p>No magic involved... A classic installation is using the same MPCONFIG things as our container... JPA is the one creating the tables if not existing. The underlying database is created by the Docker entrypoint scripts of the postgres image (names are taken from the provided env vars). See also "Environment Variables" at <a href="https://hub.docker.com/_/postgres">https://hub.docker.com/_/postgres</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

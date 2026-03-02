@@ -1,0 +1,303 @@
+<html>
+<head><meta charset="utf-8"><title>Installing metadata block - it&#x27;s not showing up · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html">Installing metadata block - it&#x27;s not showing up</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="544990351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544990351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544990351">(Oct 15 2025 at 14:51)</a>:</h4>
+<p>Hello, <br>
+I've just installed a new custom metadata block on our production server and it's not showing up.  I've already tested this in our test/staging environment and am a bit confused as to why it's not showing up in this environment. </p>
+<p>I can see it when I query the API: </p>
+<div class="codehilite"><pre><span></span><code> curl http://localhost:8080/api/metadatablocks | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   585  100   585    0     0  53181      0 --:--:-- --:--:-- --:--:-- 53181
+{
+  "status": "OK",
+  "data": [
+    {
+      "id": 1,
+      "displayName": "Citation Metadata",
+      "name": "citation"
+    },
+    {
+      "id": 2,
+      "displayName": "Geospatial Metadata",
+      "name": "geospatial"
+    },
+    {
+      "id": 3,
+      "displayName": "Social Science and Humanities Metadata",
+      "name": "socialscience"
+    },
+    {
+      "id": 4,
+      "displayName": "Astronomy and Astrophysics Metadata",
+      "name": "astrophysics"
+    },
+    {
+      "id": 5,
+      "displayName": "Life Sciences Metadata",
+      "name": "biomedical"
+    },
+    {
+      "id": 6,
+      "displayName": "Journal Metadata",
+      "name": "journal"
+    },
+    {
+      "id": 7,
+      "displayName": "ISPS Metadata",
+      "name": "customISPS"
+    },
+    {
+      "id": 8,
+      "displayName": "Software Metadata (CodeMeta v2.0)",
+      "name": "codeMeta20"
+    }
+  ]
+}
+</code></pre></div>
+<p>It's ID 7  - customISPS - But it's not in our UI: <br>
+<a href="/user_uploads/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="690x247" src="/user_uploads/thumbnail/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png/840x560.webp"></a></div><p>What am I missing? Thanks!</p>
+
+
+
+<a name="544990600"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544990600" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544990600">(Oct 15 2025 at 14:52)</a>:</h4>
+<p>Huh. Do you have to restart Payara?</p>
+
+
+
+<a name="544990819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544990819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544990819">(Oct 15 2025 at 14:53)</a>:</h4>
+<p>Yes, I did once so it would pick up the properties file - and that was after I installed the tsv file.  I installed the codeMeta block at the same time, fyi... that one shows up fine.</p>
+
+
+
+<a name="544990978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544990978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544990978">(Oct 15 2025 at 14:54)</a>:</h4>
+<p>Any errors in server.log?</p>
+
+
+
+<a name="544991060"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544991060" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544991060">(Oct 15 2025 at 14:54)</a>:</h4>
+<p>It's strange that you see it in the API but not the UI. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="544991161"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544991161" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544991161">(Oct 15 2025 at 14:55)</a>:</h4>
+<p>none that I could find. I will look again.</p>
+
+
+
+<a name="544992223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544992223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544992223">(Oct 15 2025 at 14:59)</a>:</h4>
+<p>It works fine in staging, I assume.</p>
+
+
+
+<a name="544993664"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544993664" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544993664">(Oct 15 2025 at 15:05)</a>:</h4>
+<p>yeah, staging and test worked fine.</p>
+
+
+
+<a name="544993782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544993782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544993782">(Oct 15 2025 at 15:05)</a>:</h4>
+<p>What's different in prod? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="544996386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544996386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544996386">(Oct 15 2025 at 15:16)</a>:</h4>
+<p>Thinking outloud here.... I don't think there's much different.  One thing I did differently was the order I loaded them in (codeMeta and customISPS)... aside from system size, I can't think of other differences. </p>
+<p>There are no messages about these blocks in the log (server.log) - is there another spot I should look?</p>
+
+
+
+<a name="544998788"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544998788" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544998788">(Oct 15 2025 at 15:27)</a>:</h4>
+<p>You're using Datavere 5.14, right? Here's where that help text appears: <a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L282">https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L282</a></p>
+<p><code>dataverse.metadataElements.tip=Choose the metadata fields to use in dataset templates and when adding a dataset to this dataverse.</code></p>
+
+
+
+<a name="544999120"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999120" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999120">(Oct 15 2025 at 15:28)</a>:</h4>
+<p>It looks like it's looping over blocks with this:</p>
+<p><code>&lt;ui:repeat value="#{DataversePage.allMetadataBlocks}" var="mdb"&gt;</code></p>
+<p><a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L303">https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L303</a></p>
+
+
+
+<a name="544999316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999316">(Oct 15 2025 at 15:29)</a>:</h4>
+<p>And allMetadataBlocks is defined here: <a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DataversePage.java#L968">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DataversePage.java#L968</a></p>
+
+
+
+<a name="544999422"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999422" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999422">(Oct 15 2025 at 15:29)</a>:</h4>
+<p>If that was erroring out, where would the errors go?  </p>
+<p>I'll look through those to see if something stands out for this block.</p>
+
+
+
+<a name="544999534"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999534" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999534">(Oct 15 2025 at 15:30)</a>:</h4>
+<p>Do you have the ability to add some println debugging, recompile the war file, and redeploy? That's all I can think at the moment. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="544999793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999793">(Oct 15 2025 at 15:31)</a>:</h4>
+<p>Hmmm... no, sadly not.  I'll poke around and see if anything stands out.</p>
+
+
+
+<a name="544999832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/544999832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#544999832">(Oct 15 2025 at 15:31)</a>:</h4>
+<p>Thank you for all the links.</p>
+
+
+
+<a name="545000598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545000598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545000598">(Oct 15 2025 at 15:34)</a>:</h4>
+<p>One thing of note -- the metadata block has an ownerID in prod, but not staging. </p>
+<p><a href="/user_uploads/53090/l5F69oaFbNpaBGi9PMR0c424/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/l5F69oaFbNpaBGi9PMR0c424/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1040x234" src="/user_uploads/thumbnail/53090/l5F69oaFbNpaBGi9PMR0c424/image.png/840x560.webp"></a></div>
+
+
+
+<a name="545001889"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545001889" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545001889">(Oct 15 2025 at 15:40)</a>:</h4>
+<p>Do you see the block on dataverse/collection 5?</p>
+
+
+
+<a name="545002761"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545002761" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545002761">(Oct 15 2025 at 15:44)</a>:</h4>
+<p>Oh wow - yeah, it's showing up there.... what did I do to make that happen?  <br>
+This block is for the whole system, not one setup. But I wonder if some sort of naming scheme lined up? </p>
+<p>The collection with id 5 is named "isps" with identifier "ISPS", and my block has a name of  "customISPS" and dataverseAlias of "ISPS".  </p>
+<p>Did we unknowingly make a link between the block and the collection?</p>
+
+
+
+<a name="545003196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545003196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545003196">(Oct 15 2025 at 15:46)</a>:</h4>
+<p>Possibly. It may be a way to hide (in the UI anyway) the metadata block. <span class="user-mention" data-user-id="621770">@Julian Gautier</span> or <span class="user-mention" data-user-id="690603">@Gustavo Durand</span> do you know anything about this?</p>
+
+
+
+<a name="545003970"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545003970" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545003970">(Oct 15 2025 at 15:50)</a>:</h4>
+<p>If you look at <a href="https://github.com/IQSS/dataverse/blob/v6.8/scripts/api/data/metadatablocks/geospatial.tsv">https://github.com/IQSS/dataverse/blob/v6.8/scripts/api/data/metadatablocks/geospatial.tsv</a> for example, you'll see that "dataverseAlias" is null. That block is supposed to appear everywhere.</p>
+<p>Contrast it with <a href="https://github.com/IQSS/dataverse.harvard.edu/blob/96a97bfdfc97773cc58075e54252b4caca3b98e5/metadatablocks/customSAEF.tsv">https://github.com/IQSS/dataverse.harvard.edu/blob/96a97bfdfc97773cc58075e54252b4caca3b98e5/metadatablocks/customSAEF.tsv</a> where "dataveseAlias=SAEF". So that block only appears there.</p>
+<p>I believe that's how it works.</p>
+
+
+
+<a name="545004113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004113">(Oct 15 2025 at 15:50)</a>:</h4>
+<p>So yeah, that 5 is in the database because you have a matching dataverseAlias (ISPS) in the tsv.</p>
+
+
+
+<a name="545004252"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004252" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004252">(Oct 15 2025 at 15:51)</a>:</h4>
+<p>Do you think if I take out the dataverseAlias and reload the block, that will fix it?  Is it as simple as that?  :)</p>
+
+
+
+<a name="545004299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004299">(Oct 15 2025 at 15:51)</a>:</h4>
+<p>Here's where the owner is set when you load the block: <a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/api/DatasetFieldServiceApi.java#L390">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/api/DatasetFieldServiceApi.java#L390</a></p>
+
+
+
+<a name="545004333"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004333" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004333">(Oct 15 2025 at 15:51)</a>:</h4>
+<p>If we have any documentation on this, I can't find it. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="545004525"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004525" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004525">(Oct 15 2025 at 15:52)</a>:</h4>
+<p>It's worth a shot! But judging from the code you might need to remove that 5 manually.</p>
+
+
+
+<a name="545004530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004530">(Oct 15 2025 at 15:52)</a>:</h4>
+<p>It's here and we missed it:  <a href="https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadatablock-properties">https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadatablock-properties</a></p>
+
+
+
+<a name="545004636"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004636" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004636">(Oct 15 2025 at 15:53)</a>:</h4>
+<p>Ah, thanks. Yes, those are the docs I couldn't find. Phew! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="545004733"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004733" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004733">(Oct 15 2025 at 15:53)</a>:</h4>
+<p>"If specified, this metadata block will be available only to the Dataverse collection designated here by its alias and to children of that Dataverse collection."</p>
+<p>Sounds like what you're seeing!</p>
+
+
+
+<a name="545004783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545004783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545004783">(Oct 15 2025 at 15:53)</a>:</h4>
+<p>Thank you for all your help with this!   I'll report back how it goes in changing it.</p>
+
+
+
+<a name="545008701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545008701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545008701">(Oct 15 2025 at 16:12)</a>:</h4>
+<p>Hmm, this is actually a bug in the SPA, which shows all the blocks regardless of if dataverseAlias/owner is specified. I just opened <a href="https://github.com/IQSS/dataverse-frontend/issues/873">https://github.com/IQSS/dataverse-frontend/issues/873</a></p>
+
+
+
+<a name="545010063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/545010063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#545010063">(Oct 15 2025 at 16:18)</a>:</h4>
+<p>I just reloaded the block without the alias in the tsv file and that doesn't remove the owner, so I manually removed the owner id from the database.  Things look good now.</p>
+
+
+
+<a name="554269400"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/554269400" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#554269400">(Nov 07 2025 at 09:01)</a>:</h4>
+<p>I have a related question and hope nobody minds me hijacking this thread. Today I did some experimentation and when I loaded a faulty schema (<a href="https://jugit.fz-juelich.de/fdm/schemas/-/blob/prod/fzj.tsv?ref_type=heads#L7">it's using a not-supported field type</a>), I saw an error in the logs and in the response. What I didn't expect: the schema was still loaded half way! Honestly, my anticipation was that if loading a block fails, the database should rollback any changes! Is it just me finding this troubling?</p>
+
+
+
+<a name="554299901"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/554299901" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#554299901">(Nov 07 2025 at 11:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> woof. Can you please create an issue and upload that tsv to it? Yes, it's troubling. Yes, it should roll back. <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="554301880"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/554301880" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#554301880">(Nov 07 2025 at 11:40)</a>:</h4>
+<p>Right away Sir. Here you go: <a href="https://github.com/IQSS/dataverse/issues/11962">https://github.com/IQSS/dataverse/issues/11962</a></p>
+
+
+
+<a name="554305465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Installing%20metadata%20block%20-%20it%27s%20not%20showing%20up/near/554305465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Installing.20metadata.20block.20-.20it.27s.20not.20showing.20up.html#554305465">(Nov 07 2025 at 12:00)</a>:</h4>
+<p>Thank you!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

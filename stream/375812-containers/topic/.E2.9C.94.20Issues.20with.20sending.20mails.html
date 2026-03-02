@@ -1,0 +1,710 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Issues with sending mails · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html">✔ Issues with sending mails</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="471741595"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471741595" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471741595">(Sep 20 2024 at 14:08)</a>:</h4>
+<p>A quick question: is there any problem known regarding sending mails vie the <code>maildev</code> service? I can't get it to work. Mails are simply stored as files on the containers volume but not sent out. I think that the auto-relay feature is off (by default) and enabling it via an environment variable does not work since the set value (like <code>true</code>) is then taken as the receiver mail address. I opened an issue here <a href="https://github.com/maildev/maildev/issues/501">https://github.com/maildev/maildev/issues/501</a> but no answer yet.<br>
+Maybe I am doing something wrong ;)<br>
+The mails are here</p>
+<div class="codehilite"><pre><span></span><code>root@ecap-s051:/raid/km3net-dataverse/mail# ls -al
+total 48
+drwxr-xr-x  2 tgal tgal 4096 Sep 20 16:01 .
+drwxr-xr-x 10 root root 4096 Jul  3 22:56 ..
+-rw-r--r--  1 tgal tgal  799 Sep 13 15:11 6CCFTjjF.eml
+-rw-r--r--  1 tgal tgal  738 Sep 13 10:23 8nszk2Cu.eml
+-rw-r--r--  1 tgal tgal  797 Sep 20 16:01 AdhVA5rZ.eml
+-rw-r--r--  1 tgal tgal  752 Sep 13 10:46 cnpXNCO8.eml
+</code></pre></div>
+<p>and look OK-ish (apart that the link to Dataverse is shown as <code>localhost:8080</code>)</p>
+
+
+
+<a name="471763032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471763032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471763032">(Sep 20 2024 at 15:33)</a>:</h4>
+<p>Do you mean you don't see emails at <a href="http://localhost:1080">http://localhost:1080</a> like this?</p>
+<p><a href="/user_uploads/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png">maildev.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png" title="maildev.png"><img data-original-dimensions="957x677" src="/user_uploads/thumbnail/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png/840x560.webp"></a></div>
+
+
+
+<a name="471778695"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471778695" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471778695">(Sep 20 2024 at 16:45)</a>:</h4>
+<p>I did not expose that port. I thought it would send the mals automatically ;) I assume that if the mails are stored locally, they are not sent yet.</p>
+
+
+
+<a name="471779238"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471779238" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471779238">(Sep 20 2024 at 16:48)</a>:</h4>
+<p>to be clear: I meant that nothing is arriving at the user. The instance has a valid URL with proper SSL certificate. I don’t know why it still puts “localhost” in the mail body but the mail header itself looks fine with the correct noreply email address etc. They are simply not arriving in anyone’s inbox. I can only see those mails as files in the mail folder of the maildev container.</p>
+
+
+
+<a name="471781331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471781331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471781331">(Sep 20 2024 at 16:58)</a>:</h4>
+<p>Please don't use maildev as an MTA. You should look into either use some MTA of your institution or, if you need to mangle the mail before it's sent to a user (e.g. for SMIME signing), into deploying Postfix or other small-scale MTAs and use it as a relay.</p>
+
+
+
+<a name="471781564"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471781564" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471781564">(Sep 20 2024 at 16:59)</a>:</h4>
+<p>Maildev really is meant to be used within a development scenario, where you don't want mails to be sent to arbitrary places. We use maildev also in integration tests to verify the sending process, etc.</p>
+
+
+
+<a name="471781814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471781814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471781814">(Sep 20 2024 at 17:00)</a>:</h4>
+<p>In 6.2 the mail subsystem configuration of Dataverse has been reworked and should be pretty easy to use with any MTA out there.</p>
+
+
+
+<a name="471782166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471782166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471782166">(Sep 20 2024 at 17:01)</a>:</h4>
+<p>Also keep in mind that for real usage, you should make sure you use servers as your final MTAs when leaving your organization that are added to the DNS based SPF records. Otherwise alot of receiving mailservers of your users will start rejecting/discarding the mails you're sending as Spam.</p>
+
+
+
+<a name="471783946"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471783946" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471783946">(Sep 20 2024 at 17:08)</a>:</h4>
+<p>(I'm not even starting to talk about DANE and DKIM. SPF is the most crucial one these days.)</p>
+
+
+
+<a name="471791655"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471791655" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471791655">(Sep 20 2024 at 17:37)</a>:</h4>
+<p>Hmm, you're making me think that when we declare our containers ready for <a href="https://guides.dataverse.org/en/6.3/container/running/production.html">production</a>, in the <a href="https://github.com/IQSS/dataverse/blob/v6.3/docker/compose/demo/compose.yml">compose file</a> we should swap out Maildev for a real SMTP server. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="471825721"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471825721" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471825721">(Sep 20 2024 at 20:16)</a>:</h4>
+<p>To be honest, i was already wondering <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+<p>alright, i will amend ;)</p>
+
+
+
+<a name="471827597"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471827597" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471827597">(Sep 20 2024 at 20:26)</a>:</h4>
+<p>Maildev is very handy in dev! I used it <a href="https://github.com/IQSS/dataverse/pull/10504#issuecomment-2358862099">this week</a>! <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="471829680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471829680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471829680">(Sep 20 2024 at 20:41)</a>:</h4>
+<p>Actually we probably should leave any MTA out or just have a commented out Postfix example. People need to make up their minds about this stuff for production.</p>
+
+
+
+<a name="471900260"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471900260" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471900260">(Sep 21 2024 at 07:44)</a>:</h4>
+<p>I agree <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> !</p>
+
+
+
+<a name="471900472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471900472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471900472">(Sep 21 2024 at 07:46)</a>:</h4>
+<p>Now that I use the GMail SMTP server directly, I get a</p>
+<div class="codehilite"><pre><span></span><code>jakarta.mail.AuthenticationFailedException: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-42e754a69a7sm69421145e9.34 - gsmtp
+</code></pre></div>
+<p>which is strange since the credentials are definitely correct.<br>
+I am using these environment variables</p>
+<div class="codehilite"><pre><span></span><code>      DATAVERSE_MAIL_MTA_HOST: &quot;smtp.gmail.com&quot;
+      DATAVERSE_MAIL_MTA_PORT: &quot;465&quot;
+      DATAVERSE_MAIL_MTA_SSL_ENABLE: &quot;true&quot;
+      DATAVERSE_MAIL_MTA_AUTH: &quot;true&quot;
+      DATAVERSE_MAIL_MTA_USER: &quot;foo@gmail.com&quot;
+      DATAVERSE_MAIL_MTA_PASSWORD: &quot;...&quot;
+</code></pre></div>
+<p>According to the docs, the settings should be named correctly. <span aria-label="confused" class="emoji emoji-1f615" role="img" title="confused">:confused:</span></p>
+
+
+
+<a name="471901058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471901058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471901058">(Sep 21 2024 at 07:53)</a>:</h4>
+<p>Did you activate SMTP in your Gmail Account?</p>
+
+
+
+<a name="471901137"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471901137" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471901137">(Sep 21 2024 at 07:54)</a>:</h4>
+<p>Did you use an application password? (In case you're using 2FA)</p>
+
+
+
+<a name="471901339"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471901339" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471901339">(Sep 21 2024 at 07:56)</a>:</h4>
+<p>Can you use the same credentials and connection details from some other app, like an email program?</p>
+
+
+
+<a name="471902121"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902121" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902121">(Sep 21 2024 at 08:04)</a>:</h4>
+<p>Ah, that's a new Google Account and I just realised that they restricted the authentication methods<br>
+I now need to activate 2FA and create an App password</p>
+
+
+
+<a name="471902172"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902172" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902172">(Sep 21 2024 at 08:04)</a>:</h4>
+<p>Please note that you might also need to enable SMTP access!</p>
+
+
+
+<a name="471902182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902182">(Sep 21 2024 at 08:04)</a>:</h4>
+<p>yep, now going through all the hassle ;)</p>
+
+
+
+<a name="471902199"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902199" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902199">(Sep 21 2024 at 08:05)</a>:</h4>
+<p>thanks for the hint</p>
+
+
+
+<a name="471902259"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902259" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902259">(Sep 21 2024 at 08:05)</a>:</h4>
+<p>this also means I will need to update a few other services with Gmail SMTP, since end of september they drop the basic auth method</p>
+
+
+
+<a name="471902345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902345">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>You could try using Sasl Oauth2</p>
+
+
+
+<a name="471902377"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902377" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902377">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>It should be possibly to configure this since v6.2</p>
+
+
+
+<a name="471902395"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902395" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902395">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>aah that's also an option</p>
+
+
+
+<a name="471902404"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902404" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902404">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>very nice</p>
+
+
+
+<a name="471902419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902419">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>It would also be helpful to document your findings in the guide</p>
+
+
+
+<a name="471902431"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902431" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902431">(Sep 21 2024 at 08:06)</a>:</h4>
+<p>So others can benefit, too</p>
+
+
+
+<a name="471902579"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902579" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902579">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>yes, definitely</p>
+
+
+
+<a name="471902594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902594">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>Keep in mind that there is a debug switch in the mail settings. It will make the logs more verbose in case you need to do some diggin'</p>
+
+
+
+<a name="471902605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902605">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>ok</p>
+
+
+
+<a name="471902628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902628">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>Happy hacking!</p>
+
+
+
+<a name="471902632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902632">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>currently the only annoying thing is that i need to restart the full service, which takes about 10 minutes to start up</p>
+
+
+
+<a name="471902638"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902638" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902638">(Sep 21 2024 at 08:08)</a>:</h4>
+<p>thanks ;)</p>
+
+
+
+<a name="471902672"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902672" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902672">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>10 minutes????</p>
+
+
+
+<a name="471902680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902680">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>yes roughly</p>
+
+
+
+<a name="471902682"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902682" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902682">(Sep 21 2024 at 08:09)</a>:</h4>
+<p><span aria-label="exploding head" class="emoji emoji-1f92f" role="img" title="exploding head">:exploding_head:</span></p>
+
+
+
+<a name="471902695"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902695" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902695">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>I see the Payara page for a very long time until the actual Dataverse appears</p>
+
+
+
+<a name="471902704"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902704" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902704">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>Man you need some beef on that machine!</p>
+
+
+
+<a name="471902709"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902709" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902709">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>oh i have</p>
+
+
+
+<a name="471902713"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902713" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902713">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>It usually takes about 2 minutes</p>
+
+
+
+<a name="471902724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902724">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>128 corese, 512GB RAM</p>
+
+
+
+<a name="471902725"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902725" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902725">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>10 is very odd!</p>
+
+
+
+<a name="471902732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902732">(Sep 21 2024 at 08:09)</a>:</h4>
+<p>currently not restricted at all</p>
+
+
+
+<a name="471902826"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902826" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902826">(Sep 21 2024 at 08:10)</a>:</h4>
+<p>Can you say from the timestamps in the logs where it slows down?</p>
+
+
+
+<a name="471902839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902839">(Sep 21 2024 at 08:10)</a>:</h4>
+<p>There might be some timeout for sth</p>
+
+
+
+<a name="471902874"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902874" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902874">(Sep 21 2024 at 08:11)</a>:</h4>
+<p>Usually I redeploy on my laptop in under 2 minutes, full cycle</p>
+
+
+
+<a name="471902888"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902888" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902888">(Sep 21 2024 at 08:11)</a>:</h4>
+<p>ah wait, i am an idiot, i have restricted it to 2GB RAM and 1 CPU <span aria-label="laughing" class="emoji emoji-1f606" role="img" title="laughing">:laughing:</span></p>
+
+
+
+<a name="471902901"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902901" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902901">(Sep 21 2024 at 08:11)</a>:</h4>
+<p><a href="/user_uploads/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png">Screenshot-2024-09-21-at-10.11.37.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png" title="Screenshot-2024-09-21-at-10.11.37.png"><img data-original-dimensions="918x110" src="/user_uploads/thumbnail/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png/840x560.webp"></a></div>
+
+
+
+<a name="471902910"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902910" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902910">(Sep 21 2024 at 08:11)</a>:</h4>
+<p>That's the default for the container, yes</p>
+
+
+
+<a name="471902994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471902994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471902994">(Sep 21 2024 at 08:12)</a>:</h4>
+<p>i totally missed that...</p>
+
+
+
+<a name="471903004"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903004" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903004">(Sep 21 2024 at 08:12)</a>:</h4>
+<p>ok so it will utilise all the CPUs if i give more, or is there a maximum?</p>
+
+
+
+<a name="471903046"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903046" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903046">(Sep 21 2024 at 08:13)</a>:</h4>
+<p>If you don't give any restrictions, it will take and run with what's there</p>
+
+
+
+<a name="471903055"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903055" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903055">(Sep 21 2024 at 08:13)</a>:</h4>
+<p>perfect</p>
+
+
+
+<a name="471903067"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903067" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903067">(Sep 21 2024 at 08:13)</a>:</h4>
+<p>Beware that you really should limit the Ram</p>
+
+
+
+<a name="471903073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903073">(Sep 21 2024 at 08:13)</a>:</h4>
+<p>Otherwise it will allocate a very large heap, 70% of what the container has available</p>
+
+
+
+<a name="471903092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903092">(Sep 21 2024 at 08:13)</a>:</h4>
+<p>You won't want that to happen <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="471903253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903253">(Sep 21 2024 at 08:15)</a>:</h4>
+<p>A reasonable size to getting started would be 4g or 8g. Probably <span class="user-mention" data-user-id="626369">@Don Sizemore</span> ears are burning now</p>
+
+
+
+<a name="471903264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903264">(Sep 21 2024 at 08:15)</a>:</h4>
+<p>yes don't worry :D</p>
+
+
+
+<a name="471903278"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903278" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903278">(Sep 21 2024 at 08:15)</a>:</h4>
+<p>i started with 8GB and 4CPUs, initialises much faster</p>
+
+
+
+<a name="471903286"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903286" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903286">(Sep 21 2024 at 08:15)</a>:</h4>
+<p>SMTP works too</p>
+
+
+
+<a name="471903296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903296">(Sep 21 2024 at 08:15)</a>:</h4>
+<p>one last thing: the URL is still <code>localhost:8080</code></p>
+
+
+
+<a name="471903342"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903342" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903342">(Sep 21 2024 at 08:16)</a>:</h4>
+<p><a href="/user_uploads/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png">Screenshot-2024-09-21-at-10.14.57.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png" title="Screenshot-2024-09-21-at-10.14.57.png"><img data-original-dimensions="223x196" src="/user_uploads/thumbnail/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png/840x560.webp"></a></div>
+
+
+
+<a name="471903367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903367">(Sep 21 2024 at 08:16)</a>:</h4>
+<p>i could not figure out yet where to change that ;)</p>
+
+
+
+<a name="471903420"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903420" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903420">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>i have a commented out <code>_CT_DATAVERSE_SITEURL</code> env var</p>
+
+
+
+<a name="471903432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903432">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>but don't remember anymore what it was commented out <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="471903444"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903444" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903444">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>If you're running 6.3 with Payara 6.2024.6 you don't need the _ct thing anymore</p>
+
+
+
+<a name="471903451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903451">(Sep 21 2024 at 08:17)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/latest/installation/config.html">https://guides.dataverse.org/en/latest/installation/config.html</a></p>
+
+
+
+<a name="471903461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903461">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>ok so i use that with <code>DATAVERSE_SITEURL</code> as env var,</p>
+
+
+
+<a name="471903462"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903462" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903462">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>You can just use Dataverse_siteurl and dataverse_fqdn now</p>
+
+
+
+<a name="471903466"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903466" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903466">(Sep 21 2024 at 08:17)</a>:</h4>
+<p>ok</p>
+
+
+
+<a name="471903542"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903542" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903542">(Sep 21 2024 at 08:18)</a>:</h4>
+<p>All uppercase please. Too hard to type on mobile</p>
+
+
+
+<a name="471903554"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903554" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903554">(Sep 21 2024 at 08:18)</a>:</h4>
+<p>yesyes :) thanks, just confirming</p>
+
+
+
+<a name="471903617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903617">(Sep 21 2024 at 08:19)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="733331">Tamas Gal</span> has marked this topic as resolved.</p>
+
+
+
+<a name="471903887"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471903887" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471903887">(Sep 21 2024 at 08:22)</a>:</h4>
+<p>One last thing: if you would like to see a reload admin api endpoint to trigger re-init of subsystems like mail etc, please create an issue! I've been thinking about this for some time. Not sure when it would get implemented, but it certainly would help. Might become relevant for SPA work which makes it more likely to be implemented quicker</p>
+
+
+
+<a name="471904096"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904096" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904096">(Sep 21 2024 at 08:24)</a>:</h4>
+<p>Yes that might be something but not sure if it's worth the hassle. I mean, it might save one or two hours of deployment work but that's usually a one-time thing ;)</p>
+
+
+
+<a name="471904320"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904320" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904320">(Sep 21 2024 at 08:26)</a>:</h4>
+<p>everything works now :) deployed in Docker Swarm successfully</p>
+
+
+
+<a name="471904533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904533">(Sep 21 2024 at 08:28)</a>:</h4>
+<p>sorry for being off-topic but the bootstrap service is still trying every few seconds, I guess i can simply remove it now? i understood that it's only needed for the very first deployment</p>
+
+
+
+<a name="471904546"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904546" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904546">(Sep 21 2024 at 08:28)</a>:</h4>
+<p><a href="/user_uploads/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png">Screenshot-2024-09-21-at-10.28.44.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png" title="Screenshot-2024-09-21-at-10.28.44.png"><img data-original-dimensions="608x82" src="/user_uploads/thumbnail/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png/840x560.webp"></a></div>
+
+
+
+<a name="471904560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904560">(Sep 21 2024 at 08:29)</a>:</h4>
+<p>It might be nice to put down your experiences with Swarm. It's a nice compromise between compose and k8s</p>
+
+
+
+<a name="471904598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904598">(Sep 21 2024 at 08:29)</a>:</h4>
+<p>i will check out how to contribute to your docs in the next days</p>
+
+
+
+<a name="471904615"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904615" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904615">(Sep 21 2024 at 08:29)</a>:</h4>
+<p>The bootstrap will detect it doesn't need to do anything and quit. If it bothers you, drop it.</p>
+
+
+
+<a name="471904625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904625">(Sep 21 2024 at 08:30)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>  bootstrap:
+    image: gdcc/configbaker:alpha
+    environment:
+      - TIMEOUT=3m
+    command:
+      - bootstrap.sh
+      - dev
+</code></pre></div>
+
+
+
+<a name="471904705"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904705" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904705">(Sep 21 2024 at 08:30)</a>:</h4>
+<p>that's the service right now. not sure if <code>dev</code> is correct in production</p>
+
+
+
+<a name="471904725"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904725" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904725">(Sep 21 2024 at 08:30)</a>:</h4>
+<p>No it usually isn't 1<span aria-label="laughing" class="emoji emoji-1f606" role="img" title="laughing">:laughing:</span></p>
+
+
+
+<a name="471904743"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904743" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904743">(Sep 21 2024 at 08:30)</a>:</h4>
+<p>ok ;) so remove <code>dev</code> and let it cycle? ;)</p>
+
+
+
+<a name="471904745"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904745" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904745">(Sep 21 2024 at 08:30)</a>:</h4>
+<p>You really shouldn't <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="471904770"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904770" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904770">(Sep 21 2024 at 08:31)</a>:</h4>
+<p>No, you need to provide a different profile</p>
+
+
+
+<a name="471904789"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904789" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904789">(Sep 21 2024 at 08:31)</a>:</h4>
+<p>IIRC the demo guides page had something about this documented</p>
+
+
+
+<a name="471904805"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904805" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904805">(Sep 21 2024 at 08:31)</a>:</h4>
+<p>ok i will check</p>
+
+
+
+<a name="471904918"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904918" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904918">(Sep 21 2024 at 08:32)</a>:</h4>
+<p>We are officially not yet production ready with all of this. Still a long way to go to make it easily accessible and polished enough</p>
+
+
+
+<a name="471904945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904945">(Sep 21 2024 at 08:32)</a>:</h4>
+<p>You're breaking new ground <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="471904952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471904952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471904952">(Sep 21 2024 at 08:32)</a>:</h4>
+<p>ahah ok ;)</p>
+
+
+
+<a name="471905408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905408">(Sep 21 2024 at 08:37)</a>:</h4>
+<p>i only found this about bootstrap: <a href="https://guides.dataverse.org/en/latest/container/running/demo.html">https://guides.dataverse.org/en/latest/container/running/demo.html#</a> and it lists <code>dev</code> and <code>demo</code><br>
+i am a bit confused but I think <code>demo</code>is now the correct choice? or is bootstrapping not needed at all since settings are already settled? maybe I just don't understand if "boostrapping" is related to the very first deployment (setting up databases, directories etc.) or the actual start of the docker service stack...</p>
+
+
+
+<a name="471905480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905480">(Sep 21 2024 at 08:38)</a>:</h4>
+<p>especially this sentence:</p>
+<blockquote>
+<p>One of the main differences between the “dev” persona and our new “demo” persona is that we are now running the setup-all script without the <code>--insecure</code> flag. This makes our installation more secure, though it does block “admin” APIs that are useful for configuration.</p>
+</blockquote>
+
+
+
+<a name="471905501"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905501" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905501">(Sep 21 2024 at 08:38)</a>:</h4>
+<p>So if I now switch to <code>demo</code>, will it "reset" the settings or is no setup-all triggered anymore?</p>
+
+
+
+<a name="471905521"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905521" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905521">(Sep 21 2024 at 08:38)</a>:</h4>
+<p>sorry for the dumb questions ;)</p>
+
+
+
+<a name="471905552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905552">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>Once bootstrapped, it will not do it again</p>
+
+
+
+<a name="471905569"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905569" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905569">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>The main difference is the securing of certain api endpoints</p>
+
+
+
+<a name="471905571"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905571" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905571">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>ok so now i need to manually secure everything through the admin API</p>
+
+
+
+<a name="471905573"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905573" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905573">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>You can do that manually</p>
+
+
+
+<a name="471905578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905578">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>alright, thanks!</p>
+
+
+
+<a name="471905591"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905591" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tamas Gal <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905591">(Sep 21 2024 at 08:39)</a>:</h4>
+<p>i will then leave it as it is</p>
+
+
+
+<a name="471905659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905659">(Sep 21 2024 at 08:40)</a>:</h4>
+<p>You should think about creating your own persona with all your settings, etc</p>
+
+
+
+<a name="471905681"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905681" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905681">(Sep 21 2024 at 08:40)</a>:</h4>
+<p>That way it's easy to spin up a new instance with the same configuration</p>
+
+
+
+<a name="471905717"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905717" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905717">(Sep 21 2024 at 08:41)</a>:</h4>
+<p>The configbaker image guides page has more details on that IIRC</p>
+
+
+
+<a name="471905739"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471905739" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471905739">(Sep 21 2024 at 08:41)</a>:</h4>
+<p>Wrote it myself but keep forgetting these details <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="471935103"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Issues%20with%20sending%20mails/near/471935103" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Issues.20with.20sending.20mails.html#471935103">(Sep 21 2024 at 12:22)</a>:</h4>
+<p>Yes, please open issues to document things. Or if it's easier, you can start a thread in <a class="stream" data-stream-id="446770" href="/#narrow/stream/446770-docs">#docs</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

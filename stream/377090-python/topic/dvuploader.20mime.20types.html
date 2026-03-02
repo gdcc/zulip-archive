@@ -1,0 +1,114 @@
+<html>
+<head><meta charset="utf-8"><title>dvuploader mime types · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html">dvuploader mime types</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="431658273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431658273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431658273">(Apr 06 2024 at 09:34)</a>:</h4>
+<p>Uploading a PNG file via dvuploader resulted in a file of type plain text???</p>
+
+
+
+<a name="431676596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431676596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431676596">(Apr 06 2024 at 14:11)</a>:</h4>
+<p>You need to supply the  <code>mimeType</code> for the file. I did experiment with leaving <code>mimeType</code> out of the request body, but it did not work. <span class="user-mention" data-user-id="598112">@Philip Durbin</span> once mentioned that there is a trick to trigger detecting the mime type at Dataverse, but I dont remember exactly. Happy to fix this!</p>
+
+
+
+<a name="431676925"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431676925" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431676925">(Apr 06 2024 at 14:15)</a>:</h4>
+<p>Please note that it’s possible to “trick” a Dataverse installation into giving a file a content type (MIME type) of your choosing. For example, you can make a text file be treated like a video file with <code>-F 'file=@README.txt;type=video/mpeg4'</code>, for example. If the Dataverse installation does not properly detect a file type, specifying the content type via API like this a potential workaround.</p>
+
+
+
+<a name="431676944"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431676944" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431676944">(Apr 06 2024 at 14:15)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/6.2/api/native-api.html#add-a-file-to-a-dataset">https://guides.dataverse.org/en/6.2/api/native-api.html#add-a-file-to-a-dataset</a></p>
+
+
+
+<a name="431678614"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431678614" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431678614">(Apr 06 2024 at 14:38)</a>:</h4>
+<p>Works for the native upload now! In the S3 case, it seems not to be possible to leave out the <code>mimeType</code> in the JSON. It will result in a failed registration of each file:</p>
+<p><code>Bad Request: The file content type cannot be determined.</code> &lt;-- Is actually an XML file</p>
+<p>I guess that due to the direct upload to S3, no type detection is happening at Dataverse. Is this correct? If so, I would add a step that checks whether each file object has a mime type before the upload is happening.</p>
+
+
+
+<a name="431678809"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431678809" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431678809">(Apr 06 2024 at 14:41)</a>:</h4>
+<p>IIRC when registering these files you need to provide this metadata. There is also no ingest / analysis / unzip happening when using direct upload</p>
+
+
+
+<a name="431678948"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431678948" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431678948">(Apr 06 2024 at 14:43)</a>:</h4>
+<p>Alright, the mime type is then essential for the upload. I will add a check before uploading.</p>
+
+
+
+<a name="431679257"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431679257" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431679257">(Apr 06 2024 at 14:47)</a>:</h4>
+<p>It would mean more deps, but would it make sense to have a mime detection library do this for us?</p>
+
+
+
+<a name="431679794"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431679794" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431679794">(Apr 06 2024 at 14:53)</a>:</h4>
+<p>There is one built into Python <code>mimetypes</code> - Covers most of it but has boundaries</p>
+
+
+
+<a name="431680367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431680367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431680367">(Apr 06 2024 at 15:01)</a>:</h4>
+<p>An option would be <code>magic</code> but it requires <code>libmagic</code> to be installed, which is not a Python library.</p>
+
+
+
+<a name="431680452"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/431680452" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#431680452">(Apr 06 2024 at 15:02)</a>:</h4>
+<p>I don't know if this is worth it since there are extra steps required to make it work.</p>
+
+
+
+<a name="508598563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/508598563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#508598563">(Mar 27 2025 at 19:03)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> what would you think about some sort of interface here? e.g., dvuploader could ship with <code>mimetypes</code> usage, but if you wanted to use another option (e.g. <code>magic</code>, or something that calls an external tool)</p>
+
+
+
+<a name="508609391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/508609391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#508609391">(Mar 27 2025 at 20:12)</a>:</h4>
+<p>Sure, that is a great idea. As far as I know, the <code>magic</code> package requires the <code>libmagic</code> binaries. </p>
+<p>An alternative would be to port <a href="https://crates.io/crates/infer">infer</a> from Rust via Python bindings. This way, users do not need to install these manually, and we can ship the interface without the need to install <code>libmagic</code>. Maybe there are some existing already. Otherwise, it is quite easy to set these up - The crate is quite simple.</p>
+
+
+
+<a name="508610049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/508610049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#508610049">(Mar 27 2025 at 20:16)</a>:</h4>
+<p>yeah, there's a similar approach used in the <code>marcel</code> gem as used by Ruby on Rails - it uses the signatures from Apache Tika without otherwise adding a dependency on Tika itself.</p>
+
+
+
+<a name="508698617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/508698617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#508698617">(Mar 28 2025 at 08:48)</a>:</h4>
+<p>There are no bindings yet, but I have created a simple one that guesses the mime type.</p>
+<p><a href="/user_uploads/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="2034x590" src="/user_uploads/thumbnail/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png/840x560.webp"></a></div>
+
+
+
+<a name="508699016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/dvuploader%20mime%20types/near/508699016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/dvuploader.20mime.20types.html#508699016">(Mar 28 2025 at 08:50)</a>:</h4>
+<p>It is exclusive to binary formats and fails at CSV and other text-based ones. I can either include another one, or we can simply combine it with Python <code>mimetypes</code>.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

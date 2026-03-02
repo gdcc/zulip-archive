@@ -1,0 +1,392 @@
+<html>
+<head><meta charset="utf-8"><title>S3 Errors after upgrade · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html">S3 Errors after upgrade</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="489971452"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489971452" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489971452">(Dec 19 2024 at 14:03)</a>:</h4>
+<p>I attempted to do normal patching today on our production dataverse, and now I'm seeing the following errors in the log:</p>
+<p>[2024-12-19T13:52:17.943+0000] [Payara 6.2024.7] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.S3AccessIO] [tid: _ThreadID=95 _ThreadName=http-thread-pool::jk-connector(5)] [timeMillis: 1734616337943] [levelValue: 900] [[<br>
+  Caught an AmazonClientException in S3AccessIO.savePathAsAux():    User: arn:aws:sts::141031099449:assumed-role/AmazonSSMRoleForInstancesQuickSetup/i-098a0e852528a90ec is not authorized to perform: s3:PutObject on resource: "arn:aws:s3:::&lt;dataset ID&gt;/export_schema.org.cached" because no identity-based policy allows the s3:PutObject action (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: 74AKGFFAECW74WVA; S3 Extended Request ID: cNxNGnkZz/jjXoBuQqL0osMOs5ybNqItPkScpz5k9ZAutveyqngvN7mjUHnTQzNhVD/dmk8UChw=; Proxy: null)]]</p>
+<p>[2024-12-19T13:52:16.860+0000] [Payara 6.2024.7] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.S3AccessIO] [tid: _ThreadID=93 _ThreadName=http-thread-pool::jk-connector(3)] [timeMillis: 1734616336860] [levelValue: 900] [[<br>
+  Caught an AmazonClientException in S3AccessIO.isAuxObjectCached:    Forbidden (Service: Amazon S3; Status Code: 403; Error Code: 403 Forbidden; Request ID: Q4J9MBT25S4NS90Z; S3 Extended Request ID: 5HsBIjXxuTsjOGZz7duteNynYJo9j5idbyHBLObZ5RVU2aPI8I+4BqyyVO7lUFFeqr4MN14faSc=; Proxy: null)]]</p>
+<p>I restored the volume to before patching, but the error persists. I did not change anything related to my  access keys or policies on the user having access. I still have my CORS policy in place, and the policy on the IAM user to allow basically everything on the s3 bucket. Access keys are the same and correct.</p>
+<p>Any ideas what I'm missing?</p>
+
+
+
+<a name="489973108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489973108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489973108">(Dec 19 2024 at 14:12)</a>:</h4>
+<p>Huh, my first thought is CORS policy but it sounds like you checked that already. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="489973454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489973454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489973454">(Dec 19 2024 at 14:14)</a>:</h4>
+<p>so strange .. this is happening on all of our installations .. the server can't see the bucket .. can't upload any files .. any idea why that would suddenly occur?</p>
+
+
+
+<a name="489973753"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489973753" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489973753">(Dec 19 2024 at 14:16)</a>:</h4>
+<p>this is our CORS policy<br>
+[<br>
+    {<br>
+        "AllowedHeaders": [<br>
+            "*"<br>
+        ],<br>
+        "AllowedMethods": [<br>
+            "GET",<br>
+            "HEAD",<br>
+            "PUT"<br>
+        ],<br>
+        "AllowedOrigins": [<br>
+            "*"<br>
+        ],<br>
+        "ExposeHeaders": [<br>
+            "Content-Range",<br>
+            "ETag",<br>
+            "Content-Encoding",<br>
+            "Accept-Ranges"<br>
+        ],<br>
+        "MaxAgeSeconds": 0<br>
+    }<br>
+]</p>
+
+
+
+<a name="489973856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489973856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489973856">(Dec 19 2024 at 14:17)</a>:</h4>
+<p>Can you go over what changed? It sounds like the version of Dataverse itself didn't change but you patched the underlying OS? Linux, I assume. Which distro?</p>
+
+
+
+<a name="489974595"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489974595" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489974595">(Dec 19 2024 at 14:21)</a>:</h4>
+<p>i patched the OS, but then restored back to a snapshot of the volume, so now i'm running on that .. so the OS is not upgraded</p>
+
+
+
+<a name="489974631"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489974631" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489974631">(Dec 19 2024 at 14:21)</a>:</h4>
+<p>rocky linux 8</p>
+
+
+
+<a name="489975395"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975395" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975395">(Dec 19 2024 at 14:25)</a>:</h4>
+<p>Strange that it's causing S3 trouble.</p>
+
+
+
+<a name="489975549"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975549" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975549">(Dec 19 2024 at 14:26)</a>:</h4>
+<p>i'm still using the aws credentials file for access .. could that be an issue?</p>
+
+
+
+<a name="489975696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975696">(Dec 19 2024 at 14:27)</a>:</h4>
+<p>I mean, that should depend on the version of Dataverse, I think, which hasn't changed.</p>
+
+
+
+<a name="489975734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975734">(Dec 19 2024 at 14:27)</a>:</h4>
+<p>It is worth testing outside of Dataverse?</p>
+
+
+
+<a name="489975774"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975774" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975774">(Dec 19 2024 at 14:27)</a>:</h4>
+<p>on prod we are running v6.4<br>
+on qa i did upgrade to v6.5 recently</p>
+
+
+
+<a name="489975945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975945">(Dec 19 2024 at 14:28)</a>:</h4>
+<p>Which one is having S3 trouble?</p>
+
+
+
+<a name="489975964"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975964" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975964">(Dec 19 2024 at 14:28)</a>:</h4>
+<p>both</p>
+
+
+
+<a name="489975978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489975978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489975978">(Dec 19 2024 at 14:28)</a>:</h4>
+<p>D'oh! <img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"></p>
+
+
+
+<a name="489976171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489976171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489976171">(Dec 19 2024 at 14:30)</a>:</h4>
+<p>yea fun week .. had some other unfun issues earlier</p>
+
+
+
+<a name="489977661"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489977661" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489977661">(Dec 19 2024 at 14:38)</a>:</h4>
+<p>when i use the cli to list the bucket contents it works</p>
+
+
+
+<a name="489978436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978436">(Dec 19 2024 at 14:43)</a>:</h4>
+<p>well it does on the prod server, but not on qa .. i get "cannot import name 'PROTOCOL_TLS'"</p>
+
+
+
+<a name="489978687"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978687" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978687">(Dec 19 2024 at 14:44)</a>:</h4>
+<p>I wouldn't trust myself to test via cli but I'm glad you're trying!</p>
+
+
+
+<a name="489978730"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978730" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978730">(Dec 19 2024 at 14:44)</a>:</h4>
+<p>what version of Dataverse? with 5.14+ Dataverse will prefer RBAC even if you give it access keys.</p>
+
+
+
+<a name="489978846"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978846" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978846">(Dec 19 2024 at 14:45)</a>:</h4>
+<p>ah, v6.5. I have 6.5 running on two instances with S3 storage, one using RBAC, one still using keys.</p>
+
+
+
+<a name="489978860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978860">(Dec 19 2024 at 14:45)</a>:</h4>
+<p>v6.4 and v6.5 .. but these have been working just fine for quite some time .. until today</p>
+
+
+
+<a name="489978900"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978900" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978900">(Dec 19 2024 at 14:45)</a>:</h4>
+<p>they are both still using keys</p>
+
+
+
+<a name="489978972"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489978972" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489978972">(Dec 19 2024 at 14:46)</a>:</h4>
+<p>is there any AWS role assigned to the EC2 instance?</p>
+
+
+
+<a name="489979126"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979126" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979126">(Dec 19 2024 at 14:46)</a>:</h4>
+<p>I have an open issue requesting the ability to disable the RBAC preference within Dataverse, but if there's a role assigned to the EC2 instance, <em>that</em> sets the S3 permission policy.</p>
+
+
+
+<a name="489979176"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979176" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979176">(Dec 19 2024 at 14:47)</a>:</h4>
+<p>we use aws backup so it has the "AmazonSSMRoleForInstancesQuickSetup" assigned to it</p>
+
+
+
+<a name="489979234"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979234" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979234">(Dec 19 2024 at 14:47)</a>:</h4>
+<p>it has been there for at least a year</p>
+
+
+
+<a name="489979405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979405">(Dec 19 2024 at 14:48)</a>:</h4>
+<p>what I did was create a meta-role for the instance (in my case it had the AWS SSM role assigned previously). the parent role included the SSM policy and an "inline" custom policy into which I copy-pasted the S3 permissions.</p>
+
+
+
+<a name="489979416"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979416" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979416">(Dec 19 2024 at 14:48)</a>:</h4>
+<p>sorry i mean systems manager</p>
+
+
+
+<a name="489979479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979479">(Dec 19 2024 at 14:48)</a>:</h4>
+<p>I'm not sure why things had been working after you upgraded to v5.14 - that's when mine broke.</p>
+
+
+
+<a name="489979783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979783">(Dec 19 2024 at 14:50)</a>:</h4>
+<p>i'm not sure why we even have the systems manager role on this instance .. i'm not managing any of the rocky linux instances with SSM .. so i need to create a new role and add the SSM policy and the inline policy with the current s3 permissions that are on the IAM user?</p>
+
+
+
+<a name="489979836"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489979836" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489979836">(Dec 19 2024 at 14:50)</a>:</h4>
+<p>and attach that to the instance instead of the SSM one?</p>
+
+
+
+<a name="489980273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489980273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489980273">(Dec 19 2024 at 14:52)</a>:</h4>
+<p>if you're not using SSM, you could create a role for the instance's S3 access and assign the bucket policy to that role</p>
+
+
+
+<a name="489980387"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489980387" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489980387">(Dec 19 2024 at 14:53)</a>:</h4>
+<p>I'm still curious how/why you're just hitting this now. Does anyone else modify your AWS configuration?</p>
+
+
+
+<a name="489980721"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489980721" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489980721">(Dec 19 2024 at 14:55)</a>:</h4>
+<p>i wonder if it has to do with the recent upgrade of SSM .. if somewhere along the lines it assigned the instance policy to all the instances for some reason .. i have a distribution, host management, and patching config but none of them include any of the rocky linux instances</p>
+
+
+
+<a name="489981000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489981000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489981000">(Dec 19 2024 at 14:56)</a>:</h4>
+<p>i'm the only one that messes with our linux configs .. so it was likely something I did =)</p>
+
+
+
+<a name="489981402"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489981402" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489981402">(Dec 19 2024 at 14:58)</a>:</h4>
+<p>I'm seeing now that I need to submit a pull request to flesh out the docs mentioned in <a href="https://github.com/IQSS/dataverse/issues/10707">https://github.com/IQSS/dataverse/issues/10707</a> and open a second issue for that disableRBAC boolean</p>
+
+
+
+<a name="489981536"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489981536" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489981536">(Dec 19 2024 at 14:58)</a>:</h4>
+<p>but Dataverse will definitely prefer S3 permissions specified in the EC2 instance's assigned role over any access keys you offer it.</p>
+
+
+
+<a name="489983454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489983454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489983454">(Dec 19 2024 at 15:07)</a>:</h4>
+<p>That was it!!!! OMG i'm breathing again. DON .. thank you!!!!</p>
+
+
+
+<a name="489983525"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489983525" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489983525">(Dec 19 2024 at 15:08)</a>:</h4>
+<p>Now to figure out why it changed ...</p>
+
+
+
+<a name="489983583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489983583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489983583">(Dec 19 2024 at 15:08)</a>:</h4>
+<p>Thanks to you both for responding so quickly to this thread.</p>
+
+
+
+<a name="489983669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489983669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489983669">(Dec 19 2024 at 15:08)</a>:</h4>
+<p>Really I was just stalling you until Don showed up. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="489983851"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489983851" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489983851">(Dec 19 2024 at 15:09)</a>:</h4>
+<p>haha .. well thanks for that .. it calmed me down!</p>
+<p>that change happened on both AWS accounts, so somehow the SSM role got assigned to the instance even though I'm not including it anywhere in the configs</p>
+
+
+
+<a name="489984025"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489984025" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489984025">(Dec 19 2024 at 15:10)</a>:</h4>
+<p>I'm glad that fixed it! I'm submitting a PR for the docs now, that got buried in my to-do list.</p>
+
+
+
+<a name="489984073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489984073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489984073">(Dec 19 2024 at 15:11)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> maybe you can review the PR Don makes to improve the docs. Or you could make the PR yourself if you want!</p>
+
+
+
+<a name="489984255"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489984255" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489984255">(Dec 19 2024 at 15:11)</a>:</h4>
+<p>Happy to help with anything! LMK and I'll for sure look at it.</p>
+
+
+
+<a name="489985594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489985594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489985594">(Dec 19 2024 at 15:18)</a>:</h4>
+<p>Thank you, thank you, thank you! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="489986762"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489986762" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489986762">(Dec 19 2024 at 15:24)</a>:</h4>
+<p>I just read through that PR and it seems pretty clear .. I just hadn't seen it. <span aria-label="expressionless" class="emoji emoji-1f611" role="img" title="expressionless">:expressionless:</span>  Sorry about that!</p>
+
+
+
+<a name="489987033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489987033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489987033">(Dec 19 2024 at 15:25)</a>:</h4>
+<p>The issue, you mean? <a href="https://github.com/IQSS/dataverse/issues/10707">https://github.com/IQSS/dataverse/issues/10707</a></p>
+
+
+
+<a name="489987551"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489987551" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489987551">(Dec 19 2024 at 15:27)</a>:</h4>
+<p>Yes, but now i read again i see you meant a PR for the docs! Sorry, my brain is kind of fried.</p>
+
+
+
+<a name="489987890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489987890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489987890">(Dec 19 2024 at 15:28)</a>:</h4>
+<p>No worries. You probably got up early today.</p>
+
+
+
+<a name="489988333"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489988333" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489988333">(Dec 19 2024 at 15:30)</a>:</h4>
+<p>suuuuuper early .. patching thursday! <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="489988472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489988472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489988472">(Dec 19 2024 at 15:30)</a>:</h4>
+<p>patching stuff, breaking stuff, fixing stuff</p>
+
+
+
+<a name="489988981"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489988981" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489988981">(Dec 19 2024 at 15:33)</a>:</h4>
+<p>haha that's my cycle! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="489990665"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489990665" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489990665">(Dec 19 2024 at 15:41)</a>:</h4>
+<p>NOW there's a PR: <a href="https://github.com/IQSS/dataverse/pull/11111/files">https://github.com/IQSS/dataverse/pull/11111/files</a><br>
+and I opened <a href="https://github.com/IQSS/dataverse/issues/11112">https://github.com/IQSS/dataverse/issues/11112</a></p>
+
+
+
+<a name="489993342"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489993342" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489993342">(Dec 19 2024 at 15:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> do you see an invite at <a href="https://github.com/IQSS">https://github.com/IQSS</a> ? I'm trying add you to <a href="https://github.com/orgs/IQSS/teams/dataverse-readonly">https://github.com/orgs/IQSS/teams/dataverse-readonly</a> so I can request a review from you. <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="489997858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/489997858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#489997858">(Dec 19 2024 at 16:17)</a>:</h4>
+<p>yes .. i'm in!</p>
+
+
+
+<a name="490001132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/S3%20Errors%20after%20upgrade/near/490001132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/S3.20Errors.20after.20upgrade.html#490001132">(Dec 19 2024 at 16:34)</a>:</h4>
+<p>Review requested!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

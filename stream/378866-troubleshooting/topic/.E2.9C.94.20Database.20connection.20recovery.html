@@ -1,0 +1,203 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Database connection recovery · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html">✔ Database connection recovery</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="533069651"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533069651" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533069651">(Aug 06 2025 at 10:14)</a>:</h4>
+<p>Hi there, we have a Dataverse installation using Docker containers and whenever the Dataverse container loses the connection with the Database container, for example if there is a DB container failure, the server responds with this page, as expected:</p>
+<div class="codehilite"><pre><span></span><code>HTTP Status 500 - Internal Server Error
+
+type Exception report
+
+messageInternal Server Error
+
+descriptionThe server encountered an internal error that prevented it from fulfilling this request.
+
+exception
+
+jakarta.ejb.EJBException: Exception [EclipseLink-4002] (Eclipse Persistence Services - 4.0.1.payara-p1.v202304041433): org.eclipse.persistence.exceptions.DatabaseException
+Internal Exception: org.postgresql.util.PSQLException: Connection has been closed.
+Error Code: 0
+Call: SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG IS NULL))
+    bind =&gt; [1 parameter bound]
+Query: ReadAllQuery(name=&quot;Setting.findByName&quot; referenceClass=Setting sql=&quot;SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG IS NULL))&quot;)
+
+note The full stack traces of the exception and its root causes are available in the Payara Server 6.2023.8 #badassfish logs.
+Payara Server 6.2023.8 #badassfish
+</code></pre></div>
+<p>After the DB container is recovered this page persists and the only solution we found to recover the connection is to restart the Dataverse container. Is there any more "elegant" solution we could use to force the connection to be reestablished from the Dataverse side and solve this problem instead of the good old "restart the service" solution?</p>
+
+
+
+<a name="533099809"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533099809" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533099809">(Aug 06 2025 at 13:12)</a>:</h4>
+<p>Well, it's easy enough for me to replicate this! In Docker Desktop I stopped the postgres container and get the same error.</p>
+
+
+
+<a name="533100004"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533100004" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533100004">(Aug 06 2025 at 13:13)</a>:</h4>
+<p>Then I clicked "start" on the postgres container and refreshed my browser.</p>
+<p>Yeah, I see what you mean. Dataverse is still dead in the water. <img alt=":sad-docker:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/1f831097.png" title="sad-docker"></p>
+
+
+
+<a name="533100104"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533100104" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533100104">(Aug 06 2025 at 13:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="622863">@César Ferreira</span> do you feel like creating an issue about this? <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a></p>
+
+
+
+<a name="533103641"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533103641" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533103641">(Aug 06 2025 at 13:31)</a>:</h4>
+<p>This seems related:</p>
+<p>Is there a way to reopen the connection pools to database without needing to restart all server? - <a href="https://github.com/payara/Payara/issues/887">https://github.com/payara/Payara/issues/887</a></p>
+
+
+
+<a name="533103720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533103720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533103720">(Aug 06 2025 at 13:31)</a>:</h4>
+<p>"Use connection checking in the datasource configuration" they say.</p>
+
+
+
+<a name="533104324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533104324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533104324">(Aug 06 2025 at 13:33)</a>:</h4>
+<p>I was creating an issue, but I can take a look on that issue first.</p>
+
+
+
+<a name="533104325"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533104325" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533104325">(Aug 06 2025 at 13:33)</a>:</h4>
+<p>"You can also enable connection validation in the administration console as this will check a connection before handing it out of the pool and if it is broken it will reconnect to the database.</p>
+<p>See <a href="http://blog.payara.fish/an-introduction-to-connection-pools-in-payara-server">http://blog.payara.fish/an-introduction-to-connection-pools-in-payara-server</a> "</p>
+
+
+
+<a name="533104488"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533104488" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533104488">(Aug 06 2025 at 13:34)</a>:</h4>
+<p>Sure, whatever you want.</p>
+
+
+
+<a name="533104567"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533104567" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533104567">(Aug 06 2025 at 13:34)</a>:</h4>
+<p>Also, please note that there is a whole world of database settings we can use: <a href="https://guides.dataverse.org/en/6.7.1/installation/config.html#advanced-database-settings">https://guides.dataverse.org/en/6.7.1/installation/config.html#advanced-database-settings</a></p>
+
+
+
+<a name="533105891"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533105891" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533105891">(Aug 06 2025 at 13:40)</a>:</h4>
+<p>I am using v6.2, but I am currently on the update process of Dataverse to the latest version. Since I am using a custom .war file it will probably take some time until I catch up with v6.7. This could probably be fixed with this setting <code>dataverse.db.is-connection-validation-required</code> then.</p>
+
+
+
+<a name="533107935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533107935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533107935">(Aug 06 2025 at 13:50)</a>:</h4>
+<p>All of those options are available in 6.2 as well: <a href="https://guides.dataverse.org/en/6.2/installation/config.html#advanced-database-settings">https://guides.dataverse.org/en/6.2/installation/config.html#advanced-database-settings</a></p>
+
+
+
+<a name="533108139"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533108139" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533108139">(Aug 06 2025 at 13:51)</a>:</h4>
+<p>OK, good news. I will check that setting then.</p>
+
+
+
+<a name="533124433"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533124433" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533124433">(Aug 06 2025 at 15:11)</a>:</h4>
+<p>After some tests, I got it to work as expected with the following settings and the database connection is now automatically recovered:</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code>asadmin<span class="w"> </span>create-jvm-options<span class="w"> </span><span class="s2">"-Ddataverse.db.is-connection-validation-required=true"</span>
+asadmin<span class="w"> </span>create-jvm-options<span class="w"> </span><span class="s2">"-Ddataverse.db.connection-validation-method=table"</span>
+asadmin<span class="w"> </span>create-jvm-options<span class="w"> </span><span class="s2">"-Ddataverse.db.validation-table-name=setting"</span>
+asadmin<span class="w"> </span>create-jvm-options<span class="w"> </span><span class="s2">"-Ddataverse.db.validate-atmost-once-period-in-seconds=60"</span>
+</code></pre></div>
+<p>I wasn't sure which table I should choose for validation, I guess any table can be chosen for that purpose.<br>
+<span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  Thank you for the support <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="533126598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533126598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533126598">(Aug 06 2025 at 15:23)</a>:</h4>
+<p>The <code>setting</code> table seems fine, I guess. It's pretty fundamental. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> </p>
+<p>I'm glad you got it working! Do you want to add this to the Dataverse documentation somewhere? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="533127787"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533127787" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533127787">(Aug 06 2025 at 15:30)</a>:</h4>
+<p>I think it would be interesting to document this situation as an example. I can look into that tomorrow. Can you send me the instructions on how can I do it? It has been a while since I have contributed to the documentation.</p>
+
+
+
+<a name="533128089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533128089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533128089">(Aug 06 2025 at 15:32)</a>:</h4>
+<p>Sure, here's the latest advice: <a href="https://guides.dataverse.org/en/6.7.1/contributor/documentation.html">https://guides.dataverse.org/en/6.7.1/contributor/documentation.html</a></p>
+
+
+
+<a name="533128676"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533128676" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533128676">(Aug 06 2025 at 15:35)</a>:</h4>
+<p>I guess I would suggest a new section under <a href="https://guides.dataverse.org/en/6.7.1/installation/config.html#database-persistence">https://guides.dataverse.org/en/6.7.1/installation/config.html#database-persistence</a> after "Advanced Database Settings".</p>
+<p>Maybe "Database Configuration Tips"? And then a nested bullet for "Database Connection Recovery" (and then all those details you figured out).</p>
+
+
+
+<a name="533240045"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533240045" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533240045">(Aug 07 2025 at 08:11)</a>:</h4>
+<p>Yes, I could do that.</p>
+
+
+
+<a name="533283016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533283016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533283016">(Aug 07 2025 at 12:30)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/11730">#11730</a> looks great! (Preview at <a href="https://dataverse-guide--11730.org.readthedocs.build/en/11730/installation/config.html#database-configuration-tips">https://dataverse-guide--11730.org.readthedocs.build/en/11730/installation/config.html#database-configuration-tips</a> ). Thanks!</p>
+<p>I left a little feedback, especially about init.d vs configuring it once. Maybe I'm misunderstanding. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="533290069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533290069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533290069">(Aug 07 2025 at 13:12)</a>:</h4>
+<p>I only suggested an init.d script because we are using docker containers and as the project is still under development the container may need to be recreated and in that case the payara configs are lost.</p>
+
+
+
+<a name="533291483"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533291483" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533291483">(Aug 07 2025 at 13:20)</a>:</h4>
+<p>Ok. Maybe it should we worded more generically so the advice can be used by "classic" (non-Docker) installations as well. What do you think?</p>
+
+
+
+<a name="533292369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533292369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533292369">(Aug 07 2025 at 13:24)</a>:</h4>
+<p>Yes, I agree. I will change that to be more generic.</p>
+
+
+
+<a name="533292704"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533292704" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533292704">(Aug 07 2025 at 13:26)</a>:</h4>
+<p>Awesome, thanks!</p>
+
+
+
+<a name="533803861"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533803861" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533803861">(Aug 11 2025 at 14:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="622863">@César Ferreira</span> we merged <a href="https://github.com/IQSS/dataverse/issues/11730">#11730</a>! Thanks!</p>
+
+
+
+<a name="533936011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Database%20connection%20recovery/near/533936011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Database.20connection.20recovery.html#533936011">(Aug 12 2025 at 08:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="622863">César Ferreira</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

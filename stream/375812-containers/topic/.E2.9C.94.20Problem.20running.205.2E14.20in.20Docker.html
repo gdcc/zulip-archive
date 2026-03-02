@@ -1,0 +1,138 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Problem running 5.14 in Docker · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html">✔ Problem running 5.14 in Docker</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="401171424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401171424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401171424">(Nov 09 2023 at 14:48)</a>:</h4>
+<p>We are still on 5.13 but I thought we may upgrade to 5.14 so that we have the awesome docker support out of the box.</p>
+<p>I did this:</p>
+<div class="codehilite"><pre><span></span><code>git checkout v5.14
+mvn -Pct -DskipTests=true clean package
+mvn -Pct docker:run
+</code></pre></div>
+<p>The containers started up but then it failes with this:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt; [#|2023-11-09T14:37:07.003+0000|INFO|Payara 6.2023.8|org.jboss.weld.Bootstrap|_ThreadID=28;_ThreadName=RunLevelControllerThread-1699540613511;_TimeMillis=1699540627003;_LevelValue=800;|
+dev_dataverse&gt;   WELD-000119: Not generating any bean definitions from org.omnifaces.cdi.push.SocketSessionManager because of underlying class loading error: Type javax.websocket.CloseReason$CloseCode not found.  If this is unexpected, enable DEBUG logging to see the full error.|#]
+dev_dataverse&gt;
+dev_dataverse&gt; [#|2023-11-09T14:37:07.011+0000|SEVERE|Payara 6.2023.8|javax.enterprise.system.core|_ThreadID=28;_ThreadName=RunLevelControllerThread-1699540613511;_TimeMillis=1699540627011;_LevelValue=1000;_MessageID=NCLS-CORE-00026;|
+dev_dataverse&gt;   Exception during lifecycle processing
+dev_dataverse&gt; org.glassfish.deployment.common.DeploymentException: CDI deployment failure:javax/faces/component/behavior/ClientBehaviorHolder -- javax/faces/component/behavior/ClientBehaviorHolder
+dev_dataverse&gt;  at java.base/java.lang.ClassLoader.defineClass1(Native Method)
+dev_dataverse&gt;  at java.base/java.lang.ClassLoader.defineClass(Unknown Source)
+dev_dataverse&gt;  at java.base/java.security.SecureClassLoader.defineClass(Unknown Source)
+dev_dataverse&gt;  at org.glassfish.web.loader.WebappClassLoader.defineLoadedClass(WebappClassLoader.java:3504)
+dev_dataverse&gt;  at org.glassfish.web.loader.WebappClassLoader.findClass(WebappClassLoader.java:1246)
+dev_dataverse&gt;  at org.glassfish.web.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1818)
+dev_dataverse&gt;  at org.glassfish.web.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1696)
+dev_dataverse&gt;  at java.base/java.lang.Class.getEnclosingMethod0(Native Method)
+dev_dataverse&gt;  at java.base/java.lang.Class.hasEnclosingMethodInfo(Unknown Source)
+dev_dataverse&gt;  at java.base/java.lang.Class.isLocalOrAnonymousClass(Unknown Source)
+dev_dataverse&gt;  at java.base/java.lang.Class.isAnonymousClass(Unknown Source)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.AnnotatedTypeLoader.internalLoadAnnotatedType(AnnotatedTypeLoader.java:92)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.AnnotatedTypeLoader.loadAnnotatedType(AnnotatedTypeLoader.java:75)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.BeanDeployer.addClass(BeanDeployer.java:92)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.BeanDeployer.addLoadedClasses(BeanDeployer.java:199)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.BeanDeployment.createClasses(BeanDeployment.java:197)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.WeldStartup.startInitialization(WeldStartup.java:409)
+dev_dataverse&gt;  at org.jboss.weld.bootstrap.WeldBootstrap.startInitialization(WeldBootstrap.java:80)
+dev_dataverse&gt;  at org.glassfish.weld.WeldDeployer.processApplicationLoaded(WeldDeployer.java:579)
+dev_dataverse&gt;  at org.glassfish.weld.WeldDeployer.event(WeldDeployer.java:437)
+dev_dataverse&gt;  at org.glassfish.kernel.event.EventsImpl.send(EventsImpl.java:131)
+dev_dataverse&gt;  at org.glassfish.internal.data.ApplicationInfo.load(ApplicationInfo.java:344)
+dev_dataverse&gt;  at com.sun.enterprise.v3.server.ApplicationLifecycle.prepare(ApplicationLifecycle.java:580)
+dev_dataverse&gt;  at org.glassfish.deployment.admin.DeployCommand.execute(DeployCommand.java:570)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$2$1.run(CommandRunnerImpl.java:556)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$2$1.run(CommandRunnerImpl.java:552)
+dev_dataverse&gt;  at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+dev_dataverse&gt;  at java.base/javax.security.auth.Subject.doAs(Unknown Source)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$2.execute(CommandRunnerImpl.java:551)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$3.run(CommandRunnerImpl.java:582)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$3.run(CommandRunnerImpl.java:574)
+dev_dataverse&gt;  at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+dev_dataverse&gt;  at java.base/javax.security.auth.Subject.doAs(Unknown Source)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl.doCommand(CommandRunnerImpl.java:573)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl.doCommand(CommandRunnerImpl.java:1497)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$ExecutionContext.execute(CommandRunnerImpl.java:1879)
+dev_dataverse&gt;  at com.sun.enterprise.v3.admin.CommandRunnerImpl$ExecutionContext.execute(CommandRunnerImpl.java:1755)
+dev_dataverse&gt;  at com.sun.enterprise.admin.cli.embeddable.CommandExecutorImpl.executeCommand(CommandExecutorImpl.java:183)
+dev_dataverse&gt;  at com.sun.enterprise.admin.cli.embeddable.CommandExecutorImpl.run(CommandExecutorImpl.java:96)
+dev_dataverse&gt;  at fish.payara.boot.runtime.BootCommand.execute(BootCommand.java:69)
+dev_dataverse&gt;  at fish.payara.boot.runtime.BootCommands.executeCommands(BootCommands.java:166)
+dev_dataverse&gt;  at fish.payara.boot.runtime.BootCommands.executeCommands(BootCommands.java:160)
+dev_dataverse&gt;  at com.sun.enterprise.v3.bootstrap.BootCommandService.doBootCommands(BootCommandService.java:81)
+dev_dataverse&gt;  at com.sun.enterprise.v3.bootstrap.BootCommandService.postConstruct(BootCommandService.java:91)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.ClazzCreator.postConstructMe(ClazzCreator.java:303)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.ClazzCreator.create(ClazzCreator.java:351)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.SystemDescriptor.create(SystemDescriptor.java:466)
+dev_dataverse&gt;  at org.glassfish.hk2.runlevel.internal.AsyncRunLevelContext.findOrCreate(AsyncRunLevelContext.java:281)
+dev_dataverse&gt;  at org.glassfish.hk2.runlevel.RunLevelContext.findOrCreate(RunLevelContext.java:65)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.Utilities.createService(Utilities.java:2103)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.ServiceHandleImpl.getService(ServiceHandleImpl.java:93)
+dev_dataverse&gt;  at org.jvnet.hk2.internal.ServiceHandleImpl.getService(ServiceHandleImpl.java:67)
+dev_dataverse&gt;  at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$QueueRunner.oneJob(CurrentTaskFuture.java:1213)
+dev_dataverse&gt;  at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$QueueRunner.run(CurrentTaskFuture.java:1144)
+dev_dataverse&gt;  at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$UpOneLevel.run(CurrentTaskFuture.java:762)
+dev_dataverse&gt;  at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+dev_dataverse&gt;  at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+dev_dataverse&gt;  at java.base/java.lang.Thread.run(Unknown Source)
+dev_dataverse&gt; |#]
+dev_dataverse&gt;
+</code></pre></div>
+<p>I think the problem is that it runs Payara 6.2023.8 while the 5.14 version actually is for <code>5.2022.3</code> (based on modules/dataverse-parent/pom.xml)</p>
+<p>The docker build scripts probably take the latest version of Payara that's why we end up with 6.2023.8.</p>
+<p>Can you please help me where I could set an explicit version of Payara to be installed in the container? I just couldn't find it anywhere.</p>
+
+
+
+<a name="401179663"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401179663" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401179663">(Nov 09 2023 at 15:27)</a>:</h4>
+<p>I found this issue of Phil with a similar bug:</p>
+<p><a href="https://github.com/IQSS/dataverse/issues/9749">https://github.com/IQSS/dataverse/issues/9749</a></p>
+<p>So, it may not be related to the Payara version as it was 5.2022.5 in the issue.</p>
+
+
+
+<a name="401181074"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401181074" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401181074">(Nov 09 2023 at 15:34)</a>:</h4>
+<p>As we said in the call, please check your base image and let us know if it helps!</p>
+
+
+
+<a name="401184467"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401184467" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401184467">(Nov 09 2023 at 15:51)</a>:</h4>
+<p>Yes, it was the base image. So, the best way to do is:</p>
+<div class="codehilite"><pre><span></span><code>git checkout v5.14
+mvn -Pct -f modules/container-base install
+mvn -Pct clean package
+mvn -Pct docker:run
+</code></pre></div>
+
+
+
+<a name="401186128"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401186128" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401186128">(Nov 09 2023 at 15:59)</a>:</h4>
+<p>Ah, I see you mentioned the fix here too: <a href="https://github.com/IQSS/dataverse/issues/9749#issuecomment-1804095033">https://github.com/IQSS/dataverse/issues/9749#issuecomment-1804095033</a></p>
+
+
+
+<a name="401186139"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401186139" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401186139">(Nov 09 2023 at 15:59)</a>:</h4>
+<p>Thanks!</p>
+
+
+
+<a name="401228141"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Problem%20running%205.14%20in%20Docker/near/401228141" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Problem.20running.205.2E14.20in.20Docker.html#401228141">(Nov 09 2023 at 20:06)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="602497">Balázs Pataki</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

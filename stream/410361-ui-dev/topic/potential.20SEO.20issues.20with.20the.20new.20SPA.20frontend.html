@@ -1,0 +1,270 @@
+<html>
+<head><meta charset="utf-8"><title>potential SEO issues with the new SPA frontend · ui-dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/index.html">ui-dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html">potential SEO issues with the new SPA frontend</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="540000696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540000696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540000696">(Sep 17 2025 at 12:22)</a>:</h4>
+<p>While exploring the new Dataverse Single Page Application (SPA), I came across a potential issue with the technology stack (React on the frontend and the Dataverse API on the backend). It seems there may be challenges with search engine visibility, likely due to slower page load times and the fact that key content is only rendered after asynchronous data loading. As a result, search crawlers may index incomplete pages, which negatively impacts SEO. We’ve looked into a few approaches, but so far there doesn’t appear to be a straightforward solution within the current stack.</p>
+<p>To address this and improve both user experience and search engine performance, it seems that a more substantial change may be required. One option we’re considering is a migration to Next.js with Incremental Static Regeneration (ISR), as it offers stronger support for server-side rendering, caching, and SEO.</p>
+<p>What are your thoughts on this approach?</p>
+
+
+
+<a name="540028355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540028355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Germán Saracca <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540028355">(Sep 17 2025 at 14:20)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="617722">@Johannes D</span> , I agree, current stack won't be probably SEO friendly. </p>
+<p>I believe most pages in the Dataverse Project should use SSR (server-side rendering) since the content changes frequently. ISR is better suited for updating static pages without needing a redeploy, i.e., pages generated at build time. Generating collection(dataverses), dataset, or file pages at build time could also take a very long time, since an installation may contain thousands of them. At the moment, I can’t think of any Dataverse pages that would really benefit from being generated at build time, though it might be different in your case. What do you think?</p>
+<p>On the other hand, there’s this whole tricky thing with client-side vs. server-side React apps... the <code>use client</code> directive, javascript hydration issues, and all that. I’m not sure we really need to server-side render the entire page. Maybe just generating solid headers with the collection, dataset, or file data on the server could give us the SEO benefits (really easy with NextJS), while the rest of the page stays client-only without needing big changes to the React code.</p>
+
+
+
+<a name="540028382"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540028382" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540028382">(Sep 17 2025 at 14:21)</a>:</h4>
+<p>A (longish) while ago I had been raising similar concerns with <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> . My idea at the time was to do some server side rendering and include the necessary SEO bits etc. This would probably require adding another exporter for HTML and adding a JAX-RS endpoint to accept text/html queries and sending a proper response. This way all of this stuff can co-exist.</p>
+<p>The current exporters already allows us to cache rendered results, so it will probably be faster than current JSF pages. So this would at least help with indexing of datasets. Collections might need some more infrastructure (as we currently don't export them), but this seems very doable as well. (There have been request before about exports for collections, too)</p>
+<p>Also, the sitemaps would need to be updated to route search engine crawlers to the JAX-RS endpoints, as the JSF pages will be gone. If we this gives us too much trouble, we can try a hybrid approach and send the cached stuff over the wire and let the SPA kick off from there.</p>
+
+
+
+<a name="540150037"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540150037" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540150037">(Sep 18 2025 at 05:41)</a>:</h4>
+<p>So migration from classic plain react to next.js with server-side-rendering of some pages would be the suggested foreseen solution (roadmap)?</p>
+
+
+
+<a name="540153119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540153119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540153119">(Sep 18 2025 at 06:15)</a>:</h4>
+<p>I'm not sure switching from React to Next.js is necessary. React also supports server side rendering, but I don't have enough expertise to tell if it is flexible enough to accomodate our special needs.</p>
+
+
+
+<a name="540160838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540160838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540160838">(Sep 18 2025 at 07:13)</a>:</h4>
+<p>You are totally right, yet we need some engine that executes the serverside code parts (either pure node.js, express or someother framework). <a href="https://github.com/bluwy/create-vite-extra/blob/master/template-ssr-react/server.js">Here</a> is one of the vites (the current build system) examples on SSR with express. I personally would like to avoid to manage/develop with those lowlevel API calls. Hence, I suggested next.js...</p>
+
+
+
+<a name="540161680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540161680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540161680">(Sep 18 2025 at 07:18)</a>:</h4>
+<p>Oh wait - I misunderstood your question. I don't think the engine will be a problem at all - we do have the Java backend code that is perfectly fine to do the server side rendering, caching etc! No need to involve new tech there. As I said above, we don't necessarily have to maintain the JSF code, depending on how we approach this.</p>
+
+
+
+<a name="540168312"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540168312" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540168312">(Sep 18 2025 at 07:52)</a>:</h4>
+<p>So to explain in a bit more detail what I'm suggesting we could explore...</p>
+<h3><strong>Architecture Overview</strong></h3>
+<ol>
+<li><strong>SEO-optimized JAX-RS endpoints</strong> serve minimal HTML with critical SEO data</li>
+<li><strong>React SPA takes over</strong> after initial page load for dynamic functionality</li>
+<li><strong>Shared JSON API</strong> serves data to both server-rendered pages and client-side app</li>
+</ol>
+<h2><strong>Implementation Strategy</strong></h2>
+<h3><strong>1. JAX-RS HTML Endpoints</strong></h3>
+<p>In the interest of keeping the URLs for SPA and SEO the same, we can easily use content negotiation and serve either HTML or JSON depending on who's asking.</p>
+<div class="codehilite" data-code-language="Java"><pre><span></span><code><span class="nd">@Path</span><span class="p">(</span><span class="s">"/dataset"</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DatasetResource</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@GET</span>
+<span class="w">    </span><span class="nd">@Path</span><span class="p">(</span><span class="s">"/{id}"</span><span class="p">)</span>
+<span class="w">    </span><span class="nd">@Produces</span><span class="p">(</span><span class="n">MediaType</span><span class="p">.</span><span class="na">TEXT_HTML</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">getDatasetPage</span><span class="p">(</span><span class="nd">@PathParam</span><span class="p">(</span><span class="s">"id"</span><span class="p">)</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">,</span>
+<span class="w">                                   </span><span class="nd">@Context</span><span class="w"> </span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Dataset</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datasetService</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dataset</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">dataset</span><span class="p">.</span><span class="na">isPublic</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="mi">404</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seoTemplateService</span><span class="p">.</span><span class="na">generateDatasetHTML</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span><span class="w"> </span><span class="n">request</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+<span class="w">                </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">"Cache-Control"</span><span class="p">,</span><span class="w"> </span><span class="s">"public, max-age=3600"</span><span class="p">)</span>
+<span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@GET</span>
+<span class="w">    </span><span class="nd">@Path</span><span class="p">(</span><span class="s">"/{id}"</span><span class="p">)</span>
+<span class="w">    </span><span class="nd">@Produces</span><span class="p">(</span><span class="n">MediaType</span><span class="p">.</span><span class="na">APPLICATION_JSON</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Response</span><span class="w"> </span><span class="nf">getDatasetData</span><span class="p">(</span><span class="nd">@PathParam</span><span class="p">(</span><span class="s">"id"</span><span class="p">)</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Dataset</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">datasetService</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dataset</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">dataset</span><span class="p">.</span><span class="na">isPublic</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="mi">404</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Response</span><span class="p">.</span><span class="na">ok</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="w">                </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">"Cache-Control"</span><span class="p">,</span><span class="w"> </span><span class="s">"public, max-age=1800"</span><span class="p">)</span>
+<span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3><strong>2. Minimal HTML Template</strong></h3>
+<p>The JAX-RS endpoints would return something like he below. We can use our exporters and create a new HTML one. This will be updated on any changes to datasets. Of course we'd need to discuss how to go about stuff like files and collections, but this is an implementation detail.</p>
+<div class="codehilite" data-code-language="HTML"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Dataset: Climate Data 2023 | Dataverse<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">"description"</span> <span class="na">content</span><span class="o">=</span><span class="s">"Comprehensive climate dataset with temperature and precipitation data..."</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">"og:title"</span> <span class="na">content</span><span class="o">=</span><span class="s">"Climate Data 2023"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">"og:description"</span> <span class="na">content</span><span class="o">=</span><span class="s">"..."</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">"og:url"</span> <span class="na">content</span><span class="o">=</span><span class="s">"https://yoursite.com/dataset/123"</span><span class="p">&gt;</span>
+    <span class="cm">&lt;!-- JSON-LD Structured Data --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">"application/ld+json"</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="s2">"@context"</span><span class="o">:</span><span class="w"> </span><span class="s2">"https://schema.org/"</span><span class="p">,</span><span class="w">        </span><span class="s2">"@type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"Dataset"</span><span class="p">,</span><span class="w">        </span><span class="s2">"name"</span><span class="o">:</span><span class="w"> </span><span class="s2">"Climate Data 2023"</span><span class="p">,</span><span class="w">        </span><span class="s2">"description"</span><span class="o">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span><span class="w">        </span><span class="s2">"creator"</span><span class="o">:</span><span class="w"> </span><span class="p">{...}</span><span class="w">    </span><span class="p">}</span><span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="cm">&lt;!-- React App Scripts --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/static/js/app.js"</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"root"</span><span class="p">&gt;</span>
+        <span class="cm">&lt;!-- Minimal loading content or skeleton --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"loading-skeleton"</span><span class="p">&gt;</span>Loading dataset...<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>    <span class="cm">&lt;!-- Hydration data for React --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="nb">window</span><span class="p">.</span><span class="nx">__INITIAL_DATA__</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s2">"datasetId"</span><span class="o">:</span><span class="w"> </span><span class="mf">123</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"route"</span><span class="o">:</span><span class="w"> </span><span class="s2">"/dataset/123"</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<h3>3. <strong><span aria-label="check" class="emoji emoji-2705" role="img" title="check">:check:</span> Advantages</strong></h3>
+<ol>
+<li><strong>Leverage existing infrastructure</strong> - Use the current JAX-RS setup</li>
+<li><strong>Minimal server overhead</strong> - Only render SEO-critical data</li>
+<li><strong>Fast client-side experience</strong> - React SPA handles all user interactions, rendering all the hard bits with editing etc</li>
+<li><strong>Gradual implementation</strong> - Roll out page by page</li>
+<li><strong>Shared API logic</strong> - Same JAX-RS services for both SEO and SPA endpoints</li>
+</ol>
+<h3>4. <strong><span aria-label="warning" class="emoji emoji-26a0" role="img" title="warning">:warning:</span> Considerations</strong></h3>
+<ol>
+<li><strong>Duplicate routing logic</strong> - Maintain routes in both JAX-RS and React Router. But to be fair: we don't have a ton of routes for SEO display purposes, so this should be fairly simple.</li>
+<li><strong>Cache invalidation</strong> - Keep SEO HTML in sync with data changes. This is already the case if we follow the exporter pattern already in place. But it needs work for files and collections.</li>
+<li><strong>URL strategy</strong> - Decide how to handle URL routing between systems. It would be good to have the exact same URLs for the sake of SEO.</li>
+</ol>
+
+
+
+<a name="540206369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540206369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540206369">(Sep 18 2025 at 11:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I like your thought about exporters. All our export formats (Croissant, DataCite, etc.) are updated every time a dataset is published so perhaps we could use that latest, static, public data (JSON or XML) to render and cache some SEO-friendly HTML to serve up to search engines.</p>
+
+
+
+<a name="540209262"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540209262" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540209262">(Sep 18 2025 at 11:30)</a>:</h4>
+<p>Doing it slightly more fancy by exporting CSS etc from the React SPA built would even allow to style it somewhat. If you browse with default deactivated JS on the web like me you see a lot of these pages where they either just have a simple "activate JS" or even a static, styled export of the site.</p>
+
+
+
+<a name="540209382"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540209382" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540209382">(Sep 18 2025 at 11:31)</a>:</h4>
+<p>This approach works and provides an elegant solution with a tightly coupled integration of frontend and backend logic/code paths. An alternative would be to establish a clear separation, using Java strictly as an API-only backend and implementing a completely separate frontend stack for all web UI functionality. Both approaches have their advantages and drawbacks. Ultimately, it comes down to making a decision on the stack and roadmaps.</p>
+<p>I’m not sure how well a page with only <code>&lt;head&gt;</code> markup (and no matching visible content) would rank in SEO. A few years ago, it was important that the metadata values also appeared in the visible content for better scoring.</p>
+
+
+
+<a name="540210249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540210249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540210249">(Sep 18 2025 at 11:35)</a>:</h4>
+<p>I completely agree about making content on the static page available. Which is why we can simply extend the pre-rendered HTML from the exporter to include more details. As we are talking exporters, you can even simply create your own customized variant if need be, as you can load your own as a plugin.</p>
+<p>This also has the advantage that someone can explore at least browsing the data with deactivated JavaScript. Personally I hate websites that just give me a plain text string that I need to activate javascript or even worse, show me  an empty page.</p>
+
+
+
+<a name="540229765"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540229765" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540229765">(Sep 18 2025 at 13:10)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="617722">Johannes D</span> <a href="#narrow/channel/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend/near/540000696">said</a>:</p>
+<blockquote>
+<p>It seems there may be challenges with search engine visibility, likely due to slower page load times and the fact that key content is only rendered after asynchronous data loading.</p>
+</blockquote>
+<p>Are we able to measure these? How slow is the page load? Does async data loading matter (and how much)?</p>
+
+
+
+<a name="540232420"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540232420" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540232420">(Sep 18 2025 at 13:22)</a>:</h4>
+<p>It's all measurable. But it will require more sophisticated tooling and code changes.</p>
+<p>Observability is a huge thing these days. It allows you to track requests coming from somewhere (e.g. the SPA) being tracked along the way in the application. You can use the request and include it in logging contexts (but we'd need to move away from JUL for this).</p>
+<p>With Microprofile there's also a standardized way to define measurements and metrics, that can be collected with appropriate tooling.</p>
+<p>And of course there's Open Telemetry these days, allowing you to have a standardized way to package and ship all of these things.</p>
+<p>I would be glad to see all of this implemented, but I'm afraid it'll take a whole FTE for a year just to get this done properly.</p>
+
+
+
+<a name="540233630"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/540233630" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#540233630">(Sep 18 2025 at 13:27)</a>:</h4>
+<p>I'm just wondering if speeding up the page will help. Like <span class="user-mention" data-user-id="617722">@Johannes D</span> said, that would "improve both user experience and search engine performance". But it would be nice to measure it somehow.</p>
+
+
+
+<a name="543262042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543262042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543262042">(Oct 06 2025 at 09:33)</a>:</h4>
+<p>There’s no real need to implement a complex measurement system to assess performance. Instead, you can use the SEO debugging tools provided by Google, Bing, or other search engines to verify whether the correct metadata is being retrieved.</p>
+<p>The issue lies primarily in the crawling techniques used. Simple crawlers do not execute JavaScript at all, which means you can easily debug them using basic <code>curl</code> commands. More sophisticated crawlers, however, do execute JavaScript—but only for a limited amount of time before processing the resulting HTML. Since we don’t know the exact timeout duration, our best approach is to ensure that the page renders quickly enough and then verify whether major search engines or AI services are correctly retrieving the intended content.</p>
+<p>We should consider drafting an Architecture Decision Record (ADR) to outline the chosen strategy for SEO optimization. Such an ADR would define the context, the options evaluated (e.g., client-side rendering, pre-rendering, server-side rendering), the selected approach, and the rationale behind it. I believe this is the right time to discuss the topic, as the SPA has now reached a sufficient level of maturity to make an informed and sustainable decision.</p>
+
+
+
+<a name="543316115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543316115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543316115">(Oct 06 2025 at 13:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="617722">@Johannes D</span> sure, I agree it makes sense to use SEO debugging tools but before that shouldn't some basic steps be taken such as setting up sitemap so that search engines can more easily crawl the site?</p>
+
+
+
+<a name="543332202"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543332202" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543332202">(Oct 06 2025 at 14:31)</a>:</h4>
+<p>Does the API backend generate the sitemap? If so, it seems that the routes are defined twice — once in the Java backend and once in the SPA code. If that’s the case, then the approach suggested by Oliver is the right way to go and will most likely resolve the SEO issue.</p>
+<p>However, the SPA architecture should also account for the fact that some information is/or could already present in the initial HTML markup, meaning a REST call or lookup is unnecessary. This interweaving between the backend and SPA should be implemented and tested early on to ensure consistent behavior and to avoid redundant data fetching later in the development process.</p>
+<p>Concerning the sitemap: Yes, but  if no information can be obtained from the linked pages nothing gets indexed.</p>
+
+
+
+<a name="543332428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543332428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543332428">(Oct 06 2025 at 14:32)</a>:</h4>
+<p>Yes, the backend creates the sitemap and only for JSF pages: <a href="https://guides.dataverse.org/en/6.8/installation/config.html#creating-a-sitemap-and-submitting-it-to-search-engines">https://guides.dataverse.org/en/6.8/installation/config.html#creating-a-sitemap-and-submitting-it-to-search-engines</a></p>
+
+
+
+<a name="543332734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543332734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543332734">(Oct 06 2025 at 14:33)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend/near/543332428">said</a>:</p>
+<blockquote>
+<p>Yes, the backend creates the sitemap and only for JSF pages: <a href="https://guides.dataverse.org/en/6.8/installation/config.html#creating-a-sitemap-and-submitting-it-to-search-engines">https://guides.dataverse.org/en/6.8/installation/config.html#creating-a-sitemap-and-submitting-it-to-search-engines</a></p>
+</blockquote>
+<p>Is the same process planned for the SPA?</p>
+
+
+
+<a name="543333306"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543333306" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543333306">(Oct 06 2025 at 14:36)</a>:</h4>
+<p>I'm not aware of any specific plan but obviously when JSF is removed completely it doesn't sense to have entries in a sitemap pointing to pages that don't exist.</p>
+<p>So the sitemap generation needs to be reworked at some point.</p>
+
+
+
+<a name="543333363"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543333363" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543333363">(Oct 06 2025 at 14:36)</a>:</h4>
+<p>Do you create a sitemap?</p>
+
+
+
+<a name="543337248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543337248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Johannes D <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543337248">(Oct 06 2025 at 14:50)</a>:</h4>
+<p>Nope, this whole SEO issue is still open...</p>
+
+
+
+<a name="543338527"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/potential%20SEO%20issues%20with%20the%20new%20SPA%20frontend/near/543338527" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/potential.20SEO.20issues.20with.20the.20new.20SPA.20frontend.html#543338527">(Oct 06 2025 at 14:55)</a>:</h4>
+<p>Well, the SEO debugging tools from Google, for example, will probably work better if you submit a sitemap to them.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

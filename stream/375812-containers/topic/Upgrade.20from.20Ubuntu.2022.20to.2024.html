@@ -1,0 +1,407 @@
+<html>
+<head><meta charset="utf-8"><title>Upgrade from Ubuntu 22 to 24 · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html">Upgrade from Ubuntu 22 to 24</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="453771298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453771298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453771298">(Jul 24 2024 at 18:41)</a>:</h4>
+<p>Huh, I'm getting a crazy error at <a href="https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721">https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721</a></p>
+
+
+
+<a name="453771318"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453771318" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453771318">(Jul 24 2024 at 18:41)</a>:</h4>
+<p><code>[INFO] DOCKER&gt; ERROR: failed to solve: process "/bin/bash -euo pipefail -c # Create pathes\n mkdir -p \"${HOME_DIR}\" \"${PAYARA_DIR}\" \"${DEPLOY_DIR}\" \"${CONFIG_DIR}\" \"${SCRIPT_DIR}\"\n mkdir -p \"${STORAGE_DIR}\" \"${SECRETS_DIR}\" \"${DUMPS_DIR}\"\n # Create user\n addgroup --gid ${GID} payara\n adduser --system --uid ${UID} --no-create-home --shell /bin/bash --home \"${HOME_DIR}\" --gecos \"\" --ingroup payara payara\n echo payara:payara | chpasswd\n # Set permissions\n # Note: Following OpenShift best practices for arbitrary user id support:\n # https://docs.openshift.com/container-platform/4.14/openshift_images/create-images.html#use-uid_create-images\n chown -R payara:0 \"${HOME_DIR}\" \"${STORAGE_DIR}\" \"${SECRETS_DIR}\" \"${DUMPS_DIR}\"\n chmod -R g=u \"${HOME_DIR}\" \"${STORAGE_DIR}\" \"${SECRETS_DIR}\" \"${DUMPS_DIR}\"\n\n" did not complete successfully: exit code: 127</code></p>
+
+
+
+<a name="453771368"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453771368" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453771368">(Jul 24 2024 at 18:41)</a>:</h4>
+<p>This is a new one on me. Any ideas? I'm not doing anything Docker-related in PR <a href="https://github.com/IQSS/dataverse/issues/10721">#10721</a>.</p>
+
+
+
+<a name="453777541"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453777541" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453777541">(Jul 24 2024 at 19:20)</a>:</h4>
+<p>I get the same error when I run <code>mvn -f modules/container-base -Pct package</code> on a Rocky 8 box.</p>
+
+
+
+<a name="453779073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453779073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453779073">(Jul 24 2024 at 19:28)</a>:</h4>
+<p>If I remove all the "RUN &lt;&lt;EOF" stanzas I can build the base image but I have a feeling we need them. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="453781275"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453781275" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453781275">(Jul 24 2024 at 19:42)</a>:</h4>
+<p>From this file, I mean:</p>
+<p>modules/container-base/src/main/docker/Dockerfile</p>
+
+
+
+<a name="453781355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453781355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453781355">(Jul 24 2024 at 19:43)</a>:</h4>
+<p>For the first stanza, if I delete several lines at the end, it works:</p>
+<div class="codehilite"><pre><span></span><code>RUN &lt;&lt;EOF
+    # Create pathes
+    mkdir -p &quot;${HOME_DIR}&quot; &quot;${PAYARA_DIR}&quot; &quot;${DEPLOY_DIR}&quot; &quot;${CONFIG_DIR}&quot; &quot;${SCRIPT_DIR}&quot;
+    mkdir -p &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;
+    # Create user
+
+EOF
+</code></pre></div>
+
+
+
+<a name="453781637"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453781637" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453781637">(Jul 24 2024 at 19:45)</a>:</h4>
+<p>The next line is this:</p>
+<div class="codehilite"><pre><span></span><code>addgroup --gid ${GID} payara
+</code></pre></div>
+<p>And come to think of it, <a href="https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721">https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721</a> does say <code>[INFO] DOCKER&gt; 0.711 /bin/bash: line 5: addgroup: command not found</code> <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="453781952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453781952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453781952">(Jul 24 2024 at 19:47)</a>:</h4>
+<p>Hmm... "[Bug]: Error building with temurin-17: adduser not found" - <a href="https://github.com/adoptium/containers/issues/606">https://github.com/adoptium/containers/issues/606</a></p>
+
+
+
+<a name="453781996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453781996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453781996">(Jul 24 2024 at 19:47)</a>:</h4>
+<p>"From what I understand, <a href="https://github.com/adoptium/containers/commit/d762761bff59ad4ee3bacf89050e2081e5464c65">this commit</a> from 2 week ago changed the default base image from Ubuntu focal (20.04) to Ubuntu noble (24.04).</p>
+<p>The official <code>ubuntu:focal</code> image used to have <code>useradd</code> installed by default, but <code>ubuntu:noble</code> does not:"</p>
+
+
+
+<a name="453783738"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453783738" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453783738">(Jul 24 2024 at 19:59)</a>:</h4>
+<p>Hmm, you'd think this would fix it but I'm still getting Ubuntu 24:</p>
+<div class="codehilite"><pre><span></span><code>$ git diff
+diff --git a/modules/container-base/src/main/docker/Dockerfile b/modules/container-base/src/main/docker/Dockerfile
+index 93f9fa4f0c..4e03b3ee94 100644
+--- a/modules/container-base/src/main/docker/Dockerfile
++++ b/modules/container-base/src/main/docker/Dockerfile
+@@ -22,7 +22,7 @@
+  # Make the Java base image and version configurable (useful for trying newer Java versions and flavors)
+-ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre&quot;
++ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre-focal&quot;
+ FROM $JAVA_IMAGE
+ ```
+</code></pre></div>
+
+
+
+<a name="453785471"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453785471" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453785471">(Jul 24 2024 at 20:07)</a>:</h4>
+<p>This works:</p>
+<div class="codehilite"><pre><span></span><code>-ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre&quot;
+-FROM $JAVA_IMAGE
++FROM eclipse-temurin:17-jre-focal
+</code></pre></div>
+
+
+
+<a name="453785538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453785538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453785538">(Jul 24 2024 at 20:08)</a>:</h4>
+<p>But I'm not sure why I can't just change the env variable.</p>
+
+
+
+<a name="453789691"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453789691" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453789691">(Jul 24 2024 at 20:26)</a>:</h4>
+<p>I created an issue: Upgrade from Ubuntu 22 to 24 breaks container images <a href="https://github.com/IQSS/dataverse/issues/10722">#10722</a></p>
+
+
+
+<a name="453792546"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453792546" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453792546">(Jul 24 2024 at 20:42)</a>:</h4>
+<p>I went ahead and pushed some fixes into this PR, which I renamed:</p>
+<p>add local_lib mvn repo and primefaces themes, pin base image to Ubuntu 22 <a href="https://github.com/IQSS/dataverse/issues/10721">#10721</a></p>
+
+
+
+<a name="453947672"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453947672" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453947672">(Jul 25 2024 at 13:21)</a>:</h4>
+<p>I closed that PR <a href="https://github.com/IQSS/dataverse/issues/10721">#10721</a> and am focusing on this one instead:</p>
+<p>Security optimizations for the container base image <a href="https://github.com/IQSS/dataverse/issues/10672">#10672</a></p>
+
+
+
+<a name="453947816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453947816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453947816">(Jul 25 2024 at 13:22)</a>:</h4>
+<p>However, I'm getting a weird error: <code>[ERROR] DOCKER&gt; Unable to inspect image [solr:] : {"message":"invalid reference format"} (Bad Request: 400) [{"message":"invalid reference format"} (Bad Request: 400)]</code></p>
+<p>More lines of output at <a href="https://github.com/IQSS/dataverse/pull/10672#issuecomment-2250307844">https://github.com/IQSS/dataverse/pull/10672#issuecomment-2250307844</a></p>
+
+
+
+<a name="453947862"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453947862" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453947862">(Jul 25 2024 at 13:22)</a>:</h4>
+<p>There is a tag missing</p>
+
+
+
+<a name="453948044"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453948044" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453948044">(Jul 25 2024 at 13:23)</a>:</h4>
+<p>Oh. Did I do something wrong?</p>
+
+
+
+<a name="453948073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453948073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453948073">(Jul 25 2024 at 13:23)</a>:</h4>
+<p>Not sure... <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="453948685"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453948685" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453948685">(Jul 25 2024 at 13:26)</a>:</h4>
+<p>Nope, fails here too.</p>
+
+
+
+<a name="453948696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453948696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453948696">(Jul 25 2024 at 13:26)</a>:</h4>
+<p>Let me check</p>
+
+
+
+<a name="453948950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453948950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453948950">(Jul 25 2024 at 13:27)</a>:</h4>
+<p>That's odd - it doesn't push the tag into the configbaker build...</p>
+
+
+
+<a name="453949108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Kris Dekeyser (KU Leuven) <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949108">(Jul 25 2024 at 13:28)</a>:</h4>
+<p>If changing the ARG value does not work, you may be calling docker build with a --buildarg argument overriding your default setting in the Dockerfile.</p>
+
+
+
+<a name="453949200"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949200" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949200">(Jul 25 2024 at 13:28)</a>:</h4>
+<p>I think there was an upstream issue about this... Let me go look</p>
+
+
+
+<a name="453949301"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949301" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949301">(Jul 25 2024 at 13:28)</a>:</h4>
+<p><a href="https://github.com/fabric8io/docker-maven-plugin/issues/1800">https://github.com/fabric8io/docker-maven-plugin/issues/1800</a></p>
+
+
+
+<a name="453949359"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949359" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949359">(Jul 25 2024 at 13:29)</a>:</h4>
+<p>Merged 5 days ago...</p>
+
+
+
+<a name="453949538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949538">(Jul 25 2024 at 13:29)</a>:</h4>
+<p><a href="https://github.com/fabric8io/docker-maven-plugin/issues/1776">https://github.com/fabric8io/docker-maven-plugin/issues/1776</a></p>
+
+
+
+<a name="453949599"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949599" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949599">(Jul 25 2024 at 13:30)</a>:</h4>
+<p>Closes a while ago as fixed, but missing a release...</p>
+
+
+
+<a name="453949757"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949757" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949757">(Jul 25 2024 at 13:30)</a>:</h4>
+<p>And still no newer release... <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="453949924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453949924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453949924">(Jul 25 2024 at 13:31)</a>:</h4>
+<p>So maybe we downgrade to 0.43.4 again and tell people to use the 0.45-SNAPSHOT if they run into the driver flag problem?</p>
+
+
+
+<a name="453956461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453956461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453956461">(Jul 25 2024 at 13:54)</a>:</h4>
+<p>We talked about this during the containerization meeting: <a href="https://docs.google.com/document/d/13Zxg_iFiTOYfIJkUSmb7ytL-OeIc2vPGCuoOvtPAd6w/">https://docs.google.com/document/d/13Zxg_iFiTOYfIJkUSmb7ytL-OeIc2vPGCuoOvtPAd6w/</a></p>
+
+
+
+<a name="453957371"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453957371" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453957371">(Jul 25 2024 at 13:58)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> it is possible to auto-active a profile just for Macs. Put the links in the meeting notes doc</p>
+
+
+
+<a name="453967010"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453967010" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453967010">(Jul 25 2024 at 14:38)</a>:</h4>
+<p>Thanks!</p>
+
+
+
+<a name="453996452"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453996452" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453996452">(Jul 25 2024 at 16:31)</a>:</h4>
+<p>Ok, I merged <a href="https://github.com/IQSS/dataverse/issues/10672">#10672</a>.</p>
+
+
+
+<a name="453996713"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453996713" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453996713">(Jul 25 2024 at 16:32)</a>:</h4>
+<p>Before doing so I put docker maven plugin back to version it was before I messed with it.</p>
+
+
+
+<a name="453996839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/453996839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#453996839">(Jul 25 2024 at 16:33)</a>:</h4>
+<p>I tested on Rocky 8. Let's worry about Macs in some other effort.</p>
+
+
+
+<a name="454519538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454519538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454519538">(Jul 27 2024 at 19:39)</a>:</h4>
+<p>DMP 0.45 is out. <a href="https://github.com/fabric8io/docker-maven-plugin/releases/tag/v0.45.0">https://github.com/fabric8io/docker-maven-plugin/releases/tag/v0.45.0</a></p>
+
+
+
+<a name="454519584"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454519584" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454519584">(Jul 27 2024 at 19:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> do you want to give it a shot on your Mac?</p>
+
+
+
+<a name="454519642"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454519642" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454519642">(Jul 27 2024 at 19:39)</a>:</h4>
+<p>Then we can maybe FastTrack an update of the plugin</p>
+
+
+
+<a name="454816609"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454816609" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454816609">(Jul 29 2024 at 12:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> sure! Do you want to go ahead and make a PR? If I can build it on my Mac I'll merge it.</p>
+
+
+
+<a name="454838060"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454838060" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454838060">(Jul 29 2024 at 13:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I went ahead and made a PR: upgrade docker maven plugin to 0.45 <a href="https://github.com/IQSS/dataverse/issues/10730">#10730</a></p>
+
+
+
+<a name="454838126"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454838126" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454838126">(Jul 29 2024 at 13:43)</a>:</h4>
+<p>If you can approve and merge it, I'll appreciate it.</p>
+
+
+
+<a name="454839354"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454839354" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454839354">(Jul 29 2024 at 13:48)</a>:</h4>
+<p>Builds on my machine!</p>
+
+
+
+<a name="454839530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454839530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454839530">(Jul 29 2024 at 13:49)</a>:</h4>
+<p>Looks like CI is done too</p>
+
+
+
+<a name="454839594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454839594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454839594">(Jul 29 2024 at 13:49)</a>:</h4>
+<p>Looks like good to go for me!</p>
+
+
+
+<a name="454840328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454840328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454840328">(Jul 29 2024 at 13:51)</a>:</h4>
+<p>Great. I stuck it in "ready for review". Please feel free to approve (at minimum) and merge (I hope!).</p>
+
+
+
+<a name="454840393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454840393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454840393">(Jul 29 2024 at 13:51)</a>:</h4>
+<p>Done and done and done</p>
+
+
+
+<a name="454840528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/454840528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#454840528">(Jul 29 2024 at 13:52)</a>:</h4>
+<p>Perfect! Thanks!</p>
+
+
+
+<a name="465137854"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465137854" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465137854">(Aug 26 2024 at 09:57)</a>:</h4>
+<p>Hi!</p>
+<p>I just wanted to do a clean install of  our 6.1 based installation and got bitten by the <code>addgroup: command not found</code> thing.</p>
+<p>Is  there any way to somehow backport these changes to older Dataverse versions? And these changes are still just in <code>develop</code> and not in <code>main</code>, right?</p>
+<p>What I tried is to copy the <code>modules/*</code> from <code>develop</code> to our own install. This way <code>mvn -Pct -f modules/container-base install</code> works,  but then <code>mvn -Pct docker:run</code> fails with</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt; /opt/payara/scripts/init_2_configure.sh: line 59: POSTBOOT_COMMANDS: unbound variable
+</code></pre></div>
+<p>Any idea how to make our old installation work? Is there maybe a way to get the older version of the <code>eclipse-temurin:11-jre</code> image?</p>
+
+
+
+<a name="465180605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465180605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465180605">(Aug 26 2024 at 13:03)</a>:</h4>
+<p>Ok, I solved it by just copying the necessary <code>groupadd</code>, <code>useradd</code> commands, like these:</p>
+<div class="codehilite"><pre><span></span><code>    # Remove the default user if present (do not fail build if not, introduced by Ubuntu 24.04)
+    userdel --force --remove ubuntu || true
+    groupdel -f ubuntu || true # for some reason, groupdel on Ubuntu 22.04 does not like --force
+    # Create user
+    groupadd --gid &quot;${GID}&quot; &quot;${LINUX_GROUP}&quot;
+    useradd --system --uid &quot;${UID}&quot; --no-create-home --shell /bin/false --home &quot;${HOME_DIR}&quot; --gid &quot;${LINUX_GROUP}&quot; &quot;${LINUX_USER}&quot;
+    echo &quot;${LINUX_USER}:$LINUX_PASSWORD&quot; | chpasswd
+    # Set permissions
+    # Note: Following OpenShift best practices for arbitrary user id support:
+    #       https://docs.openshift.com/container-platform/4.14/openshift_images/create-images.html#use-uid_create-images
+    chown -R &quot;${LINUX_USER}:0&quot; &quot;${HOME_DIR}&quot; &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;
+    chmod -R g=u &quot;${HOME_DIR}&quot; &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;
+</code></pre></div>
+<p>With this fix can now use the original 6.1 docker scripts as is.</p>
+
+
+
+<a name="465191917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465191917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465191917">(Aug 26 2024 at 13:46)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> I'm glad you figured out a work around. One of our priorities is to start tagging both the <a href="https://hub.docker.com/r/gdcc/base/tags">base</a> image and <a href="https://hub.docker.com/r/gdcc/dataverse/tags">dataverse</a> image with a version number. Would this help? If you could pin the base image you use to version 6.1 or whatever? (I'm just using 6.1 as an example. We would only tag new images.)</p>
+
+
+
+<a name="465202292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465202292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465202292">(Aug 26 2024 at 14:24)</a>:</h4>
+<p>In most cases, that would be great. However in this specific case a dependency (eclipse-temurin:11-jre) changed in an unpredictable, backward way. So, even if the dataverse base images are tagged, but you need to rebuild it, the changed dependency would still cause problems. </p>
+<p>I am kind of disappointed that dockerhub tags are not permanent and tagging doesn't guarantee that the tagged image will be the same once it is tagged, forever. Instead the tag is just a name, pointer that may point to anything and changed in the future.</p>
+<p>Of course for dataverse base images there could be a methodology (an agreement of the docker image publisher), which guarantees tag permanence when an image is stored in dockerhub. Do you plan to do something like this and make the base images available in dockerhub or some other repository?</p>
+
+
+
+<a name="465205220"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465205220" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465205220">(Aug 26 2024 at 14:36)</a>:</h4>
+<p>Well, I think it's up to us what our tagging policy is. We could push a tag once and never change it. Or we could push the same tag over and over, for security updates, for example.</p>
+
+
+
+<a name="465214947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465214947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465214947">(Aug 26 2024 at 15:15)</a>:</h4>
+<p>As I wrote in <a href="#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150">https://dataverse.zulipchat.com/#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150</a>, let's follow <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Catalog/services/tutorials/GUID-understand-rolling-tags-containers-index.html">VMWare's Bitnami example</a>.</p>
+
+
+
+<a name="465215473"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Upgrade%20from%20Ubuntu%2022%20to%2024/near/465215473" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024.html#465215473">(Aug 26 2024 at 15:17)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024/near/465214947">said</a>:</p>
+<blockquote>
+<p>As I wrote in <a href="#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150">https://dataverse.zulipchat.com/#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150</a>, let's follow VMWare's Bitnami example.</p>
+</blockquote>
+<p>That's great, thanks!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

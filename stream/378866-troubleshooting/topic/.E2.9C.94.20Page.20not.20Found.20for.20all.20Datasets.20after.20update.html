@@ -1,0 +1,284 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Page not Found for all Datasets after update · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html">✔ Page not Found for all Datasets after update</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="438382860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438382860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438382860">(May 13 2024 at 14:53)</a>:</h4>
+<p>Hi there, some update troubles again <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> </p>
+<p>After updating to v6.2, I get a 404 error for all dataset pages. The page only reads "Page Not Found - The page you are looking for was not found.", reports 404 in the DevTools and the Payara Logs tell me "failed to retrieve version"</p>
+<div class="codehilite"><pre><span></span><code>[#|2024-05-13T16:26:17.001+0200|WARNUNG|Payara 6.2023.8|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=94;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1715610377001;_LevelValue=900;|
+  Failed to retrieve version|#]
+</code></pre></div>
+<p>There seems to be a problem to connect with the S3 connection that I have not seen before. From the logs:</p>
+<div class="codehilite"><pre><span></span><code>[#|2024-05-13T16:49:32.483+0200|WARNUNG|Payara 6.2023.8|com.amazonaws.internal.InstanceMetadataServiceResourceFetcher|_ThreadID=92;_ThreadName=http-thread-pool::jk-connector(1);_TimeMillis=1715611772483;_LevelValue=900;|
+  Fail to retrieve token
+com.amazonaws.SdkClientException: Failed to connect to service endpoint:
+        at com.amazonaws.internal.EC2ResourceFetcher.doReadResource(EC2ResourceFetcher.java:100)
+        at com.amazonaws.internal.InstanceMetadataServiceResourceFetcher.getToken(InstanceMetadataServiceResourceFetcher.java:91)
+        at com.amazonaws.internal.InstanceMetadataServiceResourceFetcher.readResource(InstanceMetadataServiceResourceFetcher.java:69)
+        at com.amazonaws.internal.EC2ResourceFetcher.readResource(EC2ResourceFetcher.java:66)
+[...]
+Caused by: java.net.ConnectException: Verbindungsaufbau abgelehnt (Connection Refused)
+        at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+        at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+        at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:554)
+        at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:602)
+        at java.base/java.net.Socket.connect(Socket.java:633)
+        at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178)
+        at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:533)
+        at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:638)
+        at java.base/sun.net.www.http.HttpClient.&lt;init&gt;(HttpClient.java:281)
+        at java.base/sun.net.www.http.HttpClient.New(HttpClient.java:386)
+        at java.base/sun.net.www.http.HttpClient.New(HttpClient.java:408)
+</code></pre></div>
+<p>Has anyone seen something like this before? Nothing with our S3 settings changed and on our staging server the update did not cause such issues.</p>
+
+
+
+<a name="438388473"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438388473" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438388473">(May 13 2024 at 15:18)</a>:</h4>
+<p>The issue is stranger still, and probably S3 is not at fault. I definitely have access to the S3 storage and can download files. When I navigate directly to a File's page I can see and Download the file, so there seems to be a problem with the PID settings or SOLR.</p>
+
+
+
+<a name="438390147"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438390147" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438390147">(May 13 2024 at 15:27)</a>:</h4>
+<p>Failed to retrieve version. Huh.</p>
+
+
+
+<a name="438390173"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438390173" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438390173">(May 13 2024 at 15:27)</a>:</h4>
+<p>Is there more of server.log you can share?</p>
+
+
+
+<a name="438392869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438392869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438392869">(May 13 2024 at 15:39)</a>:</h4>
+<p>Nothing that really seems to be connected. I tried to rebuild the SOLR index by first detecting orphans, then clearing the index and doing a full reindex. There I got this:</p>
+<div class="codehilite"><pre><span></span><code>[#|2024-05-13T17:19:43.062+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583062;_LevelValue=800;|
+  Beginning indexStatus()|#]
+
+[#|2024-05-13T17:19:43.063+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583063;_LevelValue=800;|
+  checking for stale or missing dataverses|#]
+
+[#|2024-05-13T17:19:43.084+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583084;_LevelValue=800;|
+  checking for stale or missing datasets|#]
+
+[#|2024-05-13T17:19:43.088+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583088;_LevelValue=800;|
+  completed check for stale or missing content.|#]
+
+[#|2024-05-13T17:19:43.088+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583088;_LevelValue=800;|
+  checking for dataverses in Solr only|#]
+
+[#|2024-05-13T17:19:43.128+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583128;_LevelValue=800;|
+  checking for datasets in Solr only|#]
+
+[#|2024-05-13T17:19:43.193+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583193;_LevelValue=800;|
+  checking for files in Solr only|#]
+
+[#|2024-05-13T17:19:43.570+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583570;_LevelValue=800;|
+  completed check for content in Solr but not database|#]
+
+[#|2024-05-13T17:19:44.362+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584362;_LevelValue=800;|
+  checking for permissions in database but stale or missing from Solr|#]
+
+[#|2024-05-13T17:19:44.373+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584373;_LevelValue=800;|
+  completed checking for permissions in database but stale or missing from Solr|#]
+
+[#|2024-05-13T17:19:44.374+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584374;_LevelValue=800;|
+  contentInDatabaseButStaleInOrMissingFromIndex: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[]}|#]
+
+[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|
+  contentInIndexButNotDatabase: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[],&quot;files&quot;:[]}|#]
+[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|
+  permissionsInDatabaseButStaleInOrMissingFromIndex: {&quot;dvobjects&quot;:[]}|#]
+
+[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|
+  permissionsInIndexButNotDatabase: {&quot;permissions&quot;:[&quot;datafile_1000_draft_permission&quot;,&quot;datafile_1001_draft_permission&quot;,&quot;datafile_1004_draft_permission&quot;,
+&quot;datafile_1007_draft_permission&quot;,&quot;datafile_1008_draft_permission&quot;,&quot;datafile_1009_draft_permission&quot;,
+&quot;datafile_1012_draft_permission&quot;,&quot;datafile_1013_draft_permission&quot;,&quot;datafile_1015_draft_permission&quot;,
+&quot;datafile_1016_draft_permission&quot;,&quot;datafile_1019_draft_permission&quot;,&quot;datafile_1020_draft_permission&quot;,
+&quot;datafile_1021_draft_permission&quot;,&quot;datafile_1022_draft_permission&quot;,&quot;datafile_1023_draft_permission&quot;,&quot;datafile_1024_draft_permission&quot;,&quot;datafile_1027_draft_permission&quot;,&quot;datafile_1030_draft_permission&quot;,&quot;datafile_1031_draft_permission&quot;,&quot;datafile_1032_draft_permission&quot;,&quot;datafile_1034_draft_permission&quot;,&quot;datafile_1037_draft_permission&quot;,&quot;datafile_1038_draft_permission&quot;,&quot;datafile_1039_draft_permission&quot;,&quot;datafile_1041_draft_permission&quot;,&quot;datafile_1044_draft_permission&quot;,&quot;datafile_1046_draft_permission&quot;,&quot;datafile_1049_draft_permission&quot;,&quot;datafile_1051_draft_permission&quot;,&quot;datafile_1055_draft_permission&quot;,&quot;datafile_1057_draft_permission&quot;,&quot;datafile_1060_draft_permission&quot;,&quot;datafile_1061_draft_permission&quot;,&quot;datafile_1067_draft_permission&quot;,&quot;datafile_1068_draft_permission&quot;,&quot;datafile_1070_draft_permission&quot;,&quot;datafile_1073_draft_permission&quot;,&quot;datafile_1079_draft_permission&quot;,&quot;datafile_1088_draft_permission&quot;,&quot;datafile_1091_draft_permission&quot;,&quot;datafile_1092_draft_permission&quot;,&quot;datafile_1094_draft_permission&quot;,&quot;datafile_1097_draft_permission&quot;,&quot;datafile_1098_draft_permission&quot;,&quot;datafile_1102_draft_permission&quot;,&quot;datafile_1104_draft_permission&quot;,&quot;datafile_1108_draft_permission&quot;,&quot;datafile_1109_draft_permission&quot;,&quot;datafile_1114_draft_permission&quot;,&quot;datafile_1115_draft_permission&quot;,&quot;datafile_1125_draft_permission&quot;,&quot;datafile_1128_draft_permission&quot;,&quot;datafile_1137_draft_permission&quot;,&quot;datafile_1139_draft_permission&quot;,&quot;datafile_1140_draft_permission&quot;,&quot;datafile_1143_draft_permission&quot;,&quot;datafile_1146_draft_permission&quot;,&quot;datafile_1147_draft_permission&quot;,&quot;datafile_1150_draft_permission&quot;,&quot;datafile_1153_draft_permission&quot;,&quot;datafile_1154_draft_permission&quot;,&quot;datafile_1159_draft_permission&quot;,&quot;datafile_1161_draft_permission&quot;,&quot;datafile_1165_draft_permission&quot;,&quot;datafile_1171_draft_permission&quot;,&quot;datafile_1177_draft_permission&quot;,&quot;datafile_1178_draft_permission&quot;,&quot;datafile_1179_draft_permission&quot;,&quot;datafile_1182_draft_permission&quot;,&quot;datafile_1184_draft_permission&quot;,&quot;datafile_1186_draft_permission&quot;,&quot;datafile_1188_draft_permission&quot;,&quot;datafile_1192_draft_permission&quot;,&quot;datafile_1194_draft_permission&quot;,&quot;datafile_1195_draft_permission&quot;,&quot;datafile_1197_draft_permission&quot;,&quot;datafile_1200_draft_permission&quot;,&quot;datafile_1201_draft_permission&quot;,&quot;datafile_1202_draft_permission&quot;,&quot;datafile_1204_draft_permission&quot;,&quot;datafile_1205_draft_permission&quot;,&quot;datafile_1210_draft_permission&quot;,&quot;datafile_1214_draft_permission&quot;,&quot;datafile_1217_draft_permission&quot;,&quot;datafile_1219_draft_permission&quot;,&quot;datafile_1222_draft_permission&quot;,&quot;datafile_1223_draft_permission&quot;,&quot;datafile_1226_draft_permission&quot;,&quot;datafile_1227_draft_permission&quot;,&quot;datafile_1230_draft_permission&quot;,&quot;datafile_1231_draft_permission&quot;,&quot;datafile_1232_draft_permission&quot;,&quot;datafile_1236_draft_permission&quot;,&quot;datafile_1249_draft_permission&quot;,&quot;datafile_1250_draft_permission&quot;,&quot;datafile_1252_draft_permission&quot;,&quot;datafile_1259_draft_permission&quot;,&quot;datafile_1260_draft_permission&quot;,&quot;datafile_1262_draft_permission&quot;,&quot;datafile_1267_draft_permission&quot;,&quot;datafile_1269_draft_permission&quot;,&quot;datafile_1270_draft_permission&quot;,&quot;datafile_1277_draft_permission&quot;,&quot;datafile_1278_draft_permission&quot;,&quot;datafile_1281_draft_permission&quot;,&quot;datafile_1282_draft_permission&quot;,&quot;datafile_1285_draft_permission&quot;,&quot;datafile_1293_draft_permission&quot;,&quot;datafile_1302_draft_permission&quot;,&quot;datafile_1303_draft_permission&quot;,&quot;datafile_1304_draft_permission&quot;,&quot;datafile_1311_draft_permission&quot;,&quot;datafile_1317_draft_permission&quot;,&quot;datafile_1319_draft_permission&quot;,&quot;datafile_1321_draft_permission&quot;,&quot;datafile_1325_draft_permission&quot;,&quot;datafile_1326_draft_permission&quot;,&quot;datafile_1327_draft_permission&quot;,&quot;datafile_1331_draft_permission&quot;,&quot;datafile_1335_draft_permission&quot;,&quot;datafile_1336_draft_permission&quot;,&quot;datafile_1338_draft_permission&quot;,&quot;datafile_1342_draft_permission&quot;,&quot;datafile_1351_draft_permission&quot;,&quot;datafile_1352_draft_permission&quot;,&quot;datafile_1353_draft_permission&quot;,&quot;datafile_1359_draft_permission&quot;,&quot;datafile_1366_draft_permission&quot;,&quot;datafile_1368_draft_permission&quot;,&quot;datafile_1371_draft_permission&quot;,&quot;datafile_1372_draft_permission&quot;,&quot;datafile_1374_draft_permission&quot;,&quot;datafile_1376_draft_permission&quot;,&quot;datafile_1377_draft_permission&quot;,&quot;datafile_1378_draft_permission&quot;,&quot;datafile_1381_draft_permission&quot;,&quot;datafile_1382_draft_permission&quot;,&quot;datafile_1389_draft_permission&quot;,&quot;datafile_1391_draft_permission&quot;,&quot;datafile_1406_draft_permission&quot;,&quot;datafile_1413_draft_permission&quot;,&quot;datafile_1418_draft_permission&quot;,&quot;datafile_1422_draft_permission&quot;,&quot;datafile_1424_draft_permission&quot;,&quot;datafile_1425_draft_permission&quot;,&quot;datafile_1430_draft_permission&quot;,&quot;datafile_1432_draft_permission&quot;,&quot;datafile_1438_draft_permission&quot;,&quot;datafile_1439_draft_permission&quot;,&quot;datafile_1444_draft_permission&quot;,&quot;datafile_1449_draft_permission&quot;,&quot;datafile_1454_draft_permission&quot;,&quot;datafile_1456_draft_permission&quot;,&quot;datafile_1464_draft_permission&quot;,&quot;datafile_1466_draft_permission&quot;,&quot;datafile_1475_draft_permission&quot;,&quot;datafile_1479_draft_permission&quot;,&quot;datafile_1480_draft_permission&quot;,&quot;datafile_1486_draft_permission&quot;,&quot;datafile_1487_draft_permission&quot;,&quot;datafile_1489_draft_permission&quot;,&quot;datafile_1491_draft_permission&quot;,&quot;datafile_1498_draft_permission&quot;,&quot;datafile_1500_draft_permission&quot;,&quot;datafile_1502_draft_permission&quot;,&quot;datafile_1505_draft_permission&quot;,&quot;datafile_1513_draft_permission&quot;,&quot;datafile_1514_draft_permission&quot;,&quot;datafile_1520_draft_permission&quot;,&quot;datafile_1521_draft_permission&quot;,&quot;datafile_1523_draft_permission&quot;,&quot;datafile_1528_draft_permission&quot;,&quot;datafile_1533_draft_permission&quot;,&quot;datafile_1534_draft_permission&quot;,&quot;datafile_1544_draft_permission&quot;,&quot;datafile_1551_draft_permission&quot;,&quot;datafile_975_draft_permission&quot;,&quot;datafile_980_draft_permission&quot;,&quot;datafile_981_draft_permission&quot;,&quot;datafile_985_draft_permission&quot;,&quot;datafile_988_draft_permission&quot;,&quot;datafile_989_draft_permission&quot;,&quot;datafile_991_draft_permission&quot;,&quot;datafile_993_draft_permission&quot;,&quot;datafile_994_draft_permission&quot;,&quot;datafile_997_draft_permission&quot;,&quot;datafile_998_draft_permission&quot;]}|#]
+</code></pre></div>
+
+
+
+<a name="438393410"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438393410" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438393410">(May 13 2024 at 15:42)</a>:</h4>
+<p>It found a lot of permissions that were in the index but not in the database, but those all seem to be for drafts.</p>
+
+
+
+<a name="438394142"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438394142" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438394142">(May 13 2024 at 15:46)</a>:</h4>
+<p>Can you retrieve datasets via API?</p>
+
+
+
+<a name="438396354"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438396354" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438396354">(May 13 2024 at 15:57)</a>:</h4>
+<p>I can find datasets via the search API, but when I try to access the dataset I get</p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;Dataset with Persistent ID perma:&lt;my-PID&gt; not found.&quot;}%
+</code></pre></div>
+<p>Where &lt;py_PID&gt; is one of the PIDs I got from the search.</p>
+
+
+
+<a name="438397602"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438397602" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438397602">(May 13 2024 at 16:03)</a>:</h4>
+<p>Maybe I damaged my database during the update? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="438397611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438397611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438397611">(May 13 2024 at 16:04)</a>:</h4>
+<p>Thank you for the help. I will need to go offline for a few hours. Its already 6pm in Germany ;)</p>
+
+
+
+<a name="438398375"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438398375" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438398375">(May 13 2024 at 16:07)</a>:</h4>
+<p>No worries.</p>
+
+
+
+<a name="438398425"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438398425" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438398425">(May 13 2024 at 16:07)</a>:</h4>
+<p>"perma". Hmm.</p>
+
+
+
+<a name="438530683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438530683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438530683">(May 14 2024 at 08:55)</a>:</h4>
+<p>Some further digging: When manually querying SOLR for a dataset, all Datasets show up and all the Metadata are there. So I think the database is intact. It just seems that Dataverse does not find a page for the given PID.</p>
+<p>When I enter a URL with a bogus PID (e.g. substitute it with <code>fdaafdsa</code> or replace <code>perma:</code> with <code>doi:</code>) I get an Internal Server Error, only for valid PIDs I get the "Page not Found" error.</p>
+
+
+
+<a name="438554148"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438554148" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438554148">(May 14 2024 at 11:19)</a>:</h4>
+<p>Ah, I bet you need this fix: IQSS/10516 fix perma legacy support <a href="https://github.com/IQSS/dataverse/issues/10521">#10521</a></p>
+
+
+
+<a name="438554168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438554168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438554168">(May 14 2024 at 11:19)</a>:</h4>
+<p>Or an equivalent workaround.</p>
+
+
+
+<a name="438554323"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438554323" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438554323">(May 14 2024 at 11:20)</a>:</h4>
+<p>Oh, wait... this is you: <a href="https://github.com/IQSS/dataverse/issues/10516#issuecomment-2097916267">https://github.com/IQSS/dataverse/issues/10516#issuecomment-2097916267</a></p>
+
+
+
+<a name="438554433"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438554433" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438554433">(May 14 2024 at 11:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="601943">@Henning Timm</span> perhaps you should create a new GitHub issue</p>
+
+
+
+<a name="438554457"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438554457" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438554457">(May 14 2024 at 11:21)</a>:</h4>
+<p>And link to the old one</p>
+
+
+
+<a name="438560211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438560211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438560211">(May 14 2024 at 11:59)</a>:</h4>
+<p>Will do.<br>
+I suspect some trouble with the Legacy PID system. In my staging server I had the following Database settings for PIDs:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">":Authority"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thz"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">":Shoulder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-ds"</span><span class="p">,</span>
+</code></pre></div>
+<p>In the production server that is giving me trouble now it looked like this:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">":Authority"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thz-"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">":Shoulder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ds-"</span><span class="p">,</span>
+</code></pre></div>
+<p>Maybe this is connected to this somehow.</p>
+
+
+
+<a name="438569222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438569222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438569222">(May 14 2024 at 12:50)</a>:</h4>
+<p>Oh. Huh. Yeah, I suppose that could explain it. Not sure.</p>
+
+
+
+<a name="438574990"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438574990" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438574990">(May 14 2024 at 13:20)</a>:</h4>
+<p>A look into the database supports that this might be the issue. In the database, the authority is (correctly) listed as <code>thz-</code>, when I create a new dataset it is just <code>thz</code> since the <code>-</code> is now the separator. I am not 100% sure how the split is performed, but I could imagine that the parsing function (<a href="https://github.com/IQSS/dataverse/blob/dae5ca7dc46c1272d65b36688f6fded224e7288c/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L291">https://github.com/IQSS/dataverse/blob/dae5ca7dc46c1272d65b36688f6fded224e7288c/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L291</a>) is truncating the separator, so the DB is queries with "thz" when it should be queried with "thz-".</p>
+
+
+
+<a name="438575221"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438575221" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438575221">(May 14 2024 at 13:21)</a>:</h4>
+<p>I could probably work around that by using another separator for the new PID provider.</p>
+
+
+
+<a name="438581946"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438581946" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438581946">(May 14 2024 at 13:54)</a>:</h4>
+<p>Sounds good. If you need a hand, please just make some noise.</p>
+<p>Also, would you consider this a bug? If so, please feel free to create an issue.</p>
+
+
+
+<a name="438767816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438767816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438767816">(May 15 2024 at 10:05)</a>:</h4>
+<p>It's running again! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> <br>
+Using the separator "/" instead of "-" when setting up the new permalink provider solved this.</p>
+
+
+
+<a name="438767833"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438767833" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438767833">(May 15 2024 at 10:05)</a>:</h4>
+<p>Thanks again for all the help!</p>
+
+
+
+<a name="438768150"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438768150" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438768150">(May 15 2024 at 10:07)</a>:</h4>
+<p>I think I would consider this a bug and create an issue describing this. We were a bit flustered here how exactly the parsing of PIDs works, so we set aside some time in the first week of June to build up a test environment and dig into this. I am not sure we can provide a fix, but we will certainly try ;)</p>
+
+
+
+<a name="438768163"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438768163" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438768163">(May 15 2024 at 10:07)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601943">Henning Timm</span> has marked this topic as resolved.</p>
+
+
+
+<a name="438774711"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438774711" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438774711">(May 15 2024 at 10:51)</a>:</h4>
+<p>At the very least, perhaps some documentation can be written. Please do go ahead and create an issue, if you don't mind! I'm glad you fixed it! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="438839866"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438839866" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Henning Timm <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438839866">(May 15 2024 at 16:13)</a>:</h4>
+<p>Done :) <a href="https://github.com/IQSS/dataverse/issues/10564">https://github.com/IQSS/dataverse/issues/10564</a></p>
+
+
+
+<a name="438843232"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Page%20not%20Found%20for%20all%20Datasets%20after%20update/near/438843232" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Page.20not.20Found.20for.20all.20Datasets.20after.20update.html#438843232">(May 15 2024 at 16:31)</a>:</h4>
+<p>Thanks! <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

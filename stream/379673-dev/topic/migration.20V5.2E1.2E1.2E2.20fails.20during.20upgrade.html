@@ -1,0 +1,67 @@
+<html>
+<head><meta charset="utf-8"><title>migration V5.1.1.2 fails during upgrade · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html">migration V5.1.1.2 fails during upgrade</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="448841700"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448841700" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448841700">(Jul 03 2024 at 12:55)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/pull/7369/files#diff-7093017fea2f3f26783632496b1b41ab0399b0c9d2c774225b66db77c5a78253">https://github.com/IQSS/dataverse/pull/7369/files#diff-7093017fea2f3f26783632496b1b41ab0399b0c9d2c774225b66db77c5a78253</a> is a good example why we need integration testing for our migrations. It relies on havin the externaltooltype table around, but this only gets created by a new deployment, not when you run the migrations manually via flyway. Which is bad obviously, as it's not easy to change...</p>
+
+
+
+<a name="448842786"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448842786" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448842786">(Jul 03 2024 at 13:00)</a>:</h4>
+<p>(Which I am doing right now with my 4.20 DB, applying the migrations on just a database, without a deployment.)</p>
+
+
+
+<a name="448846139"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448846139" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448846139">(Jul 03 2024 at 13:12)</a>:</h4>
+<p>So as a workaround are you creating the <code>externaltooltype</code> table manually?</p>
+
+
+
+<a name="448853079"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448853079" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448853079">(Jul 03 2024 at 13:40)</a>:</h4>
+<p>I will try that. Have to be extra careful, because I need to name the constraints, indices and foreign keys all the same</p>
+
+
+
+<a name="448853266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448853266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448853266">(Jul 03 2024 at 13:41)</a>:</h4>
+<p>I'm also thinking about ingesting an extra migration just for us</p>
+
+
+
+<a name="448853621"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448853621" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448853621">(Jul 03 2024 at 13:42)</a>:</h4>
+<p>I need some stuff like that anyway as I need to migrate our custom licenses and special field type to something else anyway</p>
+
+
+
+<a name="448861509"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448861509" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448861509">(Jul 03 2024 at 14:15)</a>:</h4>
+<p>Haha V5.4.1.1 fails as well because in v5.5 (where this migration was added) the auxiliaryfiles table was added. Gosh we really need to fix this. I will try to investigate in creating a new baseline...</p>
+
+
+
+<a name="448861749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448861749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448861749">(Jul 03 2024 at 14:16)</a>:</h4>
+<p>(BTW V5.4.1.1  could have just used an additional "IF EXISTS" for the table to mitigate this problem)</p>
+
+
+
+<a name="448867379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/migration%20V5.1.1.2%20fails%20during%20upgrade/near/448867379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/migration.20V5.2E1.2E1.2E2.20fails.20during.20upgrade.html#448867379">(Jul 03 2024 at 14:36)</a>:</h4>
+<p>Oh, right. Yes, I think we eventually got better about adding <code>IF EXISTS</code>. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

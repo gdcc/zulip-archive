@@ -1,0 +1,325 @@
+<html>
+<head><meta charset="utf-8"><title>guidance container for production · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html">guidance container for production</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="568310560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568310560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Andres Mauricio Heredia <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568310560">(Jan 15 2026 at 20:59)</a>:</h4>
+<p>Hi all,<br>
+I’m looking for <strong>guidance on the <em>recommended starting point</em> for a production deployment of Dataverse using containers</strong>.</p>
+<p>I’m intentionally <em>not</em> asking to debug my current setup — I’d rather understand <strong>how people who run Dataverse in production with Docker usually start</strong>.<br>
+<strong>Current context (already done):</strong></p>
+<ul>
+<li>Ubuntu 24.04 server  </li>
+<li>Docker installed (official Docker packages)  </li>
+<li>Managed PostgreSQL database (external, not containerized)  </li>
+<li>S3-compatible object storage (DigitalOcean Spaces)  </li>
+<li>DataCite account active and credentials validated  </li>
+<li>Firewall allows <strong>only HTTPS</strong>  <ul>
+<li>Payara, Solr, DB ports not exposed    </li>
+</ul>
+</li>
+<li>TLS certificates installed and configured via <strong>Nginx</strong> (reverse proxy)</li>
+</ul>
+<p><strong>What I’m trying to understand:</strong></p>
+<ol>
+<li>
+<p>For production with containers:  </p>
+<ul>
+<li>Is the <strong>official containers demo compose</strong> a valid starting point?    </li>
+<li>Or is it better to <strong>build a compose file from scratch</strong> for production?</li>
+</ul>
+</li>
+<li>
+<p>If starting from the demo:  </p>
+<ul>
+<li>Which parts are meant <em>only</em> for demo/testing?    </li>
+<li>What must be changed or removed for production?</li>
+</ul>
+</li>
+<li>
+<p>From a Dataverse perspective:  </p>
+<ul>
+<li>What is the <strong>recommended order of setup</strong>?    <ul>
+<li>Dataverse initialization?      </li>
+<li>Root dataverse creation?      </li>
+<li>Storage + DOI validation?</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Are there any <strong>“known good” reference setups</strong> (even informal) that the community considers production-ready with Docker?  </p>
+</li>
+</ol>
+<p>I’m comfortable with infrastructure and security, but I’m still learning the <strong>Dataverse-specific production patterns</strong>, and I’d really appreciate guidance on the <em>right way to start</em> rather than trial-and-error.</p>
+<p>Thanks in advance for any pointers.</p>
+<p>— Mauricio</p>
+
+
+
+<a name="568311529"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568311529" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568311529">(Jan 15 2026 at 21:04)</a>:</h4>
+<p><span class="user-mention" data-user-id="976479">@Andres Mauricio Heredia</span> hi! We had a meeting just today! (See <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/meetings/with/568192340">#containers &gt; meetings</a>). Maybe you can join the next one! Meanwhile, we can try to answer you here. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="568311693"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568311693" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568311693">(Jan 15 2026 at 21:05)</a>:</h4>
+<p>The dev persona is what we use in development. This explains how to set up a demo persona, which is more secure than the default dev persona: <a href="https://guides.dataverse.org/en/6.9/container/running/demo.html#creating-and-running-a-demo-persona">https://guides.dataverse.org/en/6.9/container/running/demo.html#creating-and-running-a-demo-persona</a></p>
+
+
+
+<a name="568311819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568311819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568311819">(Jan 15 2026 at 21:06)</a>:</h4>
+<p>Does that help?</p>
+
+
+
+<a name="568313352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568313352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Andres Mauricio Heredia <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568313352">(Jan 15 2026 at 21:18)</a>:</h4>
+<p>Hi Philip, thanks — yes, that does help <span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span></p>
+<p>What I’m trying to validate is <em>the correct production path</em>, because what I’m seeing is this:</p>
+<ul>
+<li>When I run the <strong>demo persona as-is</strong>, without changing anything, everything works.  </li>
+<li>
+<p>As soon as I start making what I would expect to be “production changes”:  </p>
+<ul>
+<li>moving the database outside the containers,    </li>
+<li>switching file storage from filesystem to S3 (DigitalOcean Spaces),    </li>
+<li>configuring DataCite,    </li>
+</ul>
+<p>Dataverse stops working properly (sometimes it only reaches Payara, other times Dataverse starts but nothing initializes).  </p>
+</li>
+</ul>
+<p>So my question is more about <strong>process than configuration</strong>:</p>
+<ul>
+<li>
+<p>Is the recommended approach to:  </p>
+<ol>
+<li>run the demo persona first and <em>then</em> gradually replace components (DB, storage, DOI), validating each step?    </li>
+</ol>
+</li>
+<li>
+<p>Or should production be approached as:<br>
+  2) starting from scratch with all production configurations defined up front, and expecting Dataverse to initialize correctly from that state?</p>
+</li>
+</ul>
+<p>I’m comfortable adjusting configs, but I’m missing the <strong>mental model</strong> of how the Dataverse team expects the transition from demo → production-with-containers to happen.</p>
+<p>Any guidance from people who’ve done this in production would be really valuable.</p>
+
+
+
+<a name="568326468"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568326468" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568326468">(Jan 15 2026 at 23:00)</a>:</h4>
+<p>I see. I would suggest starting from a working config and then making changes one by one, such as switching to S3.</p>
+
+
+
+<a name="568374334"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568374334" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Andres Mauricio Heredia <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568374334">(Jan 16 2026 at 07:49)</a>:</h4>
+<p>after several days of debugging I want to share a clear finding and ask for guidance / confirmation.</p>
+<p><strong>Observed behavior</strong></p>
+<ul>
+<li>Using the official container demo (<code>gdcc/dataverse</code> + <code>gdcc/configbaker</code>) with <strong>Dataverse 6.9</strong>, the instance can start, metadata blocks are loaded, but <strong>the root dataverse is never created</strong>.  </li>
+<li>
+<p>The <code>bootstrap.sh</code> script skips execution as soon as metadata blocks exist:<br>
+<code>BLOCK_COUNT=$(curl ... /api/metadatablocks) if [[ $BLOCK_COUNT -gt 0 ]]; then   echo "Your instance has been bootstrapped already, skipping."   exit 0 fi</code></p>
+</li>
+<li>
+<p>Once this happens, the system is left in an inconsistent state:  </p>
+<ul>
+<li>metadata blocks exist    </li>
+<li><code>dataverse</code> table is empty    </li>
+<li>root dataverse does not exist    </li>
+<li>Native API cannot create root (<code>POST /api/dataverses/:root</code> fails, <code>POST /api/dataverses</code> returns Bad API key or validation errors)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Important comparison</strong></p>
+<ul>
+<li>I tested <strong>Dataverse 6.5 + configbaker</strong>: demo bootstrap works correctly.  </li>
+<li>If I <strong>do not delete the data directory</strong>, and then upgrade containers to <strong>6.9</strong>, the demo continues to work.  </li>
+<li>If I start <strong>fresh</strong> with 6.9 (empty data dir), bootstrap does not create root anymore.  </li>
+</ul>
+<p>This strongly suggests a <strong>bootstrap regression between 6.5 → 6.9</strong>, likely related to:</p>
+<ul>
+<li>builtin users API key handling  </li>
+<li>bootstrap skip condition based solely on metadata blocks</li>
+</ul>
+<p><strong>Impact</strong></p>
+<ul>
+<li>It is currently impossible (at least for me) to produce a clean, reproducible Dataverse 6.9 container-based deployment starting from an empty volume.  </li>
+<li>Manual SQL/API workarounds are unsafe because root dataverse creation is not a simple single-table insert.</li>
+</ul>
+<p><strong>Questions to the community</strong></p>
+<ol>
+<li>Is the container demo currently considered <strong>non-functional for fresh installs</strong> on 6.9?  </li>
+<li>Is there an <strong>officially supported way</strong> to bootstrap root in containers for recent versions?  </li>
+<li>Is this a known regression / issue already tracked somewhere?  </li>
+<li>For production, should Docker users assume <strong>classic install only</strong>, even if containers are provided?</li>
+</ol>
+<p>Any confirmation, guidance, or pointer to the correct workflow would be greatly appreciated.</p>
+<p>Thanks in advance.</p>
+
+
+
+<a name="568418948"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568418948" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568418948">(Jan 16 2026 at 12:05)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="976479">Andres Mauricio Heredia</span> <a href="#narrow/channel/375812-containers/topic/guidance.20container.20for.20production/near/568374334">said</a>:</p>
+<blockquote>
+<ul>
+<li>with <strong>Dataverse 6.9</strong>, the instance can start, metadata blocks are loaded, but <strong>the root dataverse is never created</strong>.</li>
+</ul>
+</blockquote>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> <span class="user-mention" data-user-id="602497">@Balázs Pataki</span> does this sound like what <span class="user-mention" data-user-id="601920">@Akio Sone</span> was telling us in the containerization working group meeting <a href="https://harvard.zoom.us/rec/share/kLPnMLpDfyBhh0EJEvfhpZsZgjBHPHk5R7imlPRF7tYaNyTr0DOh8vHROnFO45R-.Vy2heZDG1ZjCS9Ky">yesterday</a>? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> </p>
+<p><span class="user-mention" data-user-id="601920">@Akio Sone</span> were you seeing the same symptoms? No root collection created?</p>
+
+
+
+<a name="568419527"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568419527" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568419527">(Jan 16 2026 at 12:09)</a>:</h4>
+<p>This morning I just checked out DV, built the 6.9 base image and then DV and it started all right with Root collection, and everything. But this is with a totally fresh instance and in "dev" only, not production.</p>
+
+
+
+<a name="568419964"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568419964" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568419964">(Jan 16 2026 at 12:12)</a>:</h4>
+<p>And I deleted all my gdcc/* docker images, so these were all built fresh</p>
+
+
+
+<a name="568420277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568420277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568420277">(Jan 16 2026 at 12:14)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> phew! Thanks for testing! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="568420412"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568420412" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568420412">(Jan 16 2026 at 12:15)</a>:</h4>
+<p>But how can we reproduce what <span class="user-mention" data-user-id="976479">@Andres Mauricio Heredia</span> is seeing? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="568422459"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568422459" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568422459">(Jan 16 2026 at 12:26)</a>:</h4>
+<p>Not sure what's going on here. Also I'm a bit reluctant here because the description above sounds influenced by an LLM, which may foster doing things the wrong way.</p>
+
+
+
+<a name="568422724"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568422724" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568422724">(Jan 16 2026 at 12:28)</a>:</h4>
+<p>I'm not 100% sure what <span class="user-mention" data-user-id="601920">@Akio Sone</span> problems were exactly <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span> As far as I understood, he (has?) had a build problem when checking out the 6.9 code and building the images, not a problem with bootstrapping. So I'd cautiously vote for "not related".</p>
+
+
+
+<a name="568423073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423073">(Jan 16 2026 at 12:30)</a>:</h4>
+<p>I would suggest to make sure to start from clean: remove all gdcc and other containers and images built/started by docker compose and start with a fresh clone of the repo so that previous attempts don't  "infect" the experiment.</p>
+
+
+
+<a name="568423159"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423159" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423159">(Jan 16 2026 at 12:30)</a>:</h4>
+<p>Wait a sec here - I may have an idea!</p>
+
+
+
+<a name="568423215"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423215" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423215">(Jan 16 2026 at 12:31)</a>:</h4>
+<p>He says this is about bootstrapping, so configbaker related.</p>
+
+
+
+<a name="568423264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423264">(Jan 16 2026 at 12:31)</a>:</h4>
+<p>IIRC somewhere around 6.5 we started "real" tags.</p>
+
+
+
+<a name="568423303"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423303" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423303">(Jan 16 2026 at 12:31)</a>:</h4>
+<p>So he may be using the <code>unstable</code> tag from before!</p>
+
+
+
+<a name="568423491"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423491" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423491">(Jan 16 2026 at 12:32)</a>:</h4>
+<p>If <span class="user-mention" data-user-id="976479">@Andres Mauricio Heredia</span> kept those around for any 6.9 experiments, that would be my educated guess where any kind of trouble may come from.</p>
+
+
+
+<a name="568423640"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568423640" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568423640">(Jan 16 2026 at 12:33)</a>:</h4>
+<p>I may be wrong, but my non-LLM advice: first pin down these versions in both DV <em>and</em> Bootstrapping, try again and see what happens.</p>
+
+
+
+<a name="568424068"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568424068" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568424068">(Jan 16 2026 at 12:35)</a>:</h4>
+<p>So basically what <span class="user-mention" data-user-id="602497">@Balázs Pataki</span> said, but in more controlled manner than "delete all images". <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span> Hat tip for jumpstarting my brain! <span aria-label="coin" class="emoji emoji-1fa99" role="img" title="coin">:coin:</span> <span aria-label="top hat" class="emoji emoji-1f3a9" role="img" title="top hat">:top_hat:</span>  <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span></p>
+
+
+
+<a name="568440628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568440628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568440628">(Jan 16 2026 at 13:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="601920">@Akio Sone</span> so! Please try deleting local gdcc images to get a clean test of 6.9. Thanks!</p>
+
+
+
+<a name="568440727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568440727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568440727">(Jan 16 2026 at 13:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="976479">@Andres Mauricio Heredia</span> please keep the questions coming! We love the feedback! Again, I'm sorry we could talk to you live yesterday during the meeting!</p>
+
+
+
+<a name="568467779"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568467779" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Akio Sone <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568467779">(Jan 16 2026 at 15:57)</a>:</h4>
+<p>I encountered the reported issue as follows:</p>
+<ol>
+<li>clone Dataverse as a new repository</li>
+<li>check out the tag v6.9 as a new branch (commit id: e2021d3a80;tagged to the master branch, not develop branch)</li>
+<li>build/run the container</li>
+<li>
+<p>Dataverse sub-containers were running but Dataverse (web page) seemed not working<br>
+symptoms: Docker log (server.log) showed that an old version of Payara was still running and<br>
+that the health check (hitting the health-check API endpoint) was continuously failing<br>
+Don Sizemore told me that version 6.9 requires a new version of Payara server due to some recent change made by Jim</p>
+</li>
+<li>
+<p>check out the develop branch (commit id: 96e96f4763; 2025-12-22;)</p>
+</li>
+<li>build/run the container </li>
+<li>This time it was working with a new version of Payara server</li>
+</ol>
+<p>When a new version of Dataverse is released, I set up a fresh repository for each version. <br>
+So I suspected some of the commits between the day when the tag was created and 2025-12-22 fixed the above issue although I did not dig in which commit(s) solved the issue.</p>
+
+
+
+<a name="568473288"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/568473288" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#568473288">(Jan 16 2026 at 16:23)</a>:</h4>
+<p><span class="user-mention" data-user-id="601920">@Akio Sone</span> that makes sense but our suggestion is to delete any gdcc containers from Docker and try the above again.</p>
+
+
+
+<a name="570401611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/570401611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Andres Mauricio Heredia <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#570401611">(Jan 27 2026 at 19:06)</a>:</h4>
+<p>Hi to everyone, thanks for the interest on this call for help, I couldn't do it with containers, so I made it in the tradicional installation way, and now we are in production, and we are figuring on the dataverse installations map. Thanks Again.</p>
+
+
+
+<a name="570401852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/guidance%20container%20for%20production/near/570401852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/guidance.20container.20for.20production.html#570401852">(Jan 27 2026 at 19:08)</a>:</h4>
+<p>No worries! The traditional way is fine! Is there any feedback you'd like to give about containers? Anything we can improve?</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

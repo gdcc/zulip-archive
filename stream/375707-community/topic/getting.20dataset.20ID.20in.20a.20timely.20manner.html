@@ -1,0 +1,75 @@
+<html>
+<head><meta charset="utf-8"><title>getting dataset ID in a timely manner · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html">getting dataset ID in a timely manner</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="476092296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476092296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476092296">(Oct 10 2024 at 09:53)</a>:</h4>
+<p>I am trying to find a way to get the internal dataset id for a dataset with many files (170k), the PID is known.<br>
+Search API finishes in about two minutes, and does not return the dataset ID. (/api/search?q=PID)<br>
+The native API times out, because it seems to try to serialize all file metadata. (/api/datasets/:persistentId/?persistentId=PID)</p>
+
+
+
+<a name="476092710"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476092710" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476092710">(Oct 10 2024 at 09:56)</a>:</h4>
+<p>So can either the dataset id be gotten from the search api somehow, or the files be excluded from the dataset listing in the native API?</p>
+
+
+
+<a name="476096907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476096907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476096907">(Oct 10 2024 at 10:21)</a>:</h4>
+<p>I would suggest setting show_entity_ids=true when using the Search API: <a href="https://guides.dataverse.org/en/6.4/api/search.html">https://guides.dataverse.org/en/6.4/api/search.html</a></p>
+
+
+
+<a name="476111424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476111424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476111424">(Oct 10 2024 at 11:40)</a>:</h4>
+<p>Thanks, this seems to work, even if it is quite slow.</p>
+
+
+
+<a name="476117728"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476117728" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476117728">(Oct 10 2024 at 12:12)</a>:</h4>
+<p>Is something like this faster? <a href="https://dataverse.harvard.edu/api/datasets/:persistentId/versions/:latest-published?persistentId=doi:10.7910/DVN/TJCLKP&amp;excludeFiles=false">https://dataverse.harvard.edu/api/datasets/:persistentId/versions/:latest-published?persistentId=doi:10.7910/DVN/TJCLKP&amp;excludeFiles=false</a></p>
+
+
+
+<a name="476120337"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476120337" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476120337">(Oct 10 2024 at 12:26)</a>:</h4>
+<p>I tried with both excludeFiles=true and excludeFiles=false but they do not work. Most probably because our dataverse is still on 6.1 :( . But I will keep that in mind in case we upgrade.</p>
+
+
+
+<a name="476132119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476132119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476132119">(Oct 10 2024 at 13:17)</a>:</h4>
+<p>Oh, right. I forget when it was added. Pretty recently, for the SPA, because it was slow to retrieve that data otherwise.</p>
+
+
+
+<a name="476132492"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476132492" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476132492">(Oct 10 2024 at 13:19)</a>:</h4>
+<p>It looks like it was added in 6.2 (renamed at least): <a href="https://guides.dataverse.org/en/6.4/api/changelog.html#v6-2">https://guides.dataverse.org/en/6.4/api/changelog.html#v6-2</a></p>
+
+
+
+<a name="476132830"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476132830" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476132830">(Oct 10 2024 at 13:20)</a>:</h4>
+<p>Renamed in PR <a href="https://github.com/IQSS/dataverse/issues/10191">#10191</a>.</p>
+
+
+
+<a name="476132992"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/getting%20dataset%20ID%20in%20a%20timely%20manner/near/476132992" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/getting.20dataset.20ID.20in.20a.20timely.20manner.html#476132992">(Oct 10 2024 at 13:21)</a>:</h4>
+<p>Anyway, <span class="user-mention" data-user-id="602779">@Péter Pallinger</span> I guess we could add a new API that takes a DOI/PID and simply returns the database id. If you want something like this, please feel free to open an issue.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

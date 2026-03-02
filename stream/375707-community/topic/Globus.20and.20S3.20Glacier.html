@@ -1,0 +1,88 @@
+<html>
+<head><meta charset="utf-8"><title>Globus and S3 Glacier · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html">Globus and S3 Glacier</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="553878324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/553878324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#553878324">(Nov 05 2025 at 14:56)</a>:</h4>
+<p>Just announced: <a href="https://www.globus.org/blog/globus-announces-support-for-amazon-s3-glacier-storage-classes">https://www.globus.org/blog/globus-announces-support-for-amazon-s3-glacier-storage-classes</a></p>
+
+
+
+<a name="553878478"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/553878478" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#553878478">(Nov 05 2025 at 14:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> have you seen this? How does it grab you?</p>
+
+
+
+<a name="553905650"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/553905650" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#553905650">(Nov 05 2025 at 16:31)</a>:</h4>
+<p>Oh man, super cool. I’m curious how this could fit into the current Dataverse–Globus setup and what tweaks might be needed to make it work smoothly. I think the main thing to consider would be the retrieval costs and wait times when files are restored from Glacier ..  there would be a tradeoff between saving money on storage and paying more (and waiting longer) when you need the data back. It’d take some planning to figure out which datasets can live in colder storage, but if it’s set up right, it could lead to some pretty big cost savings over time.</p>
+<p>We currently have our installation configured to upload to Standard storage and then move to Intelligent Tiering. We were transitioning to Glacier but found that we were incurring a lot of retrieval costs that we weren't expecting. Just looking to see if the file has changed causes a retrieval cost and we didn't realize that. We really want to figure out how to utilize Glacier for our file storage somewhere, but need to completely understand how the fees work and when to use it. </p>
+<p>I would be totally interested in having more discussions about this if anyone else is interested. We are in the process of working with AWS to analyze our workflows on this and determining how we can better utilize the storage classes and this fits right in with that thought process.</p>
+
+
+
+<a name="554810538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/554810538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#554810538">(Nov 10 2025 at 23:36)</a>:</h4>
+<p>Hi Deirdre, <br>
+I was away Thu.-Fri., so didn't get to chime in sooner. </p>
+<blockquote>
+<p>I’m curious how this could fit into the current Dataverse–Globus setup</p>
+</blockquote>
+<p>My understanding is that this would give you an extra storage option very similar to what we here at HDV have been offering to users with Globus-accessible tape storage at NESE (<a href="https://nese.mghpcc.org/">https://nese.mghpcc.org/</a>). Specifically, a storage tier that, on the one hand, comes with all sorts of limitations - Globus only, no "classic" api access (unlike your current Globus use case where the files end up in the same S3 buckets that Dataverse uses otherwise, and are accessible via /api/access/), the data may not be instantly available,  and the workflows are less user-friendly overall. On the other hand, it is dirt cheap, compared to AWS S3, and therefore makes handling truly "large" data  - Terabytes - possible. <br>
+From a quick look, the cost of Glacier is roughly the same as what we pay for the tape storage here.</p>
+
+
+
+<a name="554812525"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/554812525" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#554812525">(Nov 10 2025 at 23:57)</a>:</h4>
+<p>(What you mentioned about incurring retrieval costs is significant though, and may indeed make the final costs less appealing than the deal we got with NESE, since that comes with no egress fees - at least as of now)</p>
+
+
+
+<a name="554812599"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/554812599" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#554812599">(Nov 10 2025 at 23:59)</a>:</h4>
+<blockquote>
+<p>... and what tweaks might be needed to make it work smoothly</p>
+</blockquote>
+<p><em>In theory</em> at least, no special tweaks should be needed on the Dataverse side. As long as this storage is made Globus-accessible, as a Globus collection, you should be able to just create a globus-type storage volume in Dataverse, and it'll just work, like any other Globus-accessible storage. It will need to be configured as a "not-accessible-by-dataverse" volume, with something like</p>
+<div class="codehilite"><pre><span></span><code>&lt;jvm-options&gt;-Ddataverse.files.globusGlacier.type=globus&lt;/jvm-options&gt;
+&lt;jvm-options&gt;-Ddataverse.files.globusGlacier.managed=true&lt;/jvm-options&gt;
+&lt;jvm-options&gt;-Ddataverse.files.globusGlacier.files-not-accessible-by-dataverse=true&lt;/jvm-options&gt;
+</code></pre></div>
+<p>How to create and set up this Glacier volume on the S3 Connector/Globus side, I don't know (unlike you, we do not use Globus with S3 at all here). It is entirely possible that something unexpected may be encountered when attempting to set this up in real life, andmay in fact require some tweaking in the Dataverse code. One way to find out ...</p>
+
+
+
+<a name="555187177"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/555187177" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#555187177">(Nov 12 2025 at 17:48)</a>:</h4>
+<p>One thing I should've noticed sooner in the blog announcement is that their language is focused on "downloading" and "restoring archived S3 objects". In other words, they are most likely not offering support for transferring data directly to Glacier via Globus, bypassing placing it into S3 (as I initially assumed). That would still be very useful potentially, as it would keep objects Globus-accessible even after they are moved to tiered storage or Glacier.</p>
+
+
+
+<a name="555434685"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/555434685" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#555434685">(Nov 13 2025 at 18:56)</a>:</h4>
+<p>Hi Leo! <br>
+Thanks so much for all of the info! We are examining our storage/stores currently and trying to start working on a Large Data Support plan similar to Harvard's. But we don't have access to the NESE or tape storage (maybe AWS) so are looking at other alternatives and I was hoping this could help, as you mentioned, or be an option (after considering retrievals). We are using Globus and I have stores configured to use it, so I am making a plan to try to test this out, if possible. I think we would need to identify datasets that are not really utilized very often, or maybe this would just be for datasets that we are "archiving"? </p>
+<p>However I see that you pointed out that this new option likely won't be for transferring directly to Globus .. but for downloading or restoring to standard .. so then how would that work with configured globus stores? haha sorry for my confusion!</p>
+
+
+
+<a name="556940785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Globus%20and%20S3%20Glacier/near/556940785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Globus.20and.20S3.20Glacier.html#556940785">(Nov 17 2025 at 22:17)</a>:</h4>
+<p>There's a good chance I'm even more confused. <br>
+But I believe one scenario would be a Dataverse Globus volume configured exactly the same as your current one(s). But on the S3 side the bucket would be configured to move everything to Glacier automatically. Once moved, these files will still be available via Globus, because it can now handle it transparently. <br>
+For the kind of data you mentioned, something that's not expected to be utilized/downloaded very often, this could be a low cost solution, even with the retrieval fees.<br>
+The S3 space in this setup is only used for temporary staging.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

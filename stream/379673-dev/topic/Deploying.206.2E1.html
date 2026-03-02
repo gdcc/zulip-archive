@@ -1,0 +1,120 @@
+<html>
+<head><meta charset="utf-8"><title>Deploying 6.1 · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html">Deploying 6.1</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="470036013"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/470036013" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#470036013">(Sep 13 2024 at 19:22)</a>:</h4>
+<p>I just finished upgrading to 6.0 without any significant issues. I'm now attempting to update to 6.1, but I'm encountering a problem right from the start. Here are the exact steps I'm following:</p>
+<div class="codehilite" data-code-language="Bash Session"><pre><span></span><code><span class="gp"># </span>Step<span class="w"> </span><span class="m">0</span>:
+<span class="go">export PAYARA=/usr/local/payara6</span>
+<span class="go">sudo -u dataverse bash -c "echo 'export PAYARA=/usr/local/payara6' &gt;&gt; ~/.bashrc"</span>
+<span class="go">sudo -u dataverse bash -c "echo $PAYARA"</span>
+<span class="gp"># </span>Step<span class="w"> </span><span class="m">1</span>:
+<span class="go">sudo -u dataverse bash -c "$PAYARA/bin/asadmin undeploy dataverse-6.0"</span>
+<span class="gp"># </span>Step<span class="w"> </span><span class="m">2</span>:
+<span class="go">sudo systemctl stop payara</span>
+<span class="go">sudo rm -rf $PAYARA/glassfish/domains/domain1/generated</span>
+<span class="gp"># </span>Step<span class="w"> </span><span class="m">3</span>:
+<span class="go">sudo systemctl start payara</span>
+</code></pre></div>
+<p><strong>Issue:</strong> After deleting the <code>generated</code> directory I  can't restart payara. Step <a href="https://github.com/IQSS/dataverse/issues/3">#3</a> fails at this point. However, if I redeploy 6.0, it starts without any problems. I haven't made any changes to the codebase (e.g., no <code>git pull</code> or similar operations).</p>
+<p>Has anyone encountered this issue or have any suggestions on how to resolve it? Should I skip starting payara?</p>
+
+
+
+<a name="470596585"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/470596585" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#470596585">(Sep 16 2024 at 13:05)</a>:</h4>
+<p>Hmm. My first thought is about <code>systemctl stop</code> working properly. Maybe there's still a Paraya process that needs to be killed?</p>
+
+
+
+<a name="470971314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/470971314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#470971314">(Sep 17 2024 at 12:58)</a>:</h4>
+<p>Our service runs the stop-domain command.</p>
+
+
+
+<a name="470976499"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/470976499" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#470976499">(Sep 17 2024 at 13:17)</a>:</h4>
+<p>I'm not sure what to tell you. I used to blow away the "generated" directory all the time in development and I don't remember Payara not starting afterward. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="471008123"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471008123" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471008123">(Sep 17 2024 at 15:01)</a>:</h4>
+<p>This might be slightly unrelated, but I'm upgrading our cloned Dataverse site from 5.14 to 6.0. We have a full copy of the database for testing, but to save costs, we didn't copy over the data mount (i.e., <code>/usr/local/dvn/data</code>). Will the lack of mounted content cause any issues post-upgrade?</p>
+
+
+
+<a name="471013081"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471013081" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471013081">(Sep 17 2024 at 15:18)</a>:</h4>
+<p>Hmm, I wouldn't think so.</p>
+
+
+
+<a name="471013230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471013230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471013230">(Sep 17 2024 at 15:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> do you have any thoughts on this?</p>
+
+
+
+<a name="471018673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471018673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471018673">(Sep 17 2024 at 15:36)</a>:</h4>
+<p>Is there anything relevant in the server.log that might us here? (It sounds like you are starting Payara again in step 3, so there should be log output why things fail in there)</p>
+
+
+
+<a name="471029315"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471029315" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471029315">(Sep 17 2024 at 16:13)</a>:</h4>
+<p><span class="user-mention" data-user-id="651907">@Don Richards</span> did you get the osgi-cache subdirectory as well? old modules can sometimes cause problems. As Oliver says the answer should be in Payara's server.log.</p>
+
+
+
+<a name="471046409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471046409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471046409">(Sep 17 2024 at 17:33)</a>:</h4>
+<p>I'm seeing this a lot </p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="o">[</span><span class="m">2024</span>-09-17T10:45:02.382-0400<span class="o">]</span><span class="w"> </span><span class="o">[</span>Payara<span class="w"> </span><span class="m">6</span>.2023.8<span class="o">]</span><span class="w"> </span><span class="o">[</span>WARNING<span class="o">]</span><span class="w"> </span><span class="o">[]</span><span class="w"> </span><span class="o">[</span>jakarta.enterprise.web<span class="o">]</span><span class="w"> </span><span class="o">[</span>tid:<span class="w"> </span><span class="nv">_ThreadID</span><span class="o">=</span><span class="m">98</span><span class="w"> </span><span class="nv">_ThreadName</span><span class="o">=</span>http-thread-pool::jk-connector<span class="o">(</span><span class="m">4</span><span class="o">)]</span><span class="w"> </span><span class="o">[</span>timeMillis:<span class="w"> </span><span class="m">1726584302382</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>levelValue:<span class="w"> </span><span class="m">900</span><span class="o">]</span><span class="w"> </span><span class="o">[[</span>
+<span class="w">  </span>StandardWrapperValve<span class="o">[</span>Faces<span class="w"> </span>Servlet<span class="o">]</span>:<span class="w"> </span>Servlet.service<span class="o">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>servlet<span class="w"> </span>Faces<span class="w"> </span>Servlet<span class="w"> </span>threw<span class="w"> </span>exception
+java.io.IOException:<span class="w"> </span>getDataAccessObject:<span class="w"> </span>Unsupported<span class="w"> </span>storage<span class="w"> </span>method.
+...
+</code></pre></div>
+
+
+
+<a name="471049738"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471049738" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471049738">(Sep 17 2024 at 17:49)</a>:</h4>
+<p>I noticed it more than one thing:</p>
+<ul>
+<li>Missing controlled vocabulary entries (e.g., <code>command_line_interface</code> in <code>propertyFiles/software</code> for <code>locale en</code>).</li>
+<li>Repeated warnings about "Could not find storage driver for: s3".</li>
+</ul>
+
+
+
+<a name="471057667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471057667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471057667">(Sep 17 2024 at 18:17)</a>:</h4>
+<p>Hmm, do you have a custom metadata block called "software"?</p>
+
+
+
+<a name="471059287"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471059287" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471059287">(Sep 17 2024 at 18:23)</a>:</h4>
+<p><span class="user-mention" data-user-id="651907">@Don Richards</span> on not copying over the data, that's exactly how I test with our staging server. just results in 404s for existing datafiles. on unspported storage method: have you reviewed your <code>dataverse.files.*</code> jvm-options?</p>
+
+
+
+<a name="471100024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Deploying%206.1/near/471100024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Deploying.206.2E1.html#471100024">(Sep 17 2024 at 21:28)</a>:</h4>
+<p>I'm not sure I follow.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,51 @@
+<html>
+<head><meta charset="utf-8"><title>S3 Downloads · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/S3.20Downloads.html">S3 Downloads</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="556851923"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/S3%20Downloads/near/556851923" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/S3.20Downloads.html#556851923">(Nov 17 2025 at 14:55)</a>:</h4>
+<p>A couple of months ago, <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> requested optimized S3 downloads that could be parallelized. We’ve identified potential libraries to achieve this, but I’m stuck figuring out the S3 URLs. I know these URLs are typically exposed through the redirect when using the DataAccess API, but I’m wondering if there’s a more efficient way to obtain them.</p>
+<p>My concern is that not all files will be stored in S3, so the download might fail on instances that use a different storage. Therefore, I’d like to differentiate cases and support S3 downloads whenever possible, and fall back to normal HTTP downloads using httpx in other cases.</p>
+<p>Or would you suggest using the redirect URL and checking if <code>s3</code> is in<code>storageIdentifier</code>is sufficient?</p>
+<div class="spoiler-block"><div class="spoiler-header">
+<p>Example DataFile Output</p>
+</div><div class="spoiler-content" aria-hidden="true">
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="w">        </span><span class="nt">"dataFile"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"checksum"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MD5"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7961fc2b94cc8cef2ae4d143021394e0"</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="nt">"contentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text/plain"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"creationDate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2022-01-30"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"fileAccessRequest"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DeactivationOfGlucoseOxidase_Host.omex"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"filesize"</span><span class="p">:</span><span class="w"> </span><span class="mi">10743</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"friendlyType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Plain Text"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">90554</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"md5"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7961fc2b94cc8cef2ae4d143021394e0"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"persistentId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"doi:10.18419/DARUS-2469/1"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"rootDataFileId"</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"storageIdentifier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"s3://fokus-dv-prod-1:17eac74da1d-96e7a66f41eb"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"tabularData"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">        </span><span class="p">}</span>
+</code></pre></div>
+</div></div>
+
+
+
+<a name="556857762"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/S3%20Downloads/near/556857762" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/S3.20Downloads.html#556857762">(Nov 17 2025 at 15:15)</a>:</h4>
+<p>Yeah, checking the storageIdentifier feels like the right way.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

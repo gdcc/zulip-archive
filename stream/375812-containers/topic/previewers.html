@@ -1,0 +1,69 @@
+<html>
+<head><meta charset="utf-8"><title>previewers · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html">previewers</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="403449043"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/previewers/near/403449043" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html#403449043">(Nov 21 2023 at 19:31)</a>:</h4>
+<p>We should probably include previewers in our container setup: <a href="https://github.com/gdcc/dataverse-previewers">https://github.com/gdcc/dataverse-previewers</a></p>
+
+
+
+<a name="403449194"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/previewers/near/403449194" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html#403449194">(Nov 21 2023 at 19:32)</a>:</h4>
+<p>We added them a long time ago to Ansible.</p>
+
+
+
+<a name="403449321"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/previewers/near/403449321" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html#403449321">(Nov 21 2023 at 19:33)</a>:</h4>
+<p>As I test this PR, I'm wishing they were already in place: signed URLs with private url users, autogenerate API token <a href="https://github.com/IQSS/dataverse/issues/10098">#10098</a></p>
+
+
+
+<a name="403455946"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/previewers/near/403455946" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html#403455946">(Nov 21 2023 at 20:16)</a>:</h4>
+<p>Something like this should work:</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>docker-dev-volumes/app/data/docroot
+mkdir<span class="w"> </span>dataexplore
+<span class="nb">cd</span><span class="w"> </span>dataexplore
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/gdcc/dataverse-previewers.git
+</code></pre></div>
+
+
+
+<a name="403456166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/previewers/near/403456166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/previewers.html#403456166">(Nov 21 2023 at 20:18)</a>:</h4>
+<p>Followed by this:</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-type: application/json'</span><span class="w"> </span>http://localhost:8080/api/admin/externalTools<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="s1">'{</span>
+<span class="s1">  "displayName":"Read Text",</span>
+<span class="s1">  "description":"Read the text file.",</span>
+<span class="s1">  "toolName":"textPreviewer",</span>
+<span class="s1">  "scope":"file",</span>
+<span class="s1">  "types":["preview"],</span>
+<span class="s1">  "toolUrl":"http://localhost:8080/dataexplore/dataverse-previewers/previewers/v1.3/TextPreview.html",</span>
+<span class="s1">  "toolParameters": {</span>
+<span class="s1">      "queryParameters":[</span>
+<span class="s1">        {"fileid":"{fileId}"},</span>
+<span class="s1">        {"siteUrl":"{siteUrl}"},</span>
+<span class="s1">        {"key":"{apiToken}"},</span>
+<span class="s1">        {"datasetid":"{datasetId}"},</span>
+<span class="s1">        {"datasetversion":"{datasetVersion}"},</span>
+<span class="s1">        {"locale":"{localeCode}"}</span>
+<span class="s1">      ]</span>
+<span class="s1">    },</span>
+<span class="s1">  "contentType":"text/plain"</span>
+<span class="s1">}'</span>
+</code></pre></div>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

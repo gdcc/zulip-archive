@@ -1,0 +1,112 @@
+<html>
+<head><meta charset="utf-8"><title>Metadata format for Dataset Migration API in 6.5 · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html">Metadata format for Dataset Migration API in 6.5</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="494778081"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/494778081" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#494778081">(Jan 20 2025 at 10:53)</a>:</h4>
+<p>I'm experimenting with Migration API to import data from our legacy repository system. My goal is to create JSON-LD metadata which is compatible with Dataset Migration API in 6.5. </p>
+<p>To test the API, I exported some metadata records out of my 6.5 test installation in OAI-ORE format, as instructed in Migration API documents, made some trivial modifications to metadata and tried to re-import metadata using Migration API. </p>
+<p>However, I get a 400 bad request error when reimporting the data, Dataverse complaining about:<br>
+The API request cannot be completed with the parameters supplied. Details: Compound field values must be JSON objects, field: author </p>
+<p>The example file I loaded from Migration API documentation imports fine.</p>
+
+
+
+<a name="495032641"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495032641" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495032641">(Jan 21 2025 at 12:06)</a>:</h4>
+<p>How is your JSON-LD file different from the example file? Can you share it with us?</p>
+
+
+
+<a name="495048899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495048899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495048899">(Jan 21 2025 at 13:30)</a>:</h4>
+<p>At first I tried a file which I exported from Dataverse 6.5 using OAI-ORE export format because I supposed that exported JSONLD works directly with Dataset Migration API. </p>
+<p>It didn't work out but by trial and error I managed to modify the example file to include additional information our use case requires (eg. geospatial metadata). My exported file from 6.5 and modified, functional import file based on example file are here: <a href="https://gist.github.com/mjlassila/ecdbd11447ccdf87995db20bfc5e686c">https://gist.github.com/mjlassila/ecdbd11447ccdf87995db20bfc5e686c</a></p>
+
+
+
+<a name="495059127"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495059127" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495059127">(Jan 21 2025 at 14:10)</a>:</h4>
+<p>Ah, great, so you got it working.</p>
+
+
+
+<a name="495233552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495233552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495233552">(Jan 22 2025 at 09:21)</a>:</h4>
+<p>Yep, it works now as intended. </p>
+<p>Perhaps  it would be useful add to  Dataset Migration API documentation that exported OAI-ORE data is not directly compatible with the API? </p>
+<p>In case anyone other than us uses BaseX and XQuery for data wrangling, here is a snippet of XQuery for generating JSON-LD compatible with the Dataset Migration API. <a href="https://gist.github.com/mjlassila/ecdbd11447ccdf87995db20bfc5e686c">https://gist.github.com/mjlassila/ecdbd11447ccdf87995db20bfc5e686c</a></p>
+
+
+
+<a name="495270870"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495270870" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495270870">(Jan 22 2025 at 12:25)</a>:</h4>
+<p>Yes! Are you interested in making a pull request?</p>
+
+
+
+<a name="495648289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495648289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495648289">(Jan 24 2025 at 07:16)</a>:</h4>
+<p>I can try <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span> Is the documentation source in the  Dataverse Github repo current or is there a separate repository for documentation?</p>
+
+
+
+<a name="495701998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495701998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495701998">(Jan 24 2025 at 12:23)</a>:</h4>
+<p>Same repo. Here's the file: <a href="https://github.com/IQSS/dataverse/blob/develop/doc/sphinx-guides/source/developers/dataset-migration-api.rst">https://github.com/IQSS/dataverse/blob/develop/doc/sphinx-guides/source/developers/dataset-migration-api.rst</a></p>
+
+
+
+<a name="495702062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495702062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495702062">(Jan 24 2025 at 12:23)</a>:</h4>
+<p>This might help as well: <a href="https://guides.dataverse.org/en/6.5/contributor/documentation.html">https://guides.dataverse.org/en/6.5/contributor/documentation.html</a></p>
+
+
+
+<a name="495702172"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/495702172" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#495702172">(Jan 24 2025 at 12:24)</a>:</h4>
+<p>Even if you just write Markdown I'm happy to convert it to rst for you.</p>
+
+
+
+<a name="496287056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/496287056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#496287056">(Jan 28 2025 at 09:06)</a>:</h4>
+<p>Hopefully I got it right:  <a href="https://github.com/IQSS/dataverse/pull/11192">https://github.com/IQSS/dataverse/pull/11192</a></p>
+
+
+
+<a name="496325579"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/496325579" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#496325579">(Jan 28 2025 at 12:41)</a>:</h4>
+<p>Thanks for the PR!</p>
+<p><code>make html</code> works fine. You can preview the changes at <a href="https://dataverse-guide--11192.org.readthedocs.build/en/11192/developers/dataset-migration-api.html">https://dataverse-guide--11192.org.readthedocs.build/en/11192/developers/dataset-migration-api.html</a></p>
+<p>I added that link to your PR description.</p>
+
+
+
+<a name="496325638"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/496325638" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#496325638">(Jan 28 2025 at 12:41)</a>:</h4>
+<p>As to the actual content, it looks like Jim (qqmyers) has some feedback for you.</p>
+
+
+
+<a name="496325760"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/496325760" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#496325760">(Jan 28 2025 at 12:42)</a>:</h4>
+<p>I'm surprised that siteUrl is needed but Jim would know better than I would.</p>
+
+
+
+<a name="497517069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Metadata%20format%20for%20Dataset%20Migration%20API%20in%206.5/near/497517069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Metadata.20format.20for.20Dataset.20Migration.20API.20in.206.2E5.html#497517069">(Feb 03 2025 at 19:35)</a>:</h4>
+<p><span class="user-mention" data-user-id="713909">@mjlassila</span> merged! Thanks!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

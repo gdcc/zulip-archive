@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>I just checked out a fresh develop instance <code>https://github.com/IQSS/dataverse.git</code> and built it:</p>\n<p><code>&gt; mvn -Pct clean package</code></p>\n<p><code>&gt; docker image ls | grep gdcc</code></p>\n<div class=\"codehilite\"><pre><span></span><code>WARNING: This output is designed for human readability. For machine-readable output, please use --format.\ngdcc/base:6.10-noble-p6.2025.10-j17                                                                     e08cf058384d       1.06GB          348MB\ngdcc/configbaker:unstable                                                                               af96bd628e30        722MB          198MB\ngdcc/dataverse:unstable                                                                                 bbba32344ed0       1.45GB          522MB\n</code></pre></div>\n<p>When I run it I get this error:</p>\n<p><code>&gt; mvn -Pct docker:run</code></p>\n<div class=\"codehilite\"><pre><span></span><code>[INFO] Scanning for projects...\n[INFO]\n[INFO] ----------------------&lt; edu.harvard.iq:dataverse &gt;----------------------\n[INFO] Building dataverse 6.9\n[INFO]   from pom.xml\n[INFO] ----------------------------[ docker-build ]----------------------------\n[INFO]\n[INFO] --- docker:0.46.0:run (default-cli) @ dataverse ---\n[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Skipped running\n[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Start container 92100e417c55\ndev_bootstrap&gt; Waiting for http://dataverse:8080 to become ready in max 3m.\ndev_bootstrap&gt; 2026-02-04T18:46:17Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2026-02-04T18:46:17Z ERR Expectation failed error=&quot;failed to establish an http connection, caused by: Get \\&quot;http://dataverse:8080/api/info/version\\&quot;: dial tcp: lookup dataverse on 127.0.0.11:53: no such host&quot; address=http://dataverse:8080/api/info/version\n[ERROR] DOCKER&gt; Error occurred during container startup, shutting down...\n[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Stop and removed container 92100e417c55 after 0 ms\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD FAILURE\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  1.608 s\n[INFO] Finished at: 2026-02-04T19:46:17+01:00\n[INFO] ------------------------------------------------------------------------\n[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.46.0:run (default-cli) on project dataverse: Execution default-cli of goal io.fabric8:docker-maven-plugin:0.46.0:run failed: Cannot invoke &quot;com.google.gson.JsonElement.isJsonNull()&quot; because the return value of &quot;com.google.gson.JsonObject.get(String)&quot; is null -&gt; [Help 1]\n[ERROR]\n[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.\n[ERROR] Re-run Maven using the -X switch to enable full debug logging.\n[ERROR]\n[ERROR] For more information about the errors and possible solutions, please read the following articles:\n[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginExecutionException\n</code></pre></div>\n<p>Any idea what could be the problem?</p>",
+        "id": 571985856,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770231038
+    },
+    {
+        "content": "<p>By the way, <code>docker compose -f docker-compose-dev.yml up</code> works.</p>",
+        "id": 571989190,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770232116
+    },
+    {
+        "content": "<p>You may need to assign some more RAM to the DV container.</p>",
+        "id": 572004024,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770237262
+    },
+    {
+        "content": "<p>I recently did get the impression that at some point during the last releases, we made Dataverse too big to fit into 2G RAM.</p>",
+        "id": 572004132,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770237302
+    },
+    {
+        "content": "<p>Also: some log output would be helpful. There might be other stuff causing regressions</p>",
+        "id": 572004429,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770237414
+    },
+    {
+        "content": "<p>I have 16G for docker, memory should not be an issue</p>",
+        "id": 572004593,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770237480
+    },
+    {
+        "content": "<p>Where should I look for logs?</p>",
+        "id": 572004675,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770237512
+    },
+    {
+        "content": "<p>This is  the <code>mvn -Pct -e -X  docker:run</code>. Does it help?</p>\n<p><a href=\"/user_uploads/53090/kT3Qzp-_yExL1O1RGYJ4gmgv/mvn.log\">mvn.log</a></p>",
+        "id": 572005517,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770237791
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> you need to assign more RAM to the container. See also <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F/with/555465953\">#containers &gt; compose: DV needs 2.5G RAM?</a></p>",
+        "id": 572119310,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770289986
+    },
+    {
+        "content": "<p>But this is not about the RAM anyway at this point. The message you get in the logs is absolutely related to <a href=\"#narrow/channel/375812-containers/topic/DMP.20.26.20Docker.2029.2B\">#containers &gt; DMP &amp; Docker 29+</a> I've seen it before. Please try again with adding the plugin version.</p>",
+        "id": 572119677,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770290076
+    }
+]

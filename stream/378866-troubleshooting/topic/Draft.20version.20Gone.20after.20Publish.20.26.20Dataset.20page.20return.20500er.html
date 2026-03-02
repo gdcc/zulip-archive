@@ -1,0 +1,86 @@
+<html>
+<head><meta charset="utf-8"><title>Draft version Gone after Publish &amp; Dataset page return 500er · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html">Draft version Gone after Publish &amp; Dataset page return 500er</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="495420787"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495420787" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495420787">(Jan 23 2025 at 04:15)</a>:</h4>
+<p>Hi Team, <br>
+This is probably the weirdest issue I have seen! <br>
+Series of events :</p>
+<ul>
+<li>There was a Published dataset from 2021. </li>
+<li>It recently started showing "Incomplete metadata tag" warning. </li>
+<li>Our team was told to fix the metadata on a Draft version and republish by replacing current version so that it would not trigger a minor version change, this is superuser function</li>
+<li>
+<p>After Republishing the Dataset page return 500 error. I will attach the Exception but it doesn't really give you any trace of problem other that Dataset.init failed. <br>
+-<br>
+My investigation in Database: </p>
+</li>
+<li>
+<p>Action log record table <br>
+<a href="/user_uploads/53090/l3ik1usW3Qz9UhDGptgrDGtu/action.png">action.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/l3ik1usW3Qz9UhDGptgrDGtu/action.png" title="action.png"><img data-original-content-type="image/png" data-original-dimensions="1625x209" src="/user_uploads/thumbnail/53090/l3ik1usW3Qz9UhDGptgrDGtu/action.png/840x560.webp"></a></div></li>
+<li>
+<p>Draftversion ID record is gone from datasetversion table</p>
+</li>
+<li>No record in Datasetfield table for any of datasetversion_id </li>
+<li>I restored DB from backup before this change and I can see Both versions in datasetversion table and see various Datasetfield records for both versions.</li>
+</ul>
+<p>Noticeable thing from actionlogrecord table is <code>CuratePublishedDatasetVersionCommand</code> started 11:20:55 and ended at 11:21:01 where <code>DeleteDatasetVersionCommand</code>started and finished at 11:20:55 and ended at 11:20:58<br>
+I am suspecting that the chnages were never saved and <code>DeleteDatasetVersionCommandstarted</code> was executed too quickly</p>
+
+
+
+<a name="495480719"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495480719" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495480719">(Jan 23 2025 at 11:30)</a>:</h4>
+<p>Wow, crazy. Do you think it's reproducible?</p>
+
+
+
+<a name="495517246"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495517246" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495517246">(Jan 23 2025 at 14:51)</a>:</h4>
+<p>Looks like this was a discovered bug and fixed in V6.4.</p>
+<p>See the email from Jim (James Myers) within the thread:</p>
+<blockquote>
+<p>There are two recently discovered significant bugs being fixed in v6.4. One, introduced in v6.3, can affect the layout/display of the main page. <strong>The other, while limited to functionality only available to superusers, can result in metadata loss and a broken dataset.</strong></p>
+</blockquote>
+
+
+
+<a name="495522589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495522589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495522589">(Jan 23 2025 at 15:14)</a>:</h4>
+<p>Hmm, but that bug was introduced in 6.3 and it looks like <span class="user-mention" data-user-id="719882">@Bikram</span> is running 6.2. Well, v6.2.8-SP specifically, according to <a href="https://borealisdata.ca/api/info/version">https://borealisdata.ca/api/info/version</a></p>
+
+
+
+<a name="495532374"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495532374" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495532374">(Jan 23 2025 at 15:56)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin ☃️</span>   Yes we are running 6.2.<br>
+Looks like this is the bug we are having exactly <br>
+<a href="https://github.com/IQSS/dataverse/issues/10880">https://github.com/IQSS/dataverse/issues/10880</a><br>
+<a href="https://groups.google.com/g/dataverse-community/c/evn5C-pyrS8?pli=1">https://groups.google.com/g/dataverse-community/c/evn5C-pyrS8?pli=1</a></p>
+<p>I will read the threads and get back.</p>
+
+
+
+<a name="495532679"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495532679" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495532679">(Jan 23 2025 at 15:57)</a>:</h4>
+<p>Great thanks. I'm especially interested to know if versions prior to 6.3 are affected.</p>
+
+
+
+<a name="495533471"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Draft%20version%20Gone%20after%20Publish%20%26%20Dataset%20page%20return%20500er/near/495533471" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bikram <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Draft.20version.20Gone.20after.20Publish.20.26.20Dataset.20page.20return.20500er.html#495533471">(Jan 23 2025 at 16:00)</a>:</h4>
+<p>We had 13 datasets to update like this, first 3 got updated fine and this as the 4th one which got stuck. So I can say that its hard to reproduce but still exists in 6.2</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

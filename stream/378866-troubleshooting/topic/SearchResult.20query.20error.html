@@ -1,0 +1,75 @@
+<html>
+<head><meta charset="utf-8"><title>SearchResult query error · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html">SearchResult query error</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="546004617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/SearchResult%20query%20error/near/546004617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html#546004617">(Oct 20 2025 at 15:03)</a>:</h4>
+<p>Hi, I am using version 6.5 and I found a problem that if a user belongs to a group the SearchResultFragment fails to be generated and Dataverses/Datasets/Datafiles won't show for that user.<br>
+The error in server.log is like this:</p>
+<div class="codehilite"><pre><span></span><code>[2025-10-20T14:54:52.146+0000] [Payara 6.2024.6] [INFO] [] [edu.harvard.iq.dataverse.search.SearchIncludeFragment] [tid: _ThreadID=113 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1760972092146] [levelValue: 800] [[
+  Search Syntax Error: Error from server at http://solr:8983/solr/collection1: org.apache.solr.search.SyntaxError: Cannot parse &#39;discoverableBy:(group_user57&#39;: Encountered &quot;&lt;EOF&gt;&quot; at line 1, column 28.
+Was expecting one of:
+    &lt;AND&gt; ...
+    &lt;OR&gt; ...
+    &lt;NOT&gt; ...
+    &quot;+&quot; ...
+    &quot;-&quot; ...
+    &lt;BAREOPER&gt; ...
+    &quot;(&quot; ...
+    &quot;)&quot; ...
+    &quot;*&quot; ...
+    &quot;^&quot; ...
+    &lt;QUOTED&gt; ...
+    &lt;TERM&gt; ...
+    &lt;FUZZY_SLOP&gt; ...
+    &lt;PREFIXTERM&gt; ...
+    &lt;WILDTERM&gt; ...
+    &lt;REGEXPTERM&gt; ...
+    &quot;[&quot; ...
+    &quot;{&quot; ...
+    &lt;LPARAMS&gt; ...
+    &quot;filter(&quot; ...
+    &lt;NUMBER&gt; ...
+    ]]
+</code></pre></div>
+<p>I also increased verbosity for <code>edu.harvard.iq.dataverse.search</code> and found that the query parameter causing the error is like this <code>Groups: (group_user57 OR group_217-c_-L)</code>.<br>
+Any ideas of what could be causing this error?</p>
+
+
+
+<a name="546022334"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/SearchResult%20query%20error/near/546022334" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html#546022334">(Oct 20 2025 at 16:04)</a>:</h4>
+<p>Interesting. Can you reproduce it on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> ?</p>
+
+
+
+<a name="546172982"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/SearchResult%20query%20error/near/546172982" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html#546172982">(Oct 21 2025 at 08:33)</a>:</h4>
+<p>I created an account there, then I created a dataverse and added a group to my account. Everything worked fine.  I am in middle of merging 6.6 into my branch. When I am finished I could look into the HTML files, maybe I made some mistake on a previous merge. Any files I should be looking, besides <code>dataverse.xhtml</code> and <code>search-include-fragment.xhtml</code>?<br>
+While creating a new dataset on <a href="https://demo.dataverse.org/">https://demo.dataverse.org/</a>  I found this behavior for the author fields:<br>
+<a href="/user_uploads/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1135x412" src="/user_uploads/thumbnail/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png/840x560.webp"></a></div>
+
+
+
+<a name="546192380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/SearchResult%20query%20error/near/546192380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html#546192380">(Oct 21 2025 at 10:06)</a>:</h4>
+<p>Yes, on the demo server (and Harvard Dataverse) we have deployed external vocabulary scripts so the author fields look a little different: <a href="https://github.com/IQSS/dataverse.harvard.edu/issues/326">https://github.com/IQSS/dataverse.harvard.edu/issues/326</a></p>
+
+
+
+<a name="546192560"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/SearchResult%20query%20error/near/546192560" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/SearchResult.20query.20error.html#546192560">(Oct 21 2025 at 10:07)</a>:</h4>
+<p>I'm not sure what other files you should look at, sorry.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

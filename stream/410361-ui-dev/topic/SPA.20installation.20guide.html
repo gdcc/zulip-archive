@@ -1,0 +1,252 @@
+<html>
+<head><meta charset="utf-8"><title>SPA installation guide · ui-dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/index.html">ui-dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html">SPA installation guide</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="535162699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535162699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535162699">(Aug 19 2025 at 16:09)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> and everyone, would you benefit from some sort of installation guide for the SPA? I took a few notes while deploying to <a href="https://dev1.dataverse.org/spa/">https://dev1.dataverse.org/spa/</a></p>
+
+
+
+<a name="535162938"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535162938" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535162938">(Aug 19 2025 at 16:10)</a>:</h4>
+<p>This is what I have so far, very much a work in progress:</p>
+<h1>Dataverse Frontend Installation Guide</h1>
+<p>This is an opinionated guide that make the following assumptions:</p>
+<ul>
+<li>You're ok with hosting the SPA from Payara</li>
+<li>You're ok with /spa in the URL</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>git clone https://github.com/IQSS/dataverse-frontend.git
+cd dataverse-frontend
+git checkout develop
+git pull
+# adjust version as needed
+export VERSION=v0.1.0
+git checkout $VERSION
+sudo yum install nodejs
+npm install
+cd packages/design-system &amp;&amp; npm run build
+cd ../..
+cp .env.example .env
+# edit .env, especially VITE_DATAVERSE_BACKEND_URL
+vi .env
+npm run build -- --base=/spa
+cd deployment/payara
+mvn package -Dversion=$VERSION
+# replace with your server
+scp target/dataverse-frontend.war rocky@dev1.dataverse.org:/tmp
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>/usr/local/payara6/glassfish/bin/asadmin deploy --name dataverse-frontend --contextroot /spa /tmp/dataverse-frontend.war
+</code></pre></div>
+
+
+
+<a name="535163080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535163080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535163080">(Aug 19 2025 at 16:11)</a>:</h4>
+<p>Especially the <code>sudo yum install nodejs</code> part is a work in progress. In practice, for now, I'm running <code>npm</code> commands on my Mac laptop.</p>
+
+
+
+<a name="535248930"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535248930" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535248930">(Aug 20 2025 at 06:49)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Looks elegant to deploy a war. <br>
+When you have Dataverse frontend with Apache (httpd) then alternatively you could deploy the frontend under the Apache webroot (default /var/www/html). <br>
+So after the building step you need to copy the dist folder to that apache webroot and rename it to /var/www/html/spa. Then the apache config must be changed; place the folowing in the config<br>
+<code>ProxyPassMatch ^/spa !</code> <br>
+Be sure to put it before the line for the AJP to Payara. <br>
+Then restart Apache: <br>
+<code>sudo systemctl restart httpd</code></p>
+
+
+
+<a name="535295299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535295299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535295299">(Aug 20 2025 at 11:44)</a>:</h4>
+<p>I do have Dataverse fronted with Apache. I think I might like your way better.</p>
+
+
+
+<a name="535298359"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535298359" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535298359">(Aug 20 2025 at 12:02)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> before the build you have to configure a .env file, right?</p>
+
+
+
+<a name="535300648"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535300648" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535300648">(Aug 20 2025 at 12:16)</a>:</h4>
+<p>Yes indeed, you have to set the <code>VITE_DATAVERSE_BACKEND_URL</code> correctly, thats what I did, but I start to think that might only be needed in a dev environmen?</p>
+
+
+
+<a name="535304667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535304667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535304667">(Aug 20 2025 at 12:38)</a>:</h4>
+<p>BTW I was not to happy about building the application for each server specifically. But a workaround could be to build it wit some GUUID and the do some magical find and replace on the resulting files for each server.</p>
+
+
+
+<a name="535310132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535310132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535310132">(Aug 20 2025 at 13:06)</a>:</h4>
+<p>Yeah, I wasn't too happy either. Hopefully we can find a solution.</p>
+
+
+
+<a name="535310775"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535310775" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535310775">(Aug 20 2025 at 13:10)</a>:</h4>
+<p>I updated my draft installation guide above to mention the .env file.</p>
+
+
+
+<a name="535310831"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535310831" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535310831">(Aug 20 2025 at 13:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> do you have auth working? For now I skipped all that. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="535311152"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535311152" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535311152">(Aug 20 2025 at 13:12)</a>:</h4>
+<p>Same for me, I looked into getting Keycloak to work on my VM, but it is kind of involved, using a Postgres db and a jar that connects with the Datavesre db to handle build-in autentication...</p>
+
+
+
+<a name="535311257"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535311257" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535311257">(Aug 20 2025 at 13:12)</a>:</h4>
+<p>Have you played around with dev-env at <a href="https://github.com/IQSS/dataverse-frontend">https://github.com/IQSS/dataverse-frontend</a> yet? That's what I'll try next.</p>
+
+
+
+<a name="535311472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535311472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535311472">(Aug 20 2025 at 13:14)</a>:</h4>
+<p>That dev-env works, but with docker containers, and we run our stuff on servers and the development with Vagrant/Virtualbox VM's</p>
+
+
+
+<a name="535311552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535311552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535311552">(Aug 20 2025 at 13:14)</a>:</h4>
+<p>Gotcha, non-Docker.</p>
+
+
+
+<a name="535312479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535312479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535312479">(Aug 20 2025 at 13:19)</a>:</h4>
+<p>I guess that building the SPA can also be done with some container that has everything in place for building, but I am not to confident in my docker skills yet to try it out.</p>
+
+
+
+<a name="535312783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535312783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535312783">(Aug 20 2025 at 13:21)</a>:</h4>
+<p>If you're not confident you can only imagine how I feel! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="535313835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535313835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535313835">(Aug 20 2025 at 13:26)</a>:</h4>
+<p>As for using the dev-env with another backend, I did try to connect the SPA to the backend on my Vagrant box, but ran into problems...  think is was CORS, anyways it didn't work and I abondened the idea.</p>
+
+
+
+<a name="535314671"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535314671" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535314671">(Aug 20 2025 at 13:30)</a>:</h4>
+<p>Right. Well, it sounds like you'd appreciate an installation guide for classic, non-Docker installations.</p>
+
+
+
+<a name="535314755"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535314755" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535314755">(Aug 20 2025 at 13:30)</a>:</h4>
+<p>When I mentioned I took some notes yesterday <span class="user-mention" data-user-id="770046">@Germán Saracca</span> said they are open to a pull request. Maybe we can work together on it.</p>
+
+
+
+<a name="535318976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535318976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535318976">(Aug 20 2025 at 13:52)</a>:</h4>
+<p>Sure, but if it means we have to figure out how to get that Keycloak working and also have that Filestorage (needs Minio S3) problem fixed there is a lot to do.</p>
+
+
+
+<a name="535320637"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/535320637" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#535320637">(Aug 20 2025 at 14:00)</a>:</h4>
+<p>Yeah. No rush! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="536284933"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/536284933" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#536284933">(Aug 26 2025 at 17:38)</a>:</h4>
+<p>So, <code>yum install nodejs</code> didn't "just work" for me (see <a class="stream-topic" data-stream-id="378866" href="/#narrow/channel/378866-troubleshooting/topic/building.20the.20SPA.20on.20Rocky.209/with/536266846">#troubleshooting &gt; building the SPA on Rocky 9</a>) so I switched to nvm (which worked fine) and made a few more tweaks. Here's my latest version of the installation guide.</p>
+
+
+
+<a name="536284945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/536284945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#536284945">(Aug 26 2025 at 17:38)</a>:</h4>
+<h1>Dataverse Frontend Installation Guide</h1>
+<p>This is an opinionated guide that make the following assumptions:</p>
+<ul>
+<li>You're ok (for now) with having the SPA in read-only mode (no auth, no OIDC)</li>
+<li>You're ok with hosting the SPA from Payara</li>
+<li>You're ok with /spa in the URL</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>git clone https://github.com/IQSS/dataverse-frontend.git
+cd dataverse-frontend
+git checkout develop
+git pull
+# adjust version as needed
+export VERSION=v0.1.0
+git checkout $VERSION
+# set up NVM: https://github.com/nvm-sh/nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+# use node 19, for correct version see DEVELOPER_GUIDE.md in https://github.com/IQSS/dataverse-frontend
+nvm install 19
+nvm use 19
+# install SPA dependencies
+npm install
+# build design system
+cd packages/design-system &amp;&amp; npm run build
+cd ../..
+# configure SPA. TODO: auth and OIDC. See docs/KEYCLOAK_DEPLOYMENT.md in https://github.com/IQSS/dataverse-frontend
+cp .env.example .env
+# change this to your Dataverse backend URL
+export SITE_URL=https://demo.dataverse.org
+sed -i &quot;s|VITE_DATAVERSE_BACKEND_URL=http://localhost:8000|VITE_DATAVERSE_BACKEND_URL=$SITE_URL|&quot; .env
+# build SPA
+npm run build -- --base=/spa
+# build war file
+cd deployment/payara
+mvn package -Dversion=$VERSION
+# deploy war file
+/usr/local/payara6/glassfish/bin/asadmin deploy --name dataverse-frontend --contextroot /spa target/dataverse-frontend.war
+</code></pre></div>
+
+
+
+<a name="538216584"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/538216584" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#538216584">(Sep 08 2025 at 12:48)</a>:</h4>
+<p>Should we put containerization of the SPA including its build on the #ct meeting agenda?</p>
+
+
+
+<a name="538218207"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/538218207" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#538218207">(Sep 08 2025 at 12:55)</a>:</h4>
+<p>I'm not actively working on that, but please feel free!</p>
+
+
+
+<a name="538231647"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/538231647" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#538231647">(Sep 08 2025 at 13:49)</a>:</h4>
+<p>In this topic, I'm talking about non-Docker installations, so far anyway. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="553383449"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/SPA%20installation%20guide/near/553383449" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/SPA.20installation.20guide.html#553383449">(Nov 03 2025 at 13:41)</a>:</h4>
+<p>In <a href="https://github.com/IQSS/dataverse-frontend/pull/880">https://github.com/IQSS/dataverse-frontend/pull/880</a> we're switching from VITE_DATAVERSE_BACKEND_URL to backendUrl in a config file.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

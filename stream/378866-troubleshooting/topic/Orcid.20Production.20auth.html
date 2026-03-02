@@ -1,0 +1,197 @@
+<html>
+<head><meta charset="utf-8"><title>Orcid Production auth · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html">Orcid Production auth</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="438309609"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438309609" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438309609">(May 13 2024 at 09:00)</a>:</h4>
+<p>Good morning! I am playing with orcid as a auth system (on behalkf on the BSC) with a dataverse but I am getting the following error "Remote system did not return an authorization code.". In the server log I see </p>
+<div class="codehilite"><pre><span></span><code>&quot;[#|2024-05-13T08:51:00.765+0000|INFO|Payara 6.2023.8|edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean|_ThreadID=104;_ThreadName=http-thread-pool::jk-connector(3);_TimeMillis=1715590260765;_LevelValue=800;|
+  OAuth2Exception getting code parameter. HTTP return code: -1. Message: Remote system did not return an authorization code. Message body: |#]
+&quot;
+</code></pre></div>
+<p>I wrote a script (below).  to check my credentials and it create an access token</p>
+<div class="codehilite"><pre><span></span><code>[rocky@dataverse-test ~]$ python3 authTest.py
+Credentials are valid. Access token received successfully.
+Access Token: bfd9ff28-07f9-4640-a7f6-e3f4e3f68e99
+</code></pre></div>
+<p>Any idea what could be the issue? Am I missing something fundamental ? </p>
+<div class="codehilite"><pre><span></span><code>[rocky@dataverse-test ~]$ cat authTest.py
+import requests
+
+def check_orcid_credentials(client_id, client_secret, redirect_uri):
+    # ORCID API endpoint for obtaining OAuth token
+    token_url = &#39;https://orcid.org/oauth/token&#39;
+
+    # Parameters for the POST request
+    data = {
+        &#39;client_id&#39;: client_id,
+        &#39;client_secret&#39;: client_secret,
+        &#39;grant_type&#39;: &#39;client_credentials&#39;,
+        &#39;scope&#39;: &#39;/read-public&#39;,
+        &#39;redirect_uri&#39;: redirect_uri
+    }
+
+    # Make the HTTP POST request to get the access token
+    response = requests.post(token_url, data=data)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        print(&quot;Credentials are valid. Access token received successfully.&quot;)
+        print(&quot;Access Token:&quot;, response.json().get(&#39;access_token&#39;))
+    else:
+        print(&quot;Failed to validate credentials.&quot;)
+        print(&quot;Error:&quot;, response.text)
+
+# Replace these variables with your actual client ID, secret, and redirect URI
+client_id = &#39;APP-EXAMPLE&#39;
+client_secret = &#39;SECRET&#39;
+redirect_uri = &#39;https://dataverse-test.bsc.es&#39;
+
+# Call the function with your credentials
+check_orcid_credentials(client_id, client_secret, redirect_uri)
+</code></pre></div>
+<p>Thanks a lot!</p>
+
+
+
+<a name="438312041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438312041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438312041">(May 13 2024 at 09:10)</a>:</h4>
+<p>I add the output of my authenticationProviders endpoint in case it helps</p>
+<div class="codehilite"><pre><span></span><code>curl -X GET &quot;localhost:8080/api/admin/authenticationProviders&quot; -H &quot;X-Dataverse-key:***** -***** -***** -***** -***** &quot;
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[{&quot;id&quot;:&quot;builtin&quot;,&quot;factoryAlias&quot;:&quot;BuiltinAuthenticationProvider&quot;,&quot;title&quot;:&quot;Dataverse Local&quot;,&quot;subtitle&quot;:&quot;Datavers&#39; Internal Authentication provider&quot;,&quot;factoryData&quot;:&quot;&quot;,&quot;enabled&quot;:true},{&quot;id&quot;:&quot;orcid-production&quot;,&quot;factoryAlias&quot;:&quot;oauth2&quot;,&quot;title&quot;:&quot;ORCID&quot;,&quot;subtitle&quot;:&quot;Log in via ORCID&quot;,&quot;factoryData&quot;:&quot;type: orcid | userEndpoint: https://api.orcid.org/v2.0/{ORCID}/person | clientId: APP-***** | clientSecret: ***** -***** -***** -***** -*****  | scope: /authenticate&quot;,&quot;enabled&quot;:true}]}
+</code></pre></div>
+
+
+
+<a name="438314076"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438314076" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438314076">(May 13 2024 at 09:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="617722">@Johannes D</span> do you have any suggestions?</p>
+
+
+
+<a name="438380530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438380530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438380530">(May 13 2024 at 14:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="671195">@Simon Carroll</span> we have two JSON files to start from for ORCID: <a href="https://guides.dataverse.org/en/6.2/installation/oauth2.html">https://guides.dataverse.org/en/6.2/installation/oauth2.html</a>.</p>
+<p>It seems like you are starting from orcid-member.json. Is your institution an ORCID member? If not, can you try starting from orcid-public.json?</p>
+
+
+
+<a name="438380690"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438380690" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438380690">(May 13 2024 at 14:44)</a>:</h4>
+<p>(I was just reminding myself of the difference by looking at <a href="https://github.com/IQSS/dataverse/pull/7025">https://github.com/IQSS/dataverse/pull/7025</a> where the "public" version was added.)</p>
+
+
+
+<a name="438530069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438530069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438530069">(May 14 2024 at 08:51)</a>:</h4>
+<p>Great thank! That was the issue.</p>
+
+
+
+<a name="438530720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438530720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438530720">(May 14 2024 at 08:55)</a>:</h4>
+<p>Another question if I may. Is it possible to change the Title of "Orcid Sandbox" here ? <br>
+<a href="/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png">image.png</a>. In this scenario it would be a production dataverse connectiong to the public orcid system (not sandbox). However, it seems maybe with the ansible script this is populated.</p>
+<div class="message_inline_image"><a href="/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png" title="image.png"><img src="/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png"></a></div>
+
+
+
+<a name="438530957"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438530957" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438530957">(May 14 2024 at 08:56)</a>:</h4>
+<p>curl -X GET "localhost:8080/api/admin/authenticationProviders" -H "X-Dataverse-key:<strong><em>-</em></strong>-<strong><em>-</em></strong>-***"</p>
+<p>I am suprised not to see it explictly here: </p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[{&quot;id&quot;:&quot;builtin&quot;,&quot;factoryAlias&quot;:&quot;BuiltinAuthenticationProvider&quot;,&quot;title&quot;:&quot;Dataverse Local&quot;,&quot;subtitle&quot;:&quot;Datavers&#39; Internal Authentication provider&quot;,&quot;factoryData&quot;:&quot;&quot;,&quot;enabled&quot;:true},{&quot;id&quot;:&quot;orcid-production&quot;,&quot;factoryAlias&quot;:&quot;oauth2&quot;,&quot;title&quot;:&quot;ORCID Public&quot;,&quot;subtitle&quot;:&quot;Log in via ORCID&quot;,&quot;factoryData&quot;:&quot;type: orcid | userEndpoint: https://pub.orcid.org/v3.0/{ORCID}/person | clientId: APP-WSQC51RN6SVZ7MWE | clientSecret: ffd70b1b-56e9-4d8c-b342-c4f6d5761317 | scope: /authenticate&quot;,&quot;enabled&quot;:true}]}
+</code></pre></div>
+
+
+
+<a name="438553430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438553430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438553430">(May 14 2024 at 11:15)</a>:</h4>
+<p>Instead of <code>"id":"orcid-production"</code> can you please try <code>"id":"orcid"</code>. It has to match exactly: <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/impl/OrcidOAuth2AP.java#L236">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/impl/OrcidOAuth2AP.java#L236</a></p>
+
+
+
+<a name="438560082"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438560082" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438560082">(May 14 2024 at 11:58)</a>:</h4>
+<p>opps! Thanks then all solved. Cheers</p>
+
+
+
+<a name="438562850"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438562850" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438562850">(May 14 2024 at 12:15)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>[#|2024-05-14T12:13:38.617+0000|SEVERE|Payara 6.2023.8|edu.harvard.iq.dataverse.authorization.providers.oauth2.impl.OrcidOAuth2AP|_ThreadID=103;_ThreadName=http-thread-pool::jk-connector(2);_TimeMillis=1715688818617;_LevelValue=1000;|
+  XML error parsing response body from ORCiD: Attribute name &quot;data-critters-container&quot; associated with an element type &quot;html&quot; must be followed by the &#39; = &#39; character.
+org.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 50; Attribute name &quot;data-critters-container&quot; associated with an element type &quot;html&quot; must be followed by the &#39; = &#39; character.
+    at org.apache.xerces.parsers.DOMParser.parse(Unknown Source)
+    at org.apache.xerces.jaxp.DocumentBuilderImpl.parse(Unknown Source)
+    at edu.harvard.iq.dataverse.authorization.providers.oauth2.impl.OrcidOAuth2AP.parseUserResponse(OrcidOAuth2AP.java:117)
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>
+</code></pre></div>
+
+
+
+<a name="438563142"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438563142" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438563142">(May 14 2024 at 12:17)</a>:</h4>
+<p>everything seems to go well with the (sandbox) auth</p>
+
+
+
+<a name="438563253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438563253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438563253">(May 14 2024 at 12:18)</a>:</h4>
+<p><a href="/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png" title="image.png"><img src="/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png"></a></div>
+
+
+
+<a name="438568996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438568996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438568996">(May 14 2024 at 12:49)</a>:</h4>
+<p>Sorry, I'm not following. New problem?</p>
+
+
+
+<a name="438571026"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438571026" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438571026">(May 14 2024 at 13:00)</a>:</h4>
+<p>yes sorry!  the previous two resolved. I have 2 enviroments. One in which dataverse works perfectly with the orcid public api and another with the sandbox API in which I receive the above error after logging in.</p>
+
+
+
+<a name="438571740"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438571740" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438571740">(May 14 2024 at 13:03)</a>:</h4>
+<p>The second (failing) enviroment is using dataverse 6.1. It previously worked with the public API and is just failing with the sandbox. I wonder if some remnant of using the previous auth system is the cause. The error seems at quite a low level.</p>
+
+
+
+<a name="438571939"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438571939" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438571939">(May 14 2024 at 13:04)</a>:</h4>
+<p><a href="/user_uploads/53090/hsE6NMqo9PZQkh-X9PIv7eYq/orcidAuthError.log">orcidAuthError.log</a></p>
+
+
+
+<a name="438571968"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438571968" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438571968">(May 14 2024 at 13:04)</a>:</h4>
+<p>I add a much larger strack trace</p>
+
+
+
+<a name="438604032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438604032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438604032">(May 14 2024 at 15:45)</a>:</h4>
+<p><code>XML error parsing response body from ORCiD: Attribute name "data-critters-container" associated with an element type "html" must be followed by the ' = ' character</code></p>
+
+
+
+<a name="438604083"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Orcid%20Production%20auth/near/438604083" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Orcid.20Production.20auth.html#438604083">(May 14 2024 at 15:45)</a>:</h4>
+<p>I'm not sure. You might need to ask ORCID about this. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

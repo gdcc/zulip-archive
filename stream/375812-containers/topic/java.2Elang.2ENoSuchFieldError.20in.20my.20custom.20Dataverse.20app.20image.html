@@ -1,0 +1,89 @@
+<html>
+<head><meta charset="utf-8"><title>java.lang.NoSuchFieldError in my custom Dataverse app image · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html">java.lang.NoSuchFieldError in my custom Dataverse app image</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="523772244"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/523772244" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#523772244">(Jun 12 2025 at 14:39)</a>:</h4>
+<p>Hi, I am encountering a weird error I am not sure how to fix. If someone here had an idea, I would be very grateful.</p>
+<p>I am building my own custom Dataverse app image off my own branch, which is based on the current v6.6 master branch, plus some of my own commits. Until today, this was working OK, but now I the containers I start using my custom image fail with the following error:</p>
+<div class="codehilite"><pre><span></span><code>[#|2025-06-12T14:11:06.108+0000|SEVERE|Payara 6.2025.2|javax.enterprise.system.core|_ThreadID=29;_ThreadName=RunLevelControllerThread-1749737428556;_TimeMillis=1749737466108;_LevelValue=1000;|
+  Exception while loading the app : java.lang.IllegalStateException: ContainerBase.addChild: start: org.apache.catalina.LifecycleException: org.apache.catalina.LifecycleException: java.lang.NoSuchFieldError: API_BLOCKED_POLICY|#]
+
+[#|2025-06-12T14:11:06.109+0000|WARNING|Payara 6.2025.2|fish.payara.boot.runtime.BootCommand|_ThreadID=29;_ThreadName=RunLevelControllerThread-1749737428556;_TimeMillis=1749737466109;_LevelValue=900;|
+  Boot Command deploy failed PlainTextActionReporterFAILUREDescription: deploy AdminCommandError occurred during deployment: Exception while loading the app : java.lang.IllegalStateException: ContainerBase.addChild: start: org.apache.catalina.LifecycleException: org.apache.catalina.LifecycleException: java.lang.NoSuchFieldError: API_BLOCKED_POLICY. Please see server.log for more details.
+</code></pre></div>
+<p>I've actually seen this error before. I built my custom app image using the <code>unstable</code> base image, which apparently included a change that introduced <code>API_BLOCKED_POLICY</code> (which is not present in v6.6, so it's also not present in my branch). I solved it by setting <code>-Dbase.image=gdcc/base:6.6-noble</code> (instead of default <code>gdcc/base:unstable</code>).</p>
+<p>But today I built some new images and they're failing with that error again. I saw that the <code>base:6.6-noble</code> image has recently been pushed (3 days ago), and thought maybe there was a mistake made with that push. But now I've even tried to build my image with <code>-Dbase.image=gdcc/base:6.6-noble-r0</code> because that hasn't had any pushes in 2 months, and I'm still getting the error. <span aria-label="sweat" class="emoji emoji-1f613" role="img" title="sweat">:sweat:</span></p>
+<p>As I said, if anyone had an idea what's causing it, I'd be very grateful! Thanks!</p>
+
+
+
+<a name="524100563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524100563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524100563">(Jun 15 2025 at 02:59)</a>:</h4>
+<p>Not sure what's going on here. Some notes: the -rX images are the fixed tags, so their content will not change once created. Which JDK version are you using to build the images? We've seen weird stuff happening due to this and this might be another one.</p>
+
+
+
+<a name="524100689"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524100689" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524100689">(Jun 15 2025 at 03:02)</a>:</h4>
+<p>I am not sure what you are referring to when you mention API_BLOCKED_POLICY. To my knowledge, that's not an env var the base image defines?!</p>
+
+
+
+<a name="524204143"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524204143" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524204143">(Jun 16 2025 at 08:27)</a>:</h4>
+<p>I believe API_BLOCKED_POLICY refers to this newly introduced JvmSetting: <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/filter/ApiBlockingFilter.java#L81">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/filter/ApiBlockingFilter.java#L81</a></p>
+
+
+
+<a name="524204211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524204211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524204211">(Jun 16 2025 at 08:27)</a>:</h4>
+<p>It's present on develop, but not on master/my branch.</p>
+
+
+
+<a name="524204381"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524204381" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524204381">(Jun 16 2025 at 08:28)</a>:</h4>
+<p>My JDK version is this: <code>openjdk version "17.0.15" 2025-04-15</code></p>
+
+
+
+<a name="524212791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524212791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524212791">(Jun 16 2025 at 09:19)</a>:</h4>
+<p>OK, seems like I fixed it by setting <code>-Dbase.image.tag=6.6-noble</code>. It seems like <code>-Dbase.image=gdcc/base:6.6-noble</code> wasn't correct.</p>
+
+
+
+<a name="524238713"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524238713" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524238713">(Jun 16 2025 at 11:53)</a>:</h4>
+<p>Yes, it was added recently, in <a href="https://github.com/IQSS/dataverse/issues/11454">#11454</a>.</p>
+
+
+
+<a name="524323378"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524323378" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524323378">(Jun 16 2025 at 19:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="616555">@Vera Clemens</span> have you pushed your branch anywhere? Should we try it?</p>
+
+
+
+<a name="524784976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524784976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524784976">(Jun 18 2025 at 21:17)</a>:</h4>
+<p>I suppose the environment variable needs to be DATAVERSE_API_BLOCKED_POLICY as it uses mpconfig.</p>
+
+
+
+<a name="524785131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/java.lang.NoSuchFieldError%20in%20my%20custom%20Dataverse%20app%20image/near/524785131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/java.2Elang.2ENoSuchFieldError.20in.20my.20custom.20Dataverse.20app.20image.html#524785131">(Jun 18 2025 at 21:18)</a>:</h4>
+<p>Not sure why base.image wouldn't work for you though.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

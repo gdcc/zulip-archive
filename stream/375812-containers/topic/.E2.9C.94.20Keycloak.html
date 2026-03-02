@@ -1,0 +1,148 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Keycloak · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html">✔ Keycloak</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="357394839"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357394839" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357394839">(May 10 2023 at 20:09)</a>:</h4>
+<p>Talk to me about Keycloak. I'm reviewing PR <a href="https://github.com/IQSS/dataverse/issues/9532">#9532</a> and as suggested in the description, I'm adding the following to our docker compose dev file:</p>
+<div class="codehilite"><pre><span></span><code>  dev_keycloak:
+    container_name: &quot;dev_keycloack&quot;
+    image: &#39;quay.io/keycloak/keycloak:19.0&#39;
+    hostname: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=kcadmin
+      - KEYCLOAK_ADMIN_PASSWORD=kcpassword
+      - KEYCLOAK_LOGLEVEL=DEBUG
+      - KC_HOSTNAME_STRICT=false
+    networks:
+      dataverse:
+        aliases:
+          - keycloak.mydomain.com #create a DNS alis within the network (add the same alias to your /etc/hosts to get a working OIDC flow)
+    command: start-dev --import-realm --http-port=8090  # change port to 8090, so within the network and external the same port is used
+    ports:
+      - &quot;8090:8090&quot;
+    volumes:
+      - &#39;./conf/keycloak/oidc-realm.json:/opt/keycloak/data/import/oidc-realm.json&#39;
+</code></pre></div>
+<p>If this works, maybe we should remove the older stuff (and related docs):</p>
+<div class="codehilite"><pre><span></span><code>conf/keycloak
+conf/keycloak/oidc-realm.json
+conf/keycloak/rm-keycloak.sh
+conf/keycloak/docker-compose.yml
+conf/keycloak/run-keycloak.sh
+conf/keycloak/oidc-keycloak-auth-provider.json
+</code></pre></div>
+<p>Heads up especially to <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> who added this in PR <a href="https://github.com/IQSS/dataverse/issues/9234">#9234</a>.</p>
+
+
+
+<a name="357398625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357398625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357398625">(May 10 2023 at 20:29)</a>:</h4>
+<p>Oh, I see, he's reusing the old config:</p>
+<div class="codehilite"><pre><span></span><code>    volumes:
+      - &#39;./conf/keycloak/oidc-realm.json:/opt/keycloak/data/import/oidc-realm.json&#39;
+</code></pre></div>
+
+
+
+<a name="357398841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357398841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357398841">(May 10 2023 at 20:30)</a>:</h4>
+<p>But maybe we don't need <code>conf/keycloak/docker-compose.yml</code> anymore (and the stop and start scripts).</p>
+
+
+
+<a name="357408168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408168">(May 10 2023 at 21:33)</a>:</h4>
+<p>Sorry was talking with Leonid about version PIDs :-)</p>
+
+
+
+<a name="357408417"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408417" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408417">(May 10 2023 at 21:35)</a>:</h4>
+<p>I'm not sure if we should add it to that file</p>
+
+
+
+<a name="357408576"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408576" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408576">(May 10 2023 at 21:36)</a>:</h4>
+<p>On the other hand, maybe we can make it disabled/enabled in some way, so it doesn't sit around without doing anything</p>
+
+
+
+<a name="357408656"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408656" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408656">(May 10 2023 at 21:37)</a>:</h4>
+<p>We should talk about <a href="https://github.com/IQSS/dataverse/pull/9273">https://github.com/IQSS/dataverse/pull/9273</a> as well to make it easier to integrate the app and the keycloak you're starting</p>
+
+
+
+<a name="357408748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408748">(May 10 2023 at 21:38)</a>:</h4>
+<p>You could of course add it to the bootstrapping thingy to load the provider as a model</p>
+
+
+
+<a name="357408857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408857">(May 10 2023 at 21:39)</a>:</h4>
+<p>I'm simply a fan of making these things deployable and changeable as easy as possible</p>
+
+
+
+<a name="357408934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357408934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357408934">(May 10 2023 at 21:39)</a>:</h4>
+<p>No finicky "reload the provider as json" when a detail changes, like a new password etc</p>
+
+
+
+<a name="357510882"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357510882" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357510882">(May 11 2023 at 08:43)</a>:</h4>
+<p>We wanted Keycloak to be an optional dependency as opposed to the other dependencies, so I kept it in the original docker-compose file instead of adding it to docker-compose-dev.</p>
+<p>In any case, we can achieve something similar, using the same docker compose file, omitting the service when executing the up command:</p>
+<p><strong>docker-compose -f docker-compose-dev.yml up -d --scale dev_keycloak=0</strong></p>
+
+
+
+<a name="357511364"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357511364" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357511364">(May 11 2023 at 08:45)</a>:</h4>
+<p>Following this approach, we would handle only one docker-compose file, but running it may be less practical for most cases (where you don't need Keylcoak), because you need to append that arg to the command.</p>
+
+
+
+<a name="357512396"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/357512396" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#357512396">(May 11 2023 at 08:49)</a>:</h4>
+<p>Another thought: leave Keycloak in the separate compose file, but make it appear on the same network. You'd need to run two commands when using compose, but that may be fine. I'd need to look into how to integrate this in the Maven run, but that might be achievable</p>
+
+
+
+<a name="358442068"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/358442068" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#358442068">(May 15 2023 at 12:16)</a>:</h4>
+<p>Just a heads up that the PR has been replaced by PR <a href="https://github.com/IQSS/dataverse/issues/9591">#9591</a>.</p>
+
+
+
+<a name="358442424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/358442424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#358442424">(May 15 2023 at 12:18)</a>:</h4>
+<p>And it looks like my proposed change to edit the root docker compose file, adding Keycloak there, has been added. And a related note for the dev guide.</p>
+
+
+
+<a name="384006296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/384006296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#384006296">(Aug 11 2023 at 15:20)</a>:</h4>
+<p>We ended up merging <a href="https://github.com/IQSS/dataverse/issues/9591">#9591</a>. Resolving.</p>
+
+
+
+<a name="384006307"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/%E2%9C%94%20Keycloak/near/384006307" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/.E2.9C.94.20Keycloak.html#384006307">(Aug 11 2023 at 15:20)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

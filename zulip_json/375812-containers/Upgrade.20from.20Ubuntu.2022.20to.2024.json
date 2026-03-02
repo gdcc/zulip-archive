@@ -1,0 +1,338 @@
+[
+    {
+        "content": "<p>Huh, I'm getting a crazy error at <a href=\"https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721\">https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721</a></p>",
+        "id": 453771298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721846477
+    },
+    {
+        "content": "<p><code>[INFO] DOCKER&gt; ERROR: failed to solve: process \"/bin/bash -euo pipefail -c # Create pathes\\n mkdir -p \\\"${HOME_DIR}\\\" \\\"${PAYARA_DIR}\\\" \\\"${DEPLOY_DIR}\\\" \\\"${CONFIG_DIR}\\\" \\\"${SCRIPT_DIR}\\\"\\n mkdir -p \\\"${STORAGE_DIR}\\\" \\\"${SECRETS_DIR}\\\" \\\"${DUMPS_DIR}\\\"\\n # Create user\\n addgroup --gid ${GID} payara\\n adduser --system --uid ${UID} --no-create-home --shell /bin/bash --home \\\"${HOME_DIR}\\\" --gecos \\\"\\\" --ingroup payara payara\\n echo payara:payara | chpasswd\\n # Set permissions\\n # Note: Following OpenShift best practices for arbitrary user id support:\\n # https://docs.openshift.com/container-platform/4.14/openshift_images/create-images.html#use-uid_create-images\\n chown -R payara:0 \\\"${HOME_DIR}\\\" \\\"${STORAGE_DIR}\\\" \\\"${SECRETS_DIR}\\\" \\\"${DUMPS_DIR}\\\"\\n chmod -R g=u \\\"${HOME_DIR}\\\" \\\"${STORAGE_DIR}\\\" \\\"${SECRETS_DIR}\\\" \\\"${DUMPS_DIR}\\\"\\n\\n\" did not complete successfully: exit code: 127</code></p>",
+        "id": 453771318,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721846491
+    },
+    {
+        "content": "<p>This is a new one on me. Any ideas? I'm not doing anything Docker-related in PR <a href=\"https://github.com/IQSS/dataverse/issues/10721\">#10721</a>.</p>",
+        "id": 453771368,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721846517
+    },
+    {
+        "content": "<p>I get the same error when I run <code>mvn -f modules/container-base -Pct package</code> on a Rocky 8 box.</p>",
+        "id": 453777541,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721848833
+    },
+    {
+        "content": "<p>If I remove all the \"RUN &lt;&lt;EOF\" stanzas I can build the base image but I have a feeling we need them. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 453779073,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721849297
+    },
+    {
+        "content": "<p>From this file, I mean:</p>\n<p>modules/container-base/src/main/docker/Dockerfile</p>",
+        "id": 453781275,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721850135
+    },
+    {
+        "content": "<p>For the first stanza, if I delete several lines at the end, it works:</p>\n<div class=\"codehilite\"><pre><span></span><code>RUN &lt;&lt;EOF\n    # Create pathes\n    mkdir -p &quot;${HOME_DIR}&quot; &quot;${PAYARA_DIR}&quot; &quot;${DEPLOY_DIR}&quot; &quot;${CONFIG_DIR}&quot; &quot;${SCRIPT_DIR}&quot;\n    mkdir -p &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;\n    # Create user\n\nEOF\n</code></pre></div>",
+        "id": 453781355,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721850183
+    },
+    {
+        "content": "<p>The next line is this:</p>\n<div class=\"codehilite\"><pre><span></span><code>addgroup --gid ${GID} payara\n</code></pre></div>\n<p>And come to think of it, <a href=\"https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721\">https://github.com/IQSS/dataverse/actions/runs/10078623902/job/27869639991?pr=10721</a> does say <code>[INFO] DOCKER&gt; 0.711 /bin/bash: line 5: addgroup: command not found</code> <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 453781637,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721850318
+    },
+    {
+        "content": "<p>Hmm... \"[Bug]: Error building with temurin-17: adduser not found\" - <a href=\"https://github.com/adoptium/containers/issues/606\">https://github.com/adoptium/containers/issues/606</a></p>",
+        "id": 453781952,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721850448
+    },
+    {
+        "content": "<p>\"From what I understand, <a href=\"https://github.com/adoptium/containers/commit/d762761bff59ad4ee3bacf89050e2081e5464c65\">this commit</a> from 2 week ago changed the default base image from Ubuntu focal (20.04) to Ubuntu noble (24.04).</p>\n<p>The official <code>ubuntu:focal</code> image used to have <code>useradd</code> installed by default, but <code>ubuntu:noble</code> does not:\"</p>",
+        "id": 453781996,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721850472
+    },
+    {
+        "content": "<p>Hmm, you'd think this would fix it but I'm still getting Ubuntu 24:</p>\n<div class=\"codehilite\"><pre><span></span><code>$ git diff\ndiff --git a/modules/container-base/src/main/docker/Dockerfile b/modules/container-base/src/main/docker/Dockerfile\nindex 93f9fa4f0c..4e03b3ee94 100644\n--- a/modules/container-base/src/main/docker/Dockerfile\n+++ b/modules/container-base/src/main/docker/Dockerfile\n@@ -22,7 +22,7 @@\n  # Make the Java base image and version configurable (useful for trying newer Java versions and flavors)\n-ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre&quot;\n+ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre-focal&quot;\n FROM $JAVA_IMAGE\n ```\n</code></pre></div>",
+        "id": 453783738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721851190
+    },
+    {
+        "content": "<p>This works:</p>\n<div class=\"codehilite\"><pre><span></span><code>-ARG JAVA_IMAGE=&quot;eclipse-temurin:17-jre&quot;\n-FROM $JAVA_IMAGE\n+FROM eclipse-temurin:17-jre-focal\n</code></pre></div>",
+        "id": 453785471,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721851678
+    },
+    {
+        "content": "<p>But I'm not sure why I can't just change the env variable.</p>",
+        "id": 453785538,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721851687
+    },
+    {
+        "content": "<p>I created an issue: Upgrade from Ubuntu 22 to 24 breaks container images <a href=\"https://github.com/IQSS/dataverse/issues/10722\">#10722</a></p>",
+        "id": 453789691,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721852764
+    },
+    {
+        "content": "<p>I went ahead and pushed some fixes into this PR, which I renamed:</p>\n<p>add local_lib mvn repo and primefaces themes, pin base image to Ubuntu 22 <a href=\"https://github.com/IQSS/dataverse/issues/10721\">#10721</a></p>",
+        "id": 453792546,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721853752
+    },
+    {
+        "content": "<p>I closed that PR <a href=\"https://github.com/IQSS/dataverse/issues/10721\">#10721</a> and am focusing on this one instead:</p>\n<p>Security optimizations for the container base image <a href=\"https://github.com/IQSS/dataverse/issues/10672\">#10672</a></p>",
+        "id": 453947672,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721913699
+    },
+    {
+        "content": "<p>However, I'm getting a weird error: <code>[ERROR] DOCKER&gt; Unable to inspect image [solr:] : {\"message\":\"invalid reference format\"} (Bad Request: 400) [{\"message\":\"invalid reference format\"} (Bad Request: 400)]</code></p>\n<p>More lines of output at <a href=\"https://github.com/IQSS/dataverse/pull/10672#issuecomment-2250307844\">https://github.com/IQSS/dataverse/pull/10672#issuecomment-2250307844</a></p>",
+        "id": 453947816,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721913744
+    },
+    {
+        "content": "<p>There is a tag missing</p>",
+        "id": 453947862,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721913762
+    },
+    {
+        "content": "<p>Oh. Did I do something wrong?</p>",
+        "id": 453948044,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721913827
+    },
+    {
+        "content": "<p>Not sure... <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 453948073,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721913839
+    },
+    {
+        "content": "<p>Nope, fails here too.</p>",
+        "id": 453948685,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914011
+    },
+    {
+        "content": "<p>Let me check</p>",
+        "id": 453948696,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914014
+    },
+    {
+        "content": "<p>That's odd - it doesn't push the tag into the configbaker build...</p>",
+        "id": 453948950,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914069
+    },
+    {
+        "content": "<p>If changing the ARG value does not work, you may be calling docker build with a --buildarg argument overriding your default setting in the Dockerfile.</p>",
+        "id": 453949108,
+        "sender_full_name": "Kris Dekeyser (KU Leuven)",
+        "timestamp": 1721914096
+    },
+    {
+        "content": "<p>I think there was an upstream issue about this... Let me go look</p>",
+        "id": 453949200,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914116
+    },
+    {
+        "content": "<p><a href=\"https://github.com/fabric8io/docker-maven-plugin/issues/1800\">https://github.com/fabric8io/docker-maven-plugin/issues/1800</a></p>",
+        "id": 453949301,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914136
+    },
+    {
+        "content": "<p>Merged 5 days ago...</p>",
+        "id": 453949359,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914147
+    },
+    {
+        "content": "<p><a href=\"https://github.com/fabric8io/docker-maven-plugin/issues/1776\">https://github.com/fabric8io/docker-maven-plugin/issues/1776</a></p>",
+        "id": 453949538,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914189
+    },
+    {
+        "content": "<p>Closes a while ago as fixed, but missing a release...</p>",
+        "id": 453949599,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914202
+    },
+    {
+        "content": "<p>And still no newer release... <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 453949757,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914233
+    },
+    {
+        "content": "<p>So maybe we downgrade to 0.43.4 again and tell people to use the 0.45-SNAPSHOT if they run into the driver flag problem?</p>",
+        "id": 453949924,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721914287
+    },
+    {
+        "content": "<p>We talked about this during the containerization meeting: <a href=\"https://docs.google.com/document/d/13Zxg_iFiTOYfIJkUSmb7ytL-OeIc2vPGCuoOvtPAd6w/\">https://docs.google.com/document/d/13Zxg_iFiTOYfIJkUSmb7ytL-OeIc2vPGCuoOvtPAd6w/</a></p>",
+        "id": 453956461,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721915640
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> it is possible to auto-active a profile just for Macs. Put the links in the meeting notes doc</p>",
+        "id": 453957371,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721915929
+    },
+    {
+        "content": "<p>Thanks!</p>",
+        "id": 453967010,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721918280
+    },
+    {
+        "content": "<p>Ok, I merged <a href=\"https://github.com/IQSS/dataverse/issues/10672\">#10672</a>.</p>",
+        "id": 453996452,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721925080
+    },
+    {
+        "content": "<p>Before doing so I put docker maven plugin back to version it was before I messed with it.</p>",
+        "id": 453996713,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721925147
+    },
+    {
+        "content": "<p>I tested on Rocky 8. Let's worry about Macs in some other effort.</p>",
+        "id": 453996839,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721925197
+    },
+    {
+        "content": "<p>DMP 0.45 is out. <a href=\"https://github.com/fabric8io/docker-maven-plugin/releases/tag/v0.45.0\">https://github.com/fabric8io/docker-maven-plugin/releases/tag/v0.45.0</a></p>",
+        "id": 454519538,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722109150
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> do you want to give it a shot on your Mac?</p>",
+        "id": 454519584,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722109167
+    },
+    {
+        "content": "<p>Then we can maybe FastTrack an update of the plugin</p>",
+        "id": 454519642,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722109190
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> sure! Do you want to go ahead and make a PR? If I can build it on my Mac I'll merge it.</p>",
+        "id": 454816609,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722255310
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I went ahead and made a PR: upgrade docker maven plugin to 0.45 <a href=\"https://github.com/IQSS/dataverse/issues/10730\">#10730</a></p>",
+        "id": 454838060,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722260571
+    },
+    {
+        "content": "<p>If you can approve and merge it, I'll appreciate it.</p>",
+        "id": 454838126,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722260585
+    },
+    {
+        "content": "<p>Builds on my machine!</p>",
+        "id": 454839354,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722260903
+    },
+    {
+        "content": "<p>Looks like CI is done too</p>",
+        "id": 454839530,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722260942
+    },
+    {
+        "content": "<p>Looks like good to go for me!</p>",
+        "id": 454839594,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722260959
+    },
+    {
+        "content": "<p>Great. I stuck it in \"ready for review\". Please feel free to approve (at minimum) and merge (I hope!).</p>",
+        "id": 454840328,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722261091
+    },
+    {
+        "content": "<p>Done and done and done</p>",
+        "id": 454840393,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722261104
+    },
+    {
+        "content": "<p>Perfect! Thanks!</p>",
+        "id": 454840528,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722261129
+    },
+    {
+        "content": "<p>Hi!</p>\n<p>I just wanted to do a clean install of  our 6.1 based installation and got bitten by the <code>addgroup: command not found</code> thing.</p>\n<p>Is  there any way to somehow backport these changes to older Dataverse versions? And these changes are still just in <code>develop</code> and not in <code>main</code>, right?</p>\n<p>What I tried is to copy the <code>modules/*</code> from <code>develop</code> to our own install. This way <code>mvn -Pct -f modules/container-base install</code> works,  but then <code>mvn -Pct docker:run</code> fails with</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_dataverse&gt; /opt/payara/scripts/init_2_configure.sh: line 59: POSTBOOT_COMMANDS: unbound variable\n</code></pre></div>\n<p>Any idea how to make our old installation work? Is there maybe a way to get the older version of the <code>eclipse-temurin:11-jre</code> image?</p>",
+        "id": 465137854,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1724666262
+    },
+    {
+        "content": "<p>Ok, I solved it by just copying the necessary <code>groupadd</code>, <code>useradd</code> commands, like these:</p>\n<div class=\"codehilite\"><pre><span></span><code>    # Remove the default user if present (do not fail build if not, introduced by Ubuntu 24.04)\n    userdel --force --remove ubuntu || true\n    groupdel -f ubuntu || true # for some reason, groupdel on Ubuntu 22.04 does not like --force\n    # Create user\n    groupadd --gid &quot;${GID}&quot; &quot;${LINUX_GROUP}&quot;\n    useradd --system --uid &quot;${UID}&quot; --no-create-home --shell /bin/false --home &quot;${HOME_DIR}&quot; --gid &quot;${LINUX_GROUP}&quot; &quot;${LINUX_USER}&quot;\n    echo &quot;${LINUX_USER}:$LINUX_PASSWORD&quot; | chpasswd\n    # Set permissions\n    # Note: Following OpenShift best practices for arbitrary user id support:\n    #       https://docs.openshift.com/container-platform/4.14/openshift_images/create-images.html#use-uid_create-images\n    chown -R &quot;${LINUX_USER}:0&quot; &quot;${HOME_DIR}&quot; &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;\n    chmod -R g=u &quot;${HOME_DIR}&quot; &quot;${STORAGE_DIR}&quot; &quot;${SECRETS_DIR}&quot; &quot;${DUMPS_DIR}&quot;\n</code></pre></div>\n<p>With this fix can now use the original 6.1 docker scripts as is.</p>",
+        "id": 465180605,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1724677418
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> I'm glad you figured out a work around. One of our priorities is to start tagging both the <a href=\"https://hub.docker.com/r/gdcc/base/tags\">base</a> image and <a href=\"https://hub.docker.com/r/gdcc/dataverse/tags\">dataverse</a> image with a version number. Would this help? If you could pin the base image you use to version 6.1 or whatever? (I'm just using 6.1 as an example. We would only tag new images.)</p>",
+        "id": 465191917,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724680003
+    },
+    {
+        "content": "<p>In most cases, that would be great. However in this specific case a dependency (eclipse-temurin:11-jre) changed in an unpredictable, backward way. So, even if the dataverse base images are tagged, but you need to rebuild it, the changed dependency would still cause problems. </p>\n<p>I am kind of disappointed that dockerhub tags are not permanent and tagging doesn't guarantee that the tagged image will be the same once it is tagged, forever. Instead the tag is just a name, pointer that may point to anything and changed in the future.</p>\n<p>Of course for dataverse base images there could be a methodology (an agreement of the docker image publisher), which guarantees tag permanence when an image is stored in dockerhub. Do you plan to do something like this and make the base images available in dockerhub or some other repository?</p>",
+        "id": 465202292,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1724682277
+    },
+    {
+        "content": "<p>Well, I think it's up to us what our tagging policy is. We could push a tag once and never change it. Or we could push the same tag over and over, for security updates, for example.</p>",
+        "id": 465205220,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724683009
+    },
+    {
+        "content": "<p>As I wrote in <a href=\"#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150\">https://dataverse.zulipchat.com/#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150</a>, let's follow <a href=\"https://docs.vmware.com/en/VMware-Tanzu-Application-Catalog/services/tutorials/GUID-understand-rolling-tags-containers-index.html\">VMWare's Bitnami example</a>.</p>",
+        "id": 465214947,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724685336
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/375812-containers/topic/Upgrade.20from.20Ubuntu.2022.20to.2024/near/465214947\">said</a>:</p>\n<blockquote>\n<p>As I wrote in <a href=\"#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150\">https://dataverse.zulipchat.com/#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/452365150</a>, let's follow VMWare's Bitnami example.</p>\n</blockquote>\n<p>That's great, thanks!</p>",
+        "id": 465215473,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1724685475
+    }
+]

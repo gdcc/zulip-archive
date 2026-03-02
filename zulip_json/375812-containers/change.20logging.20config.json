@@ -1,0 +1,476 @@
+[
+    {
+        "content": "<p>A note: we could use the REST API to change logging levels. The configbaker image could carry scripts with well known / often used parts of Dataverse and accept list of stuff where to enable / disable logs.</p>",
+        "id": 384774425,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692018942
+    },
+    {
+        "content": "<p>I'd rather like to have means to configure the log levels via a documented ENV variable...</p>",
+        "id": 385670446,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692277813
+    },
+    {
+        "content": "<p>How should such an env var look like?</p>",
+        "id": 385670593,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692277883
+    },
+    {
+        "content": "<p>And would you be OK with rebooting the container or should it be possible to alter logging while running?</p>",
+        "id": 385670945,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692278006
+    },
+    {
+        "content": "<p>I would love spring like syntax...https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#appendix.application-properties</p>",
+        "id": 385671343,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692278184
+    },
+    {
+        "content": "<p>Could you sketch an example?</p>",
+        "id": 385671995,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692278422
+    },
+    {
+        "content": "<p>Similar to this [1]. However, I'm not sure if that works with current configuration slf4j-jdk11. It does work with log4j and logback...</p>\n<p>[1] <a href=\"https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-levels\">https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-levels</a></p>",
+        "id": 385672354,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692278571
+    },
+    {
+        "content": "<p>I think <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> does something like that with a properties file. Not sure.</p>",
+        "id": 385672704,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692278701
+    },
+    {
+        "content": "<p>Yeah, there is domain1/config/logging.properties.</p>",
+        "id": 385672762,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692278718
+    },
+    {
+        "content": "<p>I have it on the agenda: <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>",
+        "id": 385673219,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692278863
+    },
+    {
+        "content": "<p>3 minutes! <span aria-label=\"clock\" class=\"emoji emoji-1f557\" role=\"img\" title=\"clock\">:clock:</span></p>",
+        "id": 385673312,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692278884
+    },
+    {
+        "content": "<p>Initially, I would be sufficient to configure the input for <code>as-admin set-log-level</code> via env vars. This requires a restart but already eases the container debugging..</p>",
+        "id": 385673507,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692278947
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> have your say during the meeting! We're on now <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 385674895,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692279403
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"617722\">Johannes D</span> <a href=\"#narrow/stream/375812-containers/topic/change.20logging.20config/near/385673507\">said</a>:</p>\n<blockquote>\n<p>Initially, I would be sufficient to configure the input for <code>as-admin set-log-level</code> via env vars. This requires a restart but already eases the container debugging..</p>\n</blockquote>\n<p>to my experience, Glassfish and (now) Payara pick up changes to <a href=\"http://logging.properties\">logging.properties</a> on-the-fly, unless you're averse to cat and/or awk/sed?</p>",
+        "id": 385677022,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1692280035
+    },
+    {
+        "content": "<p>O rly? On the fly?</p>",
+        "id": 385677374,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692280144
+    },
+    {
+        "content": "<p>If thats the case, we could just update the <a href=\"http://init_2_configure.sh\">init_2_configure.sh</a> script to echo an ENV var to the file, right?</p>",
+        "id": 385677860,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692280280
+    },
+    {
+        "content": "<p>We probably put this in the base image, not the app image script. This is useful for more than just the app image.</p>",
+        "id": 385679494,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692280751
+    },
+    {
+        "content": "<p>One thing we need to take care of: we must not \"just write in the file\". This will write into the overlayfs, which is a baaaaad idea</p>",
+        "id": 385679574,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692280779
+    },
+    {
+        "content": "<p>So here's a thought. We could make a script sit in the background within the container, watch for some logging config to appear somewhere (on K8s that would be a mounted configmap key or similar, autoupdating on change), merge it with the original and replace it. I already put the infrastructure in place to do such things in a safe way with the init system in place. <span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> what do you think?</p>",
+        "id": 385688184,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692283044
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> Sound good!</p>",
+        "id": 385835783,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1692340566
+    },
+    {
+        "content": "<p>Yesterday, I made PR <a href=\"https://github.com/IQSS/dataverse/issues/9863\">#9863</a> that changes log levels (as a workaround for <a href=\"https://github.com/IQSS/dataverse/issues/9806\">#9806</a>). I used asadmin, like normal.</p>",
+        "id": 388288205,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1693475607
+    },
+    {
+        "content": "<p>Should we have an issue or at least a note to track what we want to change? Use the REST API to change logging levels? Is that it?</p>",
+        "id": 389626764,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694083760
+    },
+    {
+        "content": "<p>Issues sounds good :-)</p>",
+        "id": 389628530,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694084306
+    },
+    {
+        "content": "<p>Would you like to do the honors? <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 389629203,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694084466
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/375812-containers/topic/change.20logging.20config/near/385688184\">said</a>:</p>\n<blockquote>\n<p>So here's a thought. We could make a script sit in the background within the container, watch for some logging config to appear somewhere (on K8s that would be a mounted configmap key or similar, autoupdating on change), merge it with the original and replace it. I already put the infrastructure in place to do such things in a safe way with the init system in place. <span class=\"user-mention silent\" data-user-id=\"617722\">Johannes D</span> <span class=\"user-mention silent\" data-user-id=\"626369\">Don Sizemore</span> what do you think?</p>\n</blockquote>\n<p>sounds great to me. in my experience Payara picks up changes to <a href=\"http://logging.properties\">logging.properties</a> on the fly, so your changes could be as granular (numerous) as needed.</p>",
+        "id": 389865657,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1694173554
+    },
+    {
+        "content": "<p>We're talking about this again. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> See <a href=\"https://docs.google.com/document/d/1toiFxJKGvrYMy9KrW9GZ4U6FLGhMaCipJ9ggtvZFwgc/edit?usp=sharing\">https://docs.google.com/document/d/1toiFxJKGvrYMy9KrW9GZ4U6FLGhMaCipJ9ggtvZFwgc/edit?usp=sharing</a></p>",
+        "id": 432711048,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712843628
+    },
+    {
+        "content": "<p>Here's the recording: <a href=\"https://harvard.zoom.us/rec/share/LtMO_BjkgEHvqdgjnCv9V0ko6_I3L-VZ-wZapO6JiZf9aFRSs7tkDP182plACuus.fnTfrsTArCtjKFng\">https://harvard.zoom.us/rec/share/LtMO_BjkgEHvqdgjnCv9V0ko6_I3L-VZ-wZapO6JiZf9aFRSs7tkDP182plACuus.fnTfrsTArCtjKFng</a></p>",
+        "id": 432735563,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712850124
+    },
+    {
+        "content": "<p>I'm investigating adding a JUL to SLF4J bridge to make use of Logback for the server logs. Logback supports hot-reloading logging config files as well as MDC etc.</p>",
+        "id": 450523854,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720634543
+    },
+    {
+        "content": "<p>It would be neat if we make Dataverse use SLF4J instead of JUL, too.</p>",
+        "id": 450523930,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720634572
+    },
+    {
+        "content": "<p>That way we could make use enabling debugging stream in production more selectively, e.g. for a single user.</p>",
+        "id": 450524052,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720634606
+    },
+    {
+        "content": "<p>(Reason for me looking into this: I want to disable warnings about missing property files for our custom metadata block where we just don't care...)</p>",
+        "id": 450524292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720634667
+    },
+    {
+        "content": "<p>But JUL is the standard. Shouldn't we use the standard? Fewer dependencies.</p>",
+        "id": 450534623,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720637389
+    },
+    {
+        "content": "<p>A standard with flaws...</p>",
+        "id": 450541554,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720639032
+    },
+    {
+        "content": "<p>We need SLF4J anyway. Best practice for any library, plugin etc is to use a logging facade. Usually that is SLF4J</p>",
+        "id": 450541793,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720639082
+    },
+    {
+        "content": "<p>If we're talking standards and less deps: one should use System.Logger then <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 450640582,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720683862
+    },
+    {
+        "content": "<p>Yesterday I really dug deep into this. OSGi and everything.</p>",
+        "id": 450640621,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720683882
+    },
+    {
+        "content": "<p>It looks like we cannot use the SLF4JBridge handler without getting the application involved.</p>",
+        "id": 450640695,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720683911
+    },
+    {
+        "content": "<p>The logging is initialized very early in the boot process from <code>glassfish/modules/logging.jar</code>, which is an OSGi module. Looking into that one reveals that it has a MANIFEST that declares a certain class path and it seems impossible to make some other lib appear on that path from the outside. (At least I don't know how to do that.)</p>",
+        "id": 450641025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720684044
+    },
+    {
+        "content": "<p>I even went ahead and forked <a href=\"https://github.com/goodees/goodees/blob/master/payara-logback/README.adoc\">https://github.com/goodees/goodees/blob/master/payara-logback/README.adoc</a> into a more modern version, but no luck to inject it.</p>",
+        "id": 450641288,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720684135
+    },
+    {
+        "content": "<p>It seems we're stuck with JUL... Glassfish completely rewrote their logging subsystem to use \"GlassFish Java Util Logging Extension\", see also <a href=\"https://www.youtube.com/watch?v=j2gACdwWyNk\">https://www.youtube.com/watch?v=j2gACdwWyNk</a></p>\n<div class=\"youtube-video message_inline_image\"><a data-id=\"j2gACdwWyNk\" href=\"https://www.youtube.com/watch?v=j2gACdwWyNk\"><img src=\"https://uploads.zulipusercontent.net/68e442ac3a2768ab4da41b55d0f64497e91b8b0f/68747470733a2f2f692e7974696d672e636f6d2f76692f6a32674143647757794e6b2f64656661756c742e6a7067\"></a></div>",
+        "id": 450641516,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720684219
+    },
+    {
+        "content": "<p>What we can do though is to enable switch between log formats, e.g. from ULF to JSON. JSON logs are much better to handle when using fluentd etc to ship the logs to analysis. We need to set <code>java.util.logging.ConsoleHandler.formatter</code> using <a href=\"https://docs.payara.fish/community/docs/Technical%20Documentation/Payara%20Server%20Documentation/General%20Administration/Administering%20the%20Logging%20Service.html#env-var-replacement\">env var support</a>. Defaulting to <code>com.sun.enterprise.server.logging.UniformLogFormatter</code>, obviously...</p>",
+        "id": 450645459,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720685593
+    },
+    {
+        "content": "<p>Notes to self:</p>\n<ul>\n<li>Copy the original <a href=\"http://logging.properties\">logging.properties</a> on startup to a place where we can make edits without tampering with the root filesystem (entrypoint/init script thing)</li>\n<li>If the file is already present, don't do anything</li>\n<li>Make the application read the properties file from this location using a system property feed by MPCONFIG</li>\n<li>Add Admin API endpoint to list all known loggers (so people can get an idea of what is available)</li>\n<li>Read additional logging configs via MPCONFIG setting</li>\n<li>Use some internal logic to update the JUL config that applies changes when the MPCONFIG setting changes. The setting should probably be merged from different sources, overriding as configured by ordinal but still merging together stuff. (See also <a href=\"https://stackoverflow.com/questions/49414378\">https://stackoverflow.com/questions/49414378</a> for ideas how to do the JUL changes)</li>\n</ul>",
+        "id": 450667095,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720691944
+    },
+    {
+        "content": "<p>From that video: \"For GlassFish 7 we completely changed the logging system\". Interesting. Does that apply to us, though? Since we're on Payara?</p>",
+        "id": 450999479,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720795981
+    },
+    {
+        "content": "<p>I might have been doing it wrong with how I added the packages... Maybe I need to retry with what is written here: <a href=\"https://docs.payara.fish/community/docs/Technical%20Documentation/Application%20Development/Class%20Loaders.html#extension-libraries\">https://docs.payara.fish/community/docs/Technical%20Documentation/Application%20Development/Class%20Loaders.html#extension-libraries</a></p>",
+        "id": 451094319,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720826835
+    },
+    {
+        "content": "<p>Also, I did add a modules.java - maybe I sealed the package by accident, so it could not load any classes from it.</p>",
+        "id": 451094409,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720826885
+    },
+    {
+        "content": "<p>I've been looking into Observability as of late. A part of OpenTelemetry infrastructure like Sentry, Loki etc is sending these tools logs.</p>",
+        "id": 516976373,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736517
+    },
+    {
+        "content": "<p>It makes a lot of sense to enable such things in containers, as all of these tools are often around in a container production environment, especially when running on K8s</p>",
+        "id": 516976479,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736559
+    },
+    {
+        "content": "<p>Nice. I think this topic was originally about changing log levels on the fly. I still don't know how to do this. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 516976598,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1746736606
+    },
+    {
+        "content": "<p>So now I'm wondering if I should use the JUl-to-SFL4J bridge to re-route all messages from JUL to Logback</p>",
+        "id": 516976621,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736616
+    },
+    {
+        "content": "<p>With Logback, you can use JMX to change the logging levels on the fly without app restarts</p>",
+        "id": 516976674,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736642
+    },
+    {
+        "content": "<p>orly</p>",
+        "id": 516976705,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1746736658
+    },
+    {
+        "content": "<p>With Logback, you can use a config file which can be reloaded dynamically</p>",
+        "id": 516976710,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736659
+    },
+    {
+        "content": "<p>So maybe that gives us leverage to support all of these cases!</p>",
+        "id": 516976738,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736675
+    },
+    {
+        "content": "<p>So I'd say we could include <a href=\"https://github.com/jiaqi/jmxterm\">https://github.com/jiaqi/jmxterm</a> in the image / configbaker or maybe even add REST Admin API endpoints that change the levels using JMX</p>",
+        "id": 516976877,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736729
+    },
+    {
+        "content": "<p>We definitely need to make use of a proper logging library for the non-standard logs of Dataverse... <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 516976995,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736789
+    },
+    {
+        "content": "<p>Otherwise it's hard to get them out. Or at least make sure the path where they are written is configurable, so one can use a sidecar container to ship them.</p>",
+        "id": 516977084,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736821
+    },
+    {
+        "content": "<p>Writing these logs to the overlayfs is a baaaaad idea</p>",
+        "id": 516977115,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746736841
+    },
+    {
+        "content": "<p>Sure, should we take this to <a class=\"stream\" data-stream-id=\"379673\" href=\"/#narrow/channel/379673-dev\">#dev</a>? Or start with a GitHub issue to log properly?</p>",
+        "id": 516977692,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1746737129
+    },
+    {
+        "content": "<p>Let's just keep this here for a moment. This is mostly a brain dump, so I can circle back later.</p>",
+        "id": 516977771,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737162
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin ☀️</span>  Do you think we could get a PR into Dataverse that changes all loggers from JUL to SLF4J?</p>",
+        "id": 516978816,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737651
+    },
+    {
+        "content": "<p>That would spare us some of the hassle (not all, as Payara uses JUL internally)</p>",
+        "id": 516978887,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737689
+    },
+    {
+        "content": "<p>JUL is the standard but it's no good?</p>",
+        "id": 516978918,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1746737705
+    },
+    {
+        "content": "<p>Technically JUL is an implementation.</p>",
+        "id": 516978959,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737727
+    },
+    {
+        "content": "<p>It's a part of the JDK since 1.4</p>",
+        "id": 516978979,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737737
+    },
+    {
+        "content": "<p>These days, if you want it in a Jakarta like way, the industry standard is SLF4J.</p>",
+        "id": 516979077,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737767
+    },
+    {
+        "content": "<p>That's the facade and there are plenty of implementations around to send it to some concrete log system</p>",
+        "id": 516979141,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746737790
+    },
+    {
+        "content": "<p>Are we doing it right in <a href=\"https://github.com/IQSS/dataverse-hub\">https://github.com/IQSS/dataverse-hub</a> or <a href=\"https://github.com/IQSS/dataverse-marketplace\">https://github.com/IQSS/dataverse-marketplace</a> ? /cc <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span></p>",
+        "id": 516980147,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1746738190
+    },
+    {
+        "content": "<p>Note to self: keep <a href=\"https://github.com/goodees/goodees/tree/master/payara-logback\">https://github.com/goodees/goodees/tree/master/payara-logback</a> in mind and OpenTelemetry log shipping.</p>",
+        "id": 516988025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1746741858
+    },
+    {
+        "content": "<p>So I've pogged and prodded on this a bit today, trying to use Claude 3.7 to mix together an HK2 model to load SLF4J bridge plus Logback. So far, no success. Might give this tomorrow another shot. If this doesn't work out, I'm wondering if I should just create a patched Payara version that ships with the necessary libs added to the core.</p>",
+        "id": 519188890,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747678773
+    },
+    {
+        "content": "<p>@pdurbin is that overkill, creating such a patch? Not sure if the upstream would accept it... they don't seem very interested in this.</p>",
+        "id": 519189072,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747678819
+    },
+    {
+        "content": "<p>We could of course create an issue for this and vote vote vote vote. <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 519189485,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747678941
+    },
+    {
+        "content": "<p>whatever you do, it would be nice to get it into upstream</p>",
+        "id": 519189777,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1747679032
+    },
+    {
+        "content": "<p>PROGRESS!</p>",
+        "id": 519230458,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747690873
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>[#|2025-05-19T21:34:59.403+0000|SEVERE|Payara 6.2025.3|jakarta.enterprise.logging|_ThreadID=34;_ThreadName=RunLevelControllerThread-1747690499218;_TimeMillis=1747690499403;_LevelValue=1000;_MessageID=NCLS-LOGGING-00002;|\n  Could not apply the logging configuration changes.\nMultiException stack 1 of 2\ncom.sun.enterprise.module.ResolveError: Failed to start OSGiModuleImpl:: Bundle = [io.gdcc.payara-logback-hk2 [396]], State = [NEW]\n   [...]\nCaused by: org.osgi.framework.BundleException: Unable to resolve io.gdcc.payara-logback-hk2 [396](R 396.0): missing requirement [io.gdcc.payara-logback-hk2 [396](R 396.0)] osgi.wiring.package; (&amp;(osgi.wiring.package=org.slf4j)(version&gt;=2.0.0)(!(version&gt;=3.0.0))) Unresolved requirements: [[io.gdcc.payara-logback-hk2 [396](R 396.0)] osgi.wiring.package; (&amp;(osgi.wiring.package=org.slf4j)(version&gt;=2.0.0)(!(version&gt;=3.0.0)))]\n</code></pre></div>",
+        "id": 519230499,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747690891
+    },
+    {
+        "content": "<p>This stuff is hard.</p>",
+        "id": 519230560,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747690917
+    },
+    {
+        "content": "<p>YESSSS</p>",
+        "id": 519230660,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747690946
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>#!## LogManagerService.postConstruct : rootFolder=/opt/payara/appserver/glassfish\n#!## LogManagerService.postConstruct : templateDir=/opt/payara/appserver/glassfish/lib/templates\n#!## LogManagerService.postConstruct : src=/opt/payara/appserver/glassfish/lib/templates/logging.properties\n#!## LogManagerService.postConstruct : dest=/opt/payara/appserver/glassfish/domains/domain1/config/logging.properties\nSLF4J Bridge bundle is starting...\nInstalling SLF4J Bridge Handler\n</code></pre></div>",
+        "id": 519230686,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1747690954
+    },
+    {
+        "content": "<p>Go go go! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 519354407,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1747738663
+    },
+    {
+        "content": "<p>Note to self: apparently the class loading didn't properly work out. Maybe try again with an Extension Library and add to bootdelegation? <a href=\"https://docs.payara.fish/community/docs/6.2025.7/Technical%20Documentation/Application%20Development/Class%20Loaders.html#installing-libraries\">https://docs.payara.fish/community/docs/6.2025.7/Technical%20Documentation/Application%20Development/Class%20Loaders.html#installing-libraries</a></p>",
+        "id": 532283910,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1754047135
+    }
+]

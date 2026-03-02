@@ -1,0 +1,139 @@
+<html>
+<head><meta charset="utf-8"><title>CrossRef DOI provider · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html">CrossRef DOI provider</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="395835920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395835920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Konrad Perłowski <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395835920">(Oct 10 2023 at 08:51)</a>:</h4>
+<p>Hello, I want to add the ability to add CrossRef as a new DOI provider. I wrote some code (mainly inspired by the DataCite code), but I encountered one problem - after creating the dataset, Dataverse calls the 'reserveIdentifier' method, which in the case of DataCite reserves the DOI number, which is impossible in the case of CrossRef (CrossRef does not provide the option to reserve DOI). How can I deal with this problem?<br>
+I would also like to ask if I should create some kind of draft pull request where I can show my code?</p>
+
+
+
+<a name="395836298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395836298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395836298">(Oct 10 2023 at 08:53)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="657847">@Konrad Perłowski</span> and welcome! <span aria-label="wave" class="emoji emoji-1f44b" role="img" title="wave">:wave:</span></p>
+
+
+
+<a name="395836747"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395836747" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395836747">(Oct 10 2023 at 08:56)</a>:</h4>
+<p>Heads up that there are plans to make PID providers pluggable as we now enabled for exporters. How urgent is your development? Are you fine with sticking to a fork for now? (I somewhat doubt a PR to add a CrossRef provider would make it into upstream soon, but let's ask <span class="user-mention" data-user-id="598112">@Philip Durbin</span> to verify that)</p>
+
+
+
+<a name="395837333"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395837333" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395837333">(Oct 10 2023 at 08:59)</a>:</h4>
+<p>Back to your original problem (and please let's stick to that in this topic, please create a new topic for the fork vs plugin thing):</p>
+<blockquote>
+<p>Dataverse calls the 'reserveIdentifier' method</p>
+</blockquote>
+<p>Are  you referring to <a href="https://github.com/IQSS/dataverse/blob/a209f43d3f7fa44d5e8f06809ad16783ef63ee68/src/main/java/edu/harvard/iq/dataverse/DOIDataCiteServiceBean.java#L64-L80">DOIDataCiteServiceBean.createIdentifier(DvObject dvObject)</a> here? I'm not aware of a "reserveIdentifier" method coming from the interface <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/GlobalIdServiceBean.java#L14-L14">GlobalIdServiceBean</a>.</p>
+
+
+
+<a name="395837975"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395837975" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395837975">(Oct 10 2023 at 09:02)</a>:</h4>
+<p>Maybe better examples to learn from are <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/PermaLinkPidProviderServiceBean.java">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/PermaLinkPidProviderServiceBean.java</a> and <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/FakePidProviderServiceBean.java">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/pidproviders/FakePidProviderServiceBean.java</a></p>
+
+
+
+<a name="395838058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838058">(Oct 10 2023 at 09:03)</a>:</h4>
+<p>The DataCite Provider is quite messy... <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="395838529"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838529" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Konrad Perłowski <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838529">(Oct 10 2023 at 09:05)</a>:</h4>
+<p>Yes, that is the method calling reserveIdentifier. The problem is if I don't post any doi to CrossRef after creating new draft dataset, this doi could be taken later on by some other dataset, but I can't post draft dataset as published one</p>
+
+
+
+<a name="395838673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838673">(Oct 10 2023 at 09:06)</a>:</h4>
+<p>Who would take that?</p>
+
+
+
+<a name="395838707"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838707" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838707">(Oct 10 2023 at 09:06)</a>:</h4>
+<p>Which way of PID generation are you planning to use?</p>
+
+
+
+<a name="395838788"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838788" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838788">(Oct 10 2023 at 09:07)</a>:</h4>
+<p>Dataverse will take care of not creating a PID again for two different entities for you.</p>
+
+
+
+<a name="395838910"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395838910" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395838910">(Oct 10 2023 at 09:08)</a>:</h4>
+<p>(For a very long time, you could not reserve DOIs at DataCite as well.)</p>
+
+
+
+<a name="395860167"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395860167" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395860167">(Oct 10 2023 at 11:17)</a>:</h4>
+<p>Yes, we should check with Jim Myers (qqmyers) about refactoring the PID code. He has made a lot of progress recently and I just left a comment about this here: <a href="https://github.com/IQSS/dataverse/issues/8581#issuecomment-1755100912">https://github.com/IQSS/dataverse/issues/8581#issuecomment-1755100912</a></p>
+
+
+
+<a name="395879770"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395879770" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Andrzej Zemla <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395879770">(Oct 10 2023 at 13:07)</a>:</h4>
+<p>I guess that we can handle it with Konrad our problem (the discussion helped me to better understand the issue). But we are very interested in pluggable PID's since we are hosting repositories for 6 Universities, and were forced by DataCite policy to use 6 different doi's - so we have to run 6 instances, and then harvest them. But still, DV only supports DataCite as a provider, so support for Crossref should be useful. </p>
+<p>What is the roadmap for these plugged PID providers?</p>
+
+
+
+<a name="395881092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395881092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395881092">(Oct 10 2023 at 13:14)</a>:</h4>
+<p>I'm not sure. I don't see anything on the roadmap or the backlog board.</p>
+
+
+
+<a name="395882187"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395882187" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395882187">(Oct 10 2023 at 13:20)</a>:</h4>
+<p>Well it will probably not be this year... And probably putting money in the game will push things forward...</p>
+
+
+
+<a name="395882668"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395882668" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395882668">(Oct 10 2023 at 13:23)</a>:</h4>
+<p>I feel like there's an issue about multiple DOI authorities in a single installation.</p>
+
+
+
+<a name="395885779"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395885779" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395885779">(Oct 10 2023 at 13:39)</a>:</h4>
+<p>Ah ha. Found it: Support flexible option for DOI and Handle registration, in same installation <a href="https://github.com/IQSS/dataverse/issues/3623">#3623</a></p>
+
+
+
+<a name="395885888"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395885888" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395885888">(Oct 10 2023 at 13:40)</a>:</h4>
+<p>And it's currently tagged as a 6.1 proposal.</p>
+
+
+
+<a name="395886573"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/395886573" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#395886573">(Oct 10 2023 at 13:43)</a>:</h4>
+<p><span class="user-mention" data-user-id="657879">@Andrzej Zemla</span> I left a comment with your use case.</p>
+
+
+
+<a name="465518470"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/CrossRef%20DOI%20provider/near/465518470" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/CrossRef.20DOI.20provider.html#465518470">(Aug 27 2024 at 17:50)</a>:</h4>
+<p><span class="user-mention" data-user-id="657847">@Konrad Perłowski</span> hi! We've been leaving comments on your PR <a href="https://github.com/IQSS/dataverse/issues/10235">#10235</a>. It has merge conflicts and we created a new PR <a href="https://github.com/IQSS/dataverse/issues/10803">#10803</a>. We'd love to hear what you think. Also, we'd like to make sure you get credit somehow, if you want it, for kicking this off!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

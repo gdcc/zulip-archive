@@ -1,0 +1,56 @@
+<html>
+<head><meta charset="utf-8"><title>OAI endpoint only delivers 10 results · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html">OAI endpoint only delivers 10 results</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="573015902"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OAI%20endpoint%20only%20delivers%2010%20results/near/573015902" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html#573015902">(Feb 10 2026 at 11:48)</a>:</h4>
+<p>Hi<br>
+We have noticed the OAI-PMH harvesting endpoint only delivers 10 results.<br>
+Are we doing something wrong?</p>
+<p>See these examples:<br>
+<a href="https://demo.dataverse.deic.dk/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json">https://demo.dataverse.deic.dk/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json</a><br>
+<a href="https://dataverse.no/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json">https://dataverse.no/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json</a><br>
+<a href="https://dataverse.harvard.edu/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json">https://dataverse.harvard.edu/oai?verb=ListRecords&amp;metadataPrefix=dataverse_json</a></p>
+
+
+
+<a name="573019611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OAI%20endpoint%20only%20delivers%2010%20results/near/573019611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html#573019611">(Feb 10 2026 at 12:03)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="671269">@Asbjørn Skødt</span> ,</p>
+<p>The normal OAI-PMH behaviour is to return a limited number of results at a time (10 in the main Dataverse and Demo Dataverse cases, and 100 in most other instances).<br>
+You need to keep requesting the next batch of results (another 10, then the next 10, and so on).<br>
+At the end of the page you can see the resumption token (this value will change):</p>
+<p>&lt;resumptionToken completeListSize="94" cursor="0"&gt;b2Zmc2V0OjoxMHxwcmVmaXg6OmRhdGF2ZXJzZV9qc29u&lt;/resumptionToken&gt;</p>
+<p>So, next oai command to request another 10 results should be: <br>
+<a href="https://demo.dataverse.deic.dk/oai?verb=ListRecords&amp;resumptionToken=b2Zmc2V0OjoxMHxwcmVmaXg6OmRhdGF2ZXJzZV9qc29u">https://demo.dataverse.deic.dk/oai?verb=ListRecords&amp;resumptionToken=b2Zmc2V0OjoxMHxwcmVmaXg6OmRhdGF2ZXJzZV9qc29u</a></p>
+
+
+
+<a name="573022745"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OAI%20endpoint%20only%20delivers%2010%20results/near/573022745" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html#573022745">(Feb 10 2026 at 12:17)</a>:</h4>
+<p>We understand.<br>
+Thank you so much.</p>
+
+
+
+<a name="573296264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OAI%20endpoint%20only%20delivers%2010%20results/near/573296264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html#573296264">(Feb 11 2026 at 14:10)</a>:</h4>
+<p>Making this a tad more complete: if you as an installation want to return larger amounts of records at a time, you can change the MPCONFIG based setting "dataverse.oai.server.maxrecords" to whatever value you like. It defaults to 10.</p>
+
+
+
+<a name="573296537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/OAI%20endpoint%20only%20delivers%2010%20results/near/573296537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/OAI.20endpoint.20only.20delivers.2010.20results.html#573296537">(Feb 11 2026 at 14:11)</a>:</h4>
+<p>A word of caution: depending on the amount of exported data, this may blow up in your face if too large. Especially datasets with lots of variables and files may be dangerous.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

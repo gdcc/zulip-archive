@@ -1,0 +1,530 @@
+[
+    {
+        "content": "<p>Sorry but I was in a couple of workshops back-to-back today. I wanted to create the thread as <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> suggested on <a href=\"https://github.com/IQSS/dataverse/issues/9905\">#9905</a> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>, this is my last response on that thread: </p>\n<p>I think that _* text=auto_ just defaults to the default behavior <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span> where people have to set the configuration on their machine with _git config --global core.autocrlf input_ </p>\n<p>Both solutions work but the idea of this change was that that every person who pulls out the configuration needs to change their configuration to input or false to turn off the conversion, this is an additional step that can be omitted, also if someone pulled out the project before reading the documentation (<span aria-label=\"rolling eyes\" class=\"emoji emoji-1f644\" role=\"img\" title=\"rolling eyes\">:rolling_eyes:</span>), and they change the configuration after the files will be converted already.</p>\n<p>This doesn't affect linux users since the conversion happens to Windows and docker runs a linux instance, so basically on linux is - linux (project) -&gt; linux (dev) - &gt; linux(docker) and for widnows is linux (project) -&gt; windows (dev) - &gt; linux(docker) </p>\n<p>let me know your thoughts, as for more additional files we can add them as they find conflicting, mostly .sh files are the ones that give trouble since they are executed on the docker (same <strong>logic  linux (project) -&gt; windows (dev) - &gt; linux(docker)</strong> ). I could think that if we have more resources executed by the server, like an example would be a JS file executed by Node.JS then it would need this.</p>\n<p>If I or someone else find more resources that need to be added to this file, we can add them to the .gitattributes </p>\n<p>What do you guys think about it?</p>",
+        "id": 390787669,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1694633025
+    },
+    {
+        "content": "<p>Ideally the solution would \"just work\". <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 390800931,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694638271
+    },
+    {
+        "content": "<p>With no extra config.</p>",
+        "id": 390800939,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694638276
+    },
+    {
+        "content": "<p>The maintainer of libgit2 left a related comment back in 2018. I just copied it into the pull request: <a href=\"https://github.com/IQSS/dataverse/pull/9905#issuecomment-1718309113\">https://github.com/IQSS/dataverse/pull/9905#issuecomment-1718309113</a></p>",
+        "id": 390801937,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694638754
+    },
+    {
+        "content": "<p>text=auto actually enables autocrlf for all text based files. The setting is switched off by default, setting it this way is IMHO the way to go.</p>",
+        "id": 390802618,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694639128
+    },
+    {
+        "content": "<p>I don't see a necessity right now where we need to explicitly define a different behavior for some file/type.</p>",
+        "id": 390802848,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694639238
+    },
+    {
+        "content": "<p>Quoting from <a href=\"https://www.git-scm.com/docs/gitattributes\">https://www.git-scm.com/docs/gitattributes</a> on <code>* text=auto</code>:</p>\n<blockquote>\n<p>If you want to ensure that text files that any contributor introduces to the repository have their line endings normalized, you can set the text attribute to \"auto\" for all files.</p>\n</blockquote>",
+        "id": 390803116,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694639361
+    },
+    {
+        "content": "<p>Probably I am getting a bit confused but you may have a better understanding. From what I see, the normalization is the process of transforming from LF (linux) to CRLF (windows) which would be ok if this was an application running on the host (traditional developer setup). </p>\n<p>With        *<strong><em>text= auto</em></strong>      we   <strong><em>\"ensure that text files that any contributor introduces to the repository have their line endings normalized\"</em></strong>    which would cause the normalization from LF to CRLF and would cause issues when the normalized files try to execute on Docker's linux.</p>\n<p>I will do some testing tomorrow (or maybe tonight) morning with the *text = auto feature and post the results but I think this is the opposite of the requirements for the application to work on the container.</p>",
+        "id": 390808686,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1694642216
+    },
+    {
+        "content": "<p>You are right <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> - I did not think as far, the CRLF will be a problem when building the Linux containers on Windows! Good catch! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span> </p>\n<p>I digged some more into this and here's a thought: how about we go for this (<a href=\"https://gist.github.com/jonlabelle/70a87e6871a1138ac3031f5e8e39f294\">stolen from here</a>):</p>\n<div class=\"codehilite\"><pre><span></span><code>* text=auto eol=lf\n\n# Windows batch scripts need CRLF\n*.{cmd,[cC][mM][dD]} text eol=crlf\n*.{bat,[bB][aA][tT]} text eol=crlf\n</code></pre></div>\n<p>This is BTW also <a href=\"https://code.visualstudio.com/docs/devcontainers/tips-and-tricks#_resolving-git-line-ending-issues-in-containers-resulting-in-many-modified-files\">recommended by VSCode here</a>.</p>\n<p>We probably should make our container build more bullet proof, too. Someone creating a new script or other file to be included in the container on Windows would create it with CRLF as it's the Windows default. (Not sure IDEs would resolve that in some magical way for you - IntelliJ has default as \"system dependent\".)<br>\nSo maybe we need to run a <code>dos2unix</code> just to be sure during container builds (base, app, configbaker). Got the inspiration from <a href=\"https://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings/\">here</a>.</p>\n<p>On a related note: <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> we probably should cleanup CRLF files in the repo. Otherwise, they will be autoconverted with the lines above and show up as edited files in the checkout, probably causing great confusion. Yes, we could avoid that by doing the conversion for shell scripts only, but why would it be a good idea to have such an inconsistency in a codebase? (We simply screwed up by not taking care of it before)</p>",
+        "id": 390860377,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694672293
+    },
+    {
+        "content": "<p>You know, the diff is huge but it's easy enough to hide all the whitespace changes with <a href=\"https://github.com/IQSS/dataverse/pull/9905/files?diff=unified&amp;w=1\">https://github.com/IQSS/dataverse/pull/9905/files?diff=unified&amp;w=1</a></p>\n<p>If you say we need it, that's fine with me.</p>",
+        "id": 390906265,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694689743
+    },
+    {
+        "content": "<p>One quick though, should we put this best practice into place in a smaller repo first? One where we're free to merge at will?</p>",
+        "id": 390906479,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694689824
+    },
+    {
+        "content": "<blockquote>\n<p>should we put this best practice into place in a smaller repo first</p>\n</blockquote>\n<p>Do you  want to try sth first <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> ? Something specific?</p>",
+        "id": 390910012,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694691327
+    },
+    {
+        "content": "<p>Buh, maybe <a href=\"https://github.com/IQSS/dataverse-installations\">https://github.com/IQSS/dataverse-installations</a> or <a href=\"https://github.com/IQSS/dataverse-metrics\">https://github.com/IQSS/dataverse-metrics</a> ? I'm not picky.</p>",
+        "id": 390912305,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694692209
+    },
+    {
+        "content": "<p>The problem is that I don't have a way to test it. I don't have a Windows box.</p>",
+        "id": 390912345,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694692232
+    },
+    {
+        "content": "<p>There's a <code>reformat-all.sh</code> script in the installations repo, if that helps.</p>",
+        "id": 390912586,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694692325
+    },
+    {
+        "content": "<p>If you want, we can have a Zoom and do it on my windows box together. If that helps</p>",
+        "id": 390912918,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694692443
+    },
+    {
+        "content": "<p>This is what Zelig uses: <a href=\"https://github.com/IQSS/Zelig/blob/master/.gitattributes\">https://github.com/IQSS/Zelig/blob/master/.gitattributes</a></p>",
+        "id": 390913016,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694692467
+    },
+    {
+        "content": "<p>I gotta walk the dog and get to work.  Container meeting in 90 minutes. Maybe we can touch on this then. <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>",
+        "id": 390913456,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694692612
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> you're very welcome to join us and hang on Zoom! 1 precious hour of container nerds talking shop! <span aria-label=\"party ball\" class=\"emoji emoji-1f38a\" role=\"img\" title=\"party ball\">:party_ball:</span></p>",
+        "id": 390929042,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694697638
+    },
+    {
+        "content": "<p>I am very happy to help <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ! That second script starts to make sense, DOS files (cmd, bat) should still be normalized, even if the metaverse probably doesn't have any windows native files (as far as I know) I don't think it would hurt. But it seems we are going in a good direction. </p>\n<p>I am really looking forward to the Zoom call tonight!  <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 390954211,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1694703946
+    },
+    {
+        "content": "<p>Oh no you just missed us! It's in UTC, so in the morning for ET/EST</p>",
+        "id": 390954426,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1694704006
+    },
+    {
+        "content": "<p><span aria-label=\"upside down\" class=\"emoji emoji-1f643\" role=\"img\" title=\"upside down\">:upside_down:</span></p>",
+        "id": 390954714,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1694704085
+    },
+    {
+        "content": "<p>AM, PM, LF, CRLF, too many acronyms man...  <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span> I apologize <span aria-label=\"face exhaling\" class=\"emoji emoji-1f62e-200d-1f4a8\" role=\"img\" title=\"face exhaling\">:face_exhaling:</span> , I was really looking forward to it but will be on next week then. Also, if there are any tests on windows, I can help just let me know, as I commented to Phillip I am on the 73 line or I can connect over zoom.</p>",
+        "id": 390955875,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1694704436
+    },
+    {
+        "content": "<p>Hi all, I tried running the mvn -Pct package docker:run command on my windows machine but in the container I'm getting the following error message:<br>\n<code> [Entrypoint] running /opt/payara/scripts/init_2_configure.sh\n2023-10-17T14:35:35.974842400Z /opt/payara/scripts/init_2_configure.sh: line 10: $'\\r': command not found </code></p>",
+        "id": 397123361,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697553498
+    },
+    {
+        "content": "<p>can anyone help me out?</p>",
+        "id": 397125154,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697554008
+    },
+    {
+        "content": "<p>2 messages were moved here from <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22\">#dev &gt; Error when  running \"mvn -Pct package docker:run\"</a> by <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span>.</p>",
+        "id": 397132072,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1697555957
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> hi! I hope you don't mind, but because you're on Windows, I moved your question to this topic where we are discussing pull request <a href=\"https://github.com/IQSS/dataverse/issues/9905\">#9905</a> by <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> (also on Windows) that I'm hoping will help you!</p>",
+        "id": 397132353,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697556032
+    },
+    {
+        "content": "<p>Hmm, something happened to that PR so I'd actually recommend not looking at the files right now. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 397132590,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697556105
+    },
+    {
+        "content": "<p>At a high level, as a workaround, I believe you can either set up a global .gitconfig file or pass an argument when you clone the repo. I'm not sure about the details though.</p>",
+        "id": 397132872,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697556161
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> do you use the git command line? If so, what do you get when you run this?<br>\n<code>git config --global --get core.autocrlf</code></p>",
+        "id": 397134711,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697556628
+    },
+    {
+        "content": "<p>Not intentionally</p>",
+        "id": 397159147,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1697565850
+    },
+    {
+        "content": "<p>I don't have my windows host ATM, had to use it for a temporary other purpose</p>",
+        "id": 397159215,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1697565883
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion/near/397134711\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"656977\">Sakshi Jain</span> do you use the git command line? If so, what do you get when you run this?<br>\n<code>git config --global --get core.autocrlf</code></p>\n</blockquote>\n<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> I tried running this command but didn't get anything.</p>",
+        "id": 397307413,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697633955
+    },
+    {
+        "content": "<p>Ok, that's normal, I think.</p>",
+        "id": 397308136,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697634141
+    },
+    {
+        "content": "<p>I'm looking at <a href=\"https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings\">https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings</a> (the Windows tab)</p>",
+        "id": 397308194,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697634157
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> can you please try:</p>\n<ul>\n<li>running<code>git config --global core.autocrlf true</code></li>\n<li>running <code>git config --global --get core.autocrlf</code> again to see if it changed</li>\n<li>delete your previous <code>dataverse</code> directory</li>\n<li>clone the <code>dataverse</code> git repo again (fresh)</li>\n<li>try spinning up Dataverse with Docker again</li>\n</ul>",
+        "id": 397308921,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697634373
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion/near/397308921\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"656977\">Sakshi Jain</span> can you please try:</p>\n<ul>\n<li>running<code>git config --global core.autocrlf true</code></li>\n<li>running <code>git config --global --get core.autocrlf</code> again to see if it changed</li>\n<li>delete your previous <code>dataverse</code> directory</li>\n<li>clone the <code>dataverse</code> git repo again (fresh)</li>\n<li>try spinning up Dataverse with Docker again</li>\n</ul>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  Still getting the same error</p>",
+        "id": 397315034,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697636221
+    },
+    {
+        "content": "<p>bah!</p>",
+        "id": 397315136,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697636254
+    },
+    {
+        "content": "<p>Should we create a branch with <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> or <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> 's fix for you to checkout? Maybe two branches? (The fixes are a little different.)</p>",
+        "id": 397315377,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697636330
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> ok I just pushed a new branch where I cherry-picked <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> 's fix. Can you please try:</p>\n<ul>\n<li>delete previous <code>dataverse</code> directory</li>\n<li><code>git clone -b 9894-gitattributes-eol-lf git@github.com:IQSS/dataverse.git</code> (or the https version if you prefer)</li>\n<li>try Docker again</li>\n</ul>",
+        "id": 397317898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697637085
+    },
+    {
+        "content": "<p>I think the issue is somewhere else because the changes to the local git config should have the same effect as the proposed change (adding the .gitattributes file). <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> </p>\n<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> be sure to delete all the previous content before checking out again or you could also check out in a different directory. I will try to set this up, but I am not home until next week but if somehow, I figure it out, I will let you know.</p>",
+        "id": 397323016,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1697638535
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> sure no worries<br>\n<span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> I'll try with this branch once</p>",
+        "id": 397323304,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697638607
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> awesome. Thanks.</p>",
+        "id": 397328280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697639989
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> as I mentioned above, PR <a href=\"https://github.com/IQSS/dataverse/issues/9905\">#9905</a> is... not in a good state. If you'd like <span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> to try your solution, please push a new branch.</p>",
+        "id": 397328474,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697640043
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> yeah, it's weird. I was hoping the global config would be a good workaround. Oh well.</p>",
+        "id": 397329885,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697640497
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  the cloning thing didn't work.<br>\nBut I fixed the issue. It's a hacky solution but it worked :D<br>\nI opened the /init_2_configure.sh file in notepad++ and from there I was able to remove all the \\r in the file<br>\nAfter that when I ran the docker the error didn't come again</p>",
+        "id": 397331488,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697641030
+    },
+    {
+        "content": "<p>Hmm, that's frustrating. Want me to push a new branch with the other fix? <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> 's suggestion, I mean.</p>",
+        "id": 397331673,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697641091
+    },
+    {
+        "content": "<p>It would be great to figure this out for Windows developers once and for all.</p>",
+        "id": 397331738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697641115
+    },
+    {
+        "content": "<p>true</p>",
+        "id": 397331791,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697641136
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> ok, I just pushed <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> 's fix to a new branch. If you'd like to try it:</p>\n<p><code>git clone -b 9894-gitattributes-text-auto git@github.com:IQSS/dataverse.git</code></p>\n<p>I really appreciate you helping out with this. I want to better support developers on Windows.</p>",
+        "id": 397336618,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697642589
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion/near/397336618\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"656977\">Sakshi Jain</span> ok, I just pushed <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> 's fix to a new branch. If you'd like to try it:</p>\n<p><code>git clone -b 9894-gitattributes-text-auto git@github.com:IQSS/dataverse.git</code></p>\n<p>I really appreciate you helping out with this. I want to better support developers on Windows.</p>\n</blockquote>\n<p>Sure I'll check it out <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span></p>",
+        "id": 397378148,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660287
+    },
+    {
+        "content": "<p>Thanks!</p>",
+        "id": 397378360,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660408
+    },
+    {
+        "content": "<p>Are you using git from the command line?</p>",
+        "id": 397379489,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660971
+    },
+    {
+        "content": "<p>well normally I clone repository from within intellij or visual studio itself. But for this issue I tried cloning through command line and even through github desktop but the same issue came everytime.</p>",
+        "id": 397379730,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697661091
+    },
+    {
+        "content": "<p>and I can see that the autocrlf value is set as true</p>",
+        "id": 397379874,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697661150
+    },
+    {
+        "content": "<p>Do you see a .gitattributes file in the root of the repo? It should have different content based on the two branches.</p>",
+        "id": 397379974,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697661203
+    },
+    {
+        "content": "<ul>\n<li><a href=\"https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes\">https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes</a></li>\n<li><a href=\"https://github.com/IQSS/dataverse/blob/9894-gitattributes-text-auto/.gitattributes\">https://github.com/IQSS/dataverse/blob/9894-gitattributes-text-auto/.gitattributes</a></li>\n</ul>",
+        "id": 397380212,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697661326
+    },
+    {
+        "content": "<p>trying to clone the particular branches you mentioned is giving me the following error:<br>\n` <a href=\"mailto:git@github.com\">git@github.com</a>: Permission denied (publickey).<br>\nfatal: Could not read from remote repository.</p>\n<p>Please make sure you have the correct access rights<br>\nand the repository exists. `</p>",
+        "id": 397380400,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697661444
+    },
+    {
+        "content": "<p>Ah, can you please try the https version instead of the git version? Do you know what I mean?</p>",
+        "id": 397380508,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697661498
+    },
+    {
+        "content": "<p>I was thinking about adding the file manually in my git branch and cloning that<br>\nthat way I'll be easily able to continue working in it as well if it works out</p>",
+        "id": 397380828,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697661686
+    },
+    {
+        "content": "<p>Yes! Please try that!</p>",
+        "id": 397381657,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697662147
+    },
+    {
+        "content": "<p>cloned the repo with .gitattributes file having the text auto but still getting the same error</p>",
+        "id": 397382264,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697662477
+    },
+    {
+        "content": "<p>I found a stackoverflow for this same issue : <a href=\"https://stackoverflow.com/questions/2517190/how-do-i-force-git-to-use-lf-instead-of-crlf-under-windows\">https://stackoverflow.com/questions/2517190/how-do-i-force-git-to-use-lf-instead-of-crlf-under-windows</a><br>\ntrying out a solution mentioned on this</p>",
+        "id": 397383038,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697662896
+    },
+    {
+        "content": "<p>this resolved the issue!</p>",
+        "id": 397383569,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697663202
+    },
+    {
+        "content": "<p>orly?</p>",
+        "id": 397383577,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697663206
+    },
+    {
+        "content": "<p>I did the following:</p>\n<ol>\n<li>Added the .gitattributes file with the text auto change in the branch</li>\n<li>On my local I ran the following commands:<br>\ngit config --global core.autocrlf false<br>\ngit config --global core.eol lf</li>\n</ol>",
+        "id": 397383677,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697663280
+    },
+    {
+        "content": "<p>after this I cloned the branch on my system and ran the maven package docker command and the containers started without any errors <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 397383781,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697663325
+    },
+    {
+        "content": "<p>Wow. Good job. So do we need something else in <code>.gitattributes</code>, I wonder. <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> and <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> please take note!</p>",
+        "id": 397384040,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697663505
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> for now, do you want to document what you did? Make a PR for this, I mean.</p>",
+        "id": 397384110,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697663530
+    },
+    {
+        "content": "<p>well I can add the gitattributes file with the text auto change<br>\ncan I add the steps I followed in the readme file so that if anyone works on windows can follow them?</p>",
+        "id": 397384454,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697663754
+    },
+    {
+        "content": "<p>I see though that <a href=\"https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes\">https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes</a> is having the eol lf command in it. I didn't try adding that in the gitattributes file in my branch so not sure if it works on my system or not.<br>\nMaybe I can try with that file once tomorrow on another windows system to see if that works. If it does then we could directly merge the 9894-gitattributes-eol-lf branch into develop</p>",
+        "id": 397384780,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697663953
+    },
+    {
+        "content": "<p>Yes, it would be good to confirm the best approach. I think we're close! Thanks again!</p>",
+        "id": 397385297,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697664265
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion/near/397308921\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"656977\">Sakshi Jain</span> can you please try:</p>\n<ul>\n<li>running<code>git config --global core.autocrlf true</code></li>\n<li>running <code>git config --global --get core.autocrlf</code> again to see if it changed</li>\n<li>delete your previous <code>dataverse</code> directory</li>\n<li>clone the <code>dataverse</code> git repo again (fresh)</li>\n<li>try spinning up Dataverse with Docker again</li>\n</ul>\n</blockquote>\n<p>I was reading this again after looking at the stackoverflow that <span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> posted and I just realized that you mentioned to set autocrlf  to true, so this is exactly the behavior that we want to avoid when using windows. these two solutions should work:</p>\n<p>git config --global core.autocrlf false<br>\ngit config --global core.autocrlf input (the one mentioned in the official <a href=\"https://www.git-scm.com/book/en/v2/Customizing-Git-Git-Configuration\">dataverse</a> documentation) </p>\n<p>Here is the difference between <strong>false</strong> and <strong>input</strong> on the <a href=\"https://www.git-scm.com/book/en/v2/Customizing-Git-Git-Configuration\">git documentation,</a> but basically both avoid auto -conversion at checkout but auto will still auto-convert on commit.  Probably <span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> can help us with a test by changing it from false to input. </p>\n<p>What is weird to me is that this behavior should be overwritten by setting up the .gitattributes, that is why on the first place why I introduced this request. </p>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion/near/397379974\">said</a>:</p>\n<blockquote>\n<p>Do you see a .gitattributes file in the root of the repo? It should have different content based on the two branches.</p>\n</blockquote>\n<p>I think the .gitattributes file is not checked out, but I have to test this again. </p>\n<p>Sorry, I wanted to get back to both of you earlier, but we are in a hotel right now and the project took forever to download <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span> then we had to leave and we just got back to the room.</p>",
+        "id": 397431480,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1697693143
+    },
+    {
+        "content": "<p>Hi all, I just tested with changes from  <a href=\"https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes\">https://github.com/IQSS/dataverse/blob/9894-gitattributes-eol-lf/.gitattributes</a> on another windows system and that solution seems to be working fine. I didn't need to make any other changes that just add this same .gitattributes file.</p>",
+        "id": 397473893,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697710738
+    },
+    {
+        "content": "<p>9894-gitattributes-eol-lf branch can be merged into develop now as it resolves the windows crlf issue :)</p>",
+        "id": 397474033,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697710786
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> great news. Would you also be willing to test with <a href=\"https://github.com/IQSS/dataverse/blob/9894-gitattributes-text-auto/.gitattributes\">https://github.com/IQSS/dataverse/blob/9894-gitattributes-text-auto/.gitattributes</a> ?</p>",
+        "id": 397481590,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697713555
+    },
+    {
+        "content": "<p>I tested with text auto attribute earlier but it didn't work</p>",
+        "id": 397572425,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697747122
+    },
+    {
+        "content": "<p>Ok. Thanks. <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> are you following this?</p>",
+        "id": 397572693,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697747277
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> if you run <code>git config --global --get core.autocrlf</code> what do you get?</p>",
+        "id": 397572838,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697747339
+    },
+    {
+        "content": "<p>as of now I've set it to false so that's what I get</p>",
+        "id": 397577335,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697749517
+    },
+    {
+        "content": "<p>Ok. It's late for Oliver but maybe we can check in with him tomorrow on what he thinks. I appreciate all the testing!</p>",
+        "id": 397577768,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749688
+    },
+    {
+        "content": "<p>I'm sorry folks but its crazy over here today all day. I <em>might</em> have a chance looking into this next week on my windows host, but no promises. Open Science Week keeps me pretty busy.</p>",
+        "id": 397731183,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1697814638
+    },
+    {
+        "content": "<p>No worries, Oliver! Have a good weekend!</p>",
+        "id": 397731546,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697814751
+    },
+    {
+        "content": "<p>As a Windows user I have battled with Windows over end of line characters. Windows is especially problematic with  regards to VSCode editor. I have been trying for ages to configure VSCode to STOP USING CRLF, but no matter what Git settings I set or VSCode setting are set, if I use the <code>Clone Git Repository...</code> option that VSCode prominently displays on the start up screen, IT ALWAYS clones with CRLF. DO NOT USE THIS OPTION... Instead clone a Git repo using the Git command <code>git clone --config core.autocrlf=false [repo clone URL]</code> (for example <code>git clone --config core.autocrlf=false https://github.com/IQSS/dataverse.git</code>). This ensures that Git will clone the repository with LF end of line characters.</p>",
+        "id": 405377604,
+        "sender_full_name": "kuhlaid",
+        "timestamp": 1701441832
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"670990\">@kuhlaid</span> do you still have these issues? We recently added a .gitattributes file that should skip the conversion on *.sh files by default for everyone clonning the repo, all the other files should skip as your configuration is setup. Do you have any idea what other files should be converted? Right now the project works for me on Windows 10-11 with some exceptions using file storage but I haven't had a  chance to investigate these.</p>",
+        "id": 405378473,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1701442100
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> , this is just a problem with VSCode and not the Dataverse itself.</p>",
+        "id": 405384602,
+        "sender_full_name": "kuhlaid",
+        "timestamp": 1701443999
+    },
+    {
+        "content": "<p>Oh I see! Yeah you can suggest that the projects that add this file so you or everyone else doesn't need to tho additional configuration. I sugested it to another repos. Alternatively you could also setup your Git installation with git config --global core.autocrlf input, this way Git <br>\n convert CRLF to LF on commit but not the other way around.</p>\n<p>Thanks for sharing this option!</p>",
+        "id": 405386474,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1701444565
+    },
+    {
+        "content": "<p>For Windows users who want a custom VsCode task to clone Git repositories with LF end of line characters (which is what you want if you are working with Dataverse code), I created some instructions that can be found at <a href=\"https://stackoverflow.com/a/77586955/10027828\">https://stackoverflow.com/a/77586955/10027828</a>.</p>",
+        "id": 405404792,
+        "sender_full_name": "kuhlaid",
+        "timestamp": 1701450557
+    }
+]

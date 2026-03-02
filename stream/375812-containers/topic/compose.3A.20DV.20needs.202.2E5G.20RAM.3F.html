@@ -1,0 +1,69 @@
+<html>
+<head><meta charset="utf-8"><title>compose: DV needs 2.5G RAM? · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html">compose: DV needs 2.5G RAM?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="554270358"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/554270358" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#554270358">(Nov 07 2025 at 09:06)</a>:</h4>
+<p>During experimentation today I ran into the 2G memory limit of Dataverse during bootstrapping. With 2.5G it went well. Do we need to adapt the setting and documentation? Has anyone else seen these problems?</p>
+
+
+
+<a name="554300252"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/554300252" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#554300252">(Nov 07 2025 at 11:32)</a>:</h4>
+<p>As you say, right now we set it to 2G: <a href="https://github.com/IQSS/dataverse/blob/v6.8/docker/compose/demo/compose.yml#L47">https://github.com/IQSS/dataverse/blob/v6.8/docker/compose/demo/compose.yml#L47</a></p>
+<p>I just tried it yesterday and it worked on my machine but I have no objection to bumping it up.</p>
+
+
+
+<a name="554654934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/554654934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#554654934">(Nov 10 2025 at 09:37)</a>:</h4>
+<p>I see that <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> has a suggestion to use 8G <a href="https://github.com/IQSS/dataverse/pull/11961/files#diff-2286cdeca85adb587a9640aa34352ba7c2fb6e49c0129dab05892ff67d0d4c58">https://github.com/IQSS/dataverse/pull/11961/files#diff-2286cdeca85adb587a9640aa34352ba7c2fb6e49c0129dab05892ff67d0d4c58</a></p>
+
+
+
+<a name="555104411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555104411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555104411">(Nov 12 2025 at 12:22)</a>:</h4>
+<p><code># Use override file if it exists (for local customizations like memory limits)</code></p>
+<p>Sounds good to me. I guess we could also .gitignore it.</p>
+
+
+
+<a name="555462797"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555462797" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555462797">(Nov 13 2025 at 21:35)</a>:</h4>
+<p>I'm not sure I wanna do this. I already have a 32G machine, but IDEs, browsers etc all need RAM, too. And by default of these 8G, 6G will be statically allocated as heap for the Payara JVM... <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="555462883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555462883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555462883">(Nov 13 2025 at 21:35)</a>:</h4>
+<p>That's kind of a lot and may be too much for a lot of folks not using a beefy thing for dev work</p>
+
+
+
+<a name="555465643"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555465643" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555465643">(Nov 13 2025 at 21:55)</a>:</h4>
+<p>Sure, but we could rename the file to docker-compose.override.yml.sample and gitignore the non-sample version. That way it would be opt-in.</p>
+
+
+
+<a name="555465799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555465799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555465799">(Nov 13 2025 at 21:56)</a>:</h4>
+<p>Maybe also another opportunity to move things to a /docker dir... <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="555465953"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/compose%3A%20DV%20needs%202.5G%20RAM%3F/near/555465953" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/compose.3A.20DV.20needs.202.2E5G.20RAM.3F.html#555465953">(Nov 13 2025 at 21:57)</a>:</h4>
+<p>Oh, sure. We already have a /docker dir. We can use it more.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

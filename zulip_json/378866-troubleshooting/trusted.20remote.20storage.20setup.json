@@ -1,0 +1,158 @@
+[
+    {
+        "content": "<p>This my continuing issues setting up trusted remote storage.  Originally I tried a test on google drive (which I couldn't get working) but have had to switch to trying on either/both box and an S3 bucket.<br>\nThe problem I have seems to be setting up the identifier.     <br>\nbox example:<br>\n-Ddataverse.files.lariac-remote.label=LARIAC-remote<br>\n-Ddataverse.files.lariac-remote.download-redirect=true<br>\n-Ddataverse.files.lariac-remote.public=true<br>\n-Ddataverse.files.lariac-remote.type=remote<br>\n-Ddataverse.files.lariac-remote.base-url=https://ucla.box.com<br>\n-Ddataverse.files.lariac-remote.base-store=file<br>\n-Ddataverse.files.lariac-remote.upload-redirect=true</p>\n<p>The JSON_Data file:<br>\nexport API_TOKEN=<strong>*</strong><strong>*</strong>**<br>\nexport SERVER_URL=https://dataverse.ucla.edu<br>\nexport PERSISTENT_ID=doi:10.25346/S6/UEPJMA<br>\nexport JSON_DATA=\"{\"description\":\"Remote LARIAC image test\", \"storageIdentifier\": \"LARIAC-remote://s/xv53zxxsovt3mmicae9fshnk3ljycvcp\",\"label\": \"nlcd_la.tif\", \"fileName\": \"nlcd_la.tif\", \"mimeType\": \"image/tiff\", \"checksum\": {\"@type\": \"MD5\",  \"@value\": \"<strong>*</strong>****\" }}\"</p>\n<p>Thank you,   Jamie</p>",
+        "id": 407306937,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702323251
+    },
+    {
+        "content": "<p>Hmm, does removing the dash help? And what error do you get?</p>",
+        "id": 407307443,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702323461
+    },
+    {
+        "content": "<p>Sorry, should have added that.<br>\n-bash: export: `test, storageIdentifier: LARIAC-remote://s/xv53zxxsovt3mmicae9fshnk3ljycvcp,label: nlcd_la.tif, fileName: nlcd_la.tif, mimeType: image/tiff, checksum: {@type: MD5,  @value: 8d0e37b3d0cb048c2ba4ae68c31e0c1b }}': not a valid identifier</p>",
+        "id": 407308225,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702323780
+    },
+    {
+        "content": "<p>That \"not a valid identifer\" is coming from bash.</p>",
+        "id": 407308867,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324024
+    },
+    {
+        "content": "<p>I doesn't like what you've tried to assign to JSON_DATA (I think).</p>",
+        "id": 407308908,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324041
+    },
+    {
+        "content": "<p>what if you do this?</p>\n<div class=\"codehilite\"><pre><span></span><code>echo $JSON_DATA\n</code></pre></div>",
+        "id": 407308941,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324054
+    },
+    {
+        "content": "<p>echo $JSON_DATA<br>\n{description:Remote  </p>\n<p>So I guess my json still isn't correct.   <br>\n I've tried to follow the Dataverse documentation example but obviously I'm getting something wrong.</p>",
+        "id": 407309172,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702324155
+    },
+    {
+        "content": "<p>I've been typeing my code on the wndows site and pasting over to linux.  Maybe need to actually type everything on the linux side.</p>",
+        "id": 407309346,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702324223
+    },
+    {
+        "content": "<p>Well, the example in the guides might be wrong. You're welcome to create an issue if it is.</p>\n<p>Stuffing JSON in a bash variable can be tricky. For starters I would surround the JSON with single quotes instead of double quotes.</p>",
+        "id": 407309637,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324372
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>export FOO=&#39;{&quot;foo&quot;:&quot;bar&quot;}&#39;\n</code></pre></div>",
+        "id": 407309748,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324430
+    },
+    {
+        "content": "<p>Still not working - maybe I should set the variables individually instead of a json file<br>\nexport JSON_DATA=\"{'description':'Remote LARIAC image test', 'storageIdentifier': 'lariac-remote-test://s/xv53zxxsovt3mmicae9fshnk3ljycvcp','label': 'nlcd_la.tif', 'fileName': 'nlcd_la.tif', 'mimeType': 'image/tiff', 'checksum': {'@type': 'MD5',  '@value': '<strong>*</strong>' }}”</p>\n<blockquote>\n<p>\"<br>\n[ec2-user@ip-172-31-17-169 ~]$ echo $JSON_DATA<br>\n{'description':'Remote LARIAC image test', 'storageIdentifier': 'lariac-remote-test://s/xv53zxxsovt3mmicae9fshnk3ljycvcp','label': 'nlcd_la.tif', 'fileName': 'nlcd_la.tif', 'mimeType': 'image/tiff', 'checksum': {'@type': 'MD5', '@value': '<strong>*</strong>***' }}”<br>\n[ec2-user@ip-172-31-17-169 ~]$ curl -H \"X-Dataverse-key: $API_TOKEN\" -X POST \"$SERVER_URL/api/datasets/:persistentId/add?persistentId=$PERSISTENT_ID\" -F \"jsonData=$JSON_DATA\"<br>\n{\"status\":\"ERROR\",\"message\":\"Error in parsing provided json\"}[ec2-user@ip-172-31-17-169 ~]$</p>\n</blockquote>",
+        "id": 407310779,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702324820
+    },
+    {
+        "content": "<p>Can you please link me to the place in the guides you're looking at?</p>",
+        "id": 407311013,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702324906
+    },
+    {
+        "content": "<p>Here is the link:    <a href=\"https://guides.dataverse.org/en/latest/developers/big-data-support.html?highlight=trusted%20remote#trusted-remote-storage-with-the-remote-store-type\">https://guides.dataverse.org/en/latest/developers/big-data-support.html?highlight=trusted%20remote#trusted-remote-storage-with-the-remote-store-type</a></p>",
+        "id": 407311309,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702325004
+    },
+    {
+        "content": "<p>Bleh, that example JSON will never work:</p>\n<p><code>export JSON_DATA=\"{'description':'My description.','directoryLabel':'data/subdir1','categories':['Data'], 'restrict':'false', 'storageIdentifier':'trs://images/dataverse_project_logo.svg', 'fileName':'dataverse_logo.svg', 'mimeType':'image/svg+xml', 'checksum': {'@type': 'SHA-1', '@value': '123456'}}\"</code></p>\n<p>JSON uses double quotes, not single quotes. Do you want to open an issue for this?</p>",
+        "id": 407311623,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702325115
+    },
+    {
+        "content": "<p>Ok, will open an issue  but should everything have double quotes?</p>",
+        "id": 407311805,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702325175
+    },
+    {
+        "content": "<p>Here, this version passes through <code>jq</code> at least:</p>\n<p><code>export JSON_DATA='{\"description\":\"My description.\",\"directoryLabel\":\"data/subdir1\",\"categories\":[\"Data\"], \"restrict\":\"false\", \"storageIdentifier\":\"trs://images/dataverse_project_logo.svg\", \"fileName\":\"dataverse_logo.svg\", \"mimeType\":\"image/svg+xml\", \"checksum\": {\"@type\": \"SHA-1\", \"@value\": \"123456\"}}'</code></p>",
+        "id": 407311856,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702325205
+    },
+    {
+        "content": "<p>Maybe you can use that as a starting point.</p>",
+        "id": 407311875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702325219
+    },
+    {
+        "content": "<p>and I'll test that out now and open the issue</p>",
+        "id": 407312117,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702325328
+    },
+    {
+        "content": "<p>I have a new error but I think the json is now correct though I probably have to correct the jvm options.<br>\n echo $JSON_DATA<br>\n{\"description\":\"Remote LARIAC image test\", \"storageIdentifier\": \"lariac-remote-test://s/xv53zxxsovt3mmicae9fshnk3ljycvcp\",\"label\": \"nlcd_la.tif\", \"fileName\": \"nlcd_la.tif\", \"mimeType\": \"image/tiff\", \"checksum\": {\"@type\": \"MD5\", \"@value\": \"8d0e37b3d0cb048c2ba4ae68c31e0c1b\" }}<br>\n[ec2-user@ip-172-31-17-169 ~]$ export JSON_DATA='{\"description\":\"Remote LARIAC image test\", \"storageIdentifier\":  \"lariac-remote-test://s/xv53zxxsovt3mmicae9fshnk3ljycvcp\",\"label\": \"nlcd_la.tif\", \"fileName\": \"nlcd_la.tif\", \"mimeType\": \"image/tiff\", \"checksum\": {\"@type\": \"MD5\",  \"@value\": \"****\" }}'<br>\n[ec2-user@ip-172-31-17-169 ~]$ curl -H \"X-Dataverse-key: $API_TOKEN\" -X POST \"$SERVER_URL/api/datasets/:persistentId/add?persistentId=$PERSISTENT_ID\" -F \"jsonData=$JSON_DATA\"<br>\n{\"status\":\"ERROR\",\"message\":\"Dataset store configuration does not allow provided storageIdentifier.\"}[ec2-user@ip-172-31-17-169 ~]$</p>",
+        "id": 407314164,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702326154
+    },
+    {
+        "content": "<p>You're on 5.14, right? That error gets printed in three different places (unfortunately):</p>\n<div class=\"codehilite\"><pre><span></span><code>src/main/java/edu/harvard/iq/dataverse/datasetutility/AddReplaceFileHelper.java\n2066:                                addErrorSevere(&quot;Dataset store configuration does not allow provided storageIdentifier.&quot;);\n2230:                                addErrorSevere(&quot;Dataset store configuration does not allow provided storageIdentifier.&quot;);\n\nsrc/main/java/edu/harvard/iq/dataverse/api/Datasets.java\n2471:                            &quot;Dataset store configuration does not allow provided storageIdentifier.&quot;)\n</code></pre></div>",
+        "id": 407314396,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702326261
+    },
+    {
+        "content": "<p>Looks like the error is how I setup the datastore.   I'll go back over documentation.  The examples seems to assume the storage is on a web site.  I'm trying to see how that translates to departmental box.</p>",
+        "id": 407314639,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702326375
+    },
+    {
+        "content": "<p>Ok, good luck! I'd probably add 1, 2, and 3 to each of the errors above to try to figure out which one is being triggered.</p>",
+        "id": 407314760,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702326428
+    },
+    {
+        "content": "<p>will do,  thank you</p>",
+        "id": 407314954,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702326508
+    },
+    {
+        "content": "<p>I am trying to figure out where the errors are coming from.  But, from a beginner perspective I'm not sure what the configuration should look like.  There is only the one example in the documentation.  Not sure what an S3 example would look like.   I should probably also get on slack and see if I can find someone who has successfully set this up.</p>",
+        "id": 407359241,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1702348018
+    },
+    {
+        "content": "<p>Or you could ask on <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> of course.</p>",
+        "id": 407458469,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702381998
+    },
+    {
+        "content": "<p>It's been a while since I set it up.</p>",
+        "id": 407458496,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702382012
+    }
+]

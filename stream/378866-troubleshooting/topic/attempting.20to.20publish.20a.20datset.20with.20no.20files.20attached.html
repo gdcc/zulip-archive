@@ -1,0 +1,62 @@
+<html>
+<head><meta charset="utf-8"><title>attempting to publish a datset with no files attached · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html">attempting to publish a datset with no files attached</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="572876909"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/572876909" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#572876909">(Feb 09 2026 at 20:12)</a>:</h4>
+<p>The UCLA Dataverse LIdar files are stored off Dataverse.  RIght now the Lidar is in google drive with the link to these files in the Dataverse metadata.   That part works fine.   The problem I'm having is deleting a text file from the Lidar dataset and then saving it with not attached files.   I can delete it either from the web interface or via api but if I try to publish I get a validation error and dataset is locked.</p>
+<p>I can delete the lock but same result if I try to publish.   Also, we're still at 5.14.</p>
+
+
+
+<a name="572885483"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/572885483" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#572885483">(Feb 09 2026 at 20:59)</a>:</h4>
+<p>Hmm, is there anything in server.log when you get the validation error?</p>
+
+
+
+<a name="572901498"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/572901498" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#572901498">(Feb 09 2026 at 22:36)</a>:</h4>
+<p>This is the error when I try to publish.<br>
+× <strong>Failed to Publish Dataset</strong> – The dataset could not be published because one or more of the datafiles in the dataset could not be validated (physical file missing, checksum mismatch, etc.) Please contact support for further assistance.<br>
+I tried deleting the log and running again so I could find something in the log.   But,  I'm not finding something that matches file validation or FileValidationFailed.   <br>
+The error is reproducable but this is the closest I could find:<br>
+[#|2026-02-09T22:29:52.539+0000|WARNING|Payara 5.2022.4|edu.harvard.iq.dataverse.dataaccess.S3AccessIO|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1770676192539;_LevelValue=900;|<br>
+  Caught an AmazonClientException in S3AccessIO.isAuxObjectCached:    Forbidden (Service: Amazon S3; Status Code: 403; Error Code: 403 Forbidden; Request ID: C9TGHS0E4DX61AZG; S3 Extended Request ID: VGbzwYSlZCVDhD9fQn5mJ0rpF5XoYYf9XWKxDFHlaZ14LqAKy+5OelBgaJ9S5n/Tw/6N6TNNlmzdlcxQ4Fx7VhwbCZsO+wlEXCrLcvBvBPk=; Proxy: null)|#]</p>
+<p>[#|2026-02-09T22:29:52.559+0000|WARNING|Payara 5.2022.4|edu.harvard.iq.dataverse.dataaccess.S3AccessIO|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1770676192559;_LevelValue=900;|<br>
+  Caught an AmazonClientException in S3AccessIO.isAuxObjectCached:    Forbidden (Service: Amazon S3; Status Code: 403; Error Code: 403 Forbidden; Request ID: C9TYK7D1HMADBDFT; S3 Extended Request ID: nV2I86rATUbKrs3myBlkXgoW7SEWETSuU0BKWo9bdrLTkbGnLG9wRMO1ARpXioXu+hYNgpeNOtrZ50u8N4J2JJOOhkhu3E1Rcz+/D73pdTM=; Proxy: null)|#]</p>
+<p>[#|2026-02-09T22:30:01.967+0000|FINE|Payara 5.2022.4|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1770676201967;_LevelValue=500;ClassName=edu.harvard.iq.dataverse.DatasetPage;MethodName=init;|<br>
+  retrieved version: id: 2864, state: DRAFT|#]</p>
+<p>[#|2026-02-09T22:30:01.994+0000|FINE|Payara 5.2022.4|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1770676201994;_LevelValue=500;ClassName=edu.harvard.iq.dataverse.DatasetPage;MethodName=init;|<br>
+  Citation: Los Angeles Region Acquisition Consortium (LARIAC), 2024, "LARIAC 5 Imagery and Elevation Data in Los Angeles County, CA in 2017.", &lt;a href="<a href="https://doi.org/10.25346/S6/E3NVW2">https://doi.org/10.25346/S6/E3NVW2</a>" target="_blank"&gt;https://doi.org/10.25346/S6/E3NVW2&lt;/a&gt;, UCLA Dataverse, DRAFT VERSION|#]</p>
+<p>Perhaps I'm using the wrong search term?</p>
+
+
+
+<a name="573061514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/573061514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#573061514">(Feb 10 2026 at 14:43)</a>:</h4>
+<p>Huh. I wonder why you're seeing this: S3AccessIO.isAuxObjectCached: Forbidden</p>
+
+
+
+<a name="573061889"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/573061889" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#573061889">(Feb 10 2026 at 14:44)</a>:</h4>
+<p>Would you be willing to create an issue about this?</p>
+
+
+
+<a name="573157042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/attempting%20to%20publish%20a%20datset%20with%20no%20files%20attached/near/573157042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/attempting.20to.20publish.20a.20datset.20with.20no.20files.20attached.html#573157042">(Feb 10 2026 at 21:52)</a>:</h4>
+<p>I've been doing more reading.  I may be missing s3:ListBucket.   It that fixes it I'll post here, if not I'll make an issue</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

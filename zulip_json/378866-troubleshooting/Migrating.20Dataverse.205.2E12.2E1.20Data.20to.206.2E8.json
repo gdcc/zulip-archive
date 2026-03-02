@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>Good afternoon,</p>\n<p>I'm currently working on a task to migrate our Dataverse installation from a VM-based setup to a new Docker-based architecture. I have a question regarding the migration of production data (version 5.12.1), including users, metadata, and files, to the new 6.8 version.</p>\n<p>Is there a recommended strategy for backing up and migrating all data between these versions?<br>\nI’ve checked the official documentation, which mentions the option of migrating data between repositories, but I’d like to confirm whether that is the only available approach or if there are better methods for this kind of upgrade.</p>\n<p>My initial plan is:</p>\n<ul>\n<li>Back up all production data and metadata</li>\n<li>Restore that backup in a local development environment</li>\n<li>Then migrate it to the test environment</li>\n</ul>\n<p>Could you advise on the best approach to ensure data integrity and consistency throughout the migration process?</p>",
+        "id": 554126678,
+        "sender_full_name": "Marcos  Anjos",
+        "timestamp": 1762444259
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663865\">@Marcos  Anjos</span> hi! Unfortunately, you just missed our Containerization Working Group meeting. This would have been a great topic? Would you like us to put it on the agenda for next month? Here's our website: <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>",
+        "id": 554151860,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762450661
+    },
+    {
+        "content": "<p>Meanwhile, we'll try to get you some answers but I'll probably need to lean on others' expertise.</p>",
+        "id": 554151945,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762450690
+    },
+    {
+        "content": "<p>Generally, I'll say that your plan sound fine! Please let us know if find any bumps in the road!</p>",
+        "id": 554152061,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762450723
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Migrating.20Dataverse.205.2E12.2E1.20Data.20to.206.2E8/near/554151945\">said</a>:</p>\n<blockquote>\n<p>Meanwhile, we'll try to get you some answers but I'll probably need to lean on others' expertise.</p>\n</blockquote>\n<p>Just tag <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> and me <span aria-label=\"stuck out tongue closed eyes\" class=\"emoji emoji-1f61d\" role=\"img\" title=\"stuck out tongue closed eyes\">:stuck_out_tongue_closed_eyes:</span> <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 554206352,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471091
+    },
+    {
+        "content": "<p>Welcome <span class=\"user-mention\" data-user-id=\"663865\">@Marcos  Anjos</span> and congrats on choosing containers! You're in for a fun joyride <span aria-label=\"smiling imp\" class=\"emoji emoji-1f608\" role=\"img\" title=\"smiling imp\">:smiling_imp:</span> But don't worry, this is <a class=\"stream\" data-stream-id=\"378866\" href=\"/#narrow/channel/378866-troubleshooting\">#troubleshooting</a> and we're here to help.</p>",
+        "id": 554206521,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471181
+    },
+    {
+        "content": "<p>For the migration, let me highlight some bits I'm currently doing with my own container to container migration from 4.20 to 6.8...</p>",
+        "id": 554206644,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471241
+    },
+    {
+        "content": "<p>It's really handy to have a snapshot of the database around for experiments. With containers, you can do most of these experiments on your laptop. For many scenarios it's not necessary to do this on some beefy machine.</p>",
+        "id": 554206847,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471315
+    },
+    {
+        "content": "<p>In case you don't want to jump through the releases one by one, which is the only officially supported way of doing upgrades, there's a few ways you can go about this.</p>",
+        "id": 554207100,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471444
+    },
+    {
+        "content": "<p>Some have done dumps of the metadata and re-importing in a fresh installation.</p>",
+        "id": 554207152,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471467
+    },
+    {
+        "content": "<p>I will not do it like that. Here's what I presented at DCM2025 about my upgrade adventure: <a href=\"http://talks.bertuch.name/dcm2025-upgrade/#/\">http://talks.bertuch.name/dcm2025-upgrade/#/</a></p>",
+        "id": 554207200,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471499
+    },
+    {
+        "content": "<p>The most important bit around the actual data is that you need to be careful how you move it around.</p>",
+        "id": 554207449,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471630
+    },
+    {
+        "content": "<p>Depending on the storage system you're using, you need to make sure not to alter the \"identifier\" of the storage system in the config. Otherwise, you will have to do a data migration in the database to make it available again (the ID is part of the information stored about a file in the database)</p>",
+        "id": 554207637,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471720
+    },
+    {
+        "content": "<p>Also, if you plan on moving the data between places, you must make sure the structure is all the same.</p>",
+        "id": 554207681,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471747
+    },
+    {
+        "content": "<p>If you are planning to migrate between storage types, things will become a bit more tricky... <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span> You'll probably be best of with a data migration for it, so you can have the new config in the upgraded instance</p>",
+        "id": 554207810,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471815
+    },
+    {
+        "content": "<p>For your experiments you should know that in theory, it is enough to have Dataverse and Postgres running.</p>",
+        "id": 554207928,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471864
+    },
+    {
+        "content": "<p>This will at least let you make sure the database is still available. But using a browser, the UI will not show you anything because Solr will be either missing or empty.</p>",
+        "id": 554207995,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471901
+    },
+    {
+        "content": "<p>While it is possible to migrate Solr data, I'd advise against doing it. The reason is simple: 6.0 will require a full re-index anyway. So why bother moving that data around just to throw it away.</p>",
+        "id": 554208120,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762471964
+    },
+    {
+        "content": "<p>Of course, if you are using fulltext indexing in your instance, you will need to either disable it during experiments or make sure that you have a connection to your data. Just a word of caution: this will take a long time depending on your data amount...</p>",
+        "id": 554208292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762472057
+    },
+    {
+        "content": "<p>If you have custom metadata schemas, don't forget to apply the necessary changes to the latest schema.xml. Otherwise your re-index is probably going to fail, as Dataverse will not be able to add the metadata from the DB to the Index.</p>",
+        "id": 554208374,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762472094
+    },
+    {
+        "content": "<p>That's all I have for now!</p>",
+        "id": 554208574,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762472191
+    }
+]

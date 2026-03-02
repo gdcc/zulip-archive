@@ -1,0 +1,107 @@
+<html>
+<head><meta charset="utf-8"><title>eval timeout · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html">eval timeout</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="436018508"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436018508" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436018508">(Apr 29 2024 at 11:26)</a>:</h4>
+<p>I'm trying to figure out what could be wrong when I try to spin up an evaluation instance using instructions in Dataverse container setup. Somehow the <code>docker compose up</code> does not make progress past getting Payara up and running, so when I go to localhost:8080, I get the "Hello from Payara - your server is now running" page and nothing else. I increased the bootstrap timeout value to 20 minutes, but it did not help.</p>
+
+
+
+<a name="436024599"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436024599" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436024599">(Apr 29 2024 at 11:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="713909">@mjlassila</span> hmm, could you please post output from the "dataverse" container? It sounds like the war file wasn't properly deployed.</p>
+
+
+
+<a name="436050937"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436050937" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436050937">(Apr 29 2024 at 13:48)</a>:</h4>
+<p>I believe the container is called "dataverse" (if not, you can check with <code>docker ps</code>). So <code>docker logs dataverse</code> should show the output.</p>
+
+
+
+<a name="436253065"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436253065" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436253065">(Apr 30 2024 at 11:48)</a>:</h4>
+<p>Here's the output I got by redirecting <code>docker logs dataverse</code> to the file <a href="/user_uploads/53090/J711jQCtx-M1tYi0JfMrjgRw/docker-dataverse.log">docker-dataverse.log</a>. Additionally there's some likely relevant output displayed in terminal when I run <code>docker compose up</code>:</p>
+<div class="codehilite"><pre><span></span><code>dataverse         |
+dataverse exited with code 0
+dataverse         | /opt/payara/scripts/entrypoint.sh: line 15: /opt/payara/config/pre-boot-commands.asadmin: Permission denied
+dataverse         | /opt/payara/scripts/entrypoint.sh: line 17: /opt/payara/config/post-boot-commands.asadmin: Permission denied
+dataverse         | [Entrypoint] running /opt/payara/scripts/init_1_generate_deploy_commands.sh
+dataverse         | post boot commands already deploys /opt/payara/deployments/dataverse
+dataverse         |
+dataverse         | [Entrypoint] running /opt/payara/scripts/init_1_generate_devmode_commands.sh
+</code></pre></div>
+
+
+
+<a name="436255698"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436255698" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436255698">(Apr 30 2024 at 12:02)</a>:</h4>
+<p>Permission denied. Hmm</p>
+
+
+
+<a name="436256032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436256032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436256032">(Apr 30 2024 at 12:04)</a>:</h4>
+<p>Are you on Windows? If so, did you clone the repo from a Linux terminal?</p>
+
+
+
+<a name="436281355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436281355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436281355">(Apr 30 2024 at 14:13)</a>:</h4>
+<p>I'm running MacOS 14.4</p>
+
+
+
+<a name="436282768"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436282768" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436282768">(Apr 30 2024 at 14:20)</a>:</h4>
+<p>Huh, I'm on MacOS too</p>
+
+
+
+<a name="436283191"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436283191" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436283191">(Apr 30 2024 at 14:22)</a>:</h4>
+<p>Do you happen to have Java and Maven installed? If so, you could try this developer-oriented version: <a href="https://guides.dataverse.org/en/6.2/developers/dev-environment.html#quickstart">https://guides.dataverse.org/en/6.2/developers/dev-environment.html#quickstart</a></p>
+
+
+
+<a name="436283241"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436283241" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436283241">(Apr 30 2024 at 14:22)</a>:</h4>
+<p>I'm not sure why you're getting that permission error.</p>
+
+
+
+<a name="436707453"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436707453" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436707453">(May 02 2024 at 14:28)</a>:</h4>
+<p><span class="user-mention" data-user-id="713909">@mjlassila</span> we just talked about this during (<a class="stream-topic" data-stream-id="375812" href="/#narrow/stream/375812-containers/topic/weekly.20meeting">#containers &gt; weekly meeting</a> ) but no one had any ideas off hand. Any progress?</p>
+
+
+
+<a name="436866768"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436866768" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436866768">(May 03 2024 at 11:41)</a>:</h4>
+<p>I finally managed to get this working using <code>docker compose</code> by tweaking my Docker setup. I'm using colima as my Docker runtime and the latest version was using vz for virtualization in M3 Macs, instead of better supported QEMU and 9p for filesystem mounts.</p>
+
+
+
+<a name="436866783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436866783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> mjlassila <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436866783">(May 03 2024 at 11:41)</a>:</h4>
+<p>When I got Dataverse up, the final hurdle was to get Solr to initialize. From the log I saw error that schema.xml was not found in /var/solr/data/collection1 in the solr container.  When I copied schema.xml to the <code>[directory-with-docker-compose]/data/solr/data/data/collection1</code> I got Solr up and running.</p>
+
+
+
+<a name="436867557"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/eval%20timeout/near/436867557" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/eval.20timeout.html#436867557">(May 03 2024 at 11:47)</a>:</h4>
+<p>Interesting. Should we add any of this to our documentation? Would you want to make a pull request?</p>
+<p>I'm glad you got it working! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

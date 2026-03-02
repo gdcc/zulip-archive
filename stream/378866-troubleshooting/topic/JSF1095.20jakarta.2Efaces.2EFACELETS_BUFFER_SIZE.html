@@ -1,0 +1,643 @@
+<html>
+<head><meta charset="utf-8"><title>JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html">JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="447512907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447512907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447512907">(Jun 27 2024 at 15:51)</a>:</h4>
+<p>Hi there :)<br>
+We have a lot of PROD logs "<em>JSF1095: The response was already committed by the time we tried to set the outgoing cookie for the flash.  Any values stored to the flash will not be available on the next request.</em>"<br>
+We started by incrementing the related parameter<br>
+<code>glassfish/domains/datainra/applications/dataverse-5.14/WEB-INF/classes/META-INF/microprofile-config.properties:69:dataverse.jsf.buffer-size=350000</code><br>
+which reduce the number of logs but do not fix it completely.<br>
+I looked a bit deeper and the documentation says : <a href="https://jakarta.ee/specifications/faces/3.0/jakarta-faces-3.0.html#a6088"><code>By default the value is 1024</code></a> <a href="https://github.com/jakartaee/faces/issues/1004">A reasonable default such as "1024" should be specified</a><br>
+And dataverse default is way higher with <code>102400</code></p>
+<div class="codehilite" data-code-language="XML"><pre><span></span><code><span class="nt">&lt;context-param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;param-name&gt;</span>jakarta.faces.FACELETS_BUFFER_SIZE<span class="nt">&lt;/param-name&gt;</span>
+<span class="w">        </span><span class="cm">&lt;!-- Uses Microprofile Config to replace at runtime. Not standardized, Payara App Server specific. --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;param-value&gt;</span>${MPCONFIG=dataverse.jsf.buffer-size:102400}<span class="nt">&lt;/param-value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/context-param&gt;</span>
+</code></pre></div>
+<p>I start to think that increasing it to more than <code>350000</code> is not the way to go. I would like your view on this :)<br>
+<span class="user-mention" data-user-id="598183">@Oliver Bertuch</span></p>
+
+
+
+<a name="447513063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447513063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447513063">(Jun 27 2024 at 15:52)</a>:</h4>
+<p>Can you give a little more log output for those? There should be a line indicating <em>where</em> this happens</p>
+
+
+
+<a name="447513329"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447513329" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447513329">(Jun 27 2024 at 15:53)</a>:</h4>
+<p>Also the way you set these numbers is very weird with editing the deployed file. I suggest you use a system property or other, easier MPCONFIG methods to get that number in</p>
+
+
+
+<a name="447513497"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447513497" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447513497">(Jun 27 2024 at 15:54)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>[2024-06-27T17:12:25.789+0200] [Payara 5.2022.4] [WARNING] [jsf.externalcontext.flash.response.already.committed] [javax.enterprise.resource.webcontainer.jsf.flash] [tid: _ThreadID=15325 _ThreadName=http-thread-pool::jk-connector(227)] [timeMillis: 1719501145789] [levelValue: 900] [[
+  JSF1095: The response was already committed by the time we tried to set the outgoing cookie for the flash.  Any values stored to the flash will not be available on the next request.]]
+</code></pre></div>
+
+
+
+<a name="447513757"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447513757" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447513757">(Jun 27 2024 at 15:55)</a>:</h4>
+<p>I don't really see a relation with a page or action in logs</p>
+
+
+
+<a name="447513880"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447513880" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447513880">(Jun 27 2024 at 15:56)</a>:</h4>
+<p>Oh you're still on an older release of Dataverse... May I suggest you upgrade to v6.x first? We changed to Jakarta EE 10 and Jakarta Faces / Mojarra received a major overhaul. Also, any upstream issues will ask for recent tech anyway.</p>
+
+
+
+<a name="447514027"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514027" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514027">(Jun 27 2024 at 15:57)</a>:</h4>
+<p>This is what I do, I have a <code>microprofile-config.properties</code> with <code>dataverse.jsf.buffer-size=350000</code><br>
+Or I misunderstood</p>
+
+
+
+<a name="447514129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514129">(Jun 27 2024 at 15:57)</a>:</h4>
+<p>I have this issue on v6.0 also (currenly in upgrade process)</p>
+
+
+
+<a name="447514134"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514134" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514134">(Jun 27 2024 at 15:57)</a>:</h4>
+<p>You should not edit that file. It is solely used to ship defaults with the application.</p>
+
+
+
+<a name="447514320"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514320" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514320">(Jun 27 2024 at 15:58)</a>:</h4>
+<p>Are you saying that we can specify a path for our <code>microprofile-config.properties</code> ?</p>
+
+
+
+<a name="447514339"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514339" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514339">(Jun 27 2024 at 15:58)</a>:</h4>
+<p>No</p>
+
+
+
+<a name="447514349"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514349" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514349">(Jun 27 2024 at 15:58)</a>:</h4>
+<p>None of that</p>
+
+
+
+<a name="447514397"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514397" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514397">(Jun 27 2024 at 15:58)</a>:</h4>
+<p>Also, web.xml is too early in the deployment lifecycle</p>
+
+
+
+<a name="447514523"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514523" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514523">(Jun 27 2024 at 15:59)</a>:</h4>
+<p>I very much doubt adding this option to the <a href="http://microprofile-config.properties">microprofile-config.properties</a> file changes the value. It will probably still be on the default setting</p>
+
+
+
+<a name="447514861"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514861" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514861">(Jun 27 2024 at 16:00)</a>:</h4>
+<p>That is what documentation suggest no ? <a href="https://guides.dataverse.org/en/5.14/developers/debugging.html">https://guides.dataverse.org/en/5.14/developers/debugging.html</a></p>
+
+
+
+<a name="447514980"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447514980" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447514980">(Jun 27 2024 at 16:01)</a>:</h4>
+<p>It does not suggest you edit that file <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="447515021"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515021" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515021">(Jun 27 2024 at 16:01)</a>:</h4>
+<blockquote>
+<p>Some JSF options can be easily changed via MicroProfile Config (using environment variables, system properties, etc.)</p>
+</blockquote>
+
+
+
+<a name="447515173"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515173" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515173">(Jun 27 2024 at 16:02)</a>:</h4>
+<p>If you are on a classic installation, I highly recommend using a system property</p>
+
+
+
+<a name="447515251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515251">(Jun 27 2024 at 16:02)</a>:</h4>
+<p>If you're using containers, an env var is usually simpler</p>
+
+
+
+<a name="447515366"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515366" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515366">(Jun 27 2024 at 16:03)</a>:</h4>
+<p>This topic was moved here from <a class="stream-topic" data-stream-id="379673" href="/#narrow/stream/379673-dev/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE">#dev &gt; JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE</a> by <span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span>.</p>
+
+
+
+<a name="447515371"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515371" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515371">(Jun 27 2024 at 16:03)</a>:</h4>
+<p>Hum, we understood that it was recommended to start using MP so we did by modifying <code>glassfish/domains/datainra/applications/dataverse-5.14/WEB-INF/classes/META-INF/microprofile-config.properties</code> and as it is a MP Key we thought it would work ^^</p>
+
+
+
+<a name="447515428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515428">(Jun 27 2024 at 16:03)</a>:</h4>
+<p><a href="#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447515371">A message</a> was moved here from <a class="stream-topic" data-stream-id="379673" href="/#narrow/stream/379673-dev/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE">#dev &gt; JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE</a> by <span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span>.</p>
+
+
+
+<a name="447515551"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515551" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515551">(Jun 27 2024 at 16:04)</a>:</h4>
+<p>This has never been officially recommended or been mentioned in the guides. IIRC this goes back to a misunderstanding of a few dataverse-docker users.</p>
+
+
+
+<a name="447515799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515799">(Jun 27 2024 at 16:05)</a>:</h4>
+<p>What you are doing there is editing the deployment files. A new deployment of a new WAR would potentially overwrite it. It's not meant to be an admin editable file.</p>
+
+
+
+<a name="447515869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515869">(Jun 27 2024 at 16:05)</a>:</h4>
+<p>We should probably include a big fat warning that this file is not meant to abused in this way</p>
+
+
+
+<a name="447515872"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515872" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515872">(Jun 27 2024 at 16:05)</a>:</h4>
+<p>Hum, I think we needed something that is was only on MP Key while upgrading to v5.14...</p>
+
+
+
+<a name="447515953"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447515953" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447515953">(Jun 27 2024 at 16:05)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447515799">said</a>:</p>
+<blockquote>
+<p>What you are doing there is editing the deployment files. A new deployment of a new WAR would potentially overwrite it. It's not meant to be an admin editable file.</p>
+</blockquote>
+<p>you are right!</p>
+
+
+
+<a name="447516233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516233">(Jun 27 2024 at 16:07)</a>:</h4>
+<p>this can be an issue while deploying, you are right</p>
+
+
+
+<a name="447516261"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516261" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516261">(Jun 27 2024 at 16:07)</a>:</h4>
+<p>We will work on this.</p>
+
+
+
+<a name="447516323"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516323" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516323">(Jun 27 2024 at 16:07)</a>:</h4>
+<p>Anyhow, what do you think about this buffer size ?:)</p>
+
+
+
+<a name="447516450"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516450" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516450">(Jun 27 2024 at 16:08)</a>:</h4>
+<p>Well so far you didn't actually enlarge it beyond the default of 102400 bytes...</p>
+
+
+
+<a name="447516500"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516500" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516500">(Jun 27 2024 at 16:08)</a>:</h4>
+<p>ah!</p>
+
+
+
+<a name="447516505"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516505" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516505">(Jun 27 2024 at 16:08)</a>:</h4>
+<p>From what I find about this error on SO etc, increasing the buffer helped</p>
+
+
+
+<a name="447516582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516582">(Jun 27 2024 at 16:08)</a>:</h4>
+<p>So I suggest you try increasing it again, but with a system property or other valid MPCONFIG source</p>
+
+
+
+<a name="447516638"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516638" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516638">(Jun 27 2024 at 16:09)</a>:</h4>
+<p>Okay :)</p>
+
+
+
+<a name="447516713"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516713" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516713">(Jun 27 2024 at 16:09)</a>:</h4>
+<p>I wouldn't jump to the 350000 in one go, maybe double it first and then go smaller until it resurfaces</p>
+
+
+
+<a name="447516729"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516729" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516729">(Jun 27 2024 at 16:09)</a>:</h4>
+<p>I'll update the topic when tested.</p>
+
+
+
+<a name="447516814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516814">(Jun 27 2024 at 16:10)</a>:</h4>
+<p>This one here is particularly interesting: <a href="https://stackoverflow.com/a/45284797">https://stackoverflow.com/a/45284797</a></p>
+
+
+
+<a name="447516906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516906">(Jun 27 2024 at 16:10)</a>:</h4>
+<p>Don't you think <code>102400</code> is so far from the default <code>1024</code> ?</p>
+
+
+
+<a name="447516953"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447516953" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447516953">(Jun 27 2024 at 16:10)</a>:</h4>
+<blockquote>
+<p>The size is given in bytes and should be larger than your biggest page</p>
+</blockquote>
+<p>I'm not sure we ever had another look at that... <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="447517185"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517185" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517185">(Jun 27 2024 at 16:11)</a>:</h4>
+<p>our biggest html page fastly found was around that <code>350000</code></p>
+
+
+
+<a name="447517270"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517270" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517270">(Jun 27 2024 at 16:12)</a>:</h4>
+<p>Interesting!</p>
+
+
+
+<a name="447517303"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517303" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517303">(Jun 27 2024 at 16:12)</a>:</h4>
+<p>I crawled the same SO as you :D</p>
+
+
+
+<a name="447517314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517314">(Jun 27 2024 at 16:12)</a>:</h4>
+<p>I see that the default we provide has been around for quite some time. <a href="https://github.com/IQSS/dataverse/commit/5f99037e5df918cf5f653c61971b5a701d690e58">https://github.com/IQSS/dataverse/commit/5f99037e5df918cf5f653c61971b5a701d690e58</a></p>
+
+
+
+<a name="447517445"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517445" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517445">(Jun 27 2024 at 16:13)</a>:</h4>
+<p>v4.17 damn I was not working with Dataverse at this time XD</p>
+
+
+
+<a name="447517499"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517499" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517499">(Jun 27 2024 at 16:13)</a>:</h4>
+<p>I'd be cautious with that number though - is fastly only counting the HTML or also JS and images?</p>
+
+
+
+<a name="447517756"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447517756" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447517756">(Jun 27 2024 at 16:14)</a>:</h4>
+<p>html response which contains some JS/CSS (settings of Dataverse like footer/GA/custom CSS..)</p>
+
+
+
+<a name="447518001"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518001" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518001">(Jun 27 2024 at 16:15)</a>:</h4>
+<p>And that HTML is 341 KiB? Fat chance! Did fastly say which page that is?</p>
+
+
+
+<a name="447518115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518115">(Jun 27 2024 at 16:16)</a>:</h4>
+<p>I'll check fastly XD</p>
+
+
+
+<a name="447518436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518436">(Jun 27 2024 at 16:17)</a>:</h4>
+<p>I mean that probably is like 175k characters (assuming all chars are UTF-8 2byte encoding). That's ~88 DIN A4 pages of text.</p>
+
+
+
+<a name="447518446"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518446" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518446">(Jun 27 2024 at 16:18)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>wget https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/1G5UQP -O dataset.html
+--2024-06-27 18:17:34--  https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/1G5UQP
+Resolving entrepot.recherche.data.gouv.fr (entrepot.recherche.data.gouv.fr)... 147.100.174.24
+Connecting to entrepot.recherche.data.gouv.fr (entrepot.recherche.data.gouv.fr)|147.100.174.24|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘dataset.html’
+
+dataset.html                                           [ &lt;=&gt;                                                                                                            ] 176,58K  --.-KB/s    in 0,1s
+
+2024-06-27 18:17:35 (1,42 MB/s) - ‘dataset.html’ saved [180817]
+</code></pre></div>
+
+
+
+<a name="447518623"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518623" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518623">(Jun 27 2024 at 16:18)</a>:</h4>
+<p>180k with a random dataset</p>
+
+
+
+<a name="447518686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518686">(Jun 27 2024 at 16:19)</a>:</h4>
+<p>OK the pure HTML is ~180 KiB</p>
+
+
+
+<a name="447518944"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447518944" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447518944">(Jun 27 2024 at 16:20)</a>:</h4>
+<p>wget <a href="https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/SSA1VM">https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/SSA1VM</a> -O dataset.html<br>
+‘dataset.html’ saved [249153]</p>
+
+
+
+<a name="447519106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519106">(Jun 27 2024 at 16:21)</a>:</h4>
+<p><a href="/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png" title="image.png"><img src="/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png"></a></div>
+
+
+
+<a name="447519211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519211">(Jun 27 2024 at 16:22)</a>:</h4>
+<p>I see that there are tons of Javascript etc embedded</p>
+
+
+
+<a name="447519289"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519289" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519289">(Jun 27 2024 at 16:22)</a>:</h4>
+<p>Yes but this is default Dataverse settings</p>
+
+
+
+<a name="447519307"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519307" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519307">(Jun 27 2024 at 16:22)</a>:</h4>
+<p>This will obviously all go away with the new SPA</p>
+
+
+
+<a name="447519332"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519332" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519332">(Jun 27 2024 at 16:22)</a>:</h4>
+<p>yes</p>
+
+
+
+<a name="447519391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519391">(Jun 27 2024 at 16:22)</a>:</h4>
+<p>Maybe I should sniff our reposity ^^</p>
+
+
+
+<a name="447519443"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519443" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519443">(Jun 27 2024 at 16:23)</a>:</h4>
+<p>SPA is far away from our production XD</p>
+
+
+
+<a name="447519467"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519467" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519467">(Jun 27 2024 at 16:23)</a>:</h4>
+<p>Really just the defaults? No viewers / vocab stuff going on?</p>
+
+
+
+<a name="447519548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519548">(Jun 27 2024 at 16:24)</a>:</h4>
+<p>The Matomo tracking is already huge</p>
+
+
+
+<a name="447519740"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519740" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519740">(Jun 27 2024 at 16:24)</a>:</h4>
+<p>I'm thinking about : </p>
+<ul>
+<li><a href="https://guides.dataverse.org/en/latest/installation/config.html#custom-stylesheet">Custom Stylesheet</a></li>
+<li><a href="https://guides.dataverse.org/en/latest/installation/config.html#footercustomizationfile">:FooterCustomizationFile</a></li>
+<li><a href="https://guides.dataverse.org/en/latest/installation/config.html#webanalyticscode">:WebAnalyticsCode</a></li>
+</ul>
+
+
+
+<a name="447519858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519858">(Jun 27 2024 at 16:25)</a>:</h4>
+<p>It probably would be a good idea to make the CSS and Javascript embedding stuff go away</p>
+
+
+
+<a name="447519912"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447519912" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447519912">(Jun 27 2024 at 16:25)</a>:</h4>
+<p><a href="https://guides.dataverse.org/en/latest/installation/config.html#cvocconf">:CVocConf</a> is not enabled yet...</p>
+
+
+
+<a name="447520012"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520012" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520012">(Jun 27 2024 at 16:26)</a>:</h4>
+<p>All of this does a huge number on the performance, as it needs to be sent everytime, while it can be cached as separate files</p>
+
+
+
+<a name="447520061"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520061" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520061">(Jun 27 2024 at 16:26)</a>:</h4>
+<p>100% agree</p>
+
+
+
+<a name="447520131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520131">(Jun 27 2024 at 16:26)</a>:</h4>
+<p>it should be as CDN ressources</p>
+
+
+
+<a name="447520188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520188">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>That wouldn't even be necessary</p>
+
+
+
+<a name="447520226"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520226" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520226">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>Just make it separated things</p>
+
+
+
+<a name="447520227"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520227" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520227">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>"as"</p>
+
+
+
+<a name="447520291"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520291" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520291">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>That way the JSF buffer wouldn't need to be so huge</p>
+
+
+
+<a name="447520304"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520304" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520304">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>yes, just static apache is enough</p>
+
+
+
+<a name="447520315"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520315" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520315">(Jun 27 2024 at 16:27)</a>:</h4>
+<p>All of that processing is crazy</p>
+
+
+
+<a name="447520402"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520402" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520402">(Jun 27 2024 at 16:28)</a>:</h4>
+<p>You could even just let Payara hand it out</p>
+
+
+
+<a name="447520451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520451">(Jun 27 2024 at 16:28)</a>:</h4>
+<p>yeah</p>
+
+
+
+<a name="447520540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520540">(Jun 27 2024 at 16:28)</a>:</h4>
+<p>If you want, feel free to create an issue. A PR would probably be welcome. As you say - the SPA is still a long way to go.</p>
+
+
+
+<a name="447520574"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520574" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520574">(Jun 27 2024 at 16:29)</a>:</h4>
+<p>I don't know if it's easy to move, but it would also increase the page speed</p>
+
+
+
+<a name="447520618"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520618" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520618">(Jun 27 2024 at 16:29)</a>:</h4>
+<p>It shouldn't be too hard to implement</p>
+
+
+
+<a name="447520684"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520684" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520684">(Jun 27 2024 at 16:29)</a>:</h4>
+<p>But someone has to sit down and do it <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="447520790"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520790" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520790">(Jun 27 2024 at 16:30)</a>:</h4>
+<p>maybe just using <a href="https://guides.dataverse.org/en/latest/installation/config.html#footercustomizationfile">:FooterCustomizationFile</a> to call the required linked ressources could be an idea</p>
+
+
+
+<a name="447520929"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520929" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520929">(Jun 27 2024 at 16:30)</a>:</h4>
+<p>BTW all of this script and style stuff is also very bad for SEO</p>
+
+
+
+<a name="447520952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447520952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447520952">(Jun 27 2024 at 16:30)</a>:</h4>
+<p>I know :)</p>
+
+
+
+<a name="447521000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521000">(Jun 27 2024 at 16:31)</a>:</h4>
+<p>this is why I mentionned CDN</p>
+
+
+
+<a name="447521193"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521193" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521193">(Jun 27 2024 at 16:32)</a>:</h4>
+<p>Yeah. Still not necessary / easy to achieve once all of this stuff goes into separate files and you include those. Where those files are isn't that important...</p>
+
+
+
+<a name="447521404"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521404" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521404">(Jun 27 2024 at 16:33)</a>:</h4>
+<p>footer is better for page speed</p>
+
+
+
+<a name="447521457"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521457" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521457">(Jun 27 2024 at 16:33)</a>:</h4>
+<p>still need to be tested</p>
+
+
+
+<a name="447521596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521596">(Jun 27 2024 at 16:34)</a>:</h4>
+<p>G2G, I'll update after tests ;) thanks <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> for your time</p>
+
+
+
+<a name="447521657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521657">(Jun 27 2024 at 16:34)</a>:</h4>
+<p>The whole customization stuff should be refactored to enable inclusion of &lt;link&gt; and &lt;script&gt; elements</p>
+
+
+
+<a name="447521731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521731">(Jun 27 2024 at 16:35)</a>:</h4>
+<p>Yes.</p>
+
+
+
+<a name="447521771"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521771" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521771">(Jun 27 2024 at 16:35)</a>:</h4>
+<p>And then enable serving content as files (so the existing properties are still usable in a backward compatible way)</p>
+
+
+
+<a name="447521906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447521906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447521906">(Jun 27 2024 at 16:35)</a>:</h4>
+<p>That way you can actually start to serve the static content from some place else, or, if you don't want/need that kind of advanced setup, go for the all in one</p>
+
+
+
+<a name="447522019"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447522019" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447522019">(Jun 27 2024 at 16:36)</a>:</h4>
+<p>Again, feel free to help with creating descriptive issues and solving PRs <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span></p>
+
+
+
+<a name="447522055"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447522055" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447522055">(Jun 27 2024 at 16:36)</a>:</h4>
+<p>C U <span aria-label="wave" class="emoji emoji-1f44b" role="img" title="wave">:wave:</span></p>
+
+
+
+<a name="447522123"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447522123" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447522123">(Jun 27 2024 at 16:36)</a>:</h4>
+<p>See you</p>
+
+
+
+<a name="447522158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/JSF1095%20jakarta.faces.FACELETS_BUFFER_SIZE/near/447522158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE.html#447522158">(Jun 27 2024 at 16:37)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447522019">said</a>:</p>
+<blockquote>
+<p>Again, feel free to help with creating descriptive issues and solving PRs <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span></p>
+</blockquote>
+<p>ofc</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

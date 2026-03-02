@@ -1,0 +1,242 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> thanks for chatting about <a href=\"https://github.com/IQSS/dataverse/issues/11753\">#11753</a> yesterday!</p>\n<p>I suppose the next step is to figure out  a good API to unset (set to null) the list of allowed dataset types for a collection. Any suggestions?</p>\n<p>These are the docs I'm looking at but I don't see anything about unsetting an attribute:</p>\n<ul>\n<li><a href=\"https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#collection-attributes-api\">https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#collection-attributes-api</a></li>\n<li><a href=\"https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#update-dataverse-api\">https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#update-dataverse-api</a></li>\n</ul>",
+        "id": 573549339,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909526
+    },
+    {
+        "content": "<p>This should be a DELETE REST endpoint, shouldn't it?</p>",
+        "id": 573549515,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909576
+    },
+    {
+        "content": "<p>Hmm, so you're thinking a new API or at least a new verb. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 573549636,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909609
+    },
+    {
+        "content": "<p>Also, should it be allowed to actually not allow any types?</p>",
+        "id": 573549688,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909621
+    },
+    {
+        "content": "<p>I was trying to reuse existing functionality. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 573549706,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909625
+    },
+    {
+        "content": "<p>This doesn't make much sense from a business perspective, does it?</p>",
+        "id": 573549753,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909639
+    },
+    {
+        "content": "<p>Well, if it's null, it only allows the \"dataset\" dataset type.</p>",
+        "id": 573549819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909656
+    },
+    {
+        "content": "<p>But that's mostly due to backward compatibility, isn't it?</p>",
+        "id": 573549943,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909690
+    },
+    {
+        "content": "<p>yeah</p>",
+        "id": 573549961,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909695
+    },
+    {
+        "content": "<p>I'm trying to take a light touch with this feature.</p>",
+        "id": 573550035,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909721
+    },
+    {
+        "content": "<p>How about making this more explicit? Have a migration that will add the dataset type to all that have none configured.</p>",
+        "id": 573550081,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909735
+    },
+    {
+        "content": "<p>That would rule out the \"null\" case</p>",
+        "id": 573550117,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909745
+    },
+    {
+        "content": "<p>But now that I'm converting allowedDatasetTypes from a string to a ManyToMany list, things are getting more complicated. I need to be able to unset the list.</p>",
+        "id": 573550144,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909753
+    },
+    {
+        "content": "<p>That's what we did at the dataset level when we introduced dataset types. All existing datasets were set to the \"dataset\" dataset type (using Flyway).</p>",
+        "id": 573550317,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909799
+    },
+    {
+        "content": "<p>Here's an idea: what if for now we make the list non-optional and a migration adds the minimum default to all. At a future point in time, deleting the list and replacing it with null or empty would mean \"inherit\"</p>",
+        "id": 573550707,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909900
+    },
+    {
+        "content": "<p>So we can add any other calls that are necessary to do that in a new iteration</p>",
+        "id": 573550795,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909922
+    },
+    {
+        "content": "<p>Actually, that gives me an idea. I was trying to unset the list but maybe I can just explicitly set the list to a dataset type that I'm not trying to delete.</p>",
+        "id": 573551012,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909982
+    },
+    {
+        "content": "<p>At the moment, I'm just trying to get DatasetTypesIT to pass along with the change from a String to a List for allowedDatasetTypes.</p>",
+        "id": 573551601,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910132
+    },
+    {
+        "content": "<p>Yes! It works! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 573552672,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910370
+    },
+    {
+        "content": "<p>Yeah my suggestion about not allowing \"null\" or empty list for now was going in this direction of \"set the list to a type that still makes sense\"</p>",
+        "id": 573552980,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910429
+    },
+    {
+        "content": "<p>What happens if you delete a type itself that has been used? It shouldn't be allowed to be dropped, right?</p>",
+        "id": 573553124,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910463
+    },
+    {
+        "content": "<p>\"message\": \"java.lang.IllegalStateException: Dataset type with id 6 is referenced and cannot be deleted.\"</p>",
+        "id": 573553319,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910516
+    },
+    {
+        "content": "<p>but now I have the workaround above, which I'm documenting</p>",
+        "id": 573553417,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910536
+    },
+    {
+        "content": "<p>Referenced by whom? The collection or a dataset?</p>",
+        "id": 573553466,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910547
+    },
+    {
+        "content": "<p>IMHO that is an important distinction.</p>",
+        "id": 573553532,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910562
+    },
+    {
+        "content": "<p>Well, this worked before so I'm assuming it's the new List relationship to the collection.</p>",
+        "id": 573553808,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910627
+    },
+    {
+        "content": "<p>Woo-hoo! Tests passing! I'll clean this up, commit, and push.</p>",
+        "id": 573555141,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910951
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is this incrementally better? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span>  <a href=\"https://github.com/IQSS/dataverse/pull/11753/changes/d2f12dfd9eec3d782e68493b6f9293fecaf60b9e\">https://github.com/IQSS/dataverse/pull/11753/changes/d2f12dfd9eec3d782e68493b6f9293fecaf60b9e</a> - switch allowedDatasetTypes in entity from String to a ManyToMany List</p>",
+        "id": 573570521,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770914394
+    },
+    {
+        "content": "<p>I need to look into our new storage option that (finally) came through today, so won't be able to look now.</p>",
+        "id": 573570933,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770914496
+    },
+    {
+        "content": "<p>No worries, I'll look through other stuff to fix that we talked about. Thanks again!</p>",
+        "id": 573571292,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770914605
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I just noticed you still have requested changes on <a href=\"https://github.com/IQSS/dataverse/pull/11753\">https://github.com/IQSS/dataverse/pull/11753</a> . Is that right? Or should I click \"dismiss review\"?</p>\n<p>Also, <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> picked up that PR to review it.</p>",
+        "id": 575819396,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772037497
+    },
+    {
+        "content": "<p>I have not looked at the remarks and the changes you made again. Maybe Gustavo can decide what he thinks about them.</p>",
+        "id": 575819602,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772037555
+    },
+    {
+        "content": "<p>We might have a zoom call if you'd like to join. Not sure when.</p>",
+        "id": 575820804,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772037850
+    },
+    {
+        "content": "<p>Sure. Today would be a good fit for that.</p>",
+        "id": 575820958,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772037897
+    },
+    {
+        "content": "<p>I made those changes for you <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 576030606,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772114518
+    },
+    {
+        "content": "<p>Let me take another look. Posters are printed. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 576030981,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772114610
+    },
+    {
+        "content": "<p>Done.</p>",
+        "id": 576063623,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772122081
+    },
+    {
+        "content": "<p>Thanks!! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 576067625,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772123013
+    },
+    {
+        "content": "<p>I did my best to reply to open questions and found a few other issues.</p>",
+        "id": 576067751,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772123042
+    },
+    {
+        "content": "<p>The most important one is certainly the missing equals() and hashCode() on DatasetType.</p>",
+        "id": 576067845,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772123062
+    }
+]

@@ -1,0 +1,123 @@
+<html>
+<head><meta charset="utf-8"><title>[v6.8] Dataverse publishing status issue + indexing · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html">[v6.8] Dataverse publishing status issue + indexing</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="553850481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553850481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553850481">(Nov 05 2025 at 13:11)</a>:</h4>
+<p>I believe we were suffering from <a href="https://github.com/IQSS/dataverse/issues/11757">this bug</a> where the dataverse is still marked as unpublished.</p>
+<p>I decided to try and reindex everything, but now none of our published dataverses are showing up in the index.<br>
+<a href="/user_uploads/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="324x118" src="/user_uploads/thumbnail/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png/840x560.webp"></a></div>
+
+
+
+<a name="553856166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553856166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553856166">(Nov 05 2025 at 13:35)</a>:</h4>
+<p>Huh. Can you reproduce this on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> ?</p>
+
+
+
+<a name="553863472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553863472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553863472">(Nov 05 2025 at 13:58)</a>:</h4>
+<p>I wasn't involved with the publishing of the dataset. My guess was that they published the dataset at the same time as the dataverse -- but that works fine on the demo site.</p>
+<p>When I'm logged in as admin on our site, only the unpublished dataverses show up<br>
+<a href="/user_uploads/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="309x280" src="/user_uploads/thumbnail/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png/840x560.webp"></a></div>
+
+
+
+<a name="553866065"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553866065" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553866065">(Nov 05 2025 at 14:08)</a>:</h4>
+<p>Sigh.</p>
+<div class="codehilite"><pre><span></span><code>&gt; sudo diff -u schema.xml /var/solr/data/collection1/conf/schema.xml
+--- schema.xml  2025-11-05 14:05:43.745073331 +0000
++++ /var/solr/data/collection1/conf/schema.xml  2025-07-24 17:25:07.852093156 +0000
+@@ -242,7 +242,6 @@
+
+     &lt;field name=&quot;license&quot; type=&quot;string&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;
+     &lt;field name=&quot;fileCount&quot; type=&quot;plong&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;
+-    &lt;field name=&quot;datasetCount&quot; type=&quot;plong&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;
+
+     &lt;!--
+         METADATA SCHEMA FIELDS
+</code></pre></div>
+
+
+
+<a name="553866182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553866182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553866182">(Nov 05 2025 at 14:09)</a>:</h4>
+<p>Ah, yes, datasetCount must be it.</p>
+
+
+
+<a name="553866223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553866223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553866223">(Nov 05 2025 at 14:09)</a>:</h4>
+<p>updated schema, re-indexed, all good.</p>
+
+
+
+<a name="553866409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553866409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553866409">(Nov 05 2025 at 14:10)</a>:</h4>
+<p>PLUS, the initial issue with the "unpublished" icon seems to be resolved. perhaps related?</p>
+
+
+
+<a name="553867801"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553867801" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553867801">(Nov 05 2025 at 14:15)</a>:</h4>
+<p>Hmm. Maybe. Do you want to leave a comment on that issue with your experience? It could be that <span class="user-mention silent" data-user-id="770046">Germán Saracca</span> simply had an out of date Solr schema.</p>
+
+
+
+<a name="553869154"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553869154" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553869154">(Nov 05 2025 at 14:20)</a>:</h4>
+<p>Will do!</p>
+
+
+
+<a name="553870302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553870302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553870302">(Nov 05 2025 at 14:25)</a>:</h4>
+<p>Done.</p>
+
+
+
+<a name="553871550"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553871550" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553871550">(Nov 05 2025 at 14:30)</a>:</h4>
+<p>Thanks. As you may have seen I went ahead and closed that issue.</p>
+<p>The 6.8 release notes say, "Due to changes in the Solr schema (the addition of field "datasetCount"), updating the Solr schema and reindexing is required."</p>
+<p>Do you think that's enough? Should I add something like "Failure to do so will result in collections (dataverses) not transitioning from unpublished to published in terms of the Solr index."?</p>
+
+
+
+<a name="553881478"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553881478" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553881478">(Nov 05 2025 at 15:07)</a>:</h4>
+<p>I typically heed those warnings, but it's possible that I overlooked it because it wasn't part of the files attached to the release</p>
+
+
+
+<a name="553943397"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553943397" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553943397">(Nov 05 2025 at 19:14)</a>:</h4>
+<p>That makes sense. You're right, in the past we often attached schema.xml to the release. These days we explain how to download it. We made this change to streamline our release process. I hope you don't mind! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="553945528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553945528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Brian Cassidy <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553945528">(Nov 05 2025 at 19:27)</a>:</h4>
+<p>Of course not! I'll be sure to read the notes more carefully in the future :)</p>
+
+
+
+<a name="553945686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%5Bv6.8%5D%20Dataverse%20publishing%20status%20issue%20%2B%20indexing/near/553945686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.5Bv6.2E8.5D.20Dataverse.20publishing.20status.20issue.20.2B.20indexing.html#553945686">(Nov 05 2025 at 19:28)</a>:</h4>
+<p>Cool, cool, thanks for understanding. <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

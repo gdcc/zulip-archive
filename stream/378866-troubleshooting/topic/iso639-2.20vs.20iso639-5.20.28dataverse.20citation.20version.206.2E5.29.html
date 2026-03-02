@@ -1,0 +1,57 @@
+<html>
+<head><meta charset="utf-8"><title>iso639-2 vs iso639-5 (dataverse citation version 6.5) · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/iso639-2.20vs.20iso639-5.20.28dataverse.20citation.20version.206.2E5.29.html">iso639-2 vs iso639-5 (dataverse citation version 6.5)</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="523273180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/iso639-2%20vs%20iso639-5%20%28dataverse%20citation%20version%206.5%29/near/523273180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alosh <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/iso639-2.20vs.20iso639-5.20.28dataverse.20citation.20version.206.2E5.29.html#523273180">(Jun 10 2025 at 11:56)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin</span> <span class="user-mention" data-user-id="637063">@Leo Andreev</span> <span class="user-mention" data-user-id="760572">@Steven Winship</span> ,</p>
+<p>I'm Ali from DANS (Netherlands). I have a question about <br>
+<a href="https://github.com/IQSS/dataverse/pull/10762"># Support the full ISO 639-3 list of languages #10578 #10762</a><br>
+There are a lot of new languages in new Dataverse 6.5. Three is also another change that we don´t have any idea why it is changed? The sub-language-names order of some languages are changed when you compare them to <a href="https://www.loc.gov/standards/iso639-2/php/code_list.php">iso369-2</a>? </p>
+<div class="codehilite"><pre><span></span><code>ISO639-2 (DANS)                                            | Dataverse citation.tsv file (v 6.5)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bod,&quot;Tibetan Standard, Tibetan, Central&quot;                   | Tibetan, Tibetan Standard, Central bod
+tib,&quot;Tibetan Standard, Tibetan, Central&quot;                   | Tibetan  Tibetan Central   Tibetan Standard    tib
+div,&quot;Divehi, Dhivehi, Maldivian&quot;                           | Maldivian, Dhivehi, Divehi div
+ful,&quot;Fula, Fulah, Pulaar, Pular&quot;                           | Fula, Fulah        ful
+                                                           | Pulaar fuc 5671    fuc
+                                                           | Pulabu pup 5672    pup
+                                                           | Pular  fuf 5673    fuf
+gla,&quot;Scottish Gaelic, Gaelic&quot;                              | Gaelic, Scottish Gaelic    gla
+hat,&quot;Haitian, Haitian Creole&quot;                              | Haitian Creole, Haitian    hat
+kal,&quot;Kalaallisut, Greenlandic&quot;                             | Greenlandic, Kalaallisut   kal
+kua,&quot;Kwanyama, Kuanyama&quot;                                   | Kuanyama, Kwanyama kua
+lim,&quot;Limburgish, Limburgan, Limburger&quot;                     | Limburgan, Limburger, Limburgish   lim
+oci,Occitanoji,&quot;Ojibwe, Ojibwa&quot;                            | Ojibwe, Ojibwa oji
+uig,&quot;Uyghur, Uighur&quot;                                       | Uighur, Uyghur uig
+</code></pre></div>
+
+
+
+<a name="524325347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/iso639-2%20vs%20iso639-5%20%28dataverse%20citation%20version%206.5%29/near/524325347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/iso639-2.20vs.20iso639-5.20.28dataverse.20citation.20version.206.2E5.29.html#524325347">(Jun 16 2025 at 20:02)</a>:</h4>
+<p>Just to clarify, the support for the extended iso639-3 list of languages was added in the citation block update in Dataverse 6.4. No changes were made in 6.5, to the best of my knowledge. </p>
+<p><span class="user-mention" data-user-id="760572">@Steven Winship</span>  may be able to give a better answer, as the author of the PR 10762. But my best answer would be that the goal was to support the full iso369-3 list (there were multiple requests from the community to that extent). The main, preferred names of a few languages - such as the ones listed above - had changed between iso369-2 and -3. So all such cases were reviewed manually and we made the best effort to make sure all the previously known designations of the affected languages were still supported (this was achieved by supplying all such names as "alternates"). <br>
+One super important part is to make sure you didn't skip the citation block update prior to that one. The test is to confirm that all your existing language control vocab. values have non-NULL identifiers; for example: </p>
+<div class="codehilite"><pre><span></span><code>SELECT cvv.strvalue, cvv.identifier FROM controlledvocabularyvalue cvv, datasetfieldtype ft WHERE cvv.datasetfieldtype_id = ft.id AND ft.name=&#39;language&#39;;
+</code></pre></div>
+<p>If not, make sure to apply the citation.tsv from Dataverse 6.3 first (wget <a href="https://raw.githubusercontent.com/IQSS/dataverse/v6.3/scripts/api/data/metadatablocks/citation.tsv">https://raw.githubusercontent.com/IQSS/dataverse/v6.3/scripts/api/data/metadatablocks/citation.tsv</a>). As long as your existing language controlled vocab. values have the identifiers defined, extending the CV to the full iso639 list should be painless and should not result in the loss of any previously supported language codes. </p>
+<p>One real drawback of having this full list in citation.tsv is that citation block updates take much longer now.</p>
+
+
+
+<a name="524663118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/iso639-2%20vs%20iso639-5%20%28dataverse%20citation%20version%206.5%29/near/524663118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Alosh <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/iso639-2.20vs.20iso639-5.20.28dataverse.20citation.20version.206.2E5.29.html#524663118">(Jun 18 2025 at 09:18)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="637063">@Leo Andreev</span>  Thank very much for your clear reply. <span aria-label="folded hands" class="emoji emoji-1f64f" role="img" title="folded hands">:folded_hands:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

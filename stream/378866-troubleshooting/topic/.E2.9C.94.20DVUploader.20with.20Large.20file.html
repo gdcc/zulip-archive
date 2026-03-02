@@ -1,0 +1,140 @@
+<html>
+<head><meta charset="utf-8"><title>✔ DVUploader with Large file · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html">✔ DVUploader with Large file</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="428177174"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428177174" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428177174">(Mar 21 2024 at 17:01)</a>:</h4>
+<p>Any advice on timeouts I am getting with DVUploader - uploading 350GB file. I am getting timeout errors, I know why, just need to figure out how to keep the S3 "URLs" - parts open and not time out.</p>
+<div class="codehilite"><pre><span></span><code>Error response: HTTP/1.1 403 Forbidden : &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;Error&gt;&lt;Code&gt;AccessDenied&lt;/Code&gt;&lt;Message&gt;Request has expired&lt;/Message&gt;&lt;X-Amz-Expires&gt;3599&lt;/X-Amz-Expires&gt;&lt;Expires&gt;2024-03-21T16:18:09Z&lt;/Expires&gt;&lt;ServerTime&gt;2024-03-21T16:18:14Z&lt;/ServerTime&gt;&lt;RequestId&gt;4FH0FYK8QHER1BZP&lt;/RequestId&gt;&lt;HostId&gt;Cnn6zpUyPNgTnWd7lgMUa3WTnO62P7Y3v0uORF+NszVmh2FsbD0ceztzUDYQhgelZ5J7Tp60gDg=&lt;/HostId&gt;&lt;/Error&gt;
+Retrying upload of part: 118
+Upload of part: 118 failed with status: 403 (retrying)
+</code></pre></div>
+<p>Might be a Jim question, which I asked in Slack.</p>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> How did you get over the "time out", or are you using S3?<br>
+Thanks.</p>
+
+
+
+<a name="428178477"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428178477" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428178477">(Mar 21 2024 at 17:08)</a>:</h4>
+<p>Update from Jim in Slack:</p>
+<blockquote>
+<p>Yes - there's a dataverse.files.&lt;id&gt;.url-expiration-minutes setting described in <a href="https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a>. The default is 60 minutes.</p>
+</blockquote>
+
+
+
+<a name="428180737"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428180737" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428180737">(Mar 21 2024 at 17:20)</a>:</h4>
+<p>looking into this to remember .. i do know that we had to set Timeout and ProxyTimeout in our apache config as well as the database timeout option</p>
+
+
+
+<a name="428180919"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428180919" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428180919">(Mar 21 2024 at 17:21)</a>:</h4>
+<p>Timeout 6000<br>
+ ProxyTimeout 6000</p>
+
+
+
+<a name="428181193"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428181193" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428181193">(Mar 21 2024 at 17:23)</a>:</h4>
+<p>and we are using S3</p>
+
+
+
+<a name="428182392"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428182392" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428182392">(Mar 21 2024 at 17:29)</a>:</h4>
+<p>here is the command that worked for us at the time, but I think there have been changes (ie: not requiring the -directupload flag)</p>
+<p>java -jar DVUploader-v1.2.0beta3.jar -recurse -directupload -key=&lt;your api token&gt; -did=doi:10.48349/ASU/&lt;your dataset code&gt; -server=https://dataverse.asu.edu &lt;directory path&gt;</p>
+
+
+
+<a name="428225973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/428225973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#428225973">(Mar 21 2024 at 22:06)</a>:</h4>
+<p>do you have CORS rules set on your s3 bucket?</p>
+
+
+
+<a name="429421471"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/429421471" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#429421471">(Mar 25 2024 at 14:28)</a>:</h4>
+<p>Here are our CORS rules:</p>
+<div class="codehilite"><pre><span></span><code>[
+    {
+        &quot;AllowedHeaders&quot;: [
+            &quot;*&quot;
+        ],
+        &quot;AllowedMethods&quot;: [
+            &quot;GET&quot;,
+            &quot;PUT&quot;
+        ],
+        &quot;AllowedOrigins&quot;: [
+            &quot;*&quot;
+        ],
+        &quot;ExposeHeaders&quot;: [
+            &quot;ETag&quot;
+        ],
+        &quot;MaxAgeSeconds&quot;: 0
+    }
+]
+</code></pre></div>
+
+
+
+<a name="429439779"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/429439779" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#429439779">(Mar 25 2024 at 15:31)</a>:</h4>
+<p>that looks okay .. i think .. i finally found the email thread that I had with Jim M when we were trying to make this all work, and I was getting the exact same error .. </p>
+<p>.. i need to compile this whole thing into some kind of guide or something because there is so much valuable info that we got from jim's brilliant mind in it about how direct upload works .. i will send it to you</p>
+<p>.. one thing that I can see is that we set the dataverse.files.&lt;id&gt;.url-expiration-minutes to 480 .. what is yours set to?  and we definitely used the 1.1.2 beta version of dvuploader .. an yea the proxy timeouts didn't really matter</p>
+
+
+
+<a name="429442291"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/429442291" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#429442291">(Mar 25 2024 at 15:39)</a>:</h4>
+<p>Adding more docs, especially for troubleshooting, to the guide would be much appreciated!</p>
+
+
+
+<a name="429447153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/429447153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#429447153">(Mar 25 2024 at 15:53)</a>:</h4>
+<p>okay, I will see if I can organize it a little and then send it on <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="430151153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/430151153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#430151153">(Mar 28 2024 at 19:44)</a>:</h4>
+<p>setting this parameter worked</p>
+<blockquote>
+<p>:there's a dataverse.files.&lt;id&gt;.url-expiration-minutes setting described in <a href="https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a>. The default is 60 minutes.</p>
+</blockquote>
+
+
+
+<a name="430151783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/430151783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#430151783">(Mar 28 2024 at 19:49)</a>:</h4>
+<p>I tried to mark this as resolved, but could not resolve - "issues" older than 7 days. So if someone with more power than me can resolve, Thanks.</p>
+
+
+
+<a name="430152027"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/430152027" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#430152027">(Mar 28 2024 at 19:51)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as resolved.</p>
+
+
+
+<a name="430152250"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20DVUploader%20with%20Large%20file/near/430152250" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20DVUploader.20with.20Large.20file.html#430152250">(Mar 28 2024 at 19:53)</a>:</h4>
+<p>Done! I resolved this topic.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

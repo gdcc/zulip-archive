@@ -1,0 +1,41 @@
+<html>
+<head><meta charset="utf-8"><title>NullPointerException in DOI creation causes silent registra · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/NullPointerException.20in.20DOI.20creation.20causes.20silent.20registra.html">NullPointerException in DOI creation causes silent registra</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="547873265"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/NullPointerException%20in%20DOI%20creation%20causes%20silent%20registra/near/547873265" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Simon Carroll <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/NullPointerException.20in.20DOI.20creation.20causes.20silent.20registra.html#547873265">(Oct 30 2025 at 08:20)</a>:</h4>
+<p>Good morning! </p>
+<p>We're experiencing intermittent DOI registration failures on Dataverse 6.5 (also confirmed on 6.8) in the BSC Dataverse deployments.</p>
+<p><strong>Issue</strong>: When users create datasets with ROR affiliations selected from the autocomplete dropdown, DOI assignment succeeds but DataCite registration fails silently (~10-50% failure rate).</p>
+<p><strong>Symptoms</strong>:</p>
+<ul>
+<li>Dataset saves successfully</li>
+<li>DOI assigned (e.g., doi:10.82201/XXXXXX)</li>
+<li><code>identifierregistered=false</code> in database</li>
+<li><code>globalidcreatetime=NULL</code></li>
+<li>"DOI not reserved" banner shown</li>
+<li>Logs: <code>NullPointerException</code> in <code>AbstractPidProvider.getTargetUrl()</code></li>
+</ul>
+<p><strong>Root cause</strong>: Race condition where <code>getGlobalId()</code> returns null during DOI creation transaction flow.</p>
+<p><strong>Workaround</strong>: Create dataset with minimal metadata first, then edit to add ROR affiliation (100% success rate).</p>
+<p><strong>GitHub issue</strong>: <a href="https://github.com/IQSS/dataverse/issues/11941">https://github.com/IQSS/dataverse/issues/11941</a></p>
+<p>We're using external vocab scripts for ROR autocomplete. Has anyone seen PID registration issues related to external vocab scripts or similar timing-dependent DOI failures before?</p>
+<p>Thanks!</p>
+
+
+
+<a name="547907638"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/NullPointerException%20in%20DOI%20creation%20causes%20silent%20registra/near/547907638" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/NullPointerException.20in.20DOI.20creation.20causes.20silent.20registra.html#547907638">(Oct 30 2025 at 11:14)</a>:</h4>
+<p>Thanks for all the details!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,97 @@
+<html>
+<head><meta charset="utf-8"><title>fast redeploy with docker compose · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html">fast redeploy with docker compose</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="553715282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/553715282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#553715282">(Nov 04 2025 at 20:56)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>  dataverse:
+    container_name: &quot;dataverse&quot;
+    hostname: dataverse
+    build:
+      dockerfile: ./dataverse/Dockerfile
+      args:
+        - BASE_VERSION=${BASE_VERSION:-6.6-noble}
+        - DATAVERSE_WAR_URL=${DATAVERSE_WAR_URL:-https://github.com/IQSS/dataverse/releases/download/v6.6/dataverse-6.6.war}
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_ID=${GROUP_ID:-1000}
+</code></pre></div>
+<p>From <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> at <a href="https://github.com/libis/rdm-integration/blob/bca3826674a426522fdd75437b0e4ff54234f6e6/docker-compose.yml#L66">https://github.com/libis/rdm-integration/blob/bca3826674a426522fdd75437b0e4ff54234f6e6/docker-compose.yml#L66</a></p>
+
+
+
+<a name="554280092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554280092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554280092">(Nov 07 2025 at 09:57)</a>:</h4>
+<p>What I like most in that repo: the modularized approach to setup. <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> this would be good to have in upstream, too!</p>
+
+
+
+<a name="554300472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554300472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554300472">(Nov 07 2025 at 11:33)</a>:</h4>
+<p>Absolutely. That compose file was something we only touched on during tech hours but I'd love to hear more.</p>
+
+
+
+<a name="554304782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554304782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eryk Kulikowski <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554304782">(Nov 07 2025 at 11:57)</a>:</h4>
+<p>I just opened a PR that might be interesting for the upstream repo: <a href="https://github.com/IQSS/dataverse/pull/11961">https://github.com/IQSS/dataverse/pull/11961</a></p>
+<p>It adds fast-redeploy scripts for container-based development that reduce iteration time from ~54s to ~12s (4.5x faster). The workflow uses exploded WAR deployment with incremental compilation and Payara's asadmin deploy --force for hot redeployment without container restarts.</p>
+<p>Key features:</p>
+<ul>
+<li>Three scripts: <a href="http://dev-start-frd.sh">dev-start-frd.sh</a> (setup), <a href="http://dev-frd.sh">dev-frd.sh</a> (iterate), <a href="http://dev-down-frd.sh">dev-down-frd.sh</a> (shutdown)</li>
+<li>Zero infrastructure changes, completely optional</li>
+<li>Works with any editor (not IDE-dependent)</li>
+</ul>
+<p>This could be a good topic for tech hours - we could discuss what developer workflow improvements would be valuable to include in the mainstream Dataverse repo.</p>
+
+
+
+<a name="554305044"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554305044" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554305044">(Nov 07 2025 at 11:58)</a>:</h4>
+<p><span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> THANK YOU!</p>
+
+
+
+<a name="554305095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554305095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554305095">(Nov 07 2025 at 11:58)</a>:</h4>
+<p>And yes, I'd love to hear from other developers any tips and tricks to speed up development!</p>
+
+
+
+<a name="554655241"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554655241" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554655241">(Nov 10 2025 at 09:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> I really like what you did in your PR! Thanks for testing out all of this stuff and looking into making it work!</p>
+
+
+
+<a name="554655363"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554655363" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554655363">(Nov 10 2025 at 09:39)</a>:</h4>
+<p>I have a few suggestions and maybe we should discuss them here in chat or during the next containerization meeting.</p>
+
+
+
+<a name="554659031"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/fast%20redeploy%20with%20docker%20compose/near/554659031" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/fast.20redeploy.20with.20docker.20compose.html#554659031">(Nov 10 2025 at 09:58)</a>:</h4>
+<p>Braindump / Notes to self:</p>
+<ul>
+<li>Once upon a time we wanted to start a docker-related directory /docker/... in the repo. Maybe this is the perfect opportunity to kickstart it?</li>
+<li>I don't see much in there that wouldn't be possible with the Maven plugins. We should try to align both ways.</li>
+<li>I hear you on the persistence.xml bit - it's been a long standing issue to get rid of that and have devs use Flyway properly.</li>
+<li>For the memory: thinking about using an environment variable instead of the override file. Usable from Maven and compose CLI and doesn't need a wrapper script just to activate the override file.</li>
+<li>Cargo Plugin Remote?, <code>cargo.glassfish.deploy.arg.force</code></li>
+<li>Watch Background Job?</li>
+<li>DMP Watch Mode - may need fixes for our situation</li>
+<li><a href="https://docs.docker.com/compose/how-tos/file-watch">https://docs.docker.com/compose/how-tos/file-watch</a></li>
+<li>Move away from DMP to <em>run</em> things? <a href="https://github.com/chonton/compose-maven-plugin">https://github.com/chonton/compose-maven-plugin</a></li>
+</ul>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

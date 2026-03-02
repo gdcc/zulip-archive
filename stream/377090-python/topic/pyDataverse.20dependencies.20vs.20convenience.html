@@ -1,0 +1,54 @@
+<html>
+<head><meta charset="utf-8"><title>pyDataverse dependencies vs convenience · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html">pyDataverse dependencies vs convenience</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="519796573"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519796573" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519796573">(May 22 2025 at 10:09)</a>:</h4>
+<p>From the discussion yesterday in the WG meeting something stuck with me: what should be in the pyDataverse package? I looked a bit into pythonic ways to speedup transfers and there are some great libraries out there already.</p>
+<p>That made me wonder: should we just go ahead and try to add nice, convenient wrappers around them? It would make the library depend on many new things. On the other hand people just looking for an easy way to interact with Dataverse from some script, Jupyter notebook etc might actually prefer having a convenient and well documented way, they might not care much about dependencies.</p>
+<p>Should we just copy dvuploader into pyDataverse, maybe even without paying much attention to the class tree? One stop shop vs more granular reusable pieces...</p>
+
+
+
+<a name="519797231"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519797231" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519797231">(May 22 2025 at 10:12)</a>:</h4>
+<p>To make an example... There's <a href="https://pypi.org/project/pydl/">pydl</a> which seems to be exactly the library we might put in peoples hands to download data from an installation fast. But it comes with aiohttp, we use httpx. Reading up on httpx vs aiohttp reveals that the later is often much much faster compared to httpx in async cases (see <a href="https://github.com/encode/httpx/issues/3215">https://github.com/encode/httpx/issues/3215</a>). Adding these dependencies means we don't need to code all of this again and focus on making it available in a nice Dataverse API package, so it "just works" for users. But they need to install quite a bit of dependencies to get this going...</p>
+
+
+
+<a name="519797463"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519797463" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519797463">(May 22 2025 at 10:14)</a>:</h4>
+<p>The way pyDataverse is structured now also makes it hard to enable selective install choices with optional dependencies. <img alt=":shrugdog:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/86c833ef.png" title="shrugdog"></p>
+
+
+
+<a name="519797639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519797639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519797639">(May 22 2025 at 10:15)</a>:</h4>
+<p>So maybe we should just educate people how to use these libraries? And maybe only provide a thin layer of how to retrieve the download URL from the API (to stick with the example here)?</p>
+
+
+
+<a name="519798033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519798033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519798033">(May 22 2025 at 10:17)</a>:</h4>
+<p>So maybe instead of sticking with 1 library, maybe we should use a HTTP Client Facade where people can put in any python HTTP client they like best? (Or we provide some of them for them, using optional dependencies...)</p>
+
+
+
+<a name="519818285"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/pyDataverse%20dependencies%20vs%20convenience/near/519818285" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/pyDataverse.20dependencies.20vs.20convenience.html#519818285">(May 22 2025 at 12:10)</a>:</h4>
+<p>I agree that the current structure is relatively flat and challenging to maintain. I have already started a re-factor and extracted classes into separate modules in this <a href="https://github.com/gdcc/pyDataverse/tree/refactor-api/pyDataverse/api">branch</a>.</p>
+<p>I honestly think that having a couple more dependencies is not a big issue. Of course, it puts a higher maintenance burden on us when other libraries move to another major version of a dependency, but this is manageable, in my opinion.</p>
+<p>Moving the DVUploader into pyDataverse makes sense and de-clutters the DV Python landscape. I have used <code>aiohttp</code> previously, but moved to <code>httpx</code> because the API design is way nicer to work with. Both of them can coexist, though, and we could use <code>pydl</code> directly for the downloads.</p>
+<p>There is also <a href="https://github.com/gdcc/easyDataverse/tree/main">EasyDataverse</a> which is very Jupyter-friendly and easy to be used for setting datasets and downloads. Maybe we could also merge this one as a higher level interface. The good thing is that it uses DVUploader/PyDataverse already and would not require much adaption, except for some dependencies.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

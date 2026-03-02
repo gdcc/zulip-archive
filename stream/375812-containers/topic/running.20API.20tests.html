@@ -1,0 +1,909 @@
+<html>
+<head><meta charset="utf-8"><title>running API tests · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html">running API tests</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="345153378"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345153378" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345153378">(Mar 28 2023 at 14:38)</a>:</h4>
+<p>This just in from ErykKul at <a href="https://github.com/IQSS/dataverse/pull/9383#issuecomment-1486899586">https://github.com/IQSS/dataverse/pull/9383#issuecomment-1486899586</a></p>
+<p>"I think that running the integration tests with the Dockerized Dataverse is a great idea. Maybe we could use docker for that as well? For example: <a href="https://hub.docker.com/_/docker">https://hub.docker.com/_/docker</a>. Right now, the aio-docker makes some assumptions about the environment that are not true for every system (I still could not run the integration tests lately...). I am not sure about this, but it looks to me that it is no longer possible to build aio-docker using latest Rocky Linux image, like specified in the docker file? I get errors about not sufficient entropy (it also takes very long time to start the Dataverse inside the aio-docker container). Also, the "ps" command is missing, preventing the solr starting properly (procps package is not installed by default). Finally, when I get everything running, then I get errors from the sword API... I am not sure how the continuous integration runs the integration tests, I was not successful in doing that (I did get them running when trying out payara 6, but I had upgraded many packages to do that, upgraded the jdk version to 17, changed some scripts, etc.).</p>
+<p>I have tried to fix the integration test, but since I was not able to run it locally, I am waiting for the continuous integration to finish."</p>
+
+
+
+<a name="345154039"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154039" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154039">(Mar 28 2023 at 14:40)</a>:</h4>
+<p>I had ITs running in docker-aio at one point, but ran into trouble with merging PRs and nested environment variables. I definitely had ITs running, though.</p>
+
+
+
+<a name="345154122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154122">(Mar 28 2023 at 14:40)</a>:</h4>
+<p>It is a long lasting dream of me to make our API tests (these are end-to-end tests, a very special and expensive kind of integration tests) use <a href="https://www.testcontainers.org/">Testcontainers</a> and a Maven profile. I already asked on the IQSS Slack if we could transform the API tests to use JUnit5, so we can create actual extensions etc and make this great. I'm all in!</p>
+
+
+
+<a name="345154514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154514">(Mar 28 2023 at 14:42)</a>:</h4>
+<p>But obviously, we could also run API tests "just" against a dockerized version of things, without containers. It will still need some control over the internal environment to setup and tweak certain things like stored procedures etc</p>
+
+
+
+<a name="345154621"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154621" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154621">(Mar 28 2023 at 14:42)</a>:</h4>
+<p>Probably this is also a good first step <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="345154930"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154930" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154930">(Mar 28 2023 at 14:43)</a>:</h4>
+<p>And of course I want ITs also to run inside a Github workflow, which might even be speedier than using Jenkins + cheap AWS EC2 instances. <span aria-label="smiling devil" class="emoji emoji-1f608" role="img" title="smiling devil">:smiling_devil:</span></p>
+
+
+
+<a name="345154976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345154976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345154976">(Mar 28 2023 at 14:43)</a>:</h4>
+<p>Ah, should I rename this topic to "API tests"? That's really what I'm talking about.</p>
+
+
+
+<a name="345155244"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345155244" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345155244">(Mar 28 2023 at 14:44)</a>:</h4>
+<p>Probabyl <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span> Oh and didn't we talk about this somewhere already? Maybe in "sunsetting"?</p>
+
+
+
+<a name="345155397"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345155397" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345155397">(Mar 28 2023 at 14:45)</a>:</h4>
+<p>Hmm no we didn't. Maybe some place else, outside of this channel, some other context</p>
+
+
+
+<a name="345158053"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345158053" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345158053">(Mar 28 2023 at 14:55)</a>:</h4>
+<p>Do we have an open issue about running API tests in Docker?</p>
+
+
+
+<a name="345160293"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345160293" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345160293">(Mar 28 2023 at 15:02)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/running.20API.20tests/near/345158053">said</a>:</p>
+<blockquote>
+<p>Do we have an open issue about running API tests in Docker?</p>
+</blockquote>
+<p>I can open one. I never committed my branch because of said nested environment variable woes.</p>
+
+
+
+<a name="345165798"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345165798" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345165798">(Mar 28 2023 at 15:20)</a>:</h4>
+<p><span class="user-mention" data-user-id="598186">@Don Sizemore</span> this would be for new Docker for dev setup. If you haven't tried it yet, I'm happy to walk you through it. Either way, yes, an issue would be great!</p>
+
+
+
+<a name="345167366"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345167366" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345167366">(Mar 28 2023 at 15:25)</a>:</h4>
+<p>The test for <code>/api/info/version</code> works just fine. <span aria-label="happy" class="emoji emoji-1f600" role="img" title="happy">:happy:</span></p>
+
+
+
+<a name="345172089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345172089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345172089">(Mar 28 2023 at 15:41)</a>:</h4>
+<p>Actually, I can run a real API test just fine as well: <a href="https://github.com/IQSS/dataverse/pull/9383#issuecomment-1487151653">https://github.com/IQSS/dataverse/pull/9383#issuecomment-1487151653</a></p>
+
+
+
+<a name="345172254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345172254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345172254">(Mar 28 2023 at 15:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="598186">@Don Sizemore</span> so maybe we don't need an issue</p>
+
+
+
+<a name="345210439"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345210439" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345210439">(Mar 28 2023 at 18:30)</a>:</h4>
+<p>Or rather, maybe the issue is about:</p>
+<ul>
+<li>documenting how to run the tests, probably against containerized Dataverse (I'm trying this now)</li>
+<li>removing docker-aio and docker-dcm, including from the guides, of course. See also the <a href="#narrow/stream/375812-containers/topic/sunsetting/near/342567078">sunsetting</a> topic</li>
+</ul>
+
+
+
+<a name="345213679"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345213679" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345213679">(Mar 28 2023 at 18:48)</a>:</h4>
+<p>Bah. Running all these tests at once failed. 500 errors.</p>
+
+
+
+<a name="345214537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345214537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345214537">(Mar 28 2023 at 18:52)</a>:</h4>
+<p>Ah, but some of these failures are expected, like this one:</p>
+<p>Caused by: org.postgresql.util.PSQLException: ERROR: function generateidentifierfromstoredprocedure() does not exist</p>
+<p>That's because our Docker image doesn't have that sequence inserted.</p>
+
+
+
+<a name="345214694"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345214694" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345214694">(Mar 28 2023 at 18:53)</a>:</h4>
+<p>That must be this test:</p>
+<p>[ERROR]   DatasetsIT.testStoredProcGeneratedAsIdentifierGenerationStyle:816 » IllegalArgument</p>
+
+
+
+<a name="345215654"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345215654" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345215654">(Mar 28 2023 at 18:58)</a>:</h4>
+<p>Anyway, here are the errors I saw:</p>
+<p>[ERROR] Failures: <br>
+[ERROR]   DatasetsIT.testAddEmptyDatasetViaNativeAPI:362 Expected status code &lt;403&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testCuratePublishedDatasetVersionCommand:2686 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testDeleteDatasetWhileFileIngesting:1367 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testFilesUnchangedAfterDatasetMetadataUpdate:2620 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testLinkingDatasets:2189 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testRestrictFileExportDdi:2279 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testRestrictFilesWORequestAccess:2901 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   DatasetsIT.testUpdateDatasetVersionWithFiles:2132 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>
+<p>[ERROR]   HarvestingClientsIT.testHarvestingClientRun:234 Last harvest not reported a success (took 0 seconds) expected:&lt;SUCCESS&gt; but was:&lt;null&gt;<br>
+[ERROR]   HarvestingServerIT.testMultiRecordOaiSet:606 Wrong number of items on the first ListIdentifiers page expected:&lt;2&gt; but was:&lt;5&gt;<br>
+[ERROR]   MakeDataCountApiIT.testMakeDataCountGetMetric:61 Expected status code &lt;200&gt; doesn't match actual status code &lt;400&gt;.</p>
+
+
+
+<a name="345215735"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/345215735" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#345215735">(Mar 28 2023 at 18:59)</a>:</h4>
+<p>I'm on this commit: 753ee8451b</p>
+
+
+
+<a name="351037341"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/351037341" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#351037341">(Apr 19 2023 at 12:49)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> explained to me that we should be able to run our own base/app containers within GitHub Actions.</p>
+<p>This is huge.</p>
+<p>I'm not sure yet how it will work but maybe this blog post will help: <a href="https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/">https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/</a></p>
+<p>They build Docker images and push them and then run them during API tests, I think.</p>
+
+
+
+<a name="351038114"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/351038114" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#351038114">(Apr 19 2023 at 12:51)</a>:</h4>
+<p>Might depend a little on whether you want to push images to registries only after API tests passed or not</p>
+
+
+
+<a name="351038277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/351038277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#351038277">(Apr 19 2023 at 12:52)</a>:</h4>
+<p>Could of course push to a temp registry first.</p>
+
+
+
+<a name="351038332"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/351038332" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#351038332">(Apr 19 2023 at 12:52)</a>:</h4>
+<p>Has the advantage of splitting the runs</p>
+
+
+
+<a name="351055223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/351055223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#351055223">(Apr 19 2023 at 13:51)</a>:</h4>
+<p>What if we get all this working in a small app like <a href="https://github.com/IQSS/dataverse-people">https://github.com/IQSS/dataverse-people</a> ? Faster, lighter, no red tape.</p>
+
+
+
+<a name="353967277"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/353967277" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#353967277">(Apr 28 2023 at 16:30)</a>:</h4>
+<p>I just created this related topic: <a href="#narrow/stream/377090-python/topic/containers.20for.20API.20testing">https://dataverse.zulipchat.com/#narrow/stream/377090-python/topic/containers.20for.20API.20testing</a></p>
+
+
+
+<a name="355053749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355053749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355053749">(May 02 2023 at 07:23)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> <a href="#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/354959912">said</a>:</p>
+<blockquote>
+<p>Thanks! Didn't expect it to be that simple</p>
+</blockquote>
+<p>Sounds like we have a first happy customer for the working group's output!</p>
+
+
+
+<a name="355680952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355680952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355680952">(May 04 2023 at 07:07)</a>:</h4>
+<p>I suppose the action about this topic now somehow happens in <a class="stream" data-stream-id="377090" href="/#narrow/stream/377090-python">#python</a> ... I'm gonna resolve this here.</p>
+
+
+
+<a name="355681000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355681000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355681000">(May 04 2023 at 07:08)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> has marked this topic as resolved.</p>
+
+
+
+<a name="355740273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355740273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355740273">(May 04 2023 at 11:14)</a>:</h4>
+<p>Maybe. It would be nice to deliver on what Eryk wanted in the top post, the ability to run the REST Assured API test suite.</p>
+
+
+
+<a name="355758118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355758118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355758118">(May 04 2023 at 12:26)</a>:</h4>
+<p>Oh yeah sure, but let's stick to milestones - integrations come first :-D</p>
+
+
+
+<a name="355770086"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355770086" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355770086">(May 04 2023 at 13:12)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as unresolved.</p>
+
+
+
+<a name="355770092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/355770092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#355770092">(May 04 2023 at 13:12)</a>:</h4>
+<p>That's a little like saying "let's close all the open GitHub issues we aren't actively working  on", isn't it? <span aria-label="happy" class="emoji emoji-1f600" role="img" title="happy">:happy:</span></p>
+<p>Like Eryk, I'm interested in this too so I'm unresolving this topic.</p>
+<p>Next steps (yes, as time allows) as I see them:</p>
+<ul>
+<li>build on work by <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> and <span class="user-mention" data-user-id="599841">@Jan Range</span> in <a href="https://github.com/IQSS/dataverse-sample-data/compare/container-test">https://github.com/IQSS/dataverse-sample-data/compare/container-test</a> to spin up Dataverse in containers within a GitHub Actions VM</li>
+<li>always add the database sequence to prevent certain PID tests from failing (see "generateidentifierfromstoredprocedure" above)</li>
+</ul>
+
+
+
+<a name="362741875"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362741875" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362741875">(Jun 01 2023 at 12:47)</a>:</h4>
+<p>I see <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> is interested in Jenkins access: <a href="#narrow/stream/379673-dev/topic/jenkins.20access/near/362673296">https://dataverse.zulipchat.com/#narrow/stream/379673-dev/topic/jenkins.20access/near/362673296</a></p>
+<p>That's fine, but longer term we should circle back to this topic of getting API tests running in containers, right? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="362744421"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362744421" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362744421">(Jun 01 2023 at 12:56)</a>:</h4>
+<p>YEs of course! Just wanted to make sure they communicate and he's unblocked</p>
+
+
+
+<a name="362744810"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362744810" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362744810">(Jun 01 2023 at 12:57)</a>:</h4>
+<p>Yes, thank you, thank you.</p>
+<p>I'm just conscious of the fact that we closed and reopened this topic. If we need to start a new topic that's more specific, that's fine.</p>
+
+
+
+<a name="362744850"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362744850" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362744850">(Jun 01 2023 at 12:57)</a>:</h4>
+<p>Also, I can run an idea by you if you like.</p>
+
+
+
+<a name="362745101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745101">(Jun 01 2023 at 12:58)</a>:</h4>
+<p>'bout API testing? Hit me!</p>
+
+
+
+<a name="362745223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745223">(Jun 01 2023 at 12:59)</a>:</h4>
+<p>What if we made a new repo called "second opinion".</p>
+
+
+
+<a name="362745293"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745293" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745293">(Jun 01 2023 at 12:59)</a>:</h4>
+<p>The first doctor said your health is not so good. You'd like a second opinion.</p>
+
+
+
+<a name="362745394"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745394" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745394">(Jun 01 2023 at 12:59)</a>:</h4>
+<p>Not sure I'm following <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="362745419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745419">(Jun 01 2023 at 12:59)</a>:</h4>
+<p>We use GitHub Actions workflow dispatch or whatever it's called. We click a button to trigger it. For now at least.</p>
+
+
+
+<a name="362745657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745657">(Jun 01 2023 at 13:00)</a>:</h4>
+<p>It spins up the develop branch in containers and configures them. Then it runs the API tests.</p>
+
+
+
+<a name="362745871"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362745871" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362745871">(Jun 01 2023 at 13:01)</a>:</h4>
+<p>The idea is you can look at Jenkins, see failures on develop, go over to Second Opinion, click the button, and see what the other doctor thinks.</p>
+
+
+
+<a name="362882063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362882063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362882063">(Jun 01 2023 at 21:11)</a>:</h4>
+<p>Still not following?</p>
+
+
+
+<a name="362882563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362882563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362882563">(Jun 01 2023 at 21:13)</a>:</h4>
+<p>Oh sry missed that one</p>
+
+
+
+<a name="362882700"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362882700" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362882700">(Jun 01 2023 at 21:14)</a>:</h4>
+<p>I think we share the same vision but I don't believe we need a second repo for that</p>
+
+
+
+<a name="362882780"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362882780" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362882780">(Jun 01 2023 at 21:14)</a>:</h4>
+<p>We can have Jenkins do Jenkins and make Github Actions do the same with containers</p>
+
+
+
+<a name="362886496"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362886496" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362886496">(Jun 01 2023 at 21:37)</a>:</h4>
+<p>That's what I figured you'd say: put it in the main repo.</p>
+
+
+
+<a name="362886604"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362886604" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362886604">(Jun 01 2023 at 21:38)</a>:</h4>
+<p>But! With a new repo we can merge and innovate as fast as we want. And we can retire it when the code goes in the main repo.</p>
+
+
+
+<a name="362887824"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362887824" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362887824">(Jun 01 2023 at 21:46)</a>:</h4>
+<p>Ideas how to replicate the PRs?</p>
+
+
+
+<a name="362887948"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362887948" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362887948">(Jun 01 2023 at 21:47)</a>:</h4>
+<p>Does Kevin do QA for Workflow files?</p>
+
+
+
+<a name="362888247"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888247" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888247">(Jun 01 2023 at 21:49)</a>:</h4>
+<p>People seemed to detest red crosses but love green checkmarks. So as long as we don't break to many builds...</p>
+
+
+
+<a name="362888367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888367">(Jun 01 2023 at 21:50)</a>:</h4>
+<p>Oh I might have missed sth here: you said "develop". Not PRs</p>
+
+
+
+<a name="362888689"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888689" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888689">(Jun 01 2023 at 21:53)</a>:</h4>
+<p>Yeah, I hate it when develop is broken.</p>
+
+
+
+<a name="362888755"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888755" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888755">(Jun 01 2023 at 21:53)</a>:</h4>
+<p>Sometimes Jenkins is 100% right. Sometimes there's nothing wrong with develop.</p>
+
+
+
+<a name="362888764"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888764" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888764">(Jun 01 2023 at 21:53)</a>:</h4>
+<p>Hackathon on Sunday? <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="362888836"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888836" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888836">(Jun 01 2023 at 21:54)</a>:</h4>
+<p>Sure!</p>
+
+
+
+<a name="362888862"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888862" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888862">(Jun 01 2023 at 21:54)</a>:</h4>
+<p>But I think we have a couple talks to write too. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="362888893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888893">(Jun 01 2023 at 21:54)</a>:</h4>
+<p>Who? Me? You? <span aria-label="shrug" class="emoji emoji-1f937" role="img" title="shrug">:shrug:</span></p>
+
+
+
+<a name="362888953"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888953" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888953">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>The auth talk. The container demo.</p>
+
+
+
+<a name="362888985"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362888985" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362888985">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>Hey I added some bits for the auth talk already</p>
+
+
+
+<a name="362889008"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889008" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889008">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>oh, phew, thank you!</p>
+
+
+
+<a name="362889028"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889028" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889028">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>they might record it, you know</p>
+
+
+
+<a name="362889036"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889036" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889036">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>Very basic. Just some ideas.</p>
+
+
+
+<a name="362889045"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889045" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889045">(Jun 01 2023 at 21:55)</a>:</h4>
+<p>Ugh</p>
+
+
+
+<a name="362889122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889122">(Jun 01 2023 at 21:56)</a>:</h4>
+<p>Last time I checked it said I'm not presenting anything</p>
+
+
+
+<a name="362889182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889182">(Jun 01 2023 at 21:56)</a>:</h4>
+<p>Well, the auth talk <span aria-label="happy" class="emoji emoji-1f600" role="img" title="happy">:happy:</span> brb <span aria-label="smiling imp" class="emoji emoji-1f608" role="img" title="smiling imp">:smiling_imp:</span></p>
+
+
+
+<a name="362889215"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889215" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889215">(Jun 01 2023 at 21:57)</a>:</h4>
+<p>I want this. <a href="https://github.com/marketplace/actions/test-reporter">https://github.com/marketplace/actions/test-reporter</a></p>
+
+
+
+<a name="362889502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362889502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362889502">(Jun 01 2023 at 21:59)</a>:</h4>
+<p>Or this. <a href="https://github.com/marketplace/actions/publish-test-results">https://github.com/marketplace/actions/publish-test-results</a></p>
+
+
+
+<a name="362890251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362890251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362890251">(Jun 01 2023 at 22:03)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/running.20API.20tests/near/362886604">said</a>:</p>
+<blockquote>
+<p>But! With a new repo we can merge and innovate as fast as we want. And we can retire it when the code goes in the main repo.</p>
+</blockquote>
+<p>I was going to delete <a href="https://github.com/gdcc/dataverse">https://github.com/gdcc/dataverse</a> soon as we have almost all from the container branches incorporated (phew!)</p>
+
+
+
+<a name="362890312"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362890312" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362890312">(Jun 01 2023 at 22:03)</a>:</h4>
+<p>It already contains stuff to update branches with content from the main repo</p>
+
+
+
+<a name="362890397"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362890397" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362890397">(Jun 01 2023 at 22:04)</a>:</h4>
+<p>Maybe we can reuse some of that?</p>
+
+
+
+<a name="362897509"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/362897509" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#362897509">(Jun 01 2023 at 22:52)</a>:</h4>
+<p>Sure!</p>
+
+
+
+<a name="365852547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365852547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365852547">(Jun 13 2023 at 12:29)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> should I try to explain Second Opinion again?</p>
+
+
+
+<a name="365852668"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365852668" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365852668">(Jun 13 2023 at 12:29)</a>:</h4>
+<p>I <em>think</em> I know what you're up to... <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="365852883"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365852883" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365852883">(Jun 13 2023 at 12:30)</a>:</h4>
+<p>BTW this run took 44 minutes to complete on Jenkins <span aria-label="rolling eyes" class="emoji emoji-1f644" role="img" title="rolling eyes">:rolling_eyes:</span></p>
+
+
+
+<a name="365862731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365862731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365862731">(Jun 13 2023 at 13:06)</a>:</h4>
+<p>It would be nice to have at least one test runner saying everything is fine.</p>
+
+
+
+<a name="365863827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365863827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365863827">(Jun 13 2023 at 13:09)</a>:</h4>
+<p>After waiting another 40 minutes, it says: all good!</p>
+
+
+
+<a name="365872680"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/365872680" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#365872680">(Jun 13 2023 at 13:38)</a>:</h4>
+<p>Phew!</p>
+
+
+
+<a name="376376160"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376376160" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376376160">(Jul 18 2023 at 14:43)</a>:</h4>
+<p>I finally got around to creating <a href="https://github.com/pdurbin/dataverse-api-test-runner">https://github.com/pdurbin/dataverse-api-test-runner</a></p>
+
+
+
+<a name="376376351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376376351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376376351">(Jul 18 2023 at 14:43)</a>:</h4>
+<p>My current problem is that I'm running FitsIT which uploads a file. I get this error:</p>
+<p>{"status":"ERROR","message":"There was an error when trying to add the new file. Temp directory is not configured."}</p>
+
+
+
+<a name="376376442"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376376442" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376376442">(Jul 18 2023 at 14:44)</a>:</h4>
+<p>See <a href="https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5588687039/jobs/10215838726#step:5:33283">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5588687039/jobs/10215838726#step:5:33283</a></p>
+
+
+
+<a name="376376807"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376376807" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376376807">(Jul 18 2023 at 14:45)</a>:</h4>
+<p>Here's my GitHub Action as of this writing: <a href="https://github.com/pdurbin/dataverse-api-test-runner/blob/f4cce7e919846ac14acaad5de2ca2ce41b36936b/.github/workflows/test.yml">https://github.com/pdurbin/dataverse-api-test-runner/blob/f4cce7e919846ac14acaad5de2ca2ce41b36936b/.github/workflows/test.yml</a></p>
+
+
+
+<a name="376377267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376377267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376377267">(Jul 18 2023 at 14:46)</a>:</h4>
+<p>It ends with this:</p>
+<div class="codehilite"><pre><span></span><code>- name: Start Dataverse containers
+  run: |
+    cd dataverse
+    docker compose -f docker-compose-dev.yml up -d
+- name: Run API tests
+  run: |
+    cd dataverse
+    mvn test -Ddataverse.test.baseurl=http://localhost:8080 -Dtest=UtilIT,FitsIT
+</code></pre></div>
+
+
+
+<a name="376381425"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376381425" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376381425">(Jul 18 2023 at 15:00)</a>:</h4>
+<p>[#|2023-07-18T14:57:33.342+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.util.FileUtil|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253342;_LevelValue=1000;|<br>
+    Failed to create filesTempDirectory: /dv/temp|#]</p>
+<p>[#|2023-07-18T14:57:33.345+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253345;_LevelValue=1000;|<br>
+    There was an error when trying to add the new file. Temp directory is not configured.|#]</p>
+<p>[#|2023-07-18T14:57:33.346+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253346;_LevelValue=1000;|<br>
+    java.io.IOException: Temp directory is not configured.|#]</p>
+
+
+
+<a name="376381515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376381515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376381515">(Jul 18 2023 at 15:00)</a>:</h4>
+<p>I'm having deja vu. I'm pretty sure we talked about this before.</p>
+
+
+
+<a name="376391920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376391920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376391920">(Jul 18 2023 at 15:32)</a>:</h4>
+<p>Right, stuff like <code>${RUNNER_TEMP}/app/data:/dv</code> at <a href="https://github.com/IQSS/dataverse-sample-data/blob/bbc104832ab0b55c2d9340df7f73f83e401ee3f5/docker-compose-ci.yml">https://github.com/IQSS/dataverse-sample-data/blob/bbc104832ab0b55c2d9340df7f73f83e401ee3f5/docker-compose-ci.yml</a></p>
+
+
+
+<a name="376394783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376394783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376394783">(Jul 18 2023 at 15:40)</a>:</h4>
+<p>Related conversation: <a href="#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434190">https://dataverse.zulipchat.com/#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434190</a></p>
+
+
+
+<a name="376544006"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376544006" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376544006">(Jul 19 2023 at 06:07)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/375812-containers/topic/running.20API.20tests/near/365852883">said</a>:</p>
+<blockquote>
+<p>BTW this run took 44 minutes to complete on Jenkins <span aria-label="rolling eyes" class="emoji emoji-1f644" role="img" title="rolling eyes">:rolling_eyes:</span></p>
+</blockquote>
+<p>Out of curiosity here (we had a similar problem, and resolved it, a few years back); how are tests presently organized? Are they split into separate suites/modules or are they monolithic in nature?</p>
+
+
+
+<a name="376659088"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376659088" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376659088">(Jul 19 2023 at 13:05)</a>:</h4>
+<p>Yes, modules, well Java classes. Please see how <a href="https://github.com/IQSS/dataverse/blob/v5.13/conf/docker-aio/run-test-suite.sh">https://github.com/IQSS/dataverse/blob/v5.13/conf/docker-aio/run-test-suite.sh</a> references the classes in this file: <a href="https://github.com/IQSS/dataverse/blob/v5.13/tests/integration-tests.txt">https://github.com/IQSS/dataverse/blob/v5.13/tests/integration-tests.txt</a></p>
+
+
+
+<a name="376869665"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376869665" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376869665">(Jul 20 2023 at 07:15)</a>:</h4>
+<p>So if I'm reading this correctly (correct me if I'm wrong, I'm not a Java native), these are run sequential? If so; would it make sense to split this file into separated test suites? You could run those suites parallel.</p>
+<p>Background anecdote is that we had this in Python as well; build took 1.5 hours to complete on account of needing to run ~2000 tests, including some very, very fixture-heavy xml test suites. We split those out as we were revamping our runner infrastructure (migrated from Jenkins to autoscaling runners on DigitalOcean using Gitlab Bastion), and as a result, could run those build steps in parallel. Build took about 30 minutes afterwards and we could run several at a time as opposed to creating gridlock on Jenkins.</p>
+
+
+
+<a name="376956074"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/376956074" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#376956074">(Jul 20 2023 at 12:14)</a>:</h4>
+<p>Sure. It probably makes sense to try running API tests in parallel. That would be a good topic for <a class="stream" data-stream-id="379673" href="/#narrow/stream/379673-dev">#dev</a> . This topic is about running the API test suite in Docker and GitHub Actions. I'm struggling with the latter.</p>
+
+
+
+<a name="377009853"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/377009853" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#377009853">(Jul 20 2023 at 14:51)</a>:</h4>
+<p><span class="user-mention" data-user-id="598442">@Guillermo Portas</span> thanks for reminding me about how you're doing something similar. I just copied your config from <a href="https://github.com/pdurbin/dataverse-api-test-runner/commit/c7d1fef">https://github.com/pdurbin/dataverse-api-test-runner/commit/c7d1fef</a> over to my repo and the (only a few so far) Rest Assured tests passed: <a href="https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5612377863/jobs/10270069291">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5612377863/jobs/10270069291</a></p>
+
+
+
+<a name="377260814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/377260814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#377260814">(Jul 21 2023 at 11:15)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601950">Thomas van Erven</span> <a href="#narrow/stream/375812-containers/topic/running.20API.20tests/near/376869665">said</a>:</p>
+<blockquote>
+<p>So if I'm reading this correctly (correct me if I'm wrong, I'm not a Java native), these are run sequential? If so; would it make sense to split this file into separated test suites? You could run those suites parallel.</p>
+<p>Background anecdote is that we had this in Python as well; build took 1.5 hours to complete on account of needing to run ~2000 tests, including some very, very fixture-heavy xml test suites. We split those out as we were revamping our runner infrastructure (migrated from Jenkins to autoscaling runners on DigitalOcean using Gitlab Bastion), and as a result, could run those build steps in parallel. Build took about 30 minutes afterwards and we could run several at a time as opposed to creating gridlock on Jenkins.</p>
+</blockquote>
+<p>Yes, they're sequential by default. Just be careful of tests such as the one Jim mentioned in Slack (concerning the <code>:publicInstall</code> DB setting) which may interfere with one another.</p>
+
+
+
+<a name="377310807"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/377310807" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#377310807">(Jul 21 2023 at 13:58)</a>:</h4>
+<p>Yeap, non-avoidable interdependency between tests due to order or database state is the limiting factor for parallelization. You will always have n test suites, where n is interdependent test suites.</p>
+
+
+
+<a name="378471726"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/378471726" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#378471726">(Jul 25 2023 at 13:17)</a>:</h4>
+<p>I got a good number of API tests to run on the Payara 6 branch: <a href="https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5649829177/job/15304980462">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5649829177/job/15304980462</a></p>
+
+
+
+<a name="378604976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/378604976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#378604976">(Jul 25 2023 at 21:11)</a>:</h4>
+<p>Heads up that we need <a href="https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/pull/264">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/pull/264</a> in container-land for one of the harvesting tests to pass.</p>
+<p>Discussion at <a href="https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650561229">https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650561229</a></p>
+
+
+
+<a name="378644890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/378644890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#378644890">(Jul 26 2023 at 01:55)</a>:</h4>
+<p>I just ran the API tests against the develop branch: <a href="https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650852969">https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650852969</a></p>
+
+
+
+<a name="382582164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/382582164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#382582164">(Aug 07 2023 at 10:53)</a>:</h4>
+<p>All tests are passing on the Payara 6 branch. It has a fix that develop and master don't having to do with harvesting. See <a class="stream-topic" data-stream-id="375812" href="/#narrow/stream/375812-containers/topic/error.20running.20a.20harvest">#containers &gt; error running a harvest</a></p>
+
+
+
+<a name="383991800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/383991800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#383991800">(Aug 11 2023 at 14:44)</a>:</h4>
+<p><a href="https://github.com/pdurbin/dataverse-api-test-runner">https://github.com/pdurbin/dataverse-api-test-runner</a> is by no means perfect but shows that the full API test suite can be run against containers. I'm closing this long topic. We can open up fresh topics.</p>
+
+
+
+<a name="383991834"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/383991834" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#383991834">(Aug 11 2023 at 14:44)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as resolved.</p>
+
+
+
+<a name="397378518"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397378518" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397378518">(Oct 18 2023 at 20:21)</a>:</h4>
+<p>Hi all, not sure if this is the correct stream or not. Actually I was trying to run the tests in BuiltinUsersIT file. I started the application in docker and then ran these tests but all tests that are hitting the create API are giving this error message:<br>
+{<br>
+    "status": "ERROR",<br>
+    "message": "Dataverse config issue: No API key defined for built in user management"<br>
+}<br>
+Can anyone help me out?<br>
+<span class="user-mention" data-user-id="598112">@Philip Durbin</span></p>
+
+
+
+<a name="397378701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397378701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397378701">(Oct 18 2023 at 20:22)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as unresolved.</p>
+
+
+
+<a name="397378730"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397378730" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397378730">(Oct 18 2023 at 20:23)</a>:</h4>
+<p>Sure. Let's use this stream. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="397378935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397378935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397378935">(Oct 18 2023 at 20:24)</a>:</h4>
+<p>It's strange that the key is not defined. It should be "burrito". Given your trouble over in <a class="stream-topic" data-stream-id="375812" href="/#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion">#containers &gt; gitattributes files and windows auto conversion</a> I'm worried that a later script didn't run.</p>
+
+
+
+<a name="397378982"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397378982" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397378982">(Oct 18 2023 at 20:25)</a>:</h4>
+<p>You had to fix the first script manually, right?</p>
+
+
+
+<a name="397379002"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379002" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379002">(Oct 18 2023 at 20:25)</a>:</h4>
+<p>There are a lot of scripts. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="397379011"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379011" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379011">(Oct 18 2023 at 20:25)</a>:</h4>
+<p>yes I did</p>
+
+
+
+<a name="397379043"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379043" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379043">(Oct 18 2023 at 20:25)</a>:</h4>
+<p>haha got it, I'll check logs once if any other script got the same error</p>
+
+
+
+<a name="397379106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379106">(Oct 18 2023 at 20:26)</a>:</h4>
+<p>That's fine but it could get a bit tedious.</p>
+
+
+
+<a name="397379138"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379138" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379138">(Oct 18 2023 at 20:26)</a>:</h4>
+<p>Maybe we should resolve the line endings thing first.</p>
+
+
+
+<a name="397379150"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379150" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379150">(Oct 18 2023 at 20:26)</a>:</h4>
+<p>On opening the localhost:8080 also I'm getting error<br>
+<a href="/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png">login-page-error.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png" title="login-page-error.png"><img src="/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png"></a></div>
+
+
+
+<a name="397379190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379190">(Oct 18 2023 at 20:26)</a>:</h4>
+<p>Right, I'm assuming the root collection wasn't created.</p>
+
+
+
+<a name="397379233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379233">(Oct 18 2023 at 20:27)</a>:</h4>
+<p>Probably there will be lots of errors in the logs. Instead of ending with "have a nice day".</p>
+
+
+
+<a name="397379266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379266">(Oct 18 2023 at 20:27)</a>:</h4>
+<p>Ohh, okay then I'll try and fix the line ending issue first</p>
+
+
+
+<a name="397379378"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379378" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379378">(Oct 18 2023 at 20:28)</a>:</h4>
+<p>Awesome. Thanks. Sorry for the trouble! You get the pain but (hopefully) it will be easier for others in the future!</p>
+
+
+
+<a name="397379430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397379430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397379430">(Oct 18 2023 at 20:28)</a>:</h4>
+<p>I understand :)</p>
+
+
+
+<a name="397385570"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397385570" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397385570">(Oct 18 2023 at 21:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> even after resolving the line end issue I'm getting this same error on running the tests in BuiltinUsersIT file <span aria-label="face with diagonal mouth" class="emoji emoji-1fae4" role="img" title="face with diagonal mouth">:face_with_diagonal_mouth:</span></p>
+
+
+
+<a name="397385664"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397385664" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397385664">(Oct 18 2023 at 21:28)</a>:</h4>
+<p>although now the localhost:8080 is opening and not giving error, but tests are giving error</p>
+
+
+
+<a name="397385857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397385857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397385857">(Oct 18 2023 at 21:30)</a>:</h4>
+<p>Can you please try:</p>
+<ul>
+<li>ctrl-c to stop the containers</li>
+<li><code>rm -rf docker-dev-volumes</code></li>
+<li>start the containers up again</li>
+</ul>
+
+
+
+<a name="397385975"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397385975" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397385975">(Oct 18 2023 at 21:31)</a>:</h4>
+<p>"Note that data is persisted in ./docker-dev-volumes in the root of the Git repo. For a clean start, you should remove this directory before running the mvn commands above." -- <a href="https://guides.dataverse.org/en/6.0/container/dev-usage.html">https://guides.dataverse.org/en/6.0/container/dev-usage.html</a></p>
+
+
+
+<a name="397390142"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397390142" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397390142">(Oct 18 2023 at 22:15)</a>:</h4>
+<p>Removing the directory will delete your settings. Then, when you try again, that key you need should be inserted.</p>
+
+
+
+<a name="397477657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397477657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397477657">(Oct 19 2023 at 10:40)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin</span> , tried these steps but still getting the same result <span aria-label="face with diagonal mouth" class="emoji emoji-1fae4" role="img" title="face with diagonal mouth">:face_with_diagonal_mouth:</span></p>
+
+
+
+<a name="397481738"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397481738" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397481738">(Oct 19 2023 at 11:06)</a>:</h4>
+<p>D'oh! <img alt=":doh:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/48103.png" title="doh"></p>
+
+
+
+<a name="397481832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397481832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397481832">(Oct 19 2023 at 11:07)</a>:</h4>
+<p>What's the status of your Dataverse installation? Can you see the root dataverse in a browser? Can you log in as dataverseAdmin? (password: admin1)</p>
+
+
+
+<a name="397577265"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397577265" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397577265">(Oct 19 2023 at 21:04)</a>:</h4>
+<p>I am able to see this screen on localhost:8080<br>
+<a href="/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png">dataverse_homepage.png</a><br>
+But when I open the administration console and tried to login using the credentials in the doc I got error that incorrect username or password</p>
+<div class="message_inline_image"><a href="/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png" title="dataverse_homepage.png"><img src="/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png"></a></div>
+
+
+
+<a name="397577807"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397577807" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397577807">(Oct 19 2023 at 21:08)</a>:</h4>
+<p>Oh. That's the Payara screen.</p>
+
+
+
+<a name="397577849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397577849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397577849">(Oct 19 2023 at 21:08)</a>:</h4>
+<p>You should see something more like this: <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> ... a running Dataverse instance.</p>
+
+
+
+<a name="397577921"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397577921" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397577921">(Oct 19 2023 at 21:09)</a>:</h4>
+<p>You probably see a lot of output in your terminal. Somewhere in there might be a useful error message. I hope. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="397727392"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/397727392" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#397727392">(Oct 20 2023 at 14:54)</a>:</h4>
+<p><span class="user-mention" data-user-id="656977">@Sakshi Jain</span> when you have a minute... perhaps you could start a new topic about the trouble you're (unfortunately) having setting up a dev environment. We're happy to help you out! Then we can circle back to actually running API tests.</p>
+
+
+
+<a name="398747917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/398747917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#398747917">(Oct 26 2023 at 18:49)</a>:</h4>
+<p><span class="user-mention" data-user-id="656977">@Sakshi Jain</span> any news? We're happy to help you get a dev environment set up!</p>
+
+
+
+<a name="398790148"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/398790148" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sakshi Jain <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#398790148">(Oct 27 2023 at 00:42)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin</span> ,  I was sick so haven't been able to work on this since we last talked. Will try running this again today.</p>
+
+
+
+<a name="398796167"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/running%20API%20tests/near/398796167" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/running.20API.20tests.html#398796167">(Oct 27 2023 at 01:28)</a>:</h4>
+<p>Oh! I'm sorry to hear! I hope you're feeling better!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

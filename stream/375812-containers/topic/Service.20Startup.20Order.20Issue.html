@@ -1,0 +1,49 @@
+<html>
+<head><meta charset="utf-8"><title>Service Startup Order Issue · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Service.20Startup.20Order.20Issue.html">Service Startup Order Issue</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="520597134"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Service%20Startup%20Order%20Issue/near/520597134" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Gwenaël Doux <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Service.20Startup.20Order.20Issue.html#520597134">(May 27 2025 at 07:23)</a>:</h4>
+<p>I recently encountered a recurring issue when running the Docker demo. I was able to run version 6.2 without any problems, but when I tried to update to 6.6, I started getting a 404 response from Dataverse.<br>
+I tried several of the tips you shared here, including increasing the timeout to 10, but none of them resolved the issue. I also removed all containers and re-downloaded the original docker compose‧yml file, but the problem persisted.<br>
+The only log line I found in the configbaker logs was:<br>
+<code>Checking the http://dataverse:8080/api/info/version ... curl: (6) Could not resolve host: dataverse</code><br>
+I also asked ClaudeAI for help and described the issue. After a bit of back and forth, it suggested that the problem might be related to the order in which the Docker services are started.<br>
+So I tried the following steps:</p>
+<div class="codehilite" data-code-language="SQL"><pre><span></span><code><span class="n">docker</span><span class="w"> </span><span class="n">compose</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">postgres</span><span class="w"> </span><span class="n">solr</span><span class="w"> </span><span class="n">smtp</span><span class="w"> </span><span class="n">dv_initializer</span><span class="w"> </span><span class="n">solr_initializer</span>
+<span class="n">sleep</span><span class="w"> </span><span class="mi">10</span>
+<span class="n">docker</span><span class="w"> </span><span class="n">compose</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">dataverse</span>
+<span class="o">#</span><span class="w"> </span><span class="n">look</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">logs</span><span class="w"> </span><span class="k">until</span><span class="w"> </span><span class="n">everything</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">finished</span><span class="w"> </span><span class="n">booting</span><span class="w"> </span><span class="n">up</span>
+<span class="n">docker</span><span class="w"> </span><span class="n">compose</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">bootstrap</span><span class="w"> </span><span class="n">register</span><span class="o">-</span><span class="n">previewers</span><span class="w"> </span><span class="n">previewers</span><span class="o">-</span><span class="n">provider</span>
+</code></pre></div>
+<p>Apparently, the issue was indeed related to the service start order. I'm not sure what changes could be made to the setup to prevent this, but if anyone else encounters the same error, these steps might help.</p>
+
+
+
+<a name="520667090"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Service%20Startup%20Order%20Issue/near/520667090" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Service.20Startup.20Order.20Issue.html#520667090">(May 27 2025 at 13:19)</a>:</h4>
+<p>Hmm, we did add <code>service_completed_successfully</code> over in the frontend repo: <a href="https://github.com/IQSS/dataverse-frontend/pull/180">https://github.com/IQSS/dataverse-frontend/pull/180</a></p>
+
+
+
+<a name="520667130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Service%20Startup%20Order%20Issue/near/520667130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Service.20Startup.20Order.20Issue.html#520667130">(May 27 2025 at 13:19)</a>:</h4>
+<p>I'm not sure if it would help or not. You're welcome to try!</p>
+
+
+
+<a name="520667196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Service%20Startup%20Order%20Issue/near/520667196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Service.20Startup.20Order.20Issue.html#520667196">(May 27 2025 at 13:19)</a>:</h4>
+<p><code>Could not resolve host: dataverse</code> sounds like it's not on the same network. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

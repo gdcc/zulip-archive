@@ -1,0 +1,394 @@
+<html>
+<head><meta charset="utf-8"><title>Term URI in the Controlled Vocab URL field · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html">Term URI in the Controlled Vocab URL field</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="485686106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485686106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485686106">(Dec 02 2024 at 18:35)</a>:</h4>
+<p>hi there .. this is <em>somewhat urgen</em>t in that .. new datasets have the new Term UI field and if we add anything to that field, fixes later to migrate the data will wipe out newly entered data. </p>
+<p>So .. after upgrading to Dataverse v6.3 (and v6.4) we noticed that we have some datasets where the Term URI is appearing in the controlled vacab URL field .. I know there were instructions in the v6.3 upgrade to migrate that data to the correct field .. however, when upgrading to v6.3, when running the supplied query to find records affected it did not find any (and still does not), so I assumed there was nothing to move (my bad) .. is there a way to fix this?</p>
+
+
+
+<a name="485691063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485691063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485691063">(Dec 02 2024 at 19:05)</a>:</h4>
+<p>trying to figure out why the query didn't find anything as most of our datasets have keywords and URIs included</p>
+
+
+
+<a name="485692945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485692945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485692945">(Dec 02 2024 at 19:16)</a>:</h4>
+<p>I can see the keywords in the datasetfieldvalue field if I search on a specific keyword value .. and i can see mulitple URIs if I search for anything like 'http%'</p>
+
+
+
+<a name="485694555"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485694555" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485694555">(Dec 02 2024 at 19:26)</a>:</h4>
+<p>.. and the query <br>
+'SELECT value FROM datasetfieldvalue dfv<br>
+INNER JOIN datasetfield df ON <a href="http://df.id">df.id</a> = dfv.datasetfield_id<br>
+WHERE df.datasetfieldtype_id = (SELECT id FROM datasetfieldtype WHERE name = 'keywordValue');'  <br>
+.. <br>
+finds 357 rows of keywords</p>
+
+
+
+<a name="485694655"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485694655" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485694655">(Dec 02 2024 at 19:26)</a>:</h4>
+<p>.. and they query <br>
+'SELECT value FROM datasetfieldvalue dfv INNER JOIN datasetfield df ON <a href="http://df.id">df.id</a> = dfv.datasetfield_id WHERE value ILIKE 'http%';'</p>
+<p>.. finds 628 rows</p>
+
+
+
+<a name="485694936"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485694936" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485694936">(Dec 02 2024 at 19:28)</a>:</h4>
+<p>... it's just the 2 where clauses together don't find anything</p>
+
+
+
+<a name="485700848"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485700848" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485700848">(Dec 02 2024 at 20:10)</a>:</h4>
+<p>Any help that I could get in this matter is greatly appreciated <span aria-label="face with spiral eyes" class="emoji emoji-1f635-200d-1f4ab" role="img" title="face with spiral eyes">:face_with_spiral_eyes:</span></p>
+
+
+
+<a name="485723546"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485723546" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485723546">(Dec 02 2024 at 23:04)</a>:</h4>
+<p>Note: I also ran the query to migrate the fields in our QA site and nothing was updated.</p>
+
+
+
+<a name="485782645"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485782645" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Dimitri Szabo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485782645">(Dec 03 2024 at 08:18)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> ,<br>
+I'm pinging <span class="user-mention" data-user-id="649905">@luddaniel</span> who contributed on the addition of the field and might help you :)</p>
+
+
+
+<a name="485878616"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485878616" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485878616">(Dec 03 2024 at 15:14)</a>:</h4>
+<p>Thank you!</p>
+
+
+
+<a name="485883713"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485883713" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485883713">(Dec 03 2024 at 15:34)</a>:</h4>
+<p>Hey <span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span>, I'm not sure I understand well what is happening to you.</p>
+<div class="codehilite" data-code-language="SQL"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldvalue</span><span class="w"> </span><span class="n">dfv</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">datasetfield</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dfv</span><span class="p">.</span><span class="n">datasetfield_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">datasetfieldtype_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldtype</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'keywordValue'</span><span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="s1">'http%'</span><span class="p">;</span>
+</code></pre></div>
+<p>This query finds the <code>value</code> for the <code>keywordValue</code> when the  <code>value</code> starts with <code>http</code> so if you get nothing it means you have no url in this field.</p>
+
+
+
+<a name="485884014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485884014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485884014">(Dec 03 2024 at 15:35)</a>:</h4>
+<p>But you are saying that you urls are maybe in a controlled vocabulary URL field, do you have a customized <code>citation.tsv</code> ?</p>
+
+
+
+<a name="485884351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485884351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485884351">(Dec 03 2024 at 15:37)</a>:</h4>
+<p>Are you talking about <code>keywordVocabularyURI</code> ?</p>
+
+
+
+<a name="485885306"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485885306" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485885306">(Dec 03 2024 at 15:40)</a>:</h4>
+<p>Can you show me one example ? one dataset with the metadata that are not like you want. (dataset json export for example)</p>
+
+
+
+<a name="485885854"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485885854" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485885854">(Dec 03 2024 at 15:43)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485686106">said</a>:</p>
+<blockquote>
+<p>hi there .. this is <em>somewhat urgen</em>t in that .. new datasets have the new Term UI field and if we add anything to that field, fixes later to migrate the data will wipe out newly entered data.</p>
+</blockquote>
+<p>Unless you apply a manual <code>delete</code> in database, Dataverse mechanism does not delete data</p>
+
+
+
+<a name="485894049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485894049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485894049">(Dec 03 2024 at 16:14)</a>:</h4>
+<p>Thanks for your response! The problem is that, all the values that are currently in the "Controlled Vocabulary URL" field should be in the "Term URI" field. When we originally were entering them, we were putting them into the "Vocabulary URL" field. <br>
+<a href="/user_uploads/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg">cv-dataverse.jpg</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg" title="cv-dataverse.jpg"><img data-original-dimensions="785x131" src="/user_uploads/thumbnail/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg/840x560.webp"></a></div>
+
+
+
+<a name="485894164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485894164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485894164">(Dec 03 2024 at 16:15)</a>:</h4>
+<p>when we upgraded and the new fields appeared, the value that we were putting in the "vocabulary url" field appeared in the "Controlled Vocabulary field"</p>
+
+
+
+<a name="485894357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485894357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485894357">(Dec 03 2024 at 16:16)</a>:</h4>
+<p>we do not have a custom citation.tsv</p>
+
+
+
+<a name="485894881"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485894881" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485894881">(Dec 03 2024 at 16:18)</a>:</h4>
+<p>we don't have any custom metadata blocks, other than we added the "computational workflow" metadata block accidentally when we upgraded to v6.3</p>
+
+
+
+<a name="485899407"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485899407" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485899407">(Dec 03 2024 at 16:37)</a>:</h4>
+<p>I see now why I was confused ! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> <br>
+First, I didn't know the default label for <code>keywordVocabularyURI</code> was <code>Controlled Vocabulary URL</code> (I'm french) <br>
+2nd, We assumed for a lot of reason that the Term field could contain either a text value or the term Uri.</p>
+<p>I guess you undestand that <code>keywordVocabularyURI</code> is the URL for the vocabulary (MeSH -&gt; <a href="http://id.nlm.nih.gov/mesh/D004493">http://id.nlm.nih.gov/mesh/D004493</a> or <a href="https://www.ncbi.nlm.nih.gov/mesh">https://www.ncbi.nlm.nih.gov/mesh</a>) <br>
+and <code>keywordTermURI</code> is the URL for the term (Physical education and training -&gt; <a href="http://id.nlm.nih.gov/mesh/D010806">http://id.nlm.nih.gov/mesh/D010806</a>)</p>
+<p>In your case, if you used in the past <code>keywordVocabularyURI</code> as a way to add the <code>keywordTermURI</code> you can adjust the sql queries like this :</p>
+<div class="codehilite" data-code-language="SQL"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldvalue</span><span class="w"> </span><span class="n">dfv</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">datasetfield</span><span class="w"> </span><span class="n">df</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dfv</span><span class="p">.</span><span class="n">datasetfield_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">datasetfieldtype_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldtype</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'keywordVocabularyURI'</span><span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="s1">'http%'</span><span class="p">;</span>
+</code></pre></div>
+<div class="codehilite" data-code-language="SQL"><pre><span></span><code><span class="k">UPDATE</span><span class="w"> </span><span class="n">datasetfield</span><span class="w"> </span><span class="n">df</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">datasetfieldtype_id</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldtype</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'keywordTermURI'</span><span class="p">)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldvalue</span><span class="w"> </span><span class="n">dfv</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">dfv</span><span class="p">.</span><span class="n">datasetfield_id</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">id</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">df</span><span class="p">.</span><span class="n">datasetfieldtype_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">datasetfieldtype</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'keywordVocabularyURI'</span><span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="n">dfv</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="k">ILIKE</span><span class="w"> </span><span class="s1">'http%'</span><span class="p">;</span>
+</code></pre></div>
+<p>This will transfert all url from <code>keywordVocabularyURI</code> value to <code>keywordTermURI</code> which is empty because it's new.<br>
+This is not what you want to do if <code>keywordVocabularyURI</code> contains correct URLs for the vocabulary.</p>
+
+
+
+<a name="485901182"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485901182" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485901182">(Dec 03 2024 at 16:45)</a>:</h4>
+<p>Sorry I was just about to post the json .. i'll post it anyway just in case ..</p>
+<p>.. this looks like what we need! Thank you! I'm sorry I'm not familiar enough with the tables to know exactly where we needed to change that, but I did see the "keywordVocabularyURI" field and was wondering about it .. <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+<p>So, it seems we were adding the Term URI when that should have been Controlled Vocabulary URL? (keywordVocabularyURI)?</p>
+
+
+
+<a name="485901312"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485901312" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485901312">(Dec 03 2024 at 16:45)</a>:</h4>
+<p><a href="/user_uploads/53090/I-dHqR32x7FiYLoL2tsSUEXE/VXJNBO_export.json">VXJNBO_export.json</a></p>
+
+
+
+<a name="485902464"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485902464" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485902464">(Dec 03 2024 at 16:50)</a>:</h4>
+<p>so, I ran that query in our QA site, and it changed the dataset field names so that now I have 2 "Term URI" fields .. this is for records that already had something in the Term URI field<br>
+<a href="/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg">migrated-cv-dataverse.jpg</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg" title="migrated-cv-dataverse.jpg"><img data-original-dimensions="1063x298" src="/user_uploads/thumbnail/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg/840x560.webp"></a></div>
+
+
+
+<a name="485902941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485902941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485902941">(Dec 03 2024 at 16:52)</a>:</h4>
+<p>for records where that field was empty .. it did it correctly<br>
+<a href="/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg">migrated-cv2-dataverse.jpg</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg" title="migrated-cv2-dataverse.jpg"><img data-original-dimensions="1100x210" src="/user_uploads/thumbnail/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg/840x560.webp"></a></div>
+
+
+
+<a name="485903028"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485903028" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485903028">(Dec 03 2024 at 16:53)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485902464">said</a>:</p>
+<blockquote>
+<p>so, I ran that query in our QA site, and it changed the dataset field names so that now I have 2 "Term URI" fields .. this is for records that already had something in the Term URI field<br>
+<a href="/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg">migrated-cv-dataverse.jpg</a></p>
+</blockquote>
+<p>this one is weird</p>
+
+
+
+<a name="485903106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485903106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485903106">(Dec 03 2024 at 16:53)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485902941">said</a>:</p>
+<blockquote>
+<p>for records where that field was empty .. it did it correctly<br>
+<a href="/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg">migrated-cv2-dataverse.jpg</a></p>
+</blockquote>
+<p>this one worked but this is the case where you didn't want it :D</p>
+
+
+
+<a name="485903304"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485903304" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485903304">(Dec 03 2024 at 16:54)</a>:</h4>
+<p>oh yea, that was just a test .. i may have put the wrong URL .. but it was in the controlled vocab field .. now is in the term uri field</p>
+
+
+
+<a name="485903355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485903355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485903355">(Dec 03 2024 at 16:54)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485901182">said</a>:</p>
+<blockquote>
+<p>So, it seems we were adding the Term URI when that should have been Controlled Vocabulary URL? (keywordVocabularyURI)?</p>
+</blockquote>
+<p>Yes but you only had 1 field so you did your best :p <code>keywordTermURI</code> is by far more important.</p>
+
+
+
+<a name="485903520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485903520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485903520">(Dec 03 2024 at 16:55)</a>:</h4>
+<p>in production, we likely don't have anything in the Term URI fields .. so since the first query in the instructions didn't find anything, we should be okay?</p>
+
+
+
+<a name="485905499"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485905499" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485905499">(Dec 03 2024 at 17:04)</a>:</h4>
+<p>oh nm .. i see now it just kept what was there and added another one .. that is fine .. I think we are good! Thank you!!!</p>
+
+
+
+<a name="485919930"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485919930" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485919930">(Dec 03 2024 at 18:12)</a>:</h4>
+<p>Queries are only here to help you to move url in the correct field if you want it, feel free to not use it.</p>
+
+
+
+<a name="485920272"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485920272" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485920272">(Dec 03 2024 at 18:14)</a>:</h4>
+<p>I don't undertand why you have 5 fields, maybe the cache (need to restart payara) or you altered the data. But I don't think the queries I gave you can do that.</p>
+
+
+
+<a name="485922346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/485922346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#485922346">(Dec 03 2024 at 18:25)</a>:</h4>
+<p>all we really need to do at this point is move whatever is in the "Controlled Vocabulary URL" field to the "Term URI" field .. we were apparently using the "Vocabulary URL" field for that. </p>
+<p>Will the second query above that you added do that? (I tried it on QA and it seemed to do so successfully, although it added the second Term URI field to the dataset that already had one). We will make sure we don't have anything in that field.</p>
+
+
+
+<a name="486045511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486045511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486045511">(Dec 04 2024 at 09:20)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346">said</a>:</p>
+<blockquote>
+<p>Will the second query above that you added do that?</p>
+</blockquote>
+<p>Yes</p>
+
+
+
+<a name="486045736"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486045736" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486045736">(Dec 04 2024 at 09:21)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346">said</a>:</p>
+<blockquote>
+<p>We will make sure we don't have anything in that field.</p>
+</blockquote>
+<p>As the field is created by <code>curl http://localhost:8080/api/admin/datasetfield/load -H "Content-type: text/tab-separated-values" -X POST --upload-file citation.tsv</code> while upgrading to v6.3, it will be empty. No worries.</p>
+
+
+
+<a name="486046666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486046666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486046666">(Dec 04 2024 at 09:26)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346">said</a>:</p>
+<blockquote>
+<p>although it added the second Term URI field to the dataset that already had one</p>
+</blockquote>
+<p>I don't see how the sql query could do that, as it is a replacement of a field type, not an addition of a field value.<br>
+Something else did that. Please, restart payara, and do run some other tests, because fixing this afterward it really complicated in term of SQL.</p>
+
+
+
+<a name="486117594"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486117594" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486117594">(Dec 04 2024 at 15:22)</a>:</h4>
+<p>Running the query resolved the issue on our production site. Thank you!! <br>
+As for QA, I restarted payara but the double Term URI field is still there. This is a site that had already been upgraded to v6.3 and someone had added a record that included data in the Term URI field. When I ran the query, it moved the value of "Controlled Vocabulary URL" to a new "Term URI" field but kept the existing value in that field, so that now there are two Term URIs.</p>
+
+
+
+<a name="486118302"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486118302" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486118302">(Dec 04 2024 at 15:25)</a>:</h4>
+<p>we clear that site of all datasets once a month, so it doesn't matter to us that it is like that, unless it will cause an issue with the DB later for some reason</p>
+
+
+
+<a name="486125422"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486125422" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486125422">(Dec 04 2024 at 15:55)</a>:</h4>
+<p>Good news :)</p>
+
+
+
+<a name="486125480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/486125480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#486125480">(Dec 04 2024 at 15:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="649905">luddaniel</span> has marked this topic as resolved.</p>
+
+
+
+<a name="520077393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520077393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520077393">(May 23 2025 at 15:18)</a>:</h4>
+<p>I'm just looking at the DV 6.3 upgrade instructions and see them SQL queries. Was there a particular reason why we didn't add a Flyway migration for this? (maybe an afterMigrate style one, potentially using Java for it to make it configurable to be applied)</p>
+
+
+
+<a name="520078175"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520078175" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520078175">(May 23 2025 at 15:22)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> has marked this topic as unresolved.</p>
+
+
+
+<a name="520078210"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520078210" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520078210">(May 23 2025 at 15:23)</a>:</h4>
+<p>It looks like it came from this PR:</p>
+<p>Add keywordTermURI metadata in keyword block <a href="https://github.com/IQSS/dataverse/issues/10371">#10371</a></p>
+
+
+
+<a name="520078869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520078869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520078869">(May 23 2025 at 15:26)</a>:</h4>
+<p>From <span class="user-mention" data-user-id="709277">@Steven Ferey</span> I see "Yes absolutely, I delete the script and update the PR description" at <a href="https://github.com/IQSS/dataverse/pull/10371#discussion_r1577941808">https://github.com/IQSS/dataverse/pull/10371#discussion_r1577941808</a></p>
+<p>I'm not sure why. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="520464158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520464158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Ferey <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520464158">(May 26 2025 at 14:14)</a>:</h4>
+<p>Hello, The two topics are different: </p>
+<p>-&gt; The SQL script mentioned by <span class="user-mention" data-user-id="598112">@Philip Durbin</span>  has been deleted because the modification to this metadata has been reverted: <a href="https://github.com/IQSS/dataverse/pull/10371/commits/9f728453eff6041a3becee2a093fb3479af2d317">https://github.com/IQSS/dataverse/pull/10371/commits/9f728453eff6041a3becee2a093fb3479af2d317</a> </p>
+<p>-&gt; The SQL queries mentioned by <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> , and present in the update instructions, are current, and the update is optional. The select query allows the Dataverse administrator to evaluate the data in question. The administrator can then decide whether to migrate these values ​​from the keywordValue metadata to the new keywordTermURI metadata, depending on the proposed pattern.</p>
+
+
+
+<a name="520467683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520467683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> luddaniel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520467683">(May 26 2025 at 14:28)</a>:</h4>
+<p>In addition, the reason of this topic was that a specific Dataverse intance was using <code>keywordVocabularyURI</code> to store a Term URI (new <code>keywordTermURI</code>) that for many instances is in <code>keywordValue</code> (default case is covered by <a href="https://github.com/IQSS/dataverse/releases/tag/v6.3#upgrade-instructions-6-3">https://github.com/IQSS/dataverse/releases/tag/v6.3#upgrade-instructions-6-3</a>. </p>
+<p>You can now see why a flyway script was avoided, it may not match the administrator's wishes.</p>
+<p><span class="user-mention silent" data-user-id="649905">luddaniel</span> <a href="#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485899407">said</a>:</p>
+<blockquote>
+<div class="codehilite"><pre><span></span><code>```sql
+UPDATE datasetfield df
+SET datasetfieldtype_id  = (SELECT id FROM datasetfieldtype WHERE name = &#39;keywordTermURI&#39;)
+FROM datasetfieldvalue dfv
+WHERE dfv.datasetfield_id  = df.id
+AND df.datasetfieldtype_id = (SELECT id FROM datasetfieldtype WHERE name = &#39;keywordVocabularyURI&#39;)
+AND dfv.value ILIKE &#39;http%&#39;;
+</code></pre></div>
+<p>This will transfert all url from <code>keywordVocabularyURI</code> value to <code>keywordTermURI</code> which is empty because it's new.<br>
+This is not what you want to do if <code>keywordVocabularyURI</code> contains correct URLs for the vocabulary.</p>
+</blockquote>
+
+
+
+<a name="520668080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520668080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520668080">(May 27 2025 at 13:23)</a>:</h4>
+<p>Thanks! <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> is this making sense, that it's optional?</p>
+
+
+
+<a name="520671907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Term%20URI%20in%20the%20Controlled%20Vocab%20URL%20field/near/520671907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field.html#520671907">(May 27 2025 at 13:40)</a>:</h4>
+<p>Uhm yeah sure. I'll still add a migration to the extra migrations that can be switched on/off and will tell you if there are any such elements.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

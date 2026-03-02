@@ -1,0 +1,99 @@
+<html>
+<head><meta charset="utf-8"><title>Shibboleth AJP connection in version 5.14 · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html">Shibboleth AJP connection in version 5.14</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="425518682"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425518682" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Loïc <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425518682">(Mar 08 2024 at 13:28)</a>:</h4>
+<p>Hello everyone,<br>
+During the process of updating <a href="http://dataverse.no">dataverse.no</a> from 5.13 to 5.14 we have a question about AJP connection in version 5.14.<br>
+We are using Shibboleth as described in the documentation[Shibboleth — Dataverse.org]. (ajp on port 8009) However, the Shibboleth proxy gets the following error message.<br>
+The timeout specified has expired: [client ...:38708] AH00878: read response failed from ...:8009 (dataverse)</p>
+<p>The website on port 8080 works. My question is, how can I get the ajp to work in this version 5.14 dataverse.<br>
+Has anything changed in the ajp connection?<br>
+Thank you in advance for your time.</p>
+
+
+
+<a name="425519109"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425519109" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425519109">(Mar 08 2024 at 13:30)</a>:</h4>
+<p>Hmm, I'm not aware of anything changing <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="425522727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425522727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Benedikt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425522727">(Mar 08 2024 at 13:52)</a>:</h4>
+<p>I have updated the whole thing from 5.13 to 5.14 and then the communication does not work. If we go back from 5.14 to 5.13 ajp works. So there is a change in the setting of ajp. Has anyone tested ajp in version 5.14 with a proxy?</p>
+
+
+
+<a name="425524451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425524451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425524451">(Mar 08 2024 at 14:02)</a>:</h4>
+<p>At Harvard Dataverse we use Apache as a proxy. I assume you're using mod_shib and Apache. Are you also using an additional proxy? If so, which one?</p>
+
+
+
+<a name="425525941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425525941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Benedikt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425525941">(Mar 08 2024 at 14:10)</a>:</h4>
+<p>Yes,</p>
+<div class="codehilite"><pre><span></span><code>...
+ProxyPass &quot;/&quot; &quot;ajp://dataverse:8009/&quot; timeout=600
+ProxyPassReverse &quot;/&quot; &quot;ajp://dataverse:8009/&quot; timeout=600
+...
+</code></pre></div>
+<p>I have not changed the Shib Proxy server and version 5.13 works and the other version 5.14 does not work.</p>
+
+
+
+<a name="425526559"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425526559" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Benedikt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425526559">(Mar 08 2024 at 14:13)</a>:</h4>
+<p>How can I see what is working on ajp? I have no idea how to debug this service.</p>
+
+
+
+<a name="425528069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425528069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Benedikt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425528069">(Mar 08 2024 at 14:22)</a>:</h4>
+<p>We use the same. (Apache and mod_shib.)</p>
+
+
+
+<a name="425531091"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425531091" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Loïc <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425531091">(Mar 08 2024 at 14:38)</a>:</h4>
+<p>The main issue we are are having is that payara dose not seams to be answering on the ajp protocol in V5.14.</p>
+
+
+
+<a name="425539808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425539808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425539808">(Mar 08 2024 at 15:23)</a>:</h4>
+<p>It's very strange. Are you using the version of Payara mentioned in the Dataverse 5.14 Installation Guide?</p>
+
+
+
+<a name="425549261"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425549261" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Loïc <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425549261">(Mar 08 2024 at 16:17)</a>:</h4>
+<p>we are using :<br>
+Version = Payara Server  5.2022.5 #badassfish (build 492)<br>
+This should be the latest compatible version.</p>
+
+
+
+<a name="425556652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425556652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425556652">(Mar 08 2024 at 16:58)</a>:</h4>
+<p>At <a href="https://guides.dataverse.org/en/5.14/installation/prerequisites.html#payara">https://guides.dataverse.org/en/5.14/installation/prerequisites.html#payara</a> I see "Payara 5.2022.3 is recommended." Would you be able to try that version?</p>
+
+
+
+<a name="425871617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20AJP%20connection%20in%20version%205.14/near/425871617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Benedikt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20AJP.20connection.20in.20version.205.2E14.html#425871617">(Mar 11 2024 at 09:48)</a>:</h4>
+<p>Thank you very much! That was the problem. <span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span> <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

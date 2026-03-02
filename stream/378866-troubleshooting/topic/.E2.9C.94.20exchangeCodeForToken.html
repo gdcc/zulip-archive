@@ -1,0 +1,918 @@
+<html>
+<head><meta charset="utf-8"><title>✔ exchangeCodeForToken · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html">✔ exchangeCodeForToken</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="425860706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425860706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425860706">(Mar 11 2024 at 08:47)</a>:</h4>
+<p>I have my OpenID provider running. I have also my dockerized dataverse running. I set the OpenID jvm options and see the OpenID button in the dataverse login view. My authorize endpoint is called properly but my token endpoint is not called at all.</p>
+<p>The following is the output of the .well-know/openid-configuration endpoint:</p>
+<p>{<br>
+  "issuer": "<a href="http://host.docker.internal:3000/api/auth">http://host.docker.internal:3000/api/auth</a>",<br>
+  "authorization_endpoint": "<a href="http://host.docker.internal:3000/api/auth/authorize">http://host.docker.internal:3000/api/auth/authorize</a>",<br>
+  "token_endpoint": "<a href="http://host.docker.internal:3000/api/auth/oauth-access-token">http://host.docker.internal:3000/api/auth/oauth-access-token</a>",<br>
+  "userinfo_endpoint": "<a href="http://host.docker.internal:3000/api/auth/oauth-user-profile">http://host.docker.internal:3000/api/auth/oauth-user-profile</a>",<br>
+  "jwks_uri": "<a href="http://host.docker.internal:3000/api/auth/.well-known/jwks.json">http://host.docker.internal:3000/api/auth/.well-known/jwks.json</a>",<br>
+  "response_types_supported": ["code", "token", "id_token", "code id_token"],<br>
+  "subject_types_supported": ["public", "pairwise"],<br>
+  "id_token_signing_alg_values_supported": ["RS256", "ES256", "HS256"]<br>
+}</p>
+<p>And this is the log I see in the dataverse container logs:</p>
+<p>[#|2024-03-11T08:35:03.773+0000|WARNING|Payara 6.2023.8|jakarta.enterprise.resource.webcontainer.faces.lifecycle|_ThreadID=76;_ThreadName=http-thread-pool::http-listener-1(1);_TimeMillis=1710146103773;_LevelValue=900;|<br>
+dataverse         |   #{OAuth2Page.exchangeCodeForToken()}: /oauth2/callback.xhtml @14,74 action="#{OAuth2Page.exchangeCodeForToken()}": java.net.ConnectException: Connection refused<br>
+dataverse         | jakarta.faces.FacesException: #{OAuth2Page.exchangeCodeForToken()}: /oauth2/callback.xhtml @14,74 action="#{OAuth2Page.exchangeCodeForToken()}": java.net.ConnectException: Connection refused<br>
+dataverse         |     at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:83)<br>
+dataverse         |     at com.sun.faces.application.ActionListenerImpl.processAction(ActionListenerImpl.java:62)<br>
+dataverse         |     at jakarta.faces.component.UIViewAction.broadcast(UIViewAction.java:506)<br>
+dataverse         |     at jakarta.faces.component.UIViewRoot.broadcastEvents(UIViewRoot.java:858)<br>
+dataverse         |     at jakarta.faces.component.UIViewRoot.processApplication(UIViewRoot.java:1332)<br>
+dataverse         |     at com.sun.faces.lifecycle.InvokeApplicationPhase.execute(InvokeApplicationPhase.java:56)<br>
+dataverse         |     at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)<br>
+dataverse         |     at com.sun.faces.lifecycle.LifecycleImpl.execute(LifecycleImpl.java:159)<br>
+dataverse         |     at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:691)<br>
+dataverse         |     at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)<br>
+dataverse         |     at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>
+dataverse         |     at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:83)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>
+dataverse         |     at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>
+dataverse         |     at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>
+dataverse         |     at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)<br>
+dataverse         |     at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:166)<br>
+dataverse         |     at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)<br>
+dataverse         |     at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)<br>
+dataverse         |     at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)<br>
+dataverse         |     at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)<br>
+dataverse         |     at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:372)<br>
+dataverse         |     at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)<br>
+dataverse         |     at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)<br>
+dataverse         |     at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)<br>
+dataverse         |     at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:174)<br>
+dataverse         |     at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:153)<br>
+dataverse         |     at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:196)<br>
+dataverse         |     at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:88)<br>
+dataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)<br>
+dataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:178)<br>
+dataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:118)<br>
+dataverse         |     at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:96)<br>
+dataverse         |     at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:51)<br>
+dataverse         |     at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:510)<br>
+dataverse         |     at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:82)<br>
+dataverse         |     at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)<br>
+dataverse         |     at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)<br>
+dataverse         |     at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)<br>
+dataverse         |     at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>
+dataverse         |     at java.base/java.lang.Thread.run(Unknown Source)<br>
+dataverse         | Caused by: jakarta.el.ELException: /oauth2/callback.xhtml @14,74 action="#{OAuth2Page.exchangeCodeForToken()}": java.net.ConnectException: Connection refused<br>
+dataverse         |     at com.sun.faces.facelets.el.TagMethodExpression.invoke(TagMethodExpression.java:76)<br>
+dataverse         |     at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:74)<br>
+dataverse         |     ... 44 more<br>
+dataverse         | Caused by: java.net.ConnectException: Connection refused<br>
+dataverse         |     at java.base/sun.nio.ch.Net.connect0(Native Method)<br>
+dataverse         |     at java.base/sun.nio.ch.Net.connect(Unknown Source)<br>
+dataverse         |     at java.base/sun.nio.ch.Net.connect(Unknown Source)<br>
+dataverse         |     at java.base/sun.nio.ch.NioSocketImpl.connect(Unknown Source)<br>
+dataverse         |     at java.base/java.net.Socket.connect(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.NetworkClient.doConnect(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.http.HttpClient.openServer(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.http.HttpClient.openServer(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.http.HttpClient.&lt;init&gt;(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.http.HttpClient.New(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.http.HttpClient.New(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.connect(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getOutputStream0(Unknown Source)<br>
+dataverse         |     at java.base/sun.net.www.protocol.http.HttpURLConnection.getOutputStream(Unknown Source)<br>
+dataverse         |     at com.nimbusds.oauth2.sdk.http.HTTPRequest.toHttpURLConnection(HTTPRequest.java:939)<br>
+dataverse         |     at com.nimbusds.oauth2.sdk.http.HTTPRequest.send(HTTPRequest.java:1007)<br>
+dataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getAccessToken(OIDCAuthProvider.java:268)<br>
+dataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserRecord(OIDCAuthProvider.java:223)<br>
+dataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean.exchangeCodeForToken(OAuth2LoginBackingBean.java:103)<br>
+dataverse         |     at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean$Proxy$_$$_WeldSubclass.exchangeCodeForToken(Unknown Source)<br>
+dataverse         |     at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+dataverse         |     at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)<br>
+dataverse         |     at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)<br>
+dataverse         |     at java.base/java.lang.reflect.Method.invoke(Unknown Source)<br>
+dataverse         |     at jakarta.el.ELUtil.invokeMethod(ELUtil.java:227)<br>
+dataverse         |     at jakarta.el.BeanELResolver.invoke(BeanELResolver.java:481)<br>
+dataverse         |     at jakarta.el.CompositeELResolver.invoke(CompositeELResolver.java:198)...</p>
+
+
+
+<a name="425886859"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425886859" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425886859">(Mar 11 2024 at 11:18)</a>:</h4>
+<p>Which Docker image are you using? The one called "alpha", which is 6.1 right now? Or "unstable", which is the "develop" branch?</p>
+
+
+
+<a name="425888663"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425888663" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425888663">(Mar 11 2024 at 11:30)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/exchangeCodeForToken/near/425886859">said</a>:</p>
+<blockquote>
+<p>Which Docker image are you using? The one called "alpha", which is 6.1 right now? Or "unstable", which is the "develop" branch?</p>
+</blockquote>
+<p>The following is my compose.yml:</p>
+<p>version: "2.4"</p>
+<p>services:</p>
+<p>dataverse:<br>
+    container_name: "dataverse"<br>
+    hostname: dataverse<br>
+    image: gdcc/dataverse:alpha<br>
+    restart: on-failure<br>
+    user: payara<br>
+    environment:<br>
+      _CT_DATAVERSE_SITEURL: "<a href="http://localhost:8080">http://localhost:8080</a>"<br>
+      DATAVERSE_DB_HOST: postgres<br>
+      DATAVERSE_DB_PASSWORD: secret<br>
+      DATAVERSE_DB_USER: dataverse<br>
+      DATAVERSE_FEATURE_API_BEARER_AUTH: "1"<br>
+      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1<br>
+        -Ddataverse.files.file1.type=file<br>
+        -Ddataverse.files.file1.label=Filesystem<br>
+        -Ddataverse.files.file1.directory=${STORAGE_DIR}/store<br>
+        -Ddataverse.pid.providers=fake<br>
+        -Ddataverse.pid.default-provider=fake<br>
+        -Ddataverse.pid.fake.type=FAKE<br>
+        -Ddataverse.pid.fake.label=FakeDOIProvider<br>
+        -Ddataverse.pid.fake.authority=10.5072<br>
+        -Ddataverse.pid.fake.shoulder=FK2/<br>
+        -Ddataverse.auth.oidc.enabled=true<br>
+        -Ddataverse.auth.oidc.client-id=some_id<br>
+        -Ddataverse.auth.oidc.client-secret=some_secret<br>
+        -Ddataverse.auth.oidc.auth-server-url=http://host.docker.internal:3000/api/auth/<br>
+        -Ddataverse.auth.oidc.title=OpenID<br>
+    ports:</p>
+<div class="codehilite"><pre><span></span><code>  - &quot;8080:8080&quot; # HTTP (Dataverse Application)
+  - &quot;4848:4848&quot; # HTTP (Payara Admin Console)
+  - &quot;9009:9009&quot; # JDWP
+  - &quot;8686:8686&quot; # JMX
+networks:
+
+  - dataverse
+depends_on:
+
+  - postgres
+  - solr
+  - dv_initializer
+volumes:
+
+  - ./data/app/data:/dv
+  - ./data/app/secrets:/secrets
+tmpfs:
+
+  - /dumps:mode=770,size=2052M,uid=1000,gid=1000
+  - /tmp:mode=770,size=2052M,uid=1000,gid=1000
+mem_limit: 2147483648 # 2 GiB
+mem_reservation: 1024m
+privileged: false
+</code></pre></div>
+
+<p>bootstrap:<br>
+    container_name: "bootstrap"<br>
+    image: gdcc/configbaker:alpha<br>
+    restart: "no"<br>
+    command:</p>
+<div class="codehilite"><pre><span></span><code>  - bootstrap.sh
+  - dev
+  #- demo
+#volumes:
+#  - ./demo:/scripts/bootstrap/demo
+networks:
+
+  - dataverse
+</code></pre></div>
+
+<p>dv_initializer:<br>
+    container_name: "dv_initializer"<br>
+    image: gdcc/configbaker:alpha<br>
+    restart: "no"<br>
+    command:</p>
+<div class="codehilite"><pre><span></span><code>  - sh
+  - -c
+  - &quot;fix-fs-perms.sh dv&quot;
+volumes:
+
+  - ./data/app/data:/dv
+</code></pre></div>
+
+<p>postgres:<br>
+    container_name: "postgres"<br>
+    hostname: postgres<br>
+    image: postgres:13<br>
+    restart: on-failure<br>
+    environment:</p>
+<div class="codehilite"><pre><span></span><code>  - POSTGRES_USER=dataverse
+  - POSTGRES_PASSWORD=secret
+ports:
+
+  - &quot;5432:5432&quot;
+networks:
+
+  - dataverse
+volumes:
+
+  - ./data/postgresql/data:/var/lib/postgresql/data
+</code></pre></div>
+
+<p>solr_initializer:<br>
+    container_name: "solr_initializer"<br>
+    image: gdcc/configbaker:alpha<br>
+    restart: "no"<br>
+    command:</p>
+<div class="codehilite"><pre><span></span><code>  - sh
+  - -c
+  - &quot;fix-fs-perms.sh solr &amp;&amp; cp -a /template/* /solr-template&quot;
+volumes:
+
+  - ./data/solr/data:/var/solr
+  - ./data/solr/conf:/solr-template
+</code></pre></div>
+
+<p>solr:<br>
+    container_name: "solr"<br>
+    hostname: "solr"<br>
+    image: solr:9.3.0<br>
+    depends_on:</p>
+<div class="codehilite"><pre><span></span><code>  - solr_initializer
+restart: on-failure
+ports:
+
+  - &quot;8983:8983&quot;
+networks:
+
+  - dataverse
+command:
+
+  - &quot;solr-precreate&quot;
+  - &quot;collection1&quot;
+  - &quot;/template&quot;
+volumes:
+
+  - ./data/solr/data:/var/solr
+  - ./data/solr/conf:/template
+</code></pre></div>
+
+<p>smtp:<br>
+    container_name: "smtp"<br>
+    hostname: "smtp"<br>
+    image: maildev/maildev:2.0.5<br>
+    restart: on-failure<br>
+    ports:</p>
+<div class="codehilite"><pre><span></span><code>  - &quot;25:25&quot; # smtp server
+  - &quot;1080:1080&quot; # web ui
+environment:
+
+  - MAILDEV_SMTP_PORT=25
+  - MAILDEV_MAIL_DIRECTORY=/mail
+networks:
+
+  - dataverse
+#volumes:
+#  - ./data/smtp/data:/mail
+tmpfs:
+
+  - /mail:mode=770,size=128M,uid=1000,gid=1000
+</code></pre></div>
+
+<p>networks:<br>
+  dataverse:<br>
+    driver: bridge</p>
+
+
+
+<a name="425894814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425894814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425894814">(Mar 11 2024 at 12:08)</a>:</h4>
+<p>Ok, "alpha", thanks. So 6.1.</p>
+
+
+
+<a name="425895003"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425895003" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425895003">(Mar 11 2024 at 12:09)</a>:</h4>
+<p>Can you reach <a href="http://host.docker.internal:3000/api/auth">http://host.docker.internal:3000/api/auth</a> from the Dataverse container? With curl or whatever?</p>
+
+
+
+<a name="425895934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425895934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425895934">(Mar 11 2024 at 12:15)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/exchangeCodeForToken/near/425895003">said</a>:</p>
+<blockquote>
+<p>Can you reach <a href="http://host.docker.internal:3000/api/auth">http://host.docker.internal:3000/api/auth</a> from the Dataverse container? With curl or whatever?</p>
+</blockquote>
+<p>But The <code>http://host.docker.internal:3000/api/auth</code> is my OpenID Provider's auth controller and not any specific endpoint within it.</p>
+
+
+
+<a name="425896301"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425896301" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425896301">(Mar 11 2024 at 12:17)</a>:</h4>
+<p>But if I call any specific endpoint of the auth controller from within the dataverse they are called. For example the following is the result of the <a href="http://host.docker.internal:3000/api/auth/.well-known/openid-configuration">http://host.docker.internal:3000/api/auth/.well-known/openid-configuration</a> endpoint:</p>
+<p>{"issuer":"http://host.docker.internal:3000/api/auth","authorization_endpoint":"http://localhost:3000/api/auth/authorize","token_endpoint":"http://host.docker.internal:3000/api/auth/oauth-access-token","userinfo_endpoint":"http://host.docker.internal:3000/api/auth/oauth-user-profile","jwks_uri":"http://host.docker.internal:3000/api/auth/.well-known/jwks.json","response_types_supported":["code","token","id_token","code id_token"],"subject_types_supported":["public","pairwise"],"id_token_signing_alg_values_supported":["RS256","ES256","HS256"]}</p>
+
+
+
+<a name="425904584"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425904584" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425904584">(Mar 11 2024 at 13:04)</a>:</h4>
+<p>I see <code>Connection refused</code> for  <code>edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getAccessToken(OIDCAuthProvider.java:268</code>. That line is specifically the point where Dataverse reaches out to the token endpoint.</p>
+
+
+
+<a name="425904902"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425904902" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425904902">(Mar 11 2024 at 13:06)</a>:</h4>
+<p>Yes, but I don't know what endpoint exactly it is trying to call. I think all my configs are fine (as shown above).</p>
+
+
+
+<a name="425904950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425904950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425904950">(Mar 11 2024 at 13:06)</a>:</h4>
+<p>Seeing this "connection refused" might either be a connection problem between Dataverse and the provider or an invalid secret thing.</p>
+
+
+
+<a name="425905091"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905091" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905091">(Mar 11 2024 at 13:07)</a>:</h4>
+<p>If you use <code>docker exec</code> to open a shell in your container, can you try to reachout to the URL given in the token endpoint?</p>
+
+
+
+<a name="425905129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905129">(Mar 11 2024 at 13:07)</a>:</h4>
+<p>Just to make sure it's not DNS getting in our way</p>
+
+
+
+<a name="425905290"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905290" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905290">(Mar 11 2024 at 13:08)</a>:</h4>
+<p>(I've seen very weird DNS issues lately with alpine glibc/musl images, but this is an Ubuntu based image so we should be fine with DNS resolvers)</p>
+
+
+
+<a name="425905511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905511">(Mar 11 2024 at 13:09)</a>:</h4>
+<p>mohsen@Mohsens-Air % docker exec -it dataverse sh<br>
+$ curl -X POST <a href="http://host.docker.internal:3000/api/auth/oauth-access-token">http://host.docker.internal:3000/api/auth/oauth-access-token</a><br>
+{"statusCode":401,"message":"Unauthorized"}$</p>
+
+
+
+<a name="425905516"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905516" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905516">(Mar 11 2024 at 13:09)</a>:</h4>
+<p>The exec could be something like <code>docker exec -it dataverse-1 curl "http://host.docker.internal:3000/api/auth/oauth-access-token"</code></p>
+
+
+
+<a name="425905711"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905711" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905711">(Mar 11 2024 at 13:10)</a>:</h4>
+<p>The above is the call.</p>
+
+
+
+<a name="425905830"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425905830" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425905830">(Mar 11 2024 at 13:11)</a>:</h4>
+<p>OK that's something! Looks like Dataverse can talk to the endpoint! Great!</p>
+
+
+
+<a name="425906208"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906208" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906208">(Mar 11 2024 at 13:13)</a>:</h4>
+<p>Did you enable PKCE? (This is not yet very battle tested and might cause problems, checking to potentially rule it out)</p>
+
+
+
+<a name="425906325"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906325" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906325">(Mar 11 2024 at 13:14)</a>:</h4>
+<p>I don't know how to enable or disable PKCE.</p>
+
+
+
+<a name="425906422"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906422" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906422">(Mar 11 2024 at 13:14)</a>:</h4>
+<p>That would be JVM options</p>
+
+
+
+<a name="425906515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906515">(Mar 11 2024 at 13:15)</a>:</h4>
+<p>See <a href="https://guides.dataverse.org/en/latest/installation/oidc.html#provision-via-jvm-options">https://guides.dataverse.org/en/latest/installation/oidc.html#provision-via-jvm-options</a></p>
+
+
+
+<a name="425906646"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906646" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906646">(Mar 11 2024 at 13:16)</a>:</h4>
+<p>Just to double check: does your OIDC provider work without PKCE enabled? (Asking because some providers explicitely require you to enable PKCE)</p>
+
+
+
+<a name="425906707"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906707" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906707">(Mar 11 2024 at 13:16)</a>:</h4>
+<p>But as you can see in the above compose.yml, I didn't set any PKCE to true.</p>
+
+
+
+<a name="425906792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906792">(Mar 11 2024 at 13:16)</a>:</h4>
+<p>I personally implemented the OpenID Provider and I did not implement the PKCE part, yet.</p>
+
+
+
+<a name="425906829"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906829" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906829">(Mar 11 2024 at 13:17)</a>:</h4>
+<p>Oha! A custom OIDC provider! Fancy that!</p>
+
+
+
+<a name="425906920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906920">(Mar 11 2024 at 13:17)</a>:</h4>
+<p>I took some time to implement it using NestJS.</p>
+
+
+
+<a name="425906943"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425906943" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425906943">(Mar 11 2024 at 13:17)</a>:</h4>
+<p>OK at this point I would either go for tcpdump + Wireshark to take a look at the packages being exchanged and/or use a Debugger to see what's going on inside</p>
+
+
+
+<a name="425907078"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907078" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907078">(Mar 11 2024 at 13:18)</a>:</h4>
+<p>Could you give me a clue on the Debugger approach, so I can follow it.</p>
+
+
+
+<a name="425907125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907125">(Mar 11 2024 at 13:18)</a>:</h4>
+<p>Of course. Just a moment</p>
+
+
+
+<a name="425907257"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907257" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907257">(Mar 11 2024 at 13:19)</a>:</h4>
+<p>Do you have a Java IDE around?</p>
+
+
+
+<a name="425907296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907296">(Mar 11 2024 at 13:19)</a>:</h4>
+<p>I have VSCode in my MacBook.</p>
+
+
+
+<a name="425907410"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907410" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907410">(Mar 11 2024 at 13:20)</a>:</h4>
+<p>OK never used VSCode with a Java debugger, but I suppose there will be docs online to use it.</p>
+
+
+
+<a name="425907474"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907474" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907474">(Mar 11 2024 at 13:20)</a>:</h4>
+<p>I will check.</p>
+
+
+
+<a name="425907479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907479">(Mar 11 2024 at 13:20)</a>:</h4>
+<p>You will need to checkout the v6.1 codebase <a href="https://github.com/IQSS/dataverse/tree/v6.1">https://github.com/IQSS/dataverse/tree/v6.1</a></p>
+
+
+
+<a name="425907603"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907603" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907603">(Mar 11 2024 at 13:21)</a>:</h4>
+<p>Please add option as suggested in the container docs: <a href="https://guides.dataverse.org/en/latest/container/dev-usage.html#using-a-debugger">https://guides.dataverse.org/en/latest/container/dev-usage.html#using-a-debugger</a></p>
+
+
+
+<a name="425907658"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907658" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907658">(Mar 11 2024 at 13:21)</a>:</h4>
+<p>Then you can use the debugger in your IDE to set breaking points and attach it to the running JVM process</p>
+
+
+
+<a name="425907869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907869">(Mar 11 2024 at 13:22)</a>:</h4>
+<p>Upon trying the login, the breaking point will be triggered and the debugger should kick in</p>
+
+
+
+<a name="425907977"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425907977" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425907977">(Mar 11 2024 at 13:23)</a>:</h4>
+<p>Thank you so much Oliver</p>
+
+
+
+<a name="425908059"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908059" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908059">(Mar 11 2024 at 13:23)</a>:</h4>
+<p>No worries! I'm the one who built in any errors and bugs, so happy to help <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="425908328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908328">(Mar 11 2024 at 13:25)</a>:</h4>
+<p>We definetly should add a try/catch there to add some more helpful log output than just forwarding the exception <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="425908395"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908395" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908395">(Mar 11 2024 at 13:25)</a>:</h4>
+<p>Exactly</p>
+
+
+
+<a name="425908606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908606">(Mar 11 2024 at 13:26)</a>:</h4>
+<p>This might be helpful: <a href="https://code.visualstudio.com/docs/java/java-debugging">https://code.visualstudio.com/docs/java/java-debugging</a></p>
+
+
+
+<a name="425908710"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908710" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908710">(Mar 11 2024 at 13:27)</a>:</h4>
+<p>I will check it.</p>
+
+
+
+<a name="425908973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425908973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425908973">(Mar 11 2024 at 13:28)</a>:</h4>
+<p>This answer looks helpful, too, as the docs are mostly about running + debug - but we want to attach to a running JVM. <a href="https://stackoverflow.com/a/53389655">https://stackoverflow.com/a/53389655</a></p>
+
+
+
+<a name="425909019"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909019" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909019">(Mar 11 2024 at 13:29)</a>:</h4>
+<p>Sure</p>
+
+
+
+<a name="425909074"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909074" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909074">(Mar 11 2024 at 13:29)</a>:</h4>
+<p>Note the <a href="https://code.visualstudio.com/docs/java/java-debugging#_hot-code-replace">https://code.visualstudio.com/docs/java/java-debugging#_hot-code-replace</a></p>
+
+
+
+<a name="425909230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909230">(Mar 11 2024 at 13:30)</a>:</h4>
+<p>You might be able to alter the running code in the JVM this way to add this try/catch block or add other specifics</p>
+
+
+
+<a name="425909303"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909303" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909303">(Mar 11 2024 at 13:30)</a>:</h4>
+<p>Yeah</p>
+
+
+
+<a name="425909731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909731">(Mar 11 2024 at 13:32)</a>:</h4>
+<p>Do you know what HTTP method does dataverse use when calling the token endpoint?</p>
+
+
+
+<a name="425909986"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425909986" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425909986">(Mar 11 2024 at 13:34)</a>:</h4>
+<p>POST</p>
+
+
+
+<a name="425910041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425910041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425910041">(Mar 11 2024 at 13:34)</a>:</h4>
+<p><code>HTTPRequest httpRequest = new HTTPRequest(Method.POST, this.getEndpointURI());</code> from TokenRequest.class in Nimbus SDK</p>
+
+
+
+<a name="425910125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425910125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425910125">(Mar 11 2024 at 13:35)</a>:</h4>
+<p>Again, a first easy step might be dumping the traffic via tcpdump and look at the packages using Wireshark</p>
+
+
+
+<a name="425910392"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425910392" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425910392">(Mar 11 2024 at 13:37)</a>:</h4>
+<p>And, in the codebase, I see a bunch of <code>isDebug()</code> to log/not log helpful information. Can it be set using an environment variable so the isDebug() returns true, making logs to the container logs?</p>
+
+
+
+<a name="425911799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425911799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425911799">(Mar 11 2024 at 13:45)</a>:</h4>
+<p>Sorry where do you see those? <code>rg -i "isDebug" src/main/java</code> gives me nothing?</p>
+
+
+
+<a name="425912266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425912266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425912266">(Mar 11 2024 at 13:47)</a>:</h4>
+<p>OAuth20Service.class</p>
+
+
+
+<a name="425912479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425912479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425912479">(Mar 11 2024 at 13:49)</a>:</h4>
+<p>Sounds like Scribus SDK</p>
+
+
+
+<a name="425912519"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425912519" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425912519">(Mar 11 2024 at 13:49)</a>:</h4>
+<p>That is beyond our control and not used for OIDC</p>
+
+
+
+<a name="425912637"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/425912637" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#425912637">(Mar 11 2024 at 13:49)</a>:</h4>
+<p>OIDC uses Nimbus SDK <a href="https://connect2id.com/products/nimbus-oauth-openid-connect-sdk">https://connect2id.com/products/nimbus-oauth-openid-connect-sdk</a></p>
+
+
+
+<a name="426111172"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111172" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111172">(Mar 12 2024 at 12:11)</a>:</h4>
+<p>I put some logging middleware in my OIDC side so that I understood the problem. My token endpoint expects these four items to be received from dataverse when calling token endpoint:</p>
+<p>client_id<br>
+client_secret<br>
+redirect_uri<br>
+code</p>
+<p>However, the dataverse is sending the following data when calling my token endpoint:</p>
+<p>code<br>
+redirect_uri<br>
+grant_type<br>
+scope</p>
+
+
+
+<a name="426111367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111367">(Mar 12 2024 at 12:12)</a>:</h4>
+<p>I updated my message.</p>
+
+
+
+<a name="426111377"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111377" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111377">(Mar 12 2024 at 12:12)</a>:</h4>
+<p>Huh? Why are you expecting the client_id and secret?</p>
+
+
+
+<a name="426111610"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111610" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111610">(Mar 12 2024 at 12:14)</a>:</h4>
+<p><a href="https://openid.net/specs/openid-connect-core-1_0.html#TokenRequest">https://openid.net/specs/openid-connect-core-1_0.html#TokenRequest</a></p>
+
+
+
+<a name="426111616"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111616" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111616">(Mar 12 2024 at 12:14)</a>:</h4>
+<p>I thought authorization code and redirect_uri wouldn't be enough as security perspective.</p>
+
+
+
+<a name="426111719"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111719" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111719">(Mar 12 2024 at 12:15)</a>:</h4>
+<p>Implementations will likely stick to the spec and not add extras <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="426111751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426111751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426111751">(Mar 12 2024 at 12:15)</a>:</h4>
+<p>Thanks</p>
+
+
+
+<a name="426112136"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112136" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112136">(Mar 12 2024 at 12:18)</a>:</h4>
+<p>I see "If the Client is a Confidential Client, then it MUST authenticate to the Token Endpoint using the authentication method registered for its client_id, as described in Section 9" in there.</p>
+
+
+
+<a name="426112233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112233">(Mar 12 2024 at 12:18)</a>:</h4>
+<p>What kind of authentication methods do you support for confidential clients?</p>
+
+
+
+<a name="426112369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112369">(Mar 12 2024 at 12:19)</a>:</h4>
+<p>To be honest, I never thought of a confidential client at all in my OIDC.</p>
+
+
+
+<a name="426112444"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112444" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112444">(Mar 12 2024 at 12:19)</a>:</h4>
+<p>You can require a confidential client to present its client_id and client_secret</p>
+
+
+
+<a name="426112575"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112575" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112575">(Mar 12 2024 at 12:20)</a>:</h4>
+<p>With non-confidential / public clients, you can't <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="426112641"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112641" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112641">(Mar 12 2024 at 12:20)</a>:</h4>
+<p>You mean I can configure the dataverse so that it also sends the client_id and secret when calling token endpoint?</p>
+
+
+
+<a name="426112785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112785">(Mar 12 2024 at 12:21)</a>:</h4>
+<p>Actually I think this should already happen</p>
+
+
+
+<a name="426112863"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112863" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112863">(Mar 12 2024 at 12:22)</a>:</h4>
+<p>As in "supposed to happen"</p>
+
+
+
+<a name="426112956"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426112956" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426112956">(Mar 12 2024 at 12:22)</a>:</h4>
+<p>From "new TokenRequest(this.idpMetadata.getTokenEndpointURI(), this.clientAuth,..." it's already clear that the request has the confidential information (this.clientAuth)</p>
+
+
+
+<a name="426113180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113180">(Mar 12 2024 at 12:24)</a>:</h4>
+<p>This is the whole body of the dataverse request towards my token endpoint:</p>
+<p>Body: {"code":"123456789","redirect_uri":"http://some_IP:8080/oauth2/callback.xhtml","grant_type":"authorization_code","scope":"openid email profile"}</p>
+
+
+
+<a name="426113283"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113283" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113283">(Mar 12 2024 at 12:24)</a>:</h4>
+<p>Sorry I forgot: have you configured the confidential secrets?</p>
+
+
+
+<a name="426113369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113369">(Mar 12 2024 at 12:25)</a>:</h4>
+<p>From what I see in the code, this _should_ work already and include these details.</p>
+
+
+
+<a name="426113426"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113426" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113426">(Mar 12 2024 at 12:25)</a>:</h4>
+<p>Oh oh oh wait</p>
+
+
+
+<a name="426113455"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113455" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113455">(Mar 12 2024 at 12:25)</a>:</h4>
+<p>We're using "ClientSecretBasic".</p>
+
+
+
+<a name="426113559"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113559" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113559">(Mar 12 2024 at 12:26)</a>:</h4>
+<p>That one sets the secrets as Authorization HTTP header</p>
+
+
+
+<a name="426113579"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113579" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113579">(Mar 12 2024 at 12:26)</a>:</h4>
+<p>I only set the following in domain.xml</p>
+<p>&lt;jvm-options&gt;-Ddataverse.auth.oidc.enabled=true&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Ddataverse.auth.oidc.client-id=some_id&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Ddataverse.auth.oidc.client-secret=some_secret&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Ddataverse.auth.oidc.auth-server-url=https://my.domain.com/api/auth/&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Ddataverse.auth.oidc.title=OpenID&lt;/jvm-options&gt;</p>
+
+
+
+<a name="426113587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113587">(Mar 12 2024 at 12:26)</a>:</h4>
+<p>Could you check the headers if they are present?</p>
+
+
+
+<a name="426113663"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113663" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113663">(Mar 12 2024 at 12:26)</a>:</h4>
+<p>Yes</p>
+
+
+
+<a name="426113765"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113765" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113765">(Mar 12 2024 at 12:27)</a>:</h4>
+<p>Headers: {"x-real-ip":"some_ip","x-forwarded-for":"some_ip, some_ip","host":"my.example.com","x-nginx-proxy":"true","connection":"close","content-length":"172","authorization":"Basic YzdjZGE5NjgtNWM3Mi00NTg1LTlmOGEtNWQ4NjBlNzFhNzE2OmJjM2RhMWNjMTY2MGIxMTRiNDA4ZThiNTJmYzM0OThmZDJlMDI4ZDg5MmJkMGMyMTc5MzhmZjBlNmIxMzNkYjU=","content-type":"application/x-www-form-urlencoded; charset=UTF-8","user-agent":"Java/17.0.10","accept":"text/html, image/gif, image/jpeg, *; q=.2, <em>/</em>; q=.2"}</p>
+
+
+
+<a name="426113782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113782">(Mar 12 2024 at 12:27)</a>:</h4>
+<p>Ha there we go!</p>
+
+
+
+<a name="426113890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113890">(Mar 12 2024 at 12:28)</a>:</h4>
+<p>Quoting from the OIDC spec:<br>
+"client_secret_basic<br>
+    Clients that have received a client_secret value from the Authorization Server authenticate with the Authorization Server in accordance with Section 2.3.1 of OAuth 2.0 [RFC6749] using the HTTP Basic authentication scheme. "</p>
+
+
+
+<a name="426113913"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426113913" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426113913">(Mar 12 2024 at 12:28)</a>:</h4>
+<p><a href="https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication">https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a></p>
+
+
+
+<a name="426114096"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426114096" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426114096">(Mar 12 2024 at 12:29)</a>:</h4>
+<p>So you could say your confidential clients are only allowed to use the post method (quote: "including the Client Credentials in the request body"), which would indeed need an extension of Dataverse to make people select the method to be used</p>
+
+
+
+<a name="426114629"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426114629" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426114629">(Mar 12 2024 at 12:32)</a>:</h4>
+<p>Doing that should be simple: this constructor for the provider needs to be changed:</p>
+<div class="codehilite"><pre><span></span><code>public OIDCAuthProvider(String aClientId, String aClientSecret, String issuerEndpointURL,
+                            boolean pkceEnabled, String pkceMethod) throws AuthorizationSetupException {
+        this.clientSecret = aClientSecret; // nedded for state creation
+        this.clientAuth = new ClientSecretBasic(new ClientID(aClientId), new Secret(aClientSecret));
+</code></pre></div>
+
+
+
+<a name="426114672"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426114672" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426114672">(Mar 12 2024 at 12:33)</a>:</h4>
+<p>This would need a distinction which method to use and act accordingly (different classes)</p>
+
+
+
+<a name="426114974"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426114974" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426114974">(Mar 12 2024 at 12:34)</a>:</h4>
+<p>Was I in the wrong path when implementing my OIDC that now need to modify the dataverse's codebase, OR this is usual?</p>
+
+
+
+<a name="426115056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115056">(Mar 12 2024 at 12:35)</a>:</h4>
+<p>Yes and no</p>
+
+
+
+<a name="426115109"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115109" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115109">(Mar 12 2024 at 12:35)</a>:</h4>
+<p>It seems to me you have only implemented one option of client auth methods</p>
+
+
+
+<a name="426115181"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115181" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115181">(Mar 12 2024 at 12:36)</a>:</h4>
+<p>The HTTP Basic Auth theme is pretty common as far as I know. I'm not aware of a provider not supporting it.</p>
+
+
+
+<a name="426115272"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115272" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115272">(Mar 12 2024 at 12:36)</a>:</h4>
+<p>These are design decisions you have to make.</p>
+
+
+
+<a name="426115388"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115388" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115388">(Mar 12 2024 at 12:37)</a>:</h4>
+<p>So updating my OIDC provider to support it would make more sense, compared to touching the dataverse side.</p>
+
+
+
+<a name="426115405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115405">(Mar 12 2024 at 12:37)</a>:</h4>
+<p>We would be glad to accept a pull request extending Dataverse. There even are integration tests in place using Keycloak, so it would be easy to get you started.</p>
+
+
+
+<a name="426115473"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115473" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115473">(Mar 12 2024 at 12:37)</a>:</h4>
+<p>That said, if you are looking for quick results and want to be more compatible with clients, it probably is a good idea to add HTTP basic auth support to your provider</p>
+
+
+
+<a name="426115669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Mohsen Jafari <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115669">(Mar 12 2024 at 12:39)</a>:</h4>
+<p>I have to discuss with my team lead and decide what to do. Anyway, thank you so much for your help.</p>
+
+
+
+<a name="426115778"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115778" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115778">(Mar 12 2024 at 12:39)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="698782">Mohsen Jafari</span> has marked this topic as resolved.</p>
+
+
+
+<a name="426115783"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115783" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115783">(Mar 12 2024 at 12:39)</a>:</h4>
+<p>No worries! That's what we're here for. I am going ahead and mark this topic as resolved. If you opt for developing a patch for Dataverse, please create a new topic over at the <a class="stream" data-stream-id="379673" href="/#narrow/stream/379673-dev">#dev</a> stream, thx!</p>
+
+
+
+<a name="426115898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20exchangeCodeForToken/near/426115898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20exchangeCodeForToken.html#426115898">(Mar 12 2024 at 12:40)</a>:</h4>
+<p>You beat me to it <span aria-label="smile cat" class="emoji emoji-1f638" role="img" title="smile cat">:smile_cat:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,257 @@
+<html>
+<head><meta charset="utf-8"><title>large uploads via native api workaround · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html">large uploads via native api workaround</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="453530970"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453530970" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453530970">(Jul 23 2024 at 21:31)</a>:</h4>
+<p>hi folks - i know it's been discussed before, but can someone verify the recommended process for dealing with a large files over the native api? as i understand it it's something like the following, but i can't confirm it anywhere in the documentation.</p>
+<ol>
+<li>upload a small placeholder file with the same filename and (preferably) the same mime type</li>
+<li>find the info in the dataverse backend database for the placeholder file to get the storage location</li>
+<li>copy the large file you'd like to place in this storage location identified in (2)</li>
+<li>update the row in dataverse database that corresponds to the file, updating the <code>checksumvalue</code>, <code>contenttype</code>, and <code>filesize</code> columns.</li>
+</ol>
+
+
+
+<a name="453531157"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453531157" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453531157">(Jul 23 2024 at 21:32)</a>:</h4>
+<p>relatedly: in the case that this large file is, for example, a zip file, will dataverse extract the file placed in this location? if it can't be done automatically, is there a way to trigger this to happen?</p>
+
+
+
+<a name="453697364"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453697364" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453697364">(Jul 24 2024 at 13:33)</a>:</h4>
+<p>Right, we used to talk about that placeholder workaround, in <a href="https://groups.google.com/g/dataverse-community/c/yXDpdg-thqw/m/CWVgiGBBAwAJ">this thread</a> on the mailing list, for example.</p>
+<p>However, these days I think we enable direct upload (requires S3) and push the files up from the client.</p>
+
+
+
+<a name="453697706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453697706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453697706">(Jul 24 2024 at 13:34)</a>:</h4>
+<p>No, I don't believe there's a way to tell Dataverse to unzip a file afterwards.</p>
+<p>(There is a way to trigger a <a href="https://guides.dataverse.org/en/6.3/api/native-api.html#reingest-a-file">reingest</a> of a tabular file, but that's different.)</p>
+
+
+
+<a name="453734824"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453734824" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453734824">(Jul 24 2024 at 16:02)</a>:</h4>
+<p>okay, thanks. at Berkeley, we're still relying on <code>file</code> backend storage, and i don't think we'll be able to switch to S3 before we launch our Dataverse instance.</p>
+
+
+
+<a name="453737376"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453737376" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453737376">(Jul 24 2024 at 16:11)</a>:</h4>
+<p>we do want to revisit using object storage post launch, though (along with a number of other things!)</p>
+
+
+
+<a name="453737569"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453737569" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453737569">(Jul 24 2024 at 16:11)</a>:</h4>
+<p>There are some additional big data options on the horizon, such as Globus.</p>
+
+
+
+<a name="453757359"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453757359" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453757359">(Jul 24 2024 at 17:30)</a>:</h4>
+<p>do you know if there's a diagram or something that describes the workflow of steps a file goes through on upload? i realize i could look at the code, but curious if there's something in addition that.</p>
+
+
+
+<a name="453767557"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453767557" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453767557">(Jul 24 2024 at 18:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> created a nice diagram in this issue: Refactor file upload from web UI and temporary storage <a href="https://github.com/IQSS/dataverse/issues/6656">#6656</a></p>
+
+
+
+<a name="453767737"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453767737" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453767737">(Jul 24 2024 at 18:22)</a>:</h4>
+<p><a href="/user_uploads/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png">file-upload.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png" title="file-upload.png"><img src="/user_uploads/thumbnail/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png/840x560.webp"></a></div>
+
+
+
+<a name="453770643"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453770643" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453770643">(Jul 24 2024 at 18:36)</a>:</h4>
+<p>got it - so i gather that <code>FileUtil</code> is where that process occurs?</p>
+
+
+
+<a name="453771502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453771502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453771502">(Jul 24 2024 at 18:42)</a>:</h4>
+<p>Well, I think a lot happens in the IngestService as well. I haven't looked closely in a while. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="453771620"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453771620" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453771620">(Jul 24 2024 at 18:43)</a>:</h4>
+<p>got it - trying to figure out which seam i should advocate for there to be an API endpoint for <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="453771948"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453771948" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453771948">(Jul 24 2024 at 18:46)</a>:</h4>
+<p>Sorry, I'm multi-tasking poorly. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> You might want to make a PR? To do what?</p>
+
+
+
+<a name="453772949"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453772949" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453772949">(Jul 24 2024 at 18:54)</a>:</h4>
+<p>at this point, not a PR, just a feature request for an api endpoint to be able to retrigger these tasks.</p>
+
+
+
+<a name="453774280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453774280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453774280">(Jul 24 2024 at 19:02)</a>:</h4>
+<p>Oh, retriggering unzipping of a file, for example?</p>
+
+
+
+<a name="453774331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453774331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453774331">(Jul 24 2024 at 19:02)</a>:</h4>
+<p>exactly. <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="453774442"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453774442" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453774442">(Jul 24 2024 at 19:03)</a>:</h4>
+<p>Sure, please go ahead and create an issue for that one, if you like.</p>
+<p>Smaller issues are better for us.</p>
+
+
+
+<a name="453812372"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453812372" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453812372">(Jul 24 2024 at 23:04)</a>:</h4>
+<p>done: <a href="https://github.com/IQSS/dataverse/issues/10723">https://github.com/IQSS/dataverse/issues/10723</a></p>
+
+
+
+<a name="453829882"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/453829882" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#453829882">(Jul 25 2024 at 02:01)</a>:</h4>
+<p>Thanks!</p>
+
+
+
+<a name="455233816"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455233816" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455233816">(Jul 30 2024 at 22:38)</a>:</h4>
+<p>related question: is it possible that the replace file API method would work here (writing just the json data, not the file itself) instead of updating the database directly? again, this is for <code>file</code>-backed storage, not s3. (rationale: i'd be more comfortable sending this as an API request rather than mucking about in the database.)</p>
+
+
+
+<a name="455476966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455476966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455476966">(Jul 31 2024 at 20:23)</a>:</h4>
+<p>Yes, or maybe this API: <a href="https://guides.dataverse.org/en/6.3/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset">https://guides.dataverse.org/en/6.3/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a></p>
+
+
+
+<a name="455492582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455492582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455492582">(Jul 31 2024 at 21:58)</a>:</h4>
+<p>ah, i see. i think the issue with using the <code>/add</code> endpoint  is that there might not be an existing <code>storageIdentifier</code> for  the file. is there something that i'm missing there?</p>
+
+
+
+<a name="455496995"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455496995" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455496995">(Jul 31 2024 at 22:26)</a>:</h4>
+<p>okay, interesting. <code>/replace</code> is failing in this case because of a uniqueness constraint violation on dvobject if i pass it the same storage identifier. i take it that this is expected? would it be more correct to mint a new storage identifier?</p>
+
+
+
+<a name="455504416"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455504416" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455504416">(Jul 31 2024 at 23:22)</a>:</h4>
+<p>okay, i <em>think</em> i've got this figured out. i do need to mint a new storage identifier, which i can do fairly easily.</p>
+
+
+
+<a name="455506443"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455506443" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455506443">(Jul 31 2024 at 23:39)</a>:</h4>
+<p><code>/add</code>, however, doesn't work if i've minted a new storage location; i get a 400 error (<code>Dataset store configuration does not allow provided storageIdentifier.</code>)</p>
+
+
+
+<a name="455655168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455655168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455655168">(Aug 01 2024 at 13:52)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="735407">María A. Matienzo</span> <a href="#narrow/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround/near/455492582">said</a>:</p>
+<blockquote>
+<p>ah, i see. i think the issue with using the <code>/add</code> endpoint  is that there might not be an existing <code>storageIdentifier</code> for  the file. is there something that i'm missing there?</p>
+</blockquote>
+<p>Well, my mental model of this the storageIdentifier should be whatever filename you give the file. So you put the file on disk as <code>b4c5c9ab-4b4f</code>and then use that same string as the storageIdentifier in the JSON.</p>
+<p>I'm not sure if I've ever done this. I'm not sure if it'll work for non-S3 files. (That S3 direct upload API should work for files on S3.)</p>
+
+
+
+<a name="455699610"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455699610" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455699610">(Aug 01 2024 at 16:33)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> got it. i think the new work around, which seems to work, is as follows:</p>
+<ol>
+<li>upload a small placeholder file with the same filename</li>
+<li>get the file's ID from the API response</li>
+<li>move the actual file into a file with a <em>new</em> <code>storageIdentifier</code></li>
+<li>call the <code>/replace</code> (or, in theory, the <code>/replaceFiles</code>) endpoint</li>
+</ol>
+
+
+
+<a name="455710731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455710731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455710731">(Aug 01 2024 at 17:22)</a>:</h4>
+<p>Great! Do you want to create a pull request to document it? <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="455723753"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455723753" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455723753">(Aug 01 2024 at 18:18)</a>:</h4>
+<p>yup, sure - once i've done some more testing, i'd be happy to. any recommendation about where it should sit?</p>
+
+
+
+<a name="455723950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455723950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455723950">(Aug 01 2024 at 18:19)</a>:</h4>
+<p>i suppose it could go in the direct upload documentation, if people know to look there</p>
+
+
+
+<a name="455725014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455725014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455725014">(Aug 01 2024 at 18:22)</a>:</h4>
+<p>Hmm, you're doing this because the file is large, right? How about somewhere under a future version of <a href="https://guides.dataverse.org/en/6.3/developers/big-data-support.html">https://guides.dataverse.org/en/6.3/developers/big-data-support.html</a> ?</p>
+
+
+
+<a name="455725118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455725118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455725118">(Aug 01 2024 at 18:22)</a>:</h4>
+<p>yup, that sounds good. thanks!</p>
+
+
+
+<a name="455944556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455944556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455944556">(Aug 02 2024 at 14:14)</a>:</h4>
+<p>This just in from Jim Myers:</p>
+<p>"File stores can use dataverse.files.&lt;id&gt;.upload-out-of-band flag which allows an improved file hack - you place the file and then call the <a href="https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a> or <a href="https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset</a> to add the metadata (including size, hash, etc.). It just avoids having to edit the db."</p>
+
+
+
+<a name="455972893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/455972893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> maría a. matienzo <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#455972893">(Aug 02 2024 at 15:59)</a>:</h4>
+<p>oh, neat. thanks! i'll give that a shot.</p>
+
+
+
+<a name="462151266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/462151266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#462151266">(Aug 13 2024 at 15:56)</a>:</h4>
+<p>If you don't mind my asking, what's considered a large upload?  Anything greater than 2GB?  We are troubleshooting some issues with files greater than 2GB so I'm trying to figure out if the above suggestions are where we need to go with things as well. Thanks!</p>
+
+
+
+<a name="462153048"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/large%20uploads%20via%20native%20api%20workaround/near/462153048" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround.html#462153048">(Aug 13 2024 at 16:05)</a>:</h4>
+<p>Sure, 2GB is pretty big. I would suggest trying DVUploader, either the traditional <a href="https://guides.dataverse.org/en/6.3/user/dataset-management.html#command-line-dvuploader">Java one</a> or the <a href="https://github.com/gdcc/python-dvuploader">Python one</a>.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

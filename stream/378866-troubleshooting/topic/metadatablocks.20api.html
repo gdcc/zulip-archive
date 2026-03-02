@@ -1,0 +1,227 @@
+<html>
+<head><meta charset="utf-8"><title>metadatablocks api · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html">metadatablocks api</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="457293229"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/457293229" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Björn Selent <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#457293229">(Aug 08 2024 at 07:52)</a>:</h4>
+<p>Hi all,</p>
+<p>we encounter a inconsistent behaviour when using the /api/metadatablocks endpoint. When for example querying the citation metadatablock the first parent is "otherId" with child "otherIdAgency" etc. The entry for "otherIdAgency" is then shown again after the otherId block, which we think it shouldn't as it is a child entry. The same holds for all other child entries, too, i.e. they are all shown twice. The entries are not filtered during casting from list to set via treeSet in JsonPrinter.java, ln. 642.<br>
+Additionally we noticed that for the codeMeta20 block the children displayOrder are numbered always starting from 0 (which we think is the proper way to do it) whereas in all other blocks the entries are numbered consecutively. The counting form 0 can mitigate the filtering issue but only if a certain order within the DB of parents and children are followed.<br>
+It seems like using a non-unique identifier, i.e. displayOrder, for sorting the json export leads to undesired side-effects.<br>
+Is anybody else seeing this behaviour?</p>
+<p>We are on dataverse version 6.3.<br>
+Thank you and regards<br>
+Björn (FoKUS, University of Stuttgart)</p>
+
+
+
+<a name="457366592"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/457366592" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#457366592">(Aug 08 2024 at 13:09)</a>:</h4>
+<p>Hmm, looking at <a href="https://demo.dataverse.org/api/metadatablocks/citation">https://demo.dataverse.org/api/metadatablocks/citation</a> I see what you mean:</p>
+<div class="codehilite"><pre><span></span><code>{
+  &quot;status&quot;: &quot;OK&quot;,
+  &quot;data&quot;: {
+...
+    &quot;fields&quot;: {
+...
+      &quot;otherId&quot;: {
+        &quot;name&quot;: &quot;otherId&quot;,
+...
+        &quot;childFields&quot;: {
+          &quot;otherIdAgency&quot;: {
+            &quot;name&quot;: &quot;otherIdAgency&quot;,
+...
+      &quot;otherIdAgency&quot;: {
+        &quot;name&quot;: &quot;otherIdAgency&quot;,
+</code></pre></div>
+
+
+
+<a name="459412432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/459412432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#459412432">(Aug 09 2024 at 08:49)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/metadatablocks.20api/near/457366592">schrieb</a>:</p>
+<blockquote>
+<p>Hmm, looking at <a href="https://demo.dataverse.org/api/metadatablocks/citation">https://demo.dataverse.org/api/metadatablocks/citation</a> I see what you mean:</p>
+<p><div class="codehilite"><pre><span></span><code>{
+  &quot;status&quot;: &quot;OK&quot;,
+  &quot;data&quot;: {
+...
+    &quot;fields&quot;: {
+...
+      &quot;otherId&quot;: {
+        &quot;name&quot;: &quot;otherId&quot;,
+...
+        &quot;childFields&quot;: {
+          &quot;otherIdAgency&quot;: {
+            &quot;name&quot;: &quot;otherIdAgency&quot;,
+...
+      &quot;otherIdAgency&quot;: {
+        &quot;name&quot;: &quot;otherIdAgency&quot;,
+</code></pre></div><br>
+</p>
+</blockquote>
+<p>Hello Philip, <br>
+I have just created a Pull Request that should fix the issue: <a href="https://github.com/IQSS/dataverse/pull/10764">https://github.com/IQSS/dataverse/pull/10764</a><br>
+Kind regards<br>
+Florian (FoKUS, University of Stuttgart)<br>
+P.S. I hope I fulfilled all the requirements for a proper Pull Request.</p>
+
+
+
+<a name="460096243"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/460096243" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#460096243">(Aug 12 2024 at 14:40)</a>:</h4>
+<p><span class="user-mention" data-user-id="671970">@Florian Fritze</span> Thanks.</p>
+<p>edu.harvard.iq.dataverse.api.DataversesIT.testListMetadataBlocks is failing with this:</p>
+<div class="codehilite"><pre><span></span><code>1 expectation failed.
+JSON path data[1].fields.size() doesn&#39;t match.
+Expected: &lt;10&gt;
+  Actual: &lt;2&gt;
+</code></pre></div>
+<p>Here: edu.harvard.iq.dataverse.api.DataversesIT.testListMetadataBlocks(DataversesIT.java:779)</p>
+
+
+
+<a name="460096748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/460096748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#460096748">(Aug 12 2024 at 14:43)</a>:</h4>
+<p>It looks like the code was last edited by <span class="user-mention" data-user-id="598442">@Guillermo Portas</span> in PR <a href="https://github.com/IQSS/dataverse/issues/10642">#10642</a> to fix <a href="https://github.com/IQSS/dataverse/issues/10637">#10637</a>.</p>
+
+
+
+<a name="461940832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461940832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461940832">(Aug 12 2024 at 19:36)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span>  The issue that Florian describes is something that was present in the original code before I modified it. It's a behavior that I remember discussing in the past, and we decided to keep it this way for backwards compatibility. That is, showing the child fields also repeated as root fields in the response. We need to decide whether we want to finally change this behavior or keep it as is.</p>
+
+
+
+<a name="461941048"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461941048" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461941048">(Aug 12 2024 at 19:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> I'm in favor of changing it, although it might be good to double-check first.</p>
+
+
+
+<a name="461942648"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461942648" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461942648">(Aug 12 2024 at 19:46)</a>:</h4>
+<p>Ah, thanks <span class="user-mention" data-user-id="598442">@Guillermo Portas</span>. I didn't remember discussing it!</p>
+
+
+
+<a name="461942884"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461942884" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461942884">(Aug 12 2024 at 19:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="671970">@Florian Fritze</span> at minimum, if we do decide to make a backward-incompatible change, we should document it at a future version of <a href="https://guides.dataverse.org/en/6.3/api/changelog.html">https://guides.dataverse.org/en/6.3/api/changelog.html</a></p>
+
+
+
+<a name="461944053"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461944053" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461944053">(Aug 12 2024 at 19:55)</a>:</h4>
+<p>Can you please edit <code>doc/sphinx-guides/source/api/changelog.rst</code> in your PR?</p>
+
+
+
+<a name="461944249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/461944249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#461944249">(Aug 12 2024 at 19:57)</a>:</h4>
+<p>Oh and please create a release note snippet too: <a href="https://guides.dataverse.org/en/6.3/developers/version-control.html#writing-a-release-note-snippet">https://guides.dataverse.org/en/6.3/developers/version-control.html#writing-a-release-note-snippet</a></p>
+
+
+
+<a name="462084434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/462084434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#462084434">(Aug 13 2024 at 11:12)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/metadatablocks.20api/near/461944053">schrieb</a>:</p>
+<blockquote>
+<p>Can you please edit <code>doc/sphinx-guides/source/api/changelog.rst</code> in your PR?</p>
+</blockquote>
+<p>I am not quite familiar with this. What should I enter in the changelog.rst file? What would you expect from me. Currently on the top there is:</p>
+<blockquote>
+<p>API Changelog (Breaking Changes)<br>
+================================</p>
+<p>This API changelog is experimental and we would love feedback on its usefulness. Its primary purpose is to inform API developers of any breaking changes. (We try not ship any backward incompatible changes, but it happens.) To see a list of new APIs and backward-compatible changes to existing API, please see each version's release notes at <a href="https://github.com/IQSS/dataverse/releases">https://github.com/IQSS/dataverse/releases</a></p>
+<p>.. contents:: |toctitle|<br>
+    :local:<br>
+    :depth: 1</p>
+<p>v6.3</p>
+<hr>
+<ul>
+<li><strong>/api/admin/superuser/{identifier}</strong>: The POST endpoint that toggles superuser status has been deprecated in favor of a new PUT endpoint that allows you to specify true or false. See :ref:<code>set-superuser-status</code>.</li>
+</ul>
+</blockquote>
+
+
+
+<a name="462084787"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/462084787" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#462084787">(Aug 13 2024 at 11:15)</a>:</h4>
+<p>And an additional question: Should I make the changes in my branch which I used for the Pull Request? Thanks in advance.</p>
+
+
+
+<a name="462124848"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/462124848" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#462124848">(Aug 13 2024 at 14:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="671970">@Florian Fritze</span> Hi! v6.3 is the latest released version. You'd start a new section called v6.4 and add a bullet describing the change.</p>
+
+
+
+<a name="462132553"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/462132553" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#462132553">(Aug 13 2024 at 14:38)</a>:</h4>
+<p>And yes, all in the same branch, please. Thanks!</p>
+
+
+
+<a name="462271058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/462271058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#462271058">(Aug 14 2024 at 06:15)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/metadatablocks.20api/near/462132553">schrieb</a>:</p>
+<blockquote>
+<p>And yes, all in the same branch, please. Thanks!</p>
+</blockquote>
+<p>Good morning, it's done.</p>
+
+
+
+<a name="463713876"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/463713876" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#463713876">(Aug 20 2024 at 14:09)</a>:</h4>
+<p><span class="user-mention" data-user-id="671970">@Florian Fritze</span> thanks! I just left another review: <a href="https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241">https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241</a></p>
+
+
+
+<a name="489217923"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/489217923" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#489217923">(Dec 16 2024 at 12:03)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/metadatablocks.20api/near/463713876">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="671970">Florian Fritze</span> thanks! I just left another review: <a href="https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241">https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241</a></p>
+</blockquote>
+<p>Hello Philip, I am still waiting for an approval of my Pull Request. Could it be that it is fallen under the table?</p>
+
+
+
+<a name="489218253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/489218253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Florian Fritze <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#489218253">(Dec 16 2024 at 12:05)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="671970">Florian Fritze</span> <a href="#narrow/channel/378866-troubleshooting/topic/metadatablocks.20api/near/489217923">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/metadatablocks.20api/near/463713876">schrieb</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="671970">Florian Fritze</span> thanks! I just left another review: <a href="https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241">https://github.com/IQSS/dataverse/pull/10764#pullrequestreview-2248119241</a></p>
+</blockquote>
+<p>Hello Philip, I am still waiting for an approval of my Pull Request. Could it be that it is fallen under the table?</p>
+</blockquote>
+<p>Thanks in advance Florian</p>
+
+
+
+<a name="489233798"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/489233798" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#489233798">(Dec 16 2024 at 13:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="760572">@Steven Winship</span> can you please take a look at this?</p>
+
+
+
+<a name="489249484"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/metadatablocks%20api/near/489249484" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/metadatablocks.20api.html#489249484">(Dec 16 2024 at 14:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="681715">@Florian Förster</span> I can't push to your fork so I made a PR for you. Please take a look: <a href="https://github.com/IQSS/dataverse/pull/10764#issuecomment-2545755220">https://github.com/IQSS/dataverse/pull/10764#issuecomment-2545755220</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

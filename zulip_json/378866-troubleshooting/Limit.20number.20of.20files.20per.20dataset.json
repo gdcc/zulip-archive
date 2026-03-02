@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Hi @all,<br>\nWe recently had a user who uploaded more than 35.000 files into one dataset on our Dataverse (6.5) instance. Subsequently, not only the dataset, but the whole system became unstable and unusable for most of the time. Deleting the dataset via API or UI did not work anymore, we had to remove the files from the different database tables to get back a running system.<br>\nI know that Dataverse does not get along well with such a large number of files, so I was looking for a configuration setting that allows to limit the number of files per dataset. Couldn't find one, and I also could not find any related issues on GitHub. I know that <span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> worked on performance improvements some time ago regarding large number of files, and I have in mind that it worked better for some time, but it seems the improvements are gone in v6.5?<br>\nSo we would be interested how other instances handle such issues? Is there some kind of configuration option I just can't find? Wouldn't it make sense to have such an option, so a user cannot bring the whole system to a halt by just uploading too many files?</p>",
+        "id": 508553116,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1743090013
+    },
+    {
+        "content": "<p>The issue is less than a month old: Feature Request: (internal request) Add quota-like limit on the number of files in a dataset <a href=\"https://github.com/IQSS/dataverse/issues/11275\">#11275</a></p>",
+        "id": 508555003,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090432
+    },
+    {
+        "content": "<p>But we've talked about it off and on for years. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 508555037,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090443
+    },
+    {
+        "content": "<p>It completely makes sense that users should not be able to bring the system to a halt by uploading too many files!</p>",
+        "id": 508555257,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090487
+    },
+    {
+        "content": "<p>We do have a rate limiting feature: <a href=\"https://guides.dataverse.org/en/6.5/installation/config.html#rate-limiting\">https://guides.dataverse.org/en/6.5/installation/config.html#rate-limiting</a></p>",
+        "id": 508555408,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090525
+    },
+    {
+        "content": "<p>But I'm wondering if there's a command you can target. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 508555484,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090541
+    },
+    {
+        "content": "<p>When lots of upload are happening, do you see a lot of the same command in the actionlogrecord table? <a href=\"https://guides.dataverse.org/en/6.5/admin/monitoring.html#actionlogrecord\">https://guides.dataverse.org/en/6.5/admin/monitoring.html#actionlogrecord</a></p>",
+        "id": 508555656,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743090589
+    },
+    {
+        "content": "<p>Thanks Phil.<br>\nThere's the \"CreateNewDataFilesCommand\" in the actionlogrecord, but not sure if rate limiting is the right way to go here. <br>\nBut glad to hear that the discussion about this is alive. We'll also have to discuss internally, if such a feature will be available, what numbers would make sense. An instance-wide config option would be sufficient for us. I'm currently quite busy with another project, but when I find the time I'll try to understand the current implementation of the collection quotas and maybe get some ideas out of it for such a file limit configuration.</p>",
+        "id": 508558935,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1743091342
+    },
+    {
+        "content": "<p>Sounds good!</p>",
+        "id": 508559832,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743091550
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"652521\">@Markus Haarländer</span> <br>\nCan you say more about what tables you edited to remove the files? We at University of Virginia have such a dataset that I can't delete (over 14,000 files). See my ask in the google group: <a href=\"https://groups.google.com/g/dataverse-community/c/WFf34d8R0Aw\">https://groups.google.com/g/dataverse-community/c/WFf34d8R0Aw</a></p>\n<p>You can either reply here or send email to <a href=\"mailto:shlake@virginia.edu\">shlake@virginia.edu</a></p>",
+        "id": 508567405,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1743093239
+    },
+    {
+        "content": "<p>Hi Sherry<br>\nHere's a (not very sophisticated) SQL script which I used. Not 100% sure if everything was removed, but it worked for us. The files didn't have any tags or restrictions. If they do, maybe other tables have to be cleaned, too.</p>\n<div class=\"codehilite\" data-code-language=\"SQL\"><pre><span></span><code><span class=\"k\">UPDATE</span><span class=\"w\"> </span><span class=\"n\">dataset</span><span class=\"w\"> </span><span class=\"k\">SET</span><span class=\"w\"> </span><span class=\"n\">thumbnailfile_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"k\">NULL</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'&lt;dataset-id&gt;'</span><span class=\"p\">;</span>\n\n<span class=\"k\">DELETE</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">filemetadata</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">datafile_id</span><span class=\"w\"> </span><span class=\"k\">IN</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">dvobject</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">owner_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'&lt;dataset-id&gt;'</span><span class=\"p\">);</span>\n\n<span class=\"k\">DELETE</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datafile</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">IN</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">dvobject</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">owner_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'&lt;dataset-id&gt;'</span><span class=\"p\">);</span>\n\n<span class=\"k\">DELETE</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">dvobject</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">owner_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'&lt;dataset-id&gt;'</span><span class=\"w\"> </span><span class=\"k\">AND</span><span class=\"w\"> </span><span class=\"n\">dtype</span><span class=\"o\">=</span><span class=\"s1\">'DataFile'</span><span class=\"p\">;</span>\n</code></pre></div>",
+        "id": 508580434,
+        "sender_full_name": "Markus Haarländer",
+        "timestamp": 1743096612
+    }
+]

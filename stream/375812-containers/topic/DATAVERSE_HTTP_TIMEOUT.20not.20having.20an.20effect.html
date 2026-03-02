@@ -1,0 +1,73 @@
+<html>
+<head><meta charset="utf-8"><title>DATAVERSE_HTTP_TIMEOUT not having an effect · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html">DATAVERSE_HTTP_TIMEOUT not having an effect</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="499094581"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499094581" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499094581">(Feb 11 2025 at 20:41)</a>:</h4>
+<p>I'm playing around with DATAVERSE_HTTP_TIMEOUT in my compose file like this:</p>
+<div class="codehilite"><pre><span></span><code>       DATAVERSE_SPI_EXPORTERS_DIRECTORY: &quot;/dv/exporters&quot;
+       DATAVERSE_HTTP_TIMEOUT: &quot;123&quot;
+       # These two oai settings are here to get HarvestingServerIT to pass
+       dataverse_oai_server_maxidentifiers: &quot;2&quot;
+</code></pre></div>
+
+
+
+<a name="499094626"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499094626" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499094626">(Feb 11 2025 at 20:41)</a>:</h4>
+<p>However, it doesn't seem to be working. Or perhaps I don't know how to check the value at runtime?</p>
+
+
+
+<a name="499094682"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499094682" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499094682">(Feb 11 2025 at 20:42)</a>:</h4>
+<p>I tried getting the value like this:</p>
+<div class="codehilite"><pre><span></span><code>payara@dataverse:~$ /opt/payara/appserver/bin/asadmin get server-config.network-config.protocols.protocol.http-listener-1.http.request-timeout-seconds
+Enter admin user name&gt; admin
+Enter admin password for user &quot;admin&quot;&gt;
+server-config.network-config.protocols.protocol.http-listener-1.http.request-timeout-seconds=${MPCONFIG=dataverse.http.timeout:900}
+Command get executed successfully.
+payara@dataverse:~$
+</code></pre></div>
+
+
+
+<a name="499094811"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499094811" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499094811">(Feb 11 2025 at 20:42)</a>:</h4>
+<p>I was expecting (or at least hoping) it would say "<code>123</code>" but instead it says "<code>${MPCONFIG=dataverse.http.timeout:900}</code>"</p>
+
+
+
+<a name="499094849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499094849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499094849">(Feb 11 2025 at 20:43)</a>:</h4>
+<p>Am I doing this wrong? If I set a tunable, how can I check its value afterward?</p>
+
+
+
+<a name="499238577"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499238577" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499238577">(Feb 12 2025 at 13:50)</a>:</h4>
+<p>I'm asking because in <a href="https://github.com/IQSS/dataverse/issues/11210">#11210</a> I'm adding a new tunable called DATAVERSE_COOKIE_SAME_SITE_VALUE that isn't working. That is, when I try to use it in the compose file, it has no effect. <span aria-label="disappointed" class="emoji emoji-1f61e" role="img" title="disappointed">:disappointed:</span></p>
+
+
+
+<a name="499238619"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499238619" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499238619">(Feb 12 2025 at 13:50)</a>:</h4>
+<p>Some discussion here: <a href="https://github.com/IQSS/dataverse/pull/11210/files#r1951621318">https://github.com/IQSS/dataverse/pull/11210/files#r1951621318</a></p>
+
+
+
+<a name="499281972"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT%20not%20having%20an%20effect/near/499281972" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/DATAVERSE_HTTP_TIMEOUT.20not.20having.20an.20effect.html#499281972">(Feb 12 2025 at 16:51)</a>:</h4>
+<p>I ended up deleting DATAVERSE_COOKIE_SAME_SITE_VALUE. I couldn't get it to work.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

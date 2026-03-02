@@ -1,0 +1,69 @@
+<html>
+<head><meta charset="utf-8"><title>Upgrade to 5.14 - metric count not working · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html">Upgrade to 5.14 - metric count not working</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="517890687"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/517890687" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#517890687">(May 13 2025 at 17:50)</a>:</h4>
+<p>Hello, </p>
+<p>We recently upgraded our server from 5.13 to 5.14.  Someone noticed that the  metric count on the front page is no longer going up when something is downloaded.  </p>
+<p>We had missed updating the doi jvm options, so I just fixed that on our test and staging server. While our test server seems to work okay, our staging server will not update that number if someone downloads a document. </p>
+<p><a href="/user_uploads/53090/Iq5QFijziew8uMt5oTOZY6X0/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/Iq5QFijziew8uMt5oTOZY6X0/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="401x57" src="/user_uploads/thumbnail/53090/Iq5QFijziew8uMt5oTOZY6X0/image.png/840x560.webp"></a></div><p>We are not using Make Data Count (yet).    How can I trouble shoot this? </p>
+<p>Thanks!<br>
+Bethany</p>
+
+
+
+<a name="517891381"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/517891381" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#517891381">(May 13 2025 at 17:55)</a>:</h4>
+<p>I did just notice this thread:  <a href="https://groups.google.com/g/dataverse-community/c/CVj5nG3EIhA/m/WcWzX-YFBQAJ">https://groups.google.com/g/dataverse-community/c/CVj5nG3EIhA/m/WcWzX-YFBQAJ</a> </p>
+<p>Perhaps I just don't understand how that feature works.</p>
+
+
+
+<a name="517891605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/517891605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#517891605">(May 13 2025 at 17:56)</a>:</h4>
+<p>Part of the issue though, is before the upgrade we thought we had 5000+ downloads on our production site. Now the number is around 4833.  Would something have made it go down?  (I don't think it's related to the upgrade, as we have some stats before the upgrade and after that seem okay).</p>
+
+
+
+<a name="517901744"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/517901744" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#517901744">(May 13 2025 at 18:55)</a>:</h4>
+<p>One thing to consider is that the download count is not incremented if you download your own data, as superuser or as someone with access to the data.</p>
+<p>If you log out and download something, does the download count go up?</p>
+
+
+
+<a name="517925153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/517925153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#517925153">(May 13 2025 at 21:18)</a>:</h4>
+<p>Hi Philip, on the dataset count itself (aggregated download count for dataset), the number will go up. But the overall metric still stays the same (at the top of the site on the first page).</p>
+
+
+
+<a name="518044810"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/518044810" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#518044810">(May 14 2025 at 11:54)</a>:</h4>
+<p>Ok, it sounds like the thread on the mailing list is probably relevant, then. Jim is the one who knows the most about this. He's not here in Zulip. Would you be able to reply on that thread or start a new one?</p>
+
+
+
+<a name="518055644"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/518055644" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#518055644">(May 14 2025 at 12:44)</a>:</h4>
+<p>Sure, I'll add on to that thread.  Thanks!</p>
+
+
+
+<a name="518066514"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Upgrade%20to%205.14%20-%20metric%20count%20not%20working/near/518066514" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Upgrade.20to.205.2E14.20-.20metric.20count.20not.20working.html#518066514">(May 14 2025 at 13:28)</a>:</h4>
+<p>Thanks for <a href="https://groups.google.com/g/dataverse-community/c/CVj5nG3EIhA/m/NHhD_EjXEwAJ">posting</a>. Out of curiosity, does <a href="https://dataverse.yale.edu/api/info/metrics/downloads">https://dataverse.yale.edu/api/info/metrics/downloads</a> go up? As <a href="https://guides.dataverse.org/en/6.6/api/metrics.html">https://guides.dataverse.org/en/6.6/api/metrics.html</a> explains, the values are cached, though. I supposed you'd have to set the <a href="https://guides.dataverse.org/en/6.6/installation/config.html#metricscachetimeoutminutes">cache timeout</a> to a low value to test.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

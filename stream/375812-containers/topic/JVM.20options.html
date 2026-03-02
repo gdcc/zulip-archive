@@ -1,0 +1,113 @@
+<html>
+<head><meta charset="utf-8"><title>JVM options · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html">JVM options</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="420675220"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420675220" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420675220">(Feb 09 2024 at 15:29)</a>:</h4>
+<p><span class="user-mention" data-user-id="637063">@Leo Andreev</span> just stopped by and asked about something he observed that I can't easily answer. He used the Payara admin GUI to set some JVM options. He stopped the container and started it again. The JVM options were preserved. But where are they stored?</p>
+
+
+
+<a name="420675552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420675552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420675552">(Feb 09 2024 at 15:31)</a>:</h4>
+<p>We both agree there's no domain.xml in the data directory (data rather than docker-dev-volumes for the demo tutorial). And in the past when I exec into the dataverse container, I haven't been able to find domain.xml.</p>
+
+
+
+<a name="420676808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420676808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420676808">(Feb 09 2024 at 15:37)</a>:</h4>
+<p>You're looking for <code>${DOMAIN_DIR}/config/domain.xml</code></p>
+
+
+
+<a name="420676962"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420676962" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420676962">(Feb 09 2024 at 15:38)</a>:</h4>
+<p>Changes to that file will be written into the overlayfs, which is usually sth you want to avoid</p>
+
+
+
+<a name="420677903"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420677903" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420677903">(Feb 09 2024 at 15:42)</a>:</h4>
+<p>Hmm, I think I've heard of this overlayfs...</p>
+
+
+
+<a name="420679132"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420679132" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420679132">(Feb 09 2024 at 15:48)</a>:</h4>
+<p>Is <a href="https://jvns.ca/images/overlay.jpeg">https://jvns.ca/images/overlay.jpeg</a> more or less accurate?</p>
+<div class="message_inline_image"><a href="https://jvns.ca/images/overlay.jpeg"><img src="https://uploads.zulipusercontent.net/b7996d437a43ceee447020d5281e8d98c7faf6d4/68747470733a2f2f6a766e732e63612f696d616765732f6f7665726c61792e6a706567"></a></div>
+
+
+
+<a name="420682481"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420682481" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420682481">(Feb 09 2024 at 16:03)</a>:</h4>
+<p>Yeah that describes the concept well</p>
+
+
+
+<a name="420682657"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420682657" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420682657">(Feb 09 2024 at 16:04)</a>:</h4>
+<p>Please note this kind of writing into a container is a _very_ bad idea when on K8s. (I can elaborate if necessary)</p>
+
+
+
+<a name="420683173"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683173" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683173">(Feb 09 2024 at 16:06)</a>:</h4>
+<p>Ok. Thanks!</p>
+
+
+
+<a name="420683299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683299">(Feb 09 2024 at 16:07)</a>:</h4>
+<p>Also, I found domain.xml, with your help:</p>
+<div class="codehilite"><pre><span></span><code>$ docker exec -it dataverse-1 bash
+payara@dataverse:~$
+payara@dataverse:~$ echo $DOMAIN_DIR
+/opt/payara/appserver/glassfish/domains/domain1
+payara@dataverse:~$
+payara@dataverse:~$ ls -l $DOMAIN_DIR/config/domain.xml
+-rw-r--r-- 1 payara payara 44474 Feb  9 16:03 /opt/payara/appserver/glassfish/domains/domain1/config/domain.xml
+payara@dataverse:~$
+</code></pre></div>
+
+
+
+<a name="420683380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683380">(Feb 09 2024 at 16:07)</a>:</h4>
+<p>For setting system properties, you really should not use the admin UI</p>
+
+
+
+<a name="420683448"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683448" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683448">(Feb 09 2024 at 16:08)</a>:</h4>
+<p>I mean, fine for a oneshot thing to test sth</p>
+
+
+
+<a name="420683469"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683469" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683469">(Feb 09 2024 at 16:08)</a>:</h4>
+<p>But aside from that: bad idea</p>
+
+
+
+<a name="420683561"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420683561" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420683561">(Feb 09 2024 at 16:08)</a>:</h4>
+<p>Either go JVM_ARGS or use the special handler to convert env vars</p>
+
+
+
+<a name="420700322"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM%20options/near/420700322" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM.20options.html#420700322">(Feb 09 2024 at 17:37)</a>:</h4>
+<p>Right, that's what I documented at <a href="https://preview.guides.gdcc.io/en/develop/container/running/demo.html#jvm-options-microprofile-config">https://preview.guides.gdcc.io/en/develop/container/running/demo.html#jvm-options-microprofile-config</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

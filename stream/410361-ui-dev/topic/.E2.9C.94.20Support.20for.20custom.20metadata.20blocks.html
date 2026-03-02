@@ -1,0 +1,112 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Support for custom metadata blocks · ui-dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/index.html">ui-dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html">✔ Support for custom metadata blocks</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="532913943"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/532913943" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#532913943">(Aug 05 2025 at 13:12)</a>:</h4>
+<p>Hi, In order to get a better understanding of the new SPA, I was building it and then deploying it on our own dev enviromment, which is a Rocky8 VM with Apache fronting Payara. The backend is our own prepopulated dev Dataverse on that VM. While I do get it to work, it is very limited; only the home page and root page work. <br>
+When I try to 'view' a dataset page, I get a 404 with the error mesage (console): "There was an error getting the dataset Error: Failed to get dataset by persistent ID: Incorrect Metadata block name key<br>
+". I traced it down to the <code>toMetadataBlockName</code> function. When it tries to find “citation” it works, but the next call is with “dansRights” an exception is thrown, because it is not in the <code>MetadataBlockName</code> enum. This "dansRights" is one of our custom metadata blocks. </p>
+<p>Could it be that the SPA cannot handle custom metadata blocks or might it be that our backend Dataverse version 6.5 is incompattible?</p>
+
+
+
+<a name="532915271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/532915271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#532915271">(Aug 05 2025 at 13:19)</a>:</h4>
+<p><a href="#narrow/channel/410361-ui-dev/topic/Incorrect.20Metadata.20block.20name.20key/near/532913943">A message</a> was moved here from <a class="stream-topic" data-stream-id="410361" href="/#narrow/channel/410361-ui-dev/topic/Status.20of.20SPA/with/493989699">#ui-dev &gt; Status of SPA</a> by <span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span>.</p>
+
+
+
+<a name="532941767"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/532941767" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#532941767">(Aug 05 2025 at 15:36)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> thanks <span class="user-mention" data-user-id="770046">@Germán Saracca</span> figured out that there's a hard-coded list of metadata blocks here: <a href="https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11">https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11</a></p>
+<p>He's planning a fix. Also, we were able to replicate the bug here. Thanks for letting us know!</p>
+
+
+
+<a name="532941806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/532941806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#532941806">(Aug 05 2025 at 15:36)</a>:</h4>
+<p>When using a latest dev-env, I can reproduce this problem with the new 3d-object metadata; it is not in that list.</p>
+
+
+
+<a name="532960202"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/532960202" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#532960202">(Aug 05 2025 at 17:33)</a>:</h4>
+<p>Right. Makes sense.</p>
+
+
+
+<a name="533040399"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/533040399" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#533040399">(Aug 06 2025 at 07:27)</a>:</h4>
+<p>The question was originally in 'Status of SPA' because I was not sure if custom metadata was supported. That question remains; is it supported but somehow flawed, or is it not supported?</p>
+
+
+
+<a name="533078526"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/533078526" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Germán Saracca <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#533078526">(Aug 06 2025 at 11:10)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="928678">@Paul Boon</span> , Germán here, I'm a frontend developer working on the SPA, thanks for detecting this. There was partial support for custom metadata, limited to the blocks you mentioned from the <code>MetadataBlockName</code> enum. We're currently working on a fix <span aria-label="wrench" class="emoji emoji-1f527" role="img" title="wrench">:wrench:</span>  for the SPA.</p>
+
+
+
+<a name="533098280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/533098280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#533098280">(Aug 06 2025 at 13:05)</a>:</h4>
+<p>I'd say "not supported" at the moment. Certain blocks that are <a href="https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11">hard-coded</a> work.</p>
+
+
+
+<a name="533316373"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/533316373" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#533316373">(Aug 07 2025 at 15:28)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> for now, the fixes are going into the 0.1.0 release branch: <a href="https://github.com/IQSS/dataverse-frontend/compare/develop...release/0.1.0">https://github.com/IQSS/dataverse-frontend/compare/develop...release/0.1.0</a></p>
+<p>I believe it's these three commits by <span class="user-mention" data-user-id="770046">@Germán Saracca</span>:</p>
+<p><a href="/user_uploads/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png">Screenshot 2025-08-07 at 11.26.19 AM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png" title="Screenshot 2025-08-07 at 11.26.19 AM.png"><img data-original-content-type="image/png" data-original-dimensions="1054x331" src="/user_uploads/thumbnail/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png/840x560.webp"></a></div><p>(The PR at <a href="https://github.com/IQSS/dataverse-frontend/pull/777">https://github.com/IQSS/dataverse-frontend/pull/777</a> is where we're merging the 0.1.0 release into the "main" branch, so the commits appear there as well.)</p>
+<p>Basically, the plan is for these fixes to go into the 0.1.0 release, so thanks for reporting it!</p>
+<p>These fixes will also make it into the develop branch at some point.</p>
+
+
+
+<a name="533319401"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/533319401" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#533319401">(Aug 07 2025 at 15:46)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> oh and if you want, we can certainly rename this topic to "support for custom metadata blocks" or whatever. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="534944391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/534944391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#534944391">(Aug 18 2025 at 12:45)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Just changed it as suggested</p>
+
+
+
+<a name="534947447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/534947447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#534947447">(Aug 18 2025 at 13:02)</a>:</h4>
+<p>Looks great, thanks.</p>
+
+
+
+<a name="535162121"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/535162121" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#535162121">(Aug 19 2025 at 16:05)</a>:</h4>
+<p>Pulled develop and build and then deployed it on our test VM, now I do get Datasset metadata with those custom blocks. Great work  <span aria-label="+1" class="emoji emoji-1f44d" role="img" title="+1">:+1:</span> <span class="user-mention" data-user-id="770046">@Germán Saracca</span></p>
+
+
+
+<a name="535191590"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/535191590" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Germán Saracca <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#535191590">(Aug 19 2025 at 19:33)</a>:</h4>
+<p>Nice! Happy it’s working with the custom blocks , thanks for testing and sharing the feedback <span aria-label="praise" class="emoji emoji-1f64c" role="img" title="praise">:praise:</span>  <span class="user-mention" data-user-id="928678">@Paul Boon</span></p>
+
+
+
+<a name="537349066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/410361-ui-dev/topic/%E2%9C%94%20Support%20for%20custom%20metadata%20blocks/near/537349066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/410361-ui-dev/topic/.E2.9C.94.20Support.20for.20custom.20metadata.20blocks.html#537349066">(Sep 02 2025 at 19:09)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="770046">Germán Saracca</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

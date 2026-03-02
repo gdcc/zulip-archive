@@ -1,0 +1,121 @@
+<html>
+<head><meta charset="utf-8"><title>Container name inconsistencies cause problems in cpwebapp.sh · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html">Container name inconsistencies cause problems in cpwebapp.sh</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="547314434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547314434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547314434">(Oct 27 2025 at 15:53)</a>:</h4>
+<p>When running the dev containers via <code>docker compose</code> or <code>mvn</code> the container names will differ. This causes problems when I want to use the file watcher mechanism to track changes to xhtml-s and to copy them to the container via <code>cpwebapp.sh</code>, which assumes the container is called <code>dev_dataverse</code>. However, when the container is run via <code>mvn</code> the container name will be <code> dataverse-1</code>.</p>
+<p>Should we solve the container names, or should we check for either names in <a href="http://cpwebapp.sh">cpwebapp.sh</a>?</p>
+<div class="codehilite"><pre><span></span><code>docker compose -f docker-compose-dev.yml up
+
+&gt; docker ps --format &quot;table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Names}}&quot;
+CONTAINER ID   IMAGE                                           COMMAND                  NAMES
+beb95a3c1d2d   caddy:2-alpine                                  &quot;caddy run -c /Caddy…&quot;   dataverse-develop-dev_proxy-1
+4614654d1b01   gdcc/dataverse:unstable                         &quot;/usr/bin/dumb-init …&quot;   dev_dataverse
+0b5c5232d941   solr:9.8.0                                      &quot;docker-entrypoint.s…&quot;   dev_solr
+edb7e9476909   postgres:17                                     &quot;docker-entrypoint.s…&quot;   dev_postgres
+7044e743147b   localstack/localstack:4.2.0                     &quot;docker-entrypoint.sh&quot;   dev_localstack
+76dd4250c801   minio/minio                                     &quot;/usr/bin/docker-ent…&quot;   dev_minio
+b5636aa4f019   maildev/maildev:2.0.5                           &quot;bin/maildev&quot;            dev_smtp
+393d8c10079e   quay.io/keycloak/keycloak:26.3.2                &quot;/opt/keycloak/bin/k…&quot;   dev_keycloak
+c2ada61a01ac   trivadis/dataverse-previewers-provider:latest   &quot;/docker-entrypoint.…&quot;   previewers-provider
+c5b364b6e237   moby/buildkit:buildx-stable-1                   &quot;buildkitd&quot;              buildx_buildkit_maven0
+</code></pre></div>
+<hr>
+<div class="codehilite"><pre><span></span><code>mvn -Pct docker:run -Dapp.skipDeploy
+
+&gt; docker ps --format &quot;table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Names}}&quot;
+CONTAINER ID   IMAGE                                           COMMAND                  NAMES
+d7fc1dadd3c5   caddy:2-alpine                                  &quot;caddy run -c /Caddy…&quot;   caddy-1
+e927ec10f15e   gdcc/dataverse:unstable                         &quot;/usr/bin/dumb-init …&quot;   dataverse-1
+c900f4ebc1a5   solr:9.8.0                                      &quot;docker-entrypoint.s…&quot;   solr-1
+74429f1d6d33   trivadis/dataverse-deploy-previewers:latest     &quot;./entrypoint.sh dep…&quot;   dataverse-deploy-previewers-1
+8b52ebd65611   trivadis/dataverse-previewers-provider:latest   &quot;/docker-entrypoint.…&quot;   dataverse-previewers-provider-1
+982bd0b46f49   minio/minio                                     &quot;/usr/bin/docker-ent…&quot;   minio-1
+d5bd12b5d4fd   localstack/localstack:4.2.0                     &quot;docker-entrypoint.sh&quot;   localstack-1
+e4f714deaf07   quay.io/keycloak/keycloak:26.3.2                &quot;/opt/keycloak/bin/k…&quot;   keycloak-1
+54b960639150   maildev/maildev:2.0.5                           &quot;bin/maildev&quot;            maildev-5
+51124b94a648   postgres:17                                     &quot;docker-entrypoint.s…&quot;   postgres-1
+ec6eb6226341   gdcc/configbaker:unstable                       &quot;/usr/bin/dumb-init …&quot;   configbaker-1
+94d745503c49   gdcc/configbaker:unstable                       &quot;/usr/bin/dumb-init …&quot;   dev_bootstrap
+bf559db844df   trivadis/dataverse-deploy-previewers:latest     &quot;./entrypoint.sh dep…&quot;   register-previewers
+c5b364b6e237   moby/buildkit:buildx-stable-1                   &quot;buildkitd&quot;              buildx_buildkit_maven0
+</code></pre></div>
+
+
+
+<a name="547315015"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547315015" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547315015">(Oct 27 2025 at 15:55)</a>:</h4>
+<p>Consistent naming sounds good to me. <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> what do you think?</p>
+
+
+
+<a name="547316084"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547316084" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547316084">(Oct 27 2025 at 15:59)</a>:</h4>
+<p>And also <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> : how to solve it? <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+
+
+
+<a name="547316300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547316300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547316300">(Oct 27 2025 at 16:00)</a>:</h4>
+<p>I can work around the names in  <a href="http://cpwebapp.sh">cpwebapp.sh</a> but I'd prefer consistent naming as well.</p>
+
+
+
+<a name="547322943"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547322943" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547322943">(Oct 27 2025 at 16:28)</a>:</h4>
+<p>Ok, this maybe easy, just need to add <code>&lt;containerNamePattern&gt;%a&lt;/containerNamePattern&gt;</code> to <code>docker-maven-plugin</code> config, sg. like this:</p>
+<div class="codehilite"><pre><span></span><code>&lt;plugin&gt;
+  &lt;groupId&gt;io.fabric8&lt;/groupId&gt;
+  &lt;artifactId&gt;docker-maven-plugin&lt;/artifactId&gt;
+  &lt;configuration&gt;
+   ...
+    &lt;containerNamePattern&gt;%a&lt;/containerNamePattern&gt;
+  &lt;/configuration&gt;
+&lt;/plugin&gt;
+</code></pre></div>
+<p>Very intuitive. <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+
+
+
+<a name="547429105"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547429105" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547429105">(Oct 28 2025 at 08:02)</a>:</h4>
+<p>Hi folks. I'm fine with whatever.  It's probably easier to make the Maven Plugin use the same names as compose creates. PRs welcome.</p>
+
+
+
+<a name="547442707"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547442707" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Balázs Pataki <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547442707">(Oct 28 2025 at 09:19)</a>:</h4>
+<p>Submitted PRs for both issues:</p>
+<p><a href="https://github.com/IQSS/dataverse/pull/11935">https://github.com/IQSS/dataverse/pull/11935</a></p>
+<p><a href="https://github.com/IQSS/dataverse/pull/11936">https://github.com/IQSS/dataverse/pull/11936</a></p>
+
+
+
+<a name="547473565"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547473565" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547473565">(Oct 28 2025 at 11:54)</a>:</h4>
+<p>The fix was to add <code>&lt;containerNamePattern&gt;%a&lt;/containerNamePattern&gt;</code>? Weird. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="547473782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547473782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547473782">(Oct 28 2025 at 11:56)</a>:</h4>
+<p>"The <code>&lt;alias&gt;</code> of an image which must be set. The alias is set in the top-level image configuration" -- <a href="https://fabric8io.github.io/docker-maven-plugin/">https://fabric8io.github.io/docker-maven-plugin/</a> 4.2. Container Names</p>
+
+
+
+<a name="547473810"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Container%20name%20inconsistencies%20cause%20problems%20in%20cpwebapp.sh/near/547473810" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Container.20name.20inconsistencies.20cause.20problems.20in.20cpwebapp.2Esh.html#547473810">(Oct 28 2025 at 11:56)</a>:</h4>
+<p><span class="user-mention" data-user-id="602497">@Balázs Pataki</span> thanks for the PRs!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

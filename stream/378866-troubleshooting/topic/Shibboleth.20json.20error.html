@@ -1,0 +1,90 @@
+<html>
+<head><meta charset="utf-8"><title>Shibboleth json error · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html">Shibboleth json error</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="423056835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423056835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423056835">(Feb 23 2024 at 16:58)</a>:</h4>
+<p>I am attempting to configure Shibboleth to use the UC-Berkeley production IdP for authentication to our staging and prod Dataverse environments.  I was sucessful configuring our development Dataverse instance to use the UCB test IdP.  However I am getting the attached error in the attempt to configure our production IdP.  We are at v. 6.1 build 1590-f5d1299 on all three environments. Any thoughts on where to proceed with this? Thanks in advance! Sorry for so many troubleshooting questions.<br>
+Here are the UCB Campus entityIDs:<br>
+UCB test IdP: <br>
+<code>https://shib-test.berkeley.edu/idp/shibboleth</code><br>
+UCB prod IdP: <br>
+<code>urn:mace:incommon:berkeley.edu</code></p>
+<p><a href="/user_uploads/53090/Q1meLXNToB7xSawYKCZIqiQ0/shib-error.txt">shib-error.txt</a></p>
+
+
+
+<a name="423057709"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423057709" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423057709">(Feb 23 2024 at 17:02)</a>:</h4>
+<p>It seems to be failing while getting the affiliation: <a href="https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/Shib.java#L220">https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/Shib.java#L220</a></p>
+
+
+
+<a name="423057784"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423057784" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423057784">(Feb 23 2024 at 17:03)</a>:</h4>
+<p>The log says: Trying to get affiliation from disco feed URL: <a href="http://datasets-staging.lib.berkeley.edu/Shibboleth.sso/DiscoFeed">http://datasets-staging.lib.berkeley.edu/Shibboleth.sso/DiscoFeed</a></p>
+
+
+
+<a name="423057832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423057832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423057832">(Feb 23 2024 at 17:03)</a>:</h4>
+<p>I can't reach that DiscoFeed URL but do you get JSON out of it?</p>
+
+
+
+<a name="423065250"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423065250" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423065250">(Feb 23 2024 at 17:46)</a>:</h4>
+<p>I think I see the problem now, it's trying http instead of https. Where would that be specified?</p>
+
+
+
+<a name="423070550"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423070550" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423070550">(Feb 23 2024 at 18:18)</a>:</h4>
+<p>Maybe here: <br>
+setting the site URL<br>
+<a href="https://guides.dataverse.org/en/latest/installation/config.html#dataverse-siteurl">https://guides.dataverse.org/en/latest/installation/config.html#dataverse-siteurl</a></p>
+<p>says some sites might not need the "s", but we have found we do.</p>
+
+
+
+<a name="423072344"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423072344" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423072344">(Feb 23 2024 at 18:30)</a>:</h4>
+<p><span class="user-mention" data-user-id="674237">@Jay Sundu</span> I see a <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> ... does that mean you're all set? <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="423077589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423077589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423077589">(Feb 23 2024 at 19:07)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/Shibboleth.20json.20error/near/423072344">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="674237">Jay Sundu</span> I see a <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> ... does that mean you're all set? <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+</blockquote>
+<p>Yeah, no more problems ever!</p>
+
+
+
+<a name="423078877"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423078877" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423078877">(Feb 23 2024 at 19:16)</a>:</h4>
+<p>Ha. Please keep the questions coming!</p>
+
+
+
+<a name="423079675"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shibboleth%20json%20error/near/423079675" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jay Sundu <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shibboleth.20json.20error.html#423079675">(Feb 23 2024 at 19:21)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/378866-troubleshooting/topic/Shibboleth.20json.20error/near/423078877">said</a>:</p>
+<blockquote>
+<p>Ha. Please keep the questions coming!</p>
+</blockquote>
+<p><span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span> Thanks again <span class="user-mention" data-user-id="599826">@Sherry Lake</span>  and <span class="user-mention" data-user-id="598112">@Philip Durbin</span>  !!!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,99 @@
+<html>
+<head><meta charset="utf-8"><title>Shib login causing null pointer exception · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html">Shib login causing null pointer exception</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="521350893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521350893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521350893">(May 30 2025 at 18:30)</a>:</h4>
+<p>Hello, <br>
+We recently upgraded to v5.14 and have had points on our test server where we get a null pointer exception while trying to login via shibboleth.   After I authenticate with my credentials, the app sits there and then times out, not logging me in. Though sometimes it does log me in if I wait long enough.  </p>
+<p>It's only on our test server, so it could be a misconfiguration on our part. </p>
+<p>Has anyone seen this before? Does anything stand out to you about what we might have misconfigured?  </p>
+<p>[#|2025-05-30T17:49:11.202+0000|WARNING|Payara 5.2022.5|javax.enterprise.resource.webcontainer.jsf.lifecycle|_ThreadID=94;_ThreadName=http-thread-pool::jk-connector(1);_TimeMillis=1748627351202;_LevelValue=900;|<br>
+  #{Shib.init}: java.lang.NullPointerException<br>
+javax.faces.FacesException: #{Shib.init}: java.lang.NullPointerException<br>
+        at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:96)<br>
+        at com.sun.faces.application.ActionListenerImpl.processAction(ActionListenerImpl.java:71)<br>
+        at javax.faces.component.UIViewAction.broadcast(UIViewAction.java:548)<br>
+        at javax.faces.component.UIViewRoot.broadcastEvents(UIViewRoot.java:847)<br>
+        at javax.faces.component.UIViewRoot.processApplication(UIViewRoot.java:1396)<br>
+        at com.sun.faces.lifecycle.InvokeApplicationPhase.execute(InvokeApplicationPhase.java:58)<br>
+.<br>
+.<br>
+.<br>
+        at java.base/java.lang.Thread.run(Thread.java:829)<br>
+Caused by: javax.faces.el.EvaluationException: java.lang.NullPointerException<br>
+        at com.sun.faces.application.MethodBindingMethodExpressionAdapter.invoke(MethodBindingMethodExpressionAdapter.java:76)<br>
+        at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:82)<br>
+        ... 45 more<br>
+Caused by: java.lang.NullPointerException<br>
+        at edu.harvard.iq.dataverse.util.SessionUtil.changeSessionId(SessionUtil.java:22)<br>
+        at edu.harvard.iq.dataverse.DataverseSession.setUser(DataverseSession.java:150)<br>
+        at edu.harvard.iq.dataverse.DataverseSession$Proxy$_$$_WeldClientProxy.setUser(Unknown Source)<br>
+        at edu.harvard.iq.dataverse.Shib.logInUserAndSetShibAttributes(Shib.java:386)<br>
+        at edu.harvard.iq.dataverse.Shib.init(Shib.java:262)<br>
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)<br>
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)<br>
+        at com.sun.el.util.ReflectionUtil.invokeMethod(ReflectionUtil.java:160)<br>
+        at com.sun.el.parser.AstValue.invoke(AstValue.java:261)<br>
+        at com.sun.el.MethodExpressionImpl.invoke(MethodExpressionImpl.java:237)<br>
+        at org.jboss.weld.module.web.util.el.ForwardingMethodExpression.invoke(ForwardingMethodExpression.java:40)<br>
+        at org.jboss.weld.module.web.el.WeldMethodExpression.invoke(WeldMethodExpression.java:50)<br>
+        at com.sun.faces.facelets.el.TagMethodExpression.invoke(TagMethodExpression.java:65)<br>
+        at com.sun.faces.application.MethodBindingMethodExpressionAdapter.invoke(MethodBindingMethodExpressionAdapter.java:66)<br>
+        ... 46 more</p>
+<p>Thanks in advance for any help troubleshooting this.</p>
+
+
+
+<a name="521352057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521352057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521352057">(May 30 2025 at 18:37)</a>:</h4>
+<p>So a null pointer at <a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/util/SessionUtil.java#L22">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/util/SessionUtil.java#L22</a></p>
+
+
+
+<a name="521352061"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521352061" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521352061">(May 30 2025 at 18:37)</a>:</h4>
+<p>hmm</p>
+
+
+
+<a name="521352143"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521352143" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521352143">(May 30 2025 at 18:37)</a>:</h4>
+<p>What if you go to the equivalent of <a href="https://demo.dataverse.org/Shibboleth.sso/Session">https://demo.dataverse.org/Shibboleth.sso/Session</a></p>
+<p>Anything there?</p>
+
+
+
+<a name="521355942"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521355942" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521355942">(May 30 2025 at 19:06)</a>:</h4>
+<p>There's lots of good info there including <br>
+Miscellaneous :  session expiration, client address, sso protocol, identity provider, Authentication time, autehtnication context class and authentication context decl. <br>
+Attributes:  affiliation, eppn, givenName, mail , persistent-id and sn</p>
+<p>The fields seem to be filled in okay. </p>
+<p>What's interesting is that DV doesn't think I'm logged in.</p>
+
+
+
+<a name="521357150"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521357150" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521357150">(May 30 2025 at 19:15)</a>:</h4>
+<p>It looks like SessionUtil was added in <a href="https://github.com/IQSS/dataverse/issues/7111">#7111</a> by Jim. He isn't here in Zulip. Do you mind starting a thread at <a href="https://groups.google.com/g/dataverse-community">https://groups.google.com/g/dataverse-community</a> ?</p>
+
+
+
+<a name="521359678"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Shib%20login%20causing%20null%20pointer%20exception/near/521359678" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Shib.20login.20causing.20null.20pointer.20exception.html#521359678">(May 30 2025 at 19:32)</a>:</h4>
+<p>Thanks, Philip.  We're going to try one more thing and then I'll email the list.  There's a chance that it's something in our setup.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

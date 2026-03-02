@@ -1,0 +1,914 @@
+<html>
+<head><meta charset="utf-8"><title>publishing to Maven Central · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html">publishing to Maven Central</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="440094203"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440094203" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440094203">(May 22 2024 at 13:38)</a>:</h4>
+<p>I'd like to publish a jar to Maven Central but I'm hitting various roadblocks.</p>
+<p>Locally, from my laptop, using my "pdurbin" account, I'm able to publish a snapshot to org.dataverse but not io.gdcc. (I've emailed Central Support about getting permission to publish to io.gdcc.) For example, a <a href="https://s01.oss.sonatype.org/content/repositories/snapshots/org/dataverse/test/hello/">snapshot jar</a>, is available, built from a <a href="https://github.com/gdcc/hello">hello</a> app.</p>
+<p>I'm using credentials from my pdurbin account (User Access Token) and placing them in <code>~/.m2/settings.xml</code> like this:</p>
+<div class="codehilite"><pre><span></span><code>&lt;settings&gt;
+  &lt;servers&gt;
+    &lt;server&gt;
+      &lt;id&gt;ossrh&lt;/id&gt;
+      &lt;username&gt;REDACTED&lt;/username&gt;
+      &lt;password&gt;REDACTED&lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+&lt;/settings&gt;
+</code></pre></div>
+<p>Then I type <code>mvn deploy</code> to publish the snapshot. Pretty easy from local, but...</p>
+
+
+
+<a name="440095108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440095108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440095108">(May 22 2024 at 13:43)</a>:</h4>
+<p>I have a <a href="https://github.com/gdcc/hello/blob/900b0e9c993bbce2a0453bdcb669898ab98a625a/.github/workflows/maven-snapshot.yml">snapshot</a> GitHub Action set up for the hello app, but it's <a href="https://github.com/gdcc/hello/actions/runs/9192250925/job/25280446686#step:6:91">showing</a> (as <span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> noticed) this debug output:</p>
+<p><code>[DEBUG] Failed to decrypt password for server github: org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException: java.io.FileNotFoundException: /home/runner/.m2/settings-security.xml (No such file or directory)</code></p>
+<p>Then it fails with this error:</p>
+<p><code>Error: Failed to execute goal org.sonatype.plugins:nexus-staging-maven-plugin:1.6.13:deploy (injected-nexus-deploy) on project hello: Failed to deploy artifacts: Could not transfer artifact org.dataverse.test:hello:jar:0.0.1-20240522.132907-4 from/to ossrh (https://s01.oss.sonatype.org/content/repositories/snapshots): authentication failed for https://s01.oss.sonatype.org/content/repositories/snapshots/org/dataverse/test/hello/0.0.1-SNAPSHOT/hello-0.0.1-20240522.132907-4.jar, status: 401 Unauthorized -&gt; [Help 1]</code></p>
+<p>I'm using the same credentials, in repository secrets under <a href="https://github.com/gdcc/hello/settings/secrets/actions">https://github.com/gdcc/hello/settings/secrets/actions</a></p>
+<p>Why does it work locally but not in GitHub Actions? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440095525"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440095525" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440095525">(May 22 2024 at 13:45)</a>:</h4>
+<p>Is there anything in runners on the  other repo that is missing from this?</p>
+
+
+
+<a name="440095565"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440095565" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440095565">(May 22 2024 at 13:45)</a>:</h4>
+<p><a href="/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png" title="image.png"><img src="/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png"></a></div>
+
+
+
+<a name="440098245"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440098245" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440098245">(May 22 2024 at 13:57)</a>:</h4>
+<p>Do you mean <a href="https://github.com/IQSS/UNF/settings/actions/runners">https://github.com/IQSS/UNF/settings/actions/runners</a> , for example? Nothing there:</p>
+<p><a href="/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png">Screenshot-2024-05-22-at-9.57.26-AM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png" title="Screenshot-2024-05-22-at-9.57.26-AM.png"><img src="/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png"></a></div>
+
+
+
+<a name="440101068"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440101068" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440101068">(May 22 2024 at 14:09)</a>:</h4>
+<p>Yes but from <a href="https://github.com/gdcc/dataverse-exporters">https://github.com/gdcc/dataverse-exporters</a></p>
+
+
+
+<a name="440113101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440113101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440113101">(May 22 2024 at 14:58)</a>:</h4>
+<p>Nothing at <a href="https://github.com/gdcc/dataverse-exporters/settings/actions/runners">https://github.com/gdcc/dataverse-exporters/settings/actions/runners</a> either.</p>
+
+
+
+<a name="440117591"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440117591" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440117591">(May 22 2024 at 15:16)</a>:</h4>
+<p>I wonder where this settings-security.xml is setup</p>
+
+
+
+<a name="440117874"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440117874" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440117874">(May 22 2024 at 15:18)</a>:</h4>
+<p>Does this seems similar? <span class="user-mention" data-user-id="598112">@Philip Durbin</span>  <a href="https://github.com/orgs/community/discussions/27165">https://github.com/orgs/community/discussions/27165</a></p>
+
+
+
+<a name="440118459"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440118459" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440118459">(May 22 2024 at 15:20)</a>:</h4>
+<p>Yes, it does seem related.</p>
+
+
+
+<a name="440118830"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440118830" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440118830">(May 22 2024 at 15:22)</a>:</h4>
+<p>I just tried to push a snapshot to another org.dataverse project and it also says "401 Unauthorized": <a href="https://github.com/IQSS/UNF/actions/runs/9194059373">https://github.com/IQSS/UNF/actions/runs/9194059373</a></p>
+<p>Maybe I should add the extra debugging.</p>
+
+
+
+<a name="440119211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440119211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440119211">(May 22 2024 at 15:24)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>The ‘settings-security.xml’ file contains the master password used to encrypt remote repository credentials. The default location of this file is ‘~&lt;user_home&gt;/.m2/settings-security.xml’.
+
+Normally, if this file does not exist, or if it does not contain valid content, the ‘mvn --encrypt-password’ command line will fail with the error like:
+</code></pre></div>
+<p>So prob this is on the cache of the github action that was previously set up by someone? (not an expert just trying to figure this out <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span>)</p>
+
+
+
+<a name="440119563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440119563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440119563">(May 22 2024 at 15:25)</a>:</h4>
+<p>I added extra debugging: <a href="https://github.com/IQSS/UNF/actions/runs/9194126200">https://github.com/IQSS/UNF/actions/runs/9194126200</a></p>
+<p>No mention of settings-security.xml. Seems like it's just straight up 401 unauthorized.</p>
+
+
+
+<a name="440119955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440119955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440119955">(May 22 2024 at 15:27)</a>:</h4>
+<p><span aria-label="open mouth" class="emoji emoji-1f62e" role="img" title="open mouth">:open_mouth:</span> <a href="https://www.bitshifted.co/blog/deploy-maven-central-github-actions-step-by-step-guide/">https://www.bitshifted.co/blog/deploy-maven-central-github-actions-step-by-step-guide/</a></p>
+
+
+
+<a name="440156497"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440156497" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440156497">(May 22 2024 at 18:30)</a>:</h4>
+<p>I just heard back from Maven Central Support: "It appears that you are an authorized publisher on <code>org.dataverse</code>, but not yet <code>io.gdcc</code>, which explains the issues you're experiencing."</p>
+
+
+
+<a name="440156539"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440156539" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440156539">(May 22 2024 at 18:30)</a>:</h4>
+<p>"In order to grant publishing access on <code>io.gdcc</code>, we'll need an email on this thread approving your request from one of the accounts already authorized to publish under that domain."</p>
+
+
+
+<a name="440156860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440156860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440156860">(May 22 2024 at 18:32)</a>:</h4>
+<p><span aria-label="upside down" class="emoji emoji-1f643" role="img" title="upside down">:upside_down:</span></p>
+
+
+
+<a name="440157402"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440157402" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440157402">(May 22 2024 at 18:35)</a>:</h4>
+<p>But how we can publish from one repo</p>
+
+
+
+<a name="440157502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440157502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440157502">(May 22 2024 at 18:35)</a>:</h4>
+<p>Unless whoever set this up used credentials valid for <a href="http://gdcc.io">gdcc.io</a></p>
+
+
+
+<a name="440157587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440157587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440157587">(May 22 2024 at 18:36)</a>:</h4>
+<p>But we have credentials for <a href="http://dataverse.org">dataverse.org</a></p>
+
+
+
+<a name="440160264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440160264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440160264">(May 22 2024 at 18:50)</a>:</h4>
+<p>I feel like this is only the first step, authorizing my pdurbin account to publish to io.gdcc.</p>
+
+
+
+<a name="440160315"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440160315" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440160315">(May 22 2024 at 18:50)</a>:</h4>
+<p>There's still a lot of other weird stuff going on.</p>
+
+
+
+<a name="440161838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440161838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440161838">(May 22 2024 at 18:59)</a>:</h4>
+<p>At least I hopes that is a fix, I was running out of ideas <span aria-label="laughing" class="emoji emoji-1f606" role="img" title="laughing">:laughing:</span></p>
+
+
+
+<a name="440161898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440161898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440161898">(May 22 2024 at 18:59)</a>:</h4>
+<p>I don't think we're out of the woods yet.</p>
+
+
+
+<a name="440162038"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440162038" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440162038">(May 22 2024 at 19:00)</a>:</h4>
+<p><code>have you tried turning it off and on again</code></p>
+
+
+
+<a name="440175276"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175276" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175276">(May 22 2024 at 20:18)</a>:</h4>
+<p>It looks like they key we use to sign is not yet expired (but will soon, at the end of July):</p>
+<div class="codehilite"><pre><span></span><code>$ gpg --show-keys --keyid-format 0xshort privatekey.txt
+sec#  rsa4096/0xC031F36B 2021-07-30 [SC] [expires: 2024-07-29]
+      2DFF887456235B4550B857DFBAFC446FC031F36B
+uid                      Dataverse Bot (Signing Bot for Dataverse and GDCC packages) &lt;dataversebot@gdcc.io&gt;
+</code></pre></div>
+
+
+
+<a name="440175407"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175407" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175407">(May 22 2024 at 20:19)</a>:</h4>
+<p>That prob explains why the other one stopped working (?)</p>
+
+
+
+<a name="440175511"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175511" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175511">(May 22 2024 at 20:19)</a>:</h4>
+<p>well, it isn't expired</p>
+
+
+
+<a name="440175605"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175605" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175605">(May 22 2024 at 20:20)</a>:</h4>
+<p>The one from UNF?</p>
+
+
+
+<a name="440175639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175639">(May 22 2024 at 20:20)</a>:</h4>
+<p>They all use the same key, the one above.</p>
+
+
+
+<a name="440175659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175659">(May 22 2024 at 20:20)</a>:</h4>
+<p><span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440175697"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440175697" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440175697">(May 22 2024 at 20:20)</a>:</h4>
+<p>DATAVERSEBOT_GPG_KEY</p>
+
+
+
+<a name="440177792"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440177792" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440177792">(May 22 2024 at 20:32)</a>:</h4>
+<p>I'm hopeful that this is working, locally: <code>mvn -Prelease -Dgpg.keyname=$DATAVERSEBOT_GPG_KEYNAME -Dgpg.passphrase=$DATAVERSEBOT_GPG_PASSWORD deploy</code></p>
+
+
+
+<a name="440177939"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440177939" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440177939">(May 22 2024 at 20:33)</a>:</h4>
+<p>I had to import the private key first: <code>gpg --import privatekey.txt</code></p>
+
+
+
+<a name="440178697"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440178697" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440178697">(May 22 2024 at 20:37)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>[INFO]  * Upload of locally staged artifacts finished.
+[INFO]  * Closing staging repository with ID &quot;orgdataverse-1003&quot;.
+
+Waiting for operation to complete...
+..........
+
+[INFO] Remote staged 1 repositories, finished with success.
+[INFO] Remote staging repositories are being released...
+
+Waiting for operation to complete...
+......
+
+[INFO] Remote staging repositories released.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  57.213 s
+[INFO] Finished at: 2024-05-22T16:37:17-04:00
+[INFO] ------------------------------------------------------------------------
+</code></pre></div>
+
+
+
+<a name="440180254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440180254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440180254">(May 22 2024 at 20:46)</a>:</h4>
+<p>Nothing at <a href="https://repo1.maven.org/maven2/org/dataverse/">https://repo1.maven.org/maven2/org/dataverse/</a> though.</p>
+
+
+
+<a name="440181898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440181898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440181898">(May 22 2024 at 20:56)</a>:</h4>
+<p>So they give you access already? I got lost</p>
+
+
+
+<a name="440181935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440181935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440181935">(May 22 2024 at 20:56)</a>:</h4>
+<p>Or that will take some time</p>
+
+
+
+<a name="440182047"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440182047" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440182047">(May 22 2024 at 20:57)</a>:</h4>
+<p>No, I still don't have access to io.gdcc. Waiting. I replied from the dataversebot email account and said that Phil guy is trustworthy. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="440182114"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440182114" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440182114">(May 22 2024 at 20:57)</a>:</h4>
+<p>Above I'm trying to publish "hello" to org.dataverse. To real Maven Central, not staging.</p>
+
+
+
+<a name="440183298"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183298" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183298">(May 22 2024 at 21:04)</a>:</h4>
+<p>There it is: <a href="https://repo1.maven.org/maven2/org/dataverse/test/hello/0.0.1/">https://repo1.maven.org/maven2/org/dataverse/test/hello/0.0.1/</a></p>
+
+
+
+<a name="440183310"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183310" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183310">(May 22 2024 at 21:04)</a>:</h4>
+<p>In real Maven Central.</p>
+
+
+
+<a name="440183335"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183335" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183335">(May 22 2024 at 21:04)</a>:</h4>
+<p><span aria-label="partying face" class="emoji emoji-1f973" role="img" title="partying face">:partying_face:</span></p>
+
+
+
+<a name="440183504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183504">(May 22 2024 at 21:05)</a>:</h4>
+<p><a href="https://central.sonatype.com/artifact/org.dataverse.test/hello">https://central.sonatype.com/artifact/org.dataverse.test/hello</a></p>
+
+
+
+<a name="440183578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183578">(May 22 2024 at 21:06)</a>:</h4>
+<p>I created that "test" area so we can practice.</p>
+
+
+
+<a name="440183632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183632">(May 22 2024 at 21:06)</a>:</h4>
+<p>This was deployed locally? No github action right</p>
+
+
+
+<a name="440183669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183669">(May 22 2024 at 21:06)</a>:</h4>
+<p>Right, from my laptop.</p>
+
+
+
+<a name="440183691"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183691" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183691">(May 22 2024 at 21:07)</a>:</h4>
+<p>At least I know it's possible <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="440183726"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183726" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183726">(May 22 2024 at 21:07)</a>:</h4>
+<p>And I'm ok pushing the croissant jar this way, if I have to.</p>
+
+
+
+<a name="440183747"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183747" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183747">(May 22 2024 at 21:07)</a>:</h4>
+<p>But I would like to get GitHub Actions working.</p>
+
+
+
+<a name="440183793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440183793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440183793">(May 22 2024 at 21:07)</a>:</h4>
+<p>I hope once we have the right keys will be easy <span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span></p>
+
+
+
+<a name="440185507"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440185507" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440185507">(May 22 2024 at 21:18)</a>:</h4>
+<p>Well, the gpg key is fine. I just proved that.</p>
+
+
+
+<a name="440186119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440186119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440186119">(May 22 2024 at 21:22)</a>:</h4>
+<p>And the dataversebot sonotype username and password work from dataverse-exporters, as we discussed in <a href="https://docs.google.com/spreadsheets/d/1uO4bHrftt7YDD6lZWU4MCb3LekorlBCov-xm8qRIQfA/edit?usp=sharing">the spreadsheet</a> we made:</p>
+<p><a href="/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png">maven-central.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png" title="maven-central.png"><img src="/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png"></a></div><p>(I just updated it to say that I can push hello to org.dataverse final with my pdurbin credentials. To real Maven Central.)</p>
+
+
+
+<a name="440186246"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440186246" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440186246">(May 22 2024 at 21:23)</a>:</h4>
+<p>Here are the docs I just wrote: <a href="https://github.com/gdcc/hello/commit/d2a2fa230af6889aec112717be6fb7e5de31e3d5">https://github.com/gdcc/hello/commit/d2a2fa230af6889aec112717be6fb7e5de31e3d5</a></p>
+
+
+
+<a name="440230996"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440230996" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440230996">(May 23 2024 at 02:05)</a>:</h4>
+<p>I <a href="https://github.com/gdcc/hello/commit/efeca9c20b23bd6f4b106d359b79d37aec832075">added</a> a step to let me ssh into the runner. This is what I see:</p>
+<div class="codehilite"><pre><span></span><code>runner@fv-az973-728:~/work/hello/hello$ cd ~/.m2/
+runner@fv-az973-728:~/.m2$ ls
+repository  settings.xml  toolchains.xml
+runner@fv-az973-728:~/.m2$ cat settings.xml
+&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;
+  &lt;servers&gt;
+    &lt;server&gt;
+      &lt;id&gt;github&lt;/id&gt;
+      &lt;username&gt;${env.GITHUB_ACTOR}&lt;/username&gt;
+      &lt;password&gt;${env.GITHUB_TOKEN}&lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+&lt;/settings&gt;runner@fv-az973-728:~/.m2$
+</code></pre></div>
+
+
+
+<a name="440231373"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440231373" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440231373">(May 23 2024 at 02:08)</a>:</h4>
+<p>That id reminds me that the error is "Failed to decrypt password for server github".</p>
+<p>Instead of "github" it should be "ossrh".</p>
+<p>And the username and password should be updated, of course.</p>
+
+
+
+<a name="440231634"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440231634" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440231634">(May 23 2024 at 02:11)</a>:</h4>
+<p><a href="https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-Apache-Maven">https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-Apache-Maven</a></p>
+
+
+
+<a name="440232786"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440232786" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440232786">(May 23 2024 at 02:21)</a>:</h4>
+<p>Interesting. The <code>settings.xml</code> above was from the "hello" app. I just <a href="https://github.com/gdcc/dataverse-exporters/commit/bc7d0b9658aba415738dce6a963e0b515ad009f6">added</a> tmate to dataverse-exporters and the values are updated correctly:</p>
+<div class="codehilite"><pre><span></span><code>runner@fv-az1108-124:~/work/dataverse-exporters/dataverse-exporters$ cd ~/.m2
+runner@fv-az1108-124:~/.m2$ ls
+repository  settings.xml  toolchains.xml
+runner@fv-az1108-124:~/.m2$ cat settings.xml
+&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;
+  &lt;servers&gt;
+    &lt;server&gt;
+      &lt;id&gt;ossrh&lt;/id&gt;
+      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;
+      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+&lt;/settings&gt;runner@fv-az1108-124:~/.m2$
+</code></pre></div>
+
+
+
+<a name="440236502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440236502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440236502">(May 23 2024 at 02:53)</a>:</h4>
+<p>(Kudos to Oliver for suggesting tmate: <a href="https://mxschmitt.github.io/action-tmate/">https://mxschmitt.github.io/action-tmate/</a> )</p>
+
+
+
+<a name="440236639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440236639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440236639">(May 23 2024 at 02:54)</a>:</h4>
+<p><span aria-label="open mouth" class="emoji emoji-1f62e" role="img" title="open mouth">:open_mouth:</span></p>
+
+
+
+<a name="440236645"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440236645" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440236645">(May 23 2024 at 02:54)</a>:</h4>
+<p>Oh this looks cool</p>
+
+
+
+<a name="440293255"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440293255" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440293255">(May 23 2024 at 10:28)</a>:</h4>
+<p>Interesting, when I <a href="https://github.com/gdcc/hello/commit/6c621ade48ea1ffc6da75cf70a9efa1212bed46c">move the tmate debugging</a> to just after setup-java, the values are there on the hello project:</p>
+<div class="codehilite"><pre><span></span><code>runner@fv-az568-806:~/work/hello/hello$ cd ~/.m2
+runner@fv-az568-806:~/.m2$ ls
+settings.xml  toolchains.xml
+runner@fv-az568-806:~/.m2$ cat settings.xml
+&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;
+  &lt;servers&gt;
+    &lt;server&gt;
+      &lt;id&gt;ossrh&lt;/id&gt;
+      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;
+      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+&lt;/settings&gt;runner@fv-az568-806:~/.m2$
+</code></pre></div>
+
+
+
+<a name="440293823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440293823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440293823">(May 23 2024 at 10:32)</a>:</h4>
+<p>Maybe it's the caching? I <a href="https://github.com/gdcc/hello/commit/0a95067f269834fca124d7c048f43e2bb4d3fe84">moved debugging</a> to just after the caching and the values are not there:</p>
+<div class="codehilite"><pre><span></span><code>runner@fv-az1433-508:~/work/hello/hello$ cd ~/.m2
+runner@fv-az1433-508:~/.m2$ ls
+repository  settings.xml  toolchains.xml
+runner@fv-az1433-508:~/.m2$ cat settings.xml
+&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;
+  &lt;servers&gt;
+    &lt;server&gt;
+      &lt;id&gt;github&lt;/id&gt;
+      &lt;username&gt;${env.GITHUB_ACTOR}&lt;/username&gt;
+      &lt;password&gt;${env.GITHUB_TOKEN}&lt;/password&gt;
+    &lt;/server&gt;
+  &lt;/servers&gt;
+&lt;/settings&gt;runner@fv-az1433-508:~/.m2$
+</code></pre></div>
+
+
+
+<a name="440294547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440294547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440294547">(May 23 2024 at 10:37)</a>:</h4>
+<p>It works! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span>  I <a href="https://github.com/gdcc/hello/commit/63f3dbc2fb02d27d93fe601c0f173fe2fa948cf7">removed</a> the "Cache Maven Packages" step:</p>
+<p><a href="https://github.com/gdcc/hello/actions/runs/9206483018">https://github.com/gdcc/hello/actions/runs/9206483018</a></p>
+<p><a href="https://s01.oss.sonatype.org/content/groups/staging/org/dataverse/test/hello/0.0.2-SNAPSHOT/">https://s01.oss.sonatype.org/content/groups/staging/org/dataverse/test/hello/0.0.2-SNAPSHOT/</a></p>
+<p><a href="/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png">works.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png" title="works.png"><img src="/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png"></a></div><p><a href="/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png">uploaded.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png" title="uploaded.png"><img src="/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png"></a></div>
+
+
+
+<a name="440299833"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440299833" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440299833">(May 23 2024 at 11:12)</a>:</h4>
+<p>Hmm, what we do is slightly different than <a href="https://github.com/actions/cache/blob/v4.0.2/examples.md#java---maven">https://github.com/actions/cache/blob/v4.0.2/examples.md#java---maven</a></p>
+
+
+
+<a name="440300033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440300033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440300033">(May 23 2024 at 11:13)</a>:</h4>
+<p>Maybe we are suffering from this: Maven documentation example leads to cached settings.xml - <a href="https://github.com/actions/cache/issues/1195">https://github.com/actions/cache/issues/1195</a></p>
+
+
+
+<a name="440302835"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440302835" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440302835">(May 23 2024 at 11:30)</a>:</h4>
+<p>Ok, I <a href="https://github.com/gdcc/hello/blob/c1d5b127ede6de43e9d24943e552b384224c9d92/.github/workflows/maven-snapshot.yml#L30-L36">added</a> the cache step back and publishing still works.</p>
+
+
+
+<a name="440308550"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440308550" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440308550">(May 23 2024 at 12:07)</a>:</h4>
+<p>But why does the old caching config work on dataverse-exporters?</p>
+<p>As is the failure on the UNF repo due to caching or something else?</p>
+
+
+
+<a name="440310796"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440310796" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440310796">(May 23 2024 at 12:21)</a>:</h4>
+<p>So the action for the snapshot of Hello works now right?</p>
+
+
+
+<a name="440311212"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440311212" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440311212">(May 23 2024 at 12:24)</a>:</h4>
+<p><code>the time of validity for the key defaults to *2 years*</code></p>
+
+
+
+<a name="440311266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440311266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440311266">(May 23 2024 at 12:24)</a>:</h4>
+<p>Last successful run was 8 months ago</p>
+
+
+
+<a name="440311275"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440311275" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440311275">(May 23 2024 at 12:24)</a>:</h4>
+<p><span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440311451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440311451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440311451">(May 23 2024 at 12:25)</a>:</h4>
+<p>With the debugger can you re-export the key and test that locally?</p>
+
+
+
+<a name="440314919"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440314919" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440314919">(May 23 2024 at 12:46)</a>:</h4>
+<p>Yes, the snapshot action for "hello" works now. It was the cache.</p>
+<p>Now I'll move on to making sure <code>.github/workflows/maven-release.yml</code> works.</p>
+
+
+
+<a name="440320376"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440320376" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440320376">(May 23 2024 at 13:14)</a>:</h4>
+<p>So in theory this should also work for deploying the croissant exporter to croissant?</p>
+
+
+
+<a name="440326546"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440326546" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440326546">(May 23 2024 at 13:46)</a>:</h4>
+<p>Yes, I'm hoping the same tweak regarding caching will work on <a href="https://github.com/gdcc/exporter-croissant">https://github.com/gdcc/exporter-croissant</a></p>
+
+
+
+<a name="440326692"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440326692" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440326692">(May 23 2024 at 13:46)</a>:</h4>
+<p>Also, I just heard back from Maven Central Support: "We have provisioned your <code>pdurbin</code> OSSRH account on <a href="https://s01.oss.sonatype.org/">https://s01.oss.sonatype.org</a> as a publisher for the <code>io.gdcc</code> namespace."</p>
+
+
+
+<a name="440332243"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440332243" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440332243">(May 23 2024 at 14:11)</a>:</h4>
+<p>I just tested, and yes, I can push from pdurbin to io.gdcc, the exporter-croissant repo. I updated the <a href="https://docs.google.com/spreadsheets/d/1uO4bHrftt7YDD6lZWU4MCb3LekorlBCov-xm8qRIQfA/edit?usp=sharing">spreadsheet</a>:</p>
+<p><a href="/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png">can-push.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png" title="can-push.png"><img src="/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png"></a></div>
+
+
+
+<a name="440332849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440332849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440332849">(May 23 2024 at 14:14)</a>:</h4>
+<p>Wait, i thought you were able to push hello with the github action?</p>
+
+
+
+<a name="440332997"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440332997" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440332997">(May 23 2024 at 14:15)</a>:</h4>
+<p>Oh the image is not updated</p>
+
+
+
+<a name="440333065"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440333065" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440333065">(May 23 2024 at 14:15)</a>:</h4>
+<p>I am, I am. I just updated the image again:<br>
+<a href="/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png">green.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png" title="green.png"><img src="/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png"></a></div>
+
+
+
+<a name="440333102"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440333102" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440333102">(May 23 2024 at 14:15)</a>:</h4>
+<p>more green</p>
+
+
+
+<a name="440333215"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440333215" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440333215">(May 23 2024 at 14:16)</a>:</h4>
+<p>shoot I missed one</p>
+
+
+
+<a name="440333280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440333280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440333280">(May 23 2024 at 14:16)</a>:</h4>
+<p><a href="/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png">even-more-green.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png" title="even-more-green.png"><img src="/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png"></a></div>
+
+
+
+<a name="440334015"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440334015" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440334015">(May 23 2024 at 14:20)</a>:</h4>
+<p>It is looking good!</p>
+
+
+
+<a name="440334038"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440334038" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440334038">(May 23 2024 at 14:20)</a>:</h4>
+<p>So what did you have to do with the cache?</p>
+
+
+
+<a name="440334155"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440334155" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440334155">(May 23 2024 at 14:21)</a>:</h4>
+<p>The issue is basically this: <a href="https://github.com/actions/cache/issues/1195">https://github.com/actions/cache/issues/1195</a></p>
+
+
+
+<a name="440334205"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440334205" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440334205">(May 23 2024 at 14:21)</a>:</h4>
+<p>And the fix is to change the path.</p>
+
+
+
+<a name="440339171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440339171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440339171">(May 23 2024 at 14:45)</a>:</h4>
+<p>I removed some green. Still working on "pdurbin creds GitHub Action (hello)" for org.dataverse. To push a final version using actions only.</p>
+
+
+
+<a name="440347925"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440347925" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440347925">(May 23 2024 at 15:31)</a>:</h4>
+<p>Ok it seems to me you are out of the woods <span aria-label="tree" class="emoji emoji-1f333" role="img" title="tree">:tree:</span>  <span aria-label="tree" class="emoji emoji-1f333" role="img" title="tree">:tree:</span> <span aria-label="tree" class="emoji emoji-1f333" role="img" title="tree">:tree:</span> <span aria-label="tree" class="emoji emoji-1f333" role="img" title="tree">:tree:</span> <span aria-label="tree" class="emoji emoji-1f333" role="img" title="tree">:tree:</span></p>
+
+
+
+<a name="440347934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440347934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440347934">(May 23 2024 at 15:31)</a>:</h4>
+<p><span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span></p>
+
+
+
+<a name="440348005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440348005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440348005">(May 23 2024 at 15:31)</a>:</h4>
+<p>Going to do some PPR stuff but ping me if I can help with anything</p>
+
+
+
+<a name="440349435"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440349435" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440349435">(May 23 2024 at 15:39)</a>:</h4>
+<p>I think so! I hope so! I feel less blocked than I have in days. <span aria-label="relieved" class="emoji emoji-1f60c" role="img" title="relieved">:relieved:</span></p>
+
+
+
+<a name="440526222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440526222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440526222">(May 24 2024 at 14:57)</a>:</h4>
+<p>There's still a mystery here. The dataversebot sonatype creds I have on file don't work. I tried in GitHub Actions and locally (settings.xml) with the "hello" app.</p>
+
+
+
+<a name="440526379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440526379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440526379">(May 24 2024 at 14:58)</a>:</h4>
+<p>I've been assuming the dataversebot creds are being used for dataverse-exporters but maybe it's using Oliver's creds? They are set at the org (gdcc) level.</p>
+
+
+
+<a name="440526556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440526556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440526556">(May 24 2024 at 14:59)</a>:</h4>
+<p>In short, now that I've reset the password for the databasebot sonatype account, I'm thinking about regenerating the creds (a username and token).</p>
+
+
+
+<a name="440527034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440527034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440527034">(May 24 2024 at 15:01)</a>:</h4>
+<p>We could verify the value of the keys with the debugger right?</p>
+
+
+
+<a name="440527145"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440527145" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440527145">(May 24 2024 at 15:02)</a>:</h4>
+<p>I don’t think github lets you see them after they are saved?</p>
+
+
+
+<a name="440527216"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440527216" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440527216">(May 24 2024 at 15:02)</a>:</h4>
+<p>From the dataverse-exporters, repo, yes, I should be able to look at settings.xml.</p>
+
+
+
+<a name="440527588"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440527588" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440527588">(May 24 2024 at 15:05)</a>:</h4>
+<p>But that is because you had those locally, but I was wondering if we can verify the credentials for dataverse bot and check if these are Oliver’s or something else</p>
+
+
+
+<a name="440527681"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440527681" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440527681">(May 24 2024 at 15:05)</a>:</h4>
+<p>No, for dataverse-exporters the secrets were already defined at the org (gdcc) level.</p>
+
+
+
+<a name="440529606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440529606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440529606">(May 24 2024 at 15:18)</a>:</h4>
+<p>Oh, right, it's just this:</p>
+<div class="codehilite"><pre><span></span><code>      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;
+      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;
+</code></pre></div>
+
+
+
+<a name="440529639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440529639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440529639">(May 24 2024 at 15:18)</a>:</h4>
+<p>Not sure how to get the actual values. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440530416"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440530416" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440530416">(May 24 2024 at 15:24)</a>:</h4>
+<p>That is what I was thinking</p>
+
+
+
+<a name="440530428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440530428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440530428">(May 24 2024 at 15:24)</a>:</h4>
+<p>Can you echo</p>
+
+
+
+<a name="440530448"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440530448" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440530448">(May 24 2024 at 15:24)</a>:</h4>
+<p>Or write them with the debuger?</p>
+
+
+
+<a name="440530480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440530480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440530480">(May 24 2024 at 15:24)</a>:</h4>
+<p>Debugger</p>
+
+
+
+<a name="440530907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440530907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440530907">(May 24 2024 at 15:27)</a>:</h4>
+<p>Got them! With this: <a href="https://github.com/gdcc/dataverse-exporters/commit/01e7d2aaa664829eae60a3fa62ed156eb9d9d9e6">https://github.com/gdcc/dataverse-exporters/commit/01e7d2aaa664829eae60a3fa62ed156eb9d9d9e6</a></p>
+<p><a href="https://stackoverflow.com/questions/67503656/echo-github-action-environment-variables">https://stackoverflow.com/questions/67503656/echo-github-action-environment-variables</a></p>
+<p>And they are different than what I have on file!</p>
+
+
+
+<a name="440531002"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531002" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531002">(May 24 2024 at 15:28)</a>:</h4>
+<p>Aha!</p>
+
+
+
+<a name="440531306"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531306" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531306">(May 24 2024 at 15:30)</a>:</h4>
+<p>That is kind of wild those</p>
+
+
+
+<a name="440531314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531314">(May 24 2024 at 15:30)</a>:</h4>
+<p>Tho</p>
+
+
+
+<a name="440531320"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531320" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531320">(May 24 2024 at 15:30)</a>:</h4>
+<p>Lol</p>
+
+
+
+<a name="440531337"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531337" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531337">(May 24 2024 at 15:30)</a>:</h4>
+<p>Reading this</p>
+
+
+
+<a name="440531339"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531339" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531339">(May 24 2024 at 15:30)</a>:</h4>
+<p>Let me try them on "hello"</p>
+
+
+
+<a name="440531414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531414">(May 24 2024 at 15:30)</a>:</h4>
+<p>‘You can't show secrets through echo otherwise there would be a huge security problem (even using env variables as an intermediary).’</p>
+
+
+
+<a name="440531529"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531529" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531529">(May 24 2024 at 15:31)</a>:</h4>
+<p>That would make me think that you wouldn’t be able but <span aria-label="stuck out tongue" class="emoji emoji-1f61b" role="img" title="stuck out tongue">:stuck_out_tongue:</span></p>
+
+
+
+<a name="440531610"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531610" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531610">(May 24 2024 at 15:31)</a>:</h4>
+<p>wait, wait, didn't I already try them, by getting them at the org (gdcc) level? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440531645"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531645" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531645">(May 24 2024 at 15:31)</a>:</h4>
+<p>I'll try them locally first, from settings.xml</p>
+
+
+
+<a name="440531980"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440531980" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440531980">(May 24 2024 at 15:33)</a>:</h4>
+<p><a href="/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg">strands.jpg</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg" title="strands.jpg"><img src="/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg"></a></div>
+
+
+
+<a name="440532414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440532414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440532414">(May 24 2024 at 15:35)</a>:</h4>
+<p>The gddc org creds work from my laptop.</p>
+
+
+
+<a name="440533088"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440533088" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440533088">(May 24 2024 at 15:40)</a>:</h4>
+<p>Nice, for the "hello" app, I switched to the gddc org creds (gpg too, while I was in there) and they work, published: <a href="https://github.com/gdcc/hello/actions/runs/9226506854/job/25386421143">https://github.com/gdcc/hello/actions/runs/9226506854/job/25386421143</a></p>
+
+
+
+<a name="440533130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440533130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440533130">(May 24 2024 at 15:41)</a>:</h4>
+<p>So between the wrong dataversebot creds and the cache thing I really didn't stand a chance.</p>
+
+
+
+<a name="440568280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440568280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440568280">(May 24 2024 at 19:47)</a>:</h4>
+<p>For the UNF repo, I simply updated DATAVERSEBOT_SONATYPE_USERNAME and DATAVERSEBOT_SONATYPE_TOKEN and now it works. Phew. I was about to mess with the cache setting. Not sure why I didn't have to. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="440569723"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440569723" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440569723">(May 24 2024 at 20:00)</a>:</h4>
+<p>Changing <code>path: ~/.m2</code> to <code>path: ~/.m2/repository</code> was enough to get exporters-croissant to upload a snapshot from GitHub Actions: <a href="https://github.com/gdcc/exporter-croissant/commit/de84d164beb51fd85aeb2be4a39633065f29d9f7">https://github.com/gdcc/exporter-croissant/commit/de84d164beb51fd85aeb2be4a39633065f29d9f7</a></p>
+
+
+
+<a name="440570679"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440570679" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440570679">(May 24 2024 at 20:08)</a>:</h4>
+<p>I just left a comment here: <a href="https://github.com/actions/cache/issues/1195#issuecomment-2130284022">https://github.com/actions/cache/issues/1195#issuecomment-2130284022</a></p>
+
+
+
+<a name="440570887"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440570887" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440570887">(May 24 2024 at 20:09)</a>:</h4>
+<p>I don't have any more red. All green for pushes I've tried at least:<br>
+<a href="/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png">green.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png" title="green.png"><img src="/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png"></a></div>
+
+
+
+<a name="440570982"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/publishing%20to%20Maven%20Central/near/440570982" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/publishing.20to.20Maven.20Central.html#440570982">(May 24 2024 at 20:10)</a>:</h4>
+<p><span aria-label="walking" class="emoji emoji-1f6b6" role="img" title="walking">:walking:</span><span aria-label="evergreen tree" class="emoji emoji-1f332" role="img" title="evergreen tree">:evergreen_tree:</span><span aria-label="evergreen tree" class="emoji emoji-1f332" role="img" title="evergreen tree">:evergreen_tree:</span><span aria-label="evergreen tree" class="emoji emoji-1f332" role="img" title="evergreen tree">:evergreen_tree:</span><span aria-label="evergreen tree" class="emoji emoji-1f332" role="img" title="evergreen tree">:evergreen_tree:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

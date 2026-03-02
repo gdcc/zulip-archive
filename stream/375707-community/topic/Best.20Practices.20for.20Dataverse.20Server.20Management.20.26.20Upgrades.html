@@ -1,0 +1,155 @@
+<html>
+<head><meta charset="utf-8"><title>Best Practices for Dataverse Server Management &amp; Upgrades · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html">Best Practices for Dataverse Server Management &amp; Upgrades</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="530422856"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530422856" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Amandha Wingert Barok <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530422856">(Jul 23 2025 at 19:58)</a>:</h4>
+<p>Hi everyone!</p>
+<p>I’m Amandha, a software engineer at FIU working on a research project called EnviStor. One of our goals is to publish datasets via Dataverse, and I’ve recently become responsible for managing our Dataverse server.</p>
+<p>I’ve been learning a lot on the fly — working with an existing Payara setup, reading the documentation, and trying to understand upgrade procedures, configuration files, etc. While I’m making progress, I don’t yet feel confident handling the server on my own and would really appreciate any guidance or tips from those with more experience.</p>
+<p>Are there any good resources (guides, checklists, best practices, etc.) focused more on the <em>system administration/configuration side</em> of Dataverse? I saw there are some training resources for end users, but nothing focused on managing Payara, deployment processes, or troubleshooting in production environments.</p>
+<p>Also, if anyone here has experience upgrading Dataverse between versions (we’re going from 6.0 to 6.7), I’d love to hear how you handled it, especially any lessons learned or things to watch out for.</p>
+<p>Thanks in advance! I’m excited to learn and contribute as I go. <span aria-label="blush" class="emoji emoji-1f60a" role="img" title="blush">:blush:</span></p>
+
+
+
+<a name="530424082"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530424082" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530424082">(Jul 23 2025 at 20:04)</a>:</h4>
+<p>Welcome! Do you have some sort of staging server to experiment on? If not, I'd suggest running Dataverse on your laptop (or a server) using Docker. <a href="https://guides.dataverse.org/en/6.7/container/running/demo.html#quickstart">https://guides.dataverse.org/en/6.7/container/running/demo.html#quickstart</a> is the place to start but because of a little issue (<a href="https://github.com/IQSS/dataverse/issues/11661">#11661</a>) we're fixing, there's currently an extra step, changing "latest" to "6.7-noble" like this:</p>
+<div class="codehilite"><pre><span></span><code>% diff compose.yml.orig compose.yml
+8c8
+&lt;     image: gdcc/dataverse:latest
+---
+&gt;     image: gdcc/dataverse:6.7-noble
+</code></pre></div>
+<p>This would allow you to experiment with Dataverse configuration and get familiar with running Dataverse in a throwaway environment.</p>
+
+
+
+<a name="530425542"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530425542" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Amandha Wingert Barok <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530425542">(Jul 23 2025 at 20:13)</a>:</h4>
+<p>Yes! We do have a dev server (<code>dataversedev.fiu.edu</code>) where I’ve been testing things like version upgrades and web styling before touching production.</p>
+
+
+
+<a name="530425773"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530425773" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530425773">(Jul 23 2025 at 20:15)</a>:</h4>
+<p>Ah, that's great.</p>
+
+
+
+<a name="530425984"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530425984" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530425984">(Jul 23 2025 at 20:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="651907">@Don Richards</span> for upgrading, do you think <span class="user-mention" data-user-id="940523">@Amandha Wingert Barok</span> should try the scripts you added in <a href="https://github.com/gdcc/dataverse-recipes/pull/14">https://github.com/gdcc/dataverse-recipes/pull/14</a> ? (I know you're adding more in <a href="https://github.com/gdcc/dataverse-recipes/pull/25">https://github.com/gdcc/dataverse-recipes/pull/25</a> )</p>
+
+
+
+<a name="530426387"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530426387" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530426387">(Jul 23 2025 at 20:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="940523">@Amandha Wingert Barok</span> there's a somewhat recent thread about upgrading at <a href="https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ">https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ</a> you might want to look through.</p>
+
+
+
+<a name="530426429"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530426429" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530426429">(Jul 23 2025 at 20:19)</a>:</h4>
+<p>Generally speaking, upgrading is a pain in the butt, I'm afraid. <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="530426586"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530426586" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530426586">(Jul 23 2025 at 20:20)</a>:</h4>
+<p>As we say at <a href="https://guides.dataverse.org/en/6.7/installation/upgrading.html">https://guides.dataverse.org/en/6.7/installation/upgrading.html</a> the official way to upgrade is to step through each and every release.</p>
+<p>But that said, we have a clever community that has come up with some unsupported shortcuts. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> </p>
+<p>/me looks at <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span></p>
+
+
+
+<a name="530426652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530426652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530426652">(Jul 23 2025 at 20:21)</a>:</h4>
+<p>It might come down to your tolerance for risk, I guess. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="530427152"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530427152" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530427152">(Jul 23 2025 at 20:24)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades/near/530426387">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="940523">Amandha Wingert Barok</span> there's a somewhat recent thread about upgrading at <a href="https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ">https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ</a> you might want to look through.</p>
+</blockquote>
+<p>Shoot, I'm realizing that no one replied to that last message by <span class="user-mention" data-user-id="737390">@Bethany Seeger</span>. <img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"> How's the upgrade going, Bethany? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="530427556"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530427556" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530427556">(Jul 23 2025 at 20:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="940523">@Amandha Wingert Barok</span> in terms of deployment process, we assume that you (or your predecessor) have installed Dataverse at some point by following the Installation Guide. Then, for deploying new releases, you should look to the release notes for the next version. Since you're on 6.0 you'd look for "upgrade instructions" in the release notes for the next version, which is 6.1: <a href="https://github.com/IQSS/dataverse/releases/tag/v6.1">https://github.com/IQSS/dataverse/releases/tag/v6.1</a></p>
+
+
+
+<a name="530428663"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530428663" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530428663">(Jul 23 2025 at 20:35)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> we have a dev server that our devops engineer was able to use <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span>'s scripts to upgrade from 5.14 to 6.6.  We are still testing out the upgraded system. Looks very promising!</p>
+
+
+
+<a name="530431150"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530431150" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530431150">(Jul 23 2025 at 20:53)</a>:</h4>
+<p>orly</p>
+
+
+
+<a name="530570673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530570673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Amandha Wingert Barok <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530570673">(Jul 24 2025 at 13:59)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades/near/530427556">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="940523">Amandha Wingert Barok</span> in terms of deployment process, we assume that you (or your predecessor) have installed Dataverse at some point by following the Installation Guide. Then, for deploying new releases, you should look to the release notes for the next version. Since you're on 6.0 you'd look for "upgrade instructions" in the release notes for the next version, which is 6.1: <a href="https://github.com/IQSS/dataverse/releases/tag/v6.1">https://github.com/IQSS/dataverse/releases/tag/v6.1</a></p>
+</blockquote>
+<p>Thank you for the tips! Should I update version per version? For example, 6.0 to 6.1, then 6.1 to 6.2 and so on instead of jumping from 6.0 to 6.7?</p>
+
+
+
+<a name="530570941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530570941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530570941">(Jul 24 2025 at 14:00)</a>:</h4>
+<p>Yes, that's the supported way, the recommended way. It's the way we do it for Harvard Dataverse. (We always upgrade shortly after each release.)</p>
+
+
+
+<a name="530571346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530571346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Amandha Wingert Barok <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530571346">(Jul 24 2025 at 14:02)</a>:</h4>
+<p>Ok! I will make sure to be aware as soon as the release is available. Do we receive any kind of notification for each new version?</p>
+
+
+
+<a name="530571489"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530571489" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530571489">(Jul 24 2025 at 14:02)</a>:</h4>
+<p>There are announcements here, on the Google Group and you can have Github send you a notification for a new release.</p>
+
+
+
+<a name="530571844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530571844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530571844">(Jul 24 2025 at 14:04)</a>:</h4>
+<p>Plus the blog. See <a href="https://guides.dataverse.org/en/6.7/developers/making-releases.html#announce-the-release-on-the-dataverse-blog">https://guides.dataverse.org/en/6.7/developers/making-releases.html#announce-the-release-on-the-dataverse-blog</a> and the entries below for where we announce, most recently handled in <a href="https://github.com/IQSS/dataverse-pm/issues/379">https://github.com/IQSS/dataverse-pm/issues/379</a></p>
+
+
+
+<a name="530571982"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530571982" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Amandha Wingert Barok <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530571982">(Jul 24 2025 at 14:05)</a>:</h4>
+<p>Thank you, Oliver and Philip!</p>
+
+
+
+<a name="530594047"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/Best%20Practices%20for%20Dataverse%20Server%20Management%20%26%20Upgrades/near/530594047" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades.html#530594047">(Jul 24 2025 at 15:48)</a>:</h4>
+<p>I'm currently trying to polish the upgrade script for 6.6 now. And I'm starting on 6.7 ASAP since we need to update it anyways.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

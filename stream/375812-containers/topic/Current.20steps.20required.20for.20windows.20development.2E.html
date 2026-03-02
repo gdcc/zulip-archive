@@ -1,0 +1,1346 @@
+<html>
+<head><meta charset="utf-8"><title>Current steps required for windows development. · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html">Current steps required for windows development.</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="400133764"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400133764" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400133764">(Nov 03 2023 at 13:28)</a>:</h4>
+<p>I am working on submitting a PR today with the .gitattributes file to better support windows by removing the need to configure [core.autocrlf]. But after this there is a couple of steps required that are not "natural" or "normal" behavior that would be amazing if we can fix them but otherwise, we should mention the workaround on the documentation? <span class="user-mention" data-user-id="598112">@Philip Durbin</span>  </p>
+<p>As I mentioned earlier on <a href="https://github.com/IQSS/dataverse/issues/9949">#9949</a> the first time that the payara container launches (On windows) it will launch without the application deployed, this will cause the configbaker to fail since the API will not be available, so we need to add probably information about this and the following instructions:</p>
+<p>1) Restart the dataverse container (I do this from docker desktop if anyone can provide a CLI command we can include it)<br>
+2) Run the configbaker-1 container (Same as above) </p>
+<p>these 2 steps are only required on the first launch and can be avoided if we figure out why payara is missing the application deployed at the beginning, I tested this didn't happened to me on MAC.</p>
+
+
+
+<a name="400136454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400136454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400136454">(Nov 03 2023 at 13:45)</a>:</h4>
+<p>I am also thinking that we need to add a step to configure the host file to include the dataverse to 127.0.0.1</p>
+
+
+
+<a name="400140880"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400140880" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400140880">(Nov 03 2023 at 14:08)</a>:</h4>
+<p>Interesting. At a high level I think we should start with better documentation and additional commands, if necessary.</p>
+
+
+
+<a name="400140980"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400140980" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400140980">(Nov 03 2023 at 14:08)</a>:</h4>
+<p>Longer term it would be nice to figure out what the additional Payara restart is necessary, for example.</p>
+
+
+
+<a name="400143784"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400143784" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400143784">(Nov 03 2023 at 14:23)</a>:</h4>
+<p>Any details on why the war file isn't deployed? Logs or whatever?</p>
+
+
+
+<a name="400145020"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400145020" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400145020">(Nov 03 2023 at 14:30)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin</span> <a href="#narrow/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E/near/400143784">said</a>:</p>
+<blockquote>
+<p>Any details on why the war file isn't deployed? Logs or whatever?</p>
+</blockquote>
+<p>Plz note it's not a WAR file but an exploded WAR. This might make some difference.</p>
+
+
+
+<a name="400145170"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400145170" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400145170">(Nov 03 2023 at 14:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> is this reproducible in some way?</p>
+
+
+
+<a name="400147309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400147309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400147309">(Nov 03 2023 at 14:42)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E/near/400145170">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="648750">Juan Pablo Tosca Villanueva</span> is this reproducible in some way?</p>
+</blockquote>
+<p>Yes, you need to checkout the project and start the containers, the very first time Payara starts without any application running, need to manually restart the container.</p>
+
+
+
+<a name="400149052"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400149052" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400149052">(Nov 03 2023 at 14:52)</a>:</h4>
+<p><a href="/user_uploads/53090/Gr9zIPDF-_Pl3Xx-vExH0FSw/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/Gr9zIPDF-_Pl3Xx-vExH0FSw/image.png" title="image.png"><img src="/user_uploads/53090/Gr9zIPDF-_Pl3Xx-vExH0FSw/image.png"></a></div>
+
+
+
+<a name="400149260"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400149260" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400149260">(Nov 03 2023 at 14:54)</a>:</h4>
+<p>We can join in a zoom call if you both want to look, it shouldn't take more than a few minutes to checkout, compile and start the project. This issue seems to be consistent and I have tested this so far on Win 10 and Win 11</p>
+
+
+
+<a name="400149668"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400149668" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400149668">(Nov 03 2023 at 14:56)</a>:</h4>
+<p>I'd love a zoom call but I've having my own problems right now in <a class="stream-topic" data-stream-id="375812" href="/#narrow/stream/375812-containers/topic/dev_dv_initializer.3E.20chown.3A.20.2Fdv.3A.20I.2FO.20error">#containers &gt; dev_dv_initializer&gt; chown: /dv: I/O error</a></p>
+
+
+
+<a name="400151321"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400151321" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400151321">(Nov 03 2023 at 15:04)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="648750">Juan Pablo Tosca Villanueva</span> <a href="#narrow/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E/near/400149260">said</a>:</p>
+<blockquote>
+<p>We can join in a zoom call if you both want to look, it shouldn't take more than a few minutes to checkout, compile and start the project. This issue seems to be consistent and I have tested this so far on Win 10 and Win 11</p>
+</blockquote>
+<p>I have a few. <a href="https://fz-juelich-de.zoom.us/j/69596667050?pwd=STd5UE1adG1oaTFsYnFMV1RRL2NzUT09">https://fz-juelich-de.zoom.us/j/69596667050?pwd=STd5UE1adG1oaTFsYnFMV1RRL2NzUT09</a></p>
+
+
+
+<a name="400153123"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400153123" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400153123">(Nov 03 2023 at 15:14)</a>:</h4>
+<p>Postgres, why you so slow on Windows?!?</p>
+<p><a href="/user_uploads/53090/B1nyh4liH4xBpl3ANEZMzboe/Screenshot-2023-11-03-at-11.13.41-AM.png">Screenshot-2023-11-03-at-11.13.41-AM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/B1nyh4liH4xBpl3ANEZMzboe/Screenshot-2023-11-03-at-11.13.41-AM.png" title="Screenshot-2023-11-03-at-11.13.41-AM.png"><img src="/user_uploads/53090/B1nyh4liH4xBpl3ANEZMzboe/Screenshot-2023-11-03-at-11.13.41-AM.png"></a></div>
+
+
+
+<a name="400153415"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400153415" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400153415">(Nov 03 2023 at 15:15)</a>:</h4>
+<p><a href="https://stackoverflow.com/questions/65285379/docker-volume-mapping-windows-incredible-slow">https://stackoverflow.com/questions/65285379/docker-volume-mapping-windows-incredible-slow</a></p>
+
+
+
+<a name="400154113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400154113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400154113">(Nov 03 2023 at 15:19)</a>:</h4>
+<p>Let's add the fancy wait for: <a href="https://github.com/IQSS/dataverse-frontend/commit/d97f917677db3cc0a201f35af467088d2092f823">https://github.com/IQSS/dataverse-frontend/commit/d97f917677db3cc0a201f35af467088d2092f823</a></p>
+
+
+
+<a name="400154201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400154201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400154201">(Nov 03 2023 at 15:19)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>    depends_on:
+      dev_solr_initializer:
+        condition: service_completed_successfully
+</code></pre></div>
+
+
+
+<a name="400154542"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400154542" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400154542">(Nov 03 2023 at 15:21)</a>:</h4>
+<p><a href="https://github.com/compose-spec/compose-spec/blob/master/spec.md#long-syntax-1">https://github.com/compose-spec/compose-spec/blob/master/spec.md#long-syntax-1</a></p>
+
+
+
+<a name="400154950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400154950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400154950">(Nov 03 2023 at 15:23)</a>:</h4>
+<p><a href="https://github.com/peter-evans/docker-compose-healthcheck#waiting-for-postgresql-to-be-healthy">https://github.com/peter-evans/docker-compose-healthcheck#waiting-for-postgresql-to-be-healthy</a></p>
+
+
+
+<a name="400156770"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400156770" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400156770">(Nov 03 2023 at 15:32)</a>:</h4>
+<p>Just capturing this comment from Oliver: 'The alternative would be adding " wait4x tcp postgres:5432" to the dv_init container'</p>
+
+
+
+<a name="400163100"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400163100" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400163100">(Nov 03 2023 at 16:04)</a>:</h4>
+<p>Bummer - the Docker Maven Plugin does not properly support the long <code>depends_on</code> syntax (and probably also doesn't have the backing code to support the described construction). See <a href="https://github.com/fabric8io/docker-maven-plugin/issues/888">https://github.com/fabric8io/docker-maven-plugin/issues/888</a></p>
+
+
+
+<a name="400163270"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400163270" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400163270">(Nov 03 2023 at 16:04)</a>:</h4>
+<p>Plan for now is to add waiting in the init script of the app container using the base image shipped "wait-for" script.</p>
+
+
+
+<a name="400165754"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400165754" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400165754">(Nov 03 2023 at 16:17)</a>:</h4>
+<p><code>wait-for postgres:5432 -t 120</code> at the end of <code>src/main/docker/scripts/init_2_configure.sh</code> seems to work!</p>
+
+
+
+<a name="400176766"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/400176766" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#400176766">(Nov 03 2023 at 17:20)</a>:</h4>
+<p>Ok I sent the PR</p>
+
+
+
+<a name="401489745"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/401489745" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#401489745">(Nov 11 2023 at 07:47)</a>:</h4>
+<p>My PR to DMP was just merged. So at least we can use the long syntax once released.</p>
+
+
+
+<a name="401489812"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/401489812" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#401489812">(Nov 11 2023 at 07:48)</a>:</h4>
+<p>I will have to refactor more to enable adding healthchecks though, so we are not completely there yet for the Postgres problem.</p>
+
+
+
+<a name="404899055"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404899055" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404899055">(Nov 29 2023 at 15:59)</a>:</h4>
+<p>I'm still trying to find a containerize build setup for development Dataverse. Something I tried on Windows yesterday was to clone the Dataverse code, change to the dataverse directory in the code, and run <code>docker run -it --name myDvContainer -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.8.5-openjdk-17 mvn -Ddocker.skip=true -Pct clean package</code>. This built the <code>dataverse-6.0.jar</code> from the source but I had to add <code>-Ddocker.skip=true</code> to the Docker run command because I was getting errors with the fabric8 maven plugin. Anyway, this is not a good approach in my opinion. Dataverse probably needs something like the Docker configuration used by <a href="https://github.com/datahub-project/datahub/tree/master/docker">https://github.com/datahub-project/datahub/tree/master/docker</a>. I would love to help in this effort, but I know very little about the Dataverse configuration so figuring out the Docker commands is beyond my expertise.</p>
+
+
+
+<a name="404906704"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404906704" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404906704">(Nov 29 2023 at 16:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> sorry to hear you're having trouble. I appreciate that you're willing to help. Even just testing is extremely valuable!</p>
+
+
+
+<a name="404906866"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404906866" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404906866">(Nov 29 2023 at 16:39)</a>:</h4>
+<p>Just so I'm clear, you tried <code>mvn -Pct clean package docker:run</code> per <a href="https://guides.dataverse.org/en/6.0/developers/dev-environment.html#quickstart">https://guides.dataverse.org/en/6.0/developers/dev-environment.html#quickstart</a> FIRST? And when that didn't work you tried the <code>docker run</code> you posted?</p>
+
+
+
+<a name="404928959"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404928959" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404928959">(Nov 29 2023 at 18:40)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="670990">@kuhlaid</span> ! I run Dataverse on Windows (10 &amp; 11) and the command that <span class="user-mention" data-user-id="598112">@Philip Durbin</span> provided should complile the project, create the images and start the containers. If you have any issues please let us know. :)</p>
+
+
+
+<a name="404930171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404930171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404930171">(Nov 29 2023 at 18:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> we (JP and I) just read your comment at <a href="https://github.com/IQSS/dataverse/issues/10148#issuecomment-1832202521">https://github.com/IQSS/dataverse/issues/10148#issuecomment-1832202521</a> and I think we understand what you're trying to do. You don't want to install Java or Maven locally, so you're trying to run Maven from inside the container. Hmm. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="404930528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404930528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404930528">(Nov 29 2023 at 18:51)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> you could try this <code>docker compose -f docker-compose-dev.yml up</code></p>
+
+
+
+<a name="404930542"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404930542" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404930542">(Nov 29 2023 at 18:51)</a>:</h4>
+<p>That's from <a href="https://guides.dataverse.org/en/6.0/container/dev-usage.html#running">https://guides.dataverse.org/en/6.0/container/dev-usage.html#running</a></p>
+
+
+
+<a name="404944973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404944973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404944973">(Nov 29 2023 at 20:32)</a>:</h4>
+<p>Thank you <span class="user-mention" data-user-id="598112">@Philip Durbin</span> , but when I run the compose command I receive: <code>Error response from daemon: error creating temporary lease: write /var/lib/desktop-containerd/daemon/io.containerd.metadata.v1.bolt/meta.db: read-only file system: unknown</code>.</p>
+
+
+
+<a name="404945029"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404945029" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404945029">(Nov 29 2023 at 20:32)</a>:</h4>
+<p>Whoa! Weird.</p>
+
+
+
+<a name="404945162"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404945162" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404945162">(Nov 29 2023 at 20:33)</a>:</h4>
+<p>A suggestion to clear space from Docker and restart it: <a href="https://stackoverflow.com/a/70071216/19464">https://stackoverflow.com/a/70071216/19464</a></p>
+
+
+
+<a name="404946034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404946034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404946034">(Nov 29 2023 at 20:40)</a>:</h4>
+<p>Yep, needed to clear my Docker space. This looks promising. Building in progress.</p>
+
+
+
+<a name="404947352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404947352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404947352">(Nov 29 2023 at 20:49)</a>:</h4>
+<p>It seems like the hangup now is <code>initdb: error: could not change permissions of directory "/var/lib/postgresql/data": Operation not permitted</code> on the Docker compose.</p>
+
+
+
+<a name="404947622"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404947622" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404947622">(Nov 29 2023 at 20:51)</a>:</h4>
+<p>The postgres container keeps restarting because it is unable to change permissions on the directory.</p>
+
+
+
+<a name="404947886"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404947886" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404947886">(Nov 29 2023 at 20:53)</a>:</h4>
+<p><span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> do you think this could be related to what you said in your initial post on this topic, that on Windows you have to stop and start the Dataverse container?</p>
+
+
+
+<a name="404948506"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404948506" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404948506">(Nov 29 2023 at 20:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> in between runs you might want to delete the docker-dev-volumes directory. Until we get this working. That's where the data is stored.</p>
+
+
+
+<a name="404950731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404950731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404950731">(Nov 29 2023 at 21:11)</a>:</h4>
+<p>I don't think this is related, I have never seen this exact same error but I had issues with all the tests that require the volumes but still need to do some research on that.</p>
+
+
+
+<a name="404969564"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404969564" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404969564">(Nov 29 2023 at 23:42)</a>:</h4>
+<p>I just made a test deleting al my containers and images, downloading the project from zero and not running java/maven. It worked on my machine ( <span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span> ).  I would probably just start from zero and deleting everything and do the following: </p>
+<ol>
+<li>Check docker is running</li>
+<li>Git clone <a href="https://github.com/IQSS/dataverse.git">https://github.com/IQSS/dataverse.git</a></li>
+<li>cd dataverse</li>
+<li>docker compose -f docker-compose-dev.yml up</li>
+<li>Wait until the last message is :  "Done, your instance has been configured for development. Have a nice day!"</li>
+<li>On your browser go to localhost:8080</li>
+</ol>
+
+
+
+<a name="404969606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404969606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404969606">(Nov 29 2023 at 23:42)</a>:</h4>
+<p><a href="/user_uploads/53090/2Fl-_QOcZISwahw9ZMCVDMPl/dataversewin.gif">dataversewin.gif</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/2Fl-_QOcZISwahw9ZMCVDMPl/dataversewin.gif" title="dataversewin.gif"><img src="/user_uploads/53090/2Fl-_QOcZISwahw9ZMCVDMPl/dataversewin.gif"></a></div>
+
+
+
+<a name="404969667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404969667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404969667">(Nov 29 2023 at 23:43)</a>:</h4>
+<p>I posted this GIF showing the process on my machine if it is helpful by any means.</p>
+
+
+
+<a name="404981034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404981034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> kuhlaid <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404981034">(Nov 30 2023 at 01:05)</a>:</h4>
+<p>Back to the <code>docker compose -f docker-compose-dev.yml up</code>, I changed the volume on postgres to be <code>- ./init.sql:/docker-entrypoint-initdb.d/init.sql</code> and created an <code>init.sql</code> file at the root directory (just for testing) with the contents of <code>CREATE USER docker;
+CREATE DATABASE docker;
+GRANT ALL PRIVILEGES ON DATABASE docker TO docker;</code>. After making this change I was able to compose Docker and get output from <code>http://localhost:8080/api/info/version</code>. :)</p>
+
+
+
+<a name="404998117"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/404998117" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#404998117">(Nov 30 2023 at 02:50)</a>:</h4>
+<p>Sorry, I edited my steps. 4 is docker compose -f docker-compose-dev.yml up</p>
+
+
+
+<a name="405005945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/405005945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#405005945">(Nov 30 2023 at 03:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> if you want to talk more tomorrow, we're having a meeting: <a class="stream-topic" data-stream-id="375812" href="/#narrow/stream/375812-containers/topic/weekly.20meeting">#containers &gt; weekly meeting</a></p>
+
+
+
+<a name="406787122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/406787122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#406787122">(Dec 08 2023 at 15:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="670990">@kuhlaid</span> I just left this comment: <a href="https://github.com/IQSS/dataverse/issues/10160#issuecomment-1847436497">https://github.com/IQSS/dataverse/issues/10160#issuecomment-1847436497</a></p>
+<p>Can you please take a look?</p>
+<p>I'm trying to figure out if I should delete the draft issue we created or not. Thanks!</p>
+
+
+
+<a name="407900516"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/407900516" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#407900516">(Dec 14 2023 at 07:39)</a>:</h4>
+<p>I also left a comment about how Dataverse work WRT table init and why you should not let the database write into overlayfs</p>
+
+
+
+<a name="439091625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439091625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439091625">(May 16 2024 at 19:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> any new info on running Dataverse in Docker on Windows?</p>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> just asked about it: <a href="https://groups.google.com/g/dataverse-community/c/ZDKWf2p42vs/m/iElIWg67AwAJ">https://groups.google.com/g/dataverse-community/c/ZDKWf2p42vs/m/iElIWg67AwAJ</a></p>
+
+
+
+<a name="439095273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439095273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439095273">(May 16 2024 at 20:24)</a>:</h4>
+<p>I haven't used it in a long time but I can confirm this is in effect happening <span aria-label="sad" class="emoji emoji-2639" role="img" title="sad">:sad:</span></p>
+
+
+
+<a name="439095279"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439095279" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439095279">(May 16 2024 at 20:24)</a>:</h4>
+<p><img alt=":sad-docker:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/49981.png" title="sad-docker"></p>
+
+
+
+<a name="439096548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439096548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439096548">(May 16 2024 at 20:33)</a>:</h4>
+<p>Ha, is <img alt=":sad-docker:" class="emoji" src="https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/49981.png" title="sad-docker"> a custom emoji? <span aria-label="crazy" class="emoji emoji-1f61c" role="img" title="crazy">:crazy:</span></p>
+
+
+
+<a name="439096734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439096734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439096734">(May 16 2024 at 20:34)</a>:</h4>
+<p>I don't remember lol</p>
+
+
+
+<a name="439096808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439096808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439096808">(May 16 2024 at 20:35)</a>:</h4>
+<p>I just typed :sa and :sad-docker showed up lol</p>
+
+
+
+<a name="439096986"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439096986" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439096986">(May 16 2024 at 20:36)</a>:</h4>
+<p>I feel a bit helpless when in comes to Windows since I don't have a Windows box.</p>
+
+
+
+<a name="439097057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439097057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439097057">(May 16 2024 at 20:36)</a>:</h4>
+<p>So when you say this is happening, you mean "it seems like war file is not deploying properly"?</p>
+
+
+
+<a name="439097941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439097941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439097941">(May 16 2024 at 20:42)</a>:</h4>
+<p>I am running a new test deleting all my old images and volumes</p>
+
+
+
+<a name="439097954"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439097954" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439097954">(May 16 2024 at 20:43)</a>:</h4>
+<p>I will report soon</p>
+
+
+
+<a name="439099204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099204">(May 16 2024 at 20:50)</a>:</h4>
+<p><a href="/user_uploads/53090/k_OblNiF1j2AL1as7VAKWS2r/windows-dv.log">windows-dv.log</a></p>
+
+
+
+<a name="439099287"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099287" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099287">(May 16 2024 at 20:51)</a>:</h4>
+<p>PER01000: Got SQLException executing statement "ALTER TABLE fileaccessrequests ADD CONSTRAINT FK_fileaccessrequests_DATAFILE_ID FOREIGN KEY (DATAFILE_ID) REFERENCES DVOBJECT (ID)": org.postgresql.util.PSQLException: ERROR: constraint "fk_fileaccessrequests_datafile_id" for relation "fileaccessrequests" already exists|#]</p>
+
+
+
+<a name="439099596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099596">(May 16 2024 at 20:53)</a>:</h4>
+<p>I'm confused. Your log doesn't have any SQL errors.</p>
+
+
+
+<a name="439099761"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099761" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099761">(May 16 2024 at 20:55)</a>:</h4>
+<p>What's going on here? <code>2024-05-16 16:46:02 /opt/payara/scripts/entrypoint.sh: line 15: /opt/payara/config/pre-boot-commands.asadmin: No such file or directory</code> <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="439099859"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099859" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099859">(May 16 2024 at 20:55)</a>:</h4>
+<p><a href="/user_uploads/53090/BnLWPZtEzQ9IH5xWBJr6S6CV/windows-dv.log">windows-dv.log</a></p>
+
+
+
+<a name="439099911"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439099911" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439099911">(May 16 2024 at 20:56)</a>:</h4>
+<p>Sorry, it was incomplete</p>
+
+
+
+<a name="439100080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100080">(May 16 2024 at 20:57)</a>:</h4>
+<p>Wasn't this what we fixed with the gitproperties? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="439100155"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100155" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100155">(May 16 2024 at 20:57)</a>:</h4>
+<p>mmm I have to check a bit more what is going on lol but def is an issue now</p>
+
+
+
+<a name="439100246"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100246" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100246">(May 16 2024 at 20:58)</a>:</h4>
+<p>And with <code>wait-for</code>, I thought. I'm looking again at <a href="https://github.com/IQSS/dataverse/pull/10094">https://github.com/IQSS/dataverse/pull/10094</a></p>
+
+
+
+<a name="439100670"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100670" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100670">(May 16 2024 at 21:01)</a>:</h4>
+<p><span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span>  I guess what I'm wondering is if you and <span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> are having the same problem. No offense, but we should fix her problem first. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="439100860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100860">(May 16 2024 at 21:02)</a>:</h4>
+<p>Prio over Rocky?</p>
+
+
+
+<a name="439100943"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439100943" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439100943">(May 16 2024 at 21:02)</a>:</h4>
+<div class="message_inline_image"><a href="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmk1NDAwaTFhbGhldGVnc2l4d204ZXB2N21nMTF1NTBwZzM5djJ1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/koPSBhdvbCD4c/giphy.gif"><img src="https://uploads.zulipusercontent.net/94bff07a1e447bf755cc51e6f70cc3c84d49f311/68747470733a2f2f6d65646961342e67697068792e636f6d2f6d656469612f76312e59326c6b505463354d4749334e6a4578626d6b314e444177615446686247686c6447566e63326c34643230345a5842324e32316e4d5446314e5442775a7a4d35646a4a314f535a6c634431324d563970626e526c636d35686246396e61575a66596e6c666157516d593351395a772f6b6f50534268647662434434632f67697068792e676966"></a></div>
+
+
+
+<a name="439101378"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101378" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101378">(May 16 2024 at 21:05)</a>:</h4>
+<p>So</p>
+
+
+
+<a name="439101387"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101387" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101387">(May 16 2024 at 21:06)</a>:</h4>
+<p>It is WILD</p>
+
+
+
+<a name="439101515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101515">(May 16 2024 at 21:06)</a>:</h4>
+<p>I started at 2024-05-16 16:46:02 and it didn't finished launching until 2024-05-16 17:05:47</p>
+
+
+
+<a name="439101736"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101736" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101736">(May 16 2024 at 21:08)</a>:</h4>
+<p>The application is deployed and itt says running but can't reach it</p>
+
+
+
+<a name="439101749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101749">(May 16 2024 at 21:08)</a>:</h4>
+<p>neither the API</p>
+
+
+
+<a name="439101815"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439101815" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439101815">(May 16 2024 at 21:09)</a>:</h4>
+<p><a href="/user_uploads/53090/x0gu8674IAvJ1JixbyPFPnYc/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/x0gu8674IAvJ1JixbyPFPnYc/image.png" title="image.png"><img src="/user_uploads/53090/x0gu8674IAvJ1JixbyPFPnYc/image.png"></a></div>
+
+
+
+<a name="439132686"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439132686" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439132686">(May 17 2024 at 02:08)</a>:</h4>
+<p>Why is Windows so hard? <span aria-label="sob" class="emoji emoji-1f62d" role="img" title="sob">:sob:</span></p>
+
+
+
+<a name="439134116"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439134116" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439134116">(May 17 2024 at 02:25)</a>:</h4>
+<p><span aria-label="upside down" class="emoji emoji-1f643" role="img" title="upside down">:upside_down:</span></p>
+
+
+
+<a name="439231033"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439231033" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439231033">(May 17 2024 at 14:07)</a>:</h4>
+<p>So looking at the full log, here are some of the things that caught my eye: </p>
+<div class="codehilite"><pre><span></span><code>|SEVERE|
+ ERROR StatusLogger Log4j2 could not find a logging implementation. Please add log4j-core to the classpath. Using SimpleLogger to log to the console.
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>|INFO|
+ No deployment transformer implementation found.
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>|WARNING|
+expected resource not found: /META-INF/javamail.default.address.map
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>|INFO|
+PER01003: Deployment encountered SQL Exceptions:
+PER01000: Got SQLException executing statement &quot;ALTER TABLE fileaccessrequests ADD CONSTRAINT FK_fileaccessrequests_DATAFILE_ID FOREIGN KEY (DATAFILE_ID) REFERENCES DVOBJECT (ID)&quot;: org.postgresql.util.PSQLException: ERROR: constraint &quot;fk_fileaccessrequests_datafile_id&quot; for relation &quot;fileaccessrequests&quot; already exists
+</code></pre></div>
+
+
+
+<a name="439232502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439232502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439232502">(May 17 2024 at 14:15)</a>:</h4>
+<p>The "launch" (if you can call that a launch <span aria-label="laughing" class="emoji emoji-1f606" role="img" title="laughing">:laughing:</span> ) takes about 10 minutes and because of that the race condition fails... now it seems that the application deploys and it is working per Payara info but it is EXTREMELY slow:</p>
+
+
+
+<a name="439232612"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439232612" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439232612">(May 17 2024 at 14:16)</a>:</h4>
+<p><a href="/user_uploads/53090/F3Kd2Ka4kF6rDBZC0cO5LsQh/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/F3Kd2Ka4kF6rDBZC0cO5LsQh/image.png" title="image.png"><img src="/user_uploads/53090/F3Kd2Ka4kF6rDBZC0cO5LsQh/image.png"></a></div>
+
+
+
+<a name="439232756"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439232756" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439232756">(May 17 2024 at 14:17)</a>:</h4>
+<p>I been several minutes calling "<a href="http://localhost:8080/">http://localhost:8080/</a>" and the browser keeps loading lol but it won't show anything. It also took me like 5 minutes to get to payara console.</p>
+
+
+
+<a name="439234768"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439234768" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439234768">(May 17 2024 at 14:28)</a>:</h4>
+<p>Ok so another update, I tried building the war and deploying it manually and it booms!</p>
+
+
+
+<a name="439234991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439234991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439234991">(May 17 2024 at 14:29)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>- Error in annotation processing: {0}.
+2024-05-17 10:27:27 java.lang.NoClassDefFoundError: org/swordapp/server/CollectionListManager
+</code></pre></div>
+
+
+
+<a name="439235445"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439235445" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439235445">(May 17 2024 at 14:31)</a>:</h4>
+<p><a href="/user_uploads/53090/7XFjd70m2DS2llMUY41nYC88/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/7XFjd70m2DS2llMUY41nYC88/image.png" title="image.png"><img src="/user_uploads/53090/7XFjd70m2DS2llMUY41nYC88/image.png"></a></div>
+
+
+
+<a name="439241562"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439241562" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439241562">(May 17 2024 at 15:03)</a>:</h4>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> where are you? Are you having same troubles?</p>
+
+
+
+<a name="439245137"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439245137" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439245137">(May 17 2024 at 15:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> Yes, I think I have similar issues. I tried docker dataverse on another windows machine and it was so extremely slow, it was much more than 5 min, so I shut it off. On my other machine it was a bit faster but I do not get to dataverse app <a href="http://localhost:8080">http://localhost:8080</a>, only  Payara Service page loads.</p>
+
+
+
+<a name="439245480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439245480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439245480">(May 17 2024 at 15:23)</a>:</h4>
+<p>Thanks for joining! I wish I could help but without a Windows box I'm not sure what to do.</p>
+
+
+
+<a name="439247969"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439247969" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439247969">(May 17 2024 at 15:35)</a>:</h4>
+<p>My windows machine is very powerful so it shouldn't be having issues... there is something wrong definitely but I just can't think of what platform specific differences that could be causing this... I am going back to rocky but I will try to give this a look later <span aria-label="upside down" class="emoji emoji-1f643" role="img" title="upside down">:upside_down:</span></p>
+
+
+
+<a name="439248826"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248826" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248826">(May 17 2024 at 15:40)</a>:</h4>
+<p>Oh, now I understand the Rocky gif.</p>
+
+
+
+<a name="439248888"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248888" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248888">(May 17 2024 at 15:41)</a>:</h4>
+<p>You're working on <a href="https://github.com/IQSS/dataverse/issues/10312">#10312</a>. I get it.</p>
+
+
+
+<a name="439248906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248906">(May 17 2024 at 15:41)</a>:</h4>
+<p>Do you know why my branch is Rocky IX now?</p>
+
+
+
+<a name="439248955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248955">(May 17 2024 at 15:41)</a>:</h4>
+<p><span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span></p>
+
+
+
+<a name="439248958"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248958" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248958">(May 17 2024 at 15:41)</a>:</h4>
+<p>Let's move this to a rocky thread <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="439248975"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439248975" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439248975">(May 17 2024 at 15:41)</a>:</h4>
+<p>Nooooo</p>
+
+
+
+<a name="439249015"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439249015" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439249015">(May 17 2024 at 15:41)</a>:</h4>
+<p>I am out, I will post with more windows updates <span aria-label="rolling on the floor laughing" class="emoji emoji-1f923" role="img" title="rolling on the floor laughing">:rolling_on_the_floor_laughing:</span></p>
+
+
+
+<a name="439251676"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439251676" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439251676">(May 17 2024 at 15:58)</a>:</h4>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> can you please share as much of the output as you can? Why the war file is not deploying, for example.</p>
+
+
+
+<a name="439258057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439258057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439258057">(May 17 2024 at 16:39)</a>:</h4>
+<p>It seems payara ha sproblem starting. I noticed if I get into localhost:4848 then it stuck into "The Admin console is starting. Please wait"</p>
+
+
+
+<a name="439259248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439259248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439259248">(May 17 2024 at 16:48)</a>:</h4>
+<p><a href="/user_uploads/53090/4T9DadMl1PV3E_hNMzcXFR2z/dataverse_docker_win.log">dataverse_docker_win.log</a> i attach the full log</p>
+
+
+
+<a name="439259644"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439259644" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439259644">(May 17 2024 at 16:51)</a>:</h4>
+<p>Ok, I finally got to payara console. What should be username and password for Administration console?</p>
+
+
+
+<a name="439260134"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439260134" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439260134">(May 17 2024 at 16:55)</a>:</h4>
+<p>localhost:8080 looks like in permanent process of loading, just circle.</p>
+
+
+
+<a name="439261245"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439261245" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439261245">(May 17 2024 at 17:04)</a>:</h4>
+<p><a href="/user_uploads/53090/4kmi_XP-ja5JfRsEKOefbxSy/docker_win_more_errors.log">docker_win_more_errors.log</a><br>
+Now I got " jakarta.ejb.EJBException: getSingleResult() did not retrieve any entities."</p>
+
+
+
+<a name="439263667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439263667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439263667">(May 17 2024 at 17:21)</a>:</h4>
+<p>username: admin<br>
+password: admin<br>
+should work for <a href="http://localhost:4848">http://localhost:4848</a></p>
+
+
+
+<a name="439264211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264211">(May 17 2024 at 17:25)</a>:</h4>
+<p>Thanks, dataverse is in the list of deployed applications<br>
+Finaly, I get "Page not found" <br>
+<a href="/user_uploads/53090/jRwDWKoRhoSQ3dW46pVLaGS9/Screenshot-2024-05-17-132358.png">Screenshot-2024-05-17-132358.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/jRwDWKoRhoSQ3dW46pVLaGS9/Screenshot-2024-05-17-132358.png" title="Screenshot-2024-05-17-132358.png"><img src="/user_uploads/53090/jRwDWKoRhoSQ3dW46pVLaGS9/Screenshot-2024-05-17-132358.png"></a></div>
+
+
+
+<a name="439264296"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264296" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264296">(May 17 2024 at 17:26)</a>:</h4>
+<p>Ok, I assume <a href="http://localhost:8080/api/info/version">http://localhost:8080/api/info/version</a> is working.</p>
+
+
+
+<a name="439264335"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264335" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264335">(May 17 2024 at 17:26)</a>:</h4>
+<p>Is <a href="http://localhost:8080/api/metadatablocks/citation">http://localhost:8080/api/metadatablocks/citation</a> working?</p>
+
+
+
+<a name="439264367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264367">(May 17 2024 at 17:26)</a>:</h4>
+<p>It is all extremely slow.</p>
+
+
+
+<a name="439264443"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264443" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264443">(May 17 2024 at 17:27)</a>:</h4>
+<p>It is still loading</p>
+
+
+
+<a name="439264548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264548">(May 17 2024 at 17:28)</a>:</h4>
+<p>wow</p>
+
+
+
+<a name="439264677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264677">(May 17 2024 at 17:29)</a>:</h4>
+<p>And my machine is not that bad, i have 32 G</p>
+
+
+
+<a name="439264752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264752">(May 17 2024 at 17:30)</a>:</h4>
+<p>Something is terribly wrong <span aria-label="scream" class="emoji emoji-1f631" role="img" title="scream">:scream:</span></p>
+
+
+
+<a name="439264830"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439264830" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439264830">(May 17 2024 at 17:30)</a>:</h4>
+<p>In your logs I don't see "deployed" like I expect. I should go check what I see.</p>
+
+
+
+<a name="439265412"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439265412" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439265412">(May 17 2024 at 17:34)</a>:</h4>
+<p>At 10:07 I posted results and logs from similar testing, same results. I also tried to make a war and deploy it and this was the error</p>
+
+
+
+<a name="439265431"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439265431" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439265431">(May 17 2024 at 17:34)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="648750">Juan Pablo Tosca Villanueva</span> <a href="#narrow/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E/near/439235445">said</a>:</p>
+<blockquote>
+<p><a href="/user_uploads/53090/7XFjd70m2DS2llMUY41nYC88/image.png">image.png</a></p>
+</blockquote>
+
+
+
+<a name="439265630"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439265630" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439265630">(May 17 2024 at 17:36)</a>:</h4>
+<p>Finally I got version {"status":"OK","data":{"version":"6.2","build":null}}</p>
+
+
+
+<a name="439265699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439265699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439265699">(May 17 2024 at 17:36)</a>:</h4>
+<p>But for citation {"status":"ERROR","message":"Can't find metadata block 'citation'"}</p>
+
+
+
+<a name="439266005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266005">(May 17 2024 at 17:38)</a>:</h4>
+<p>I'm not surprised "citation" isn't there. "info/version" is available as long as the war is deployed. But the setup scripts probably didn't run.</p>
+
+
+
+<a name="439266051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266051">(May 17 2024 at 17:39)</a>:</h4>
+<p>configbaker never runs</p>
+
+
+
+<a name="439266062"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266062" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266062">(May 17 2024 at 17:39)</a>:</h4>
+<p>Here's what you should see:  <a href="/user_uploads/53090/f825Lr9YI0ggo495jnVqlU9N/success.txt">success.txt</a></p>
+
+
+
+<a name="439266103"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266103" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266103">(May 17 2024 at 17:39)</a>:</h4>
+<p>If you use dockerdesktop probably could try to start the container</p>
+
+
+
+<a name="439266569"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266569" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266569">(May 17 2024 at 17:42)</a>:</h4>
+<p>I look for this:</p>
+<div class="codehilite"><pre><span></span><code>dev_dataverse&gt;   Loading application [dataverse] at [/]|#]
+</code></pre></div>
+<p>Followed by this:</p>
+<div class="codehilite"><pre><span></span><code>dev_bootstrap&gt; Now executing bootstrapping script at /scripts/bootstrap/dev/init.sh.
+dev_bootstrap&gt; Running base setup-all.sh (INSECURE MODE)...
+</code></pre></div>
+<p>But it sounds like ConfigBaker (dev_bootstrap) never runs?</p>
+
+
+
+<a name="439266625"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266625" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266625">(May 17 2024 at 17:43)</a>:</h4>
+<p>I have configbacker-1 and configbacker-2, It says "Excited". Should I try to run one of them?</p>
+
+
+
+<a name="439266782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266782">(May 17 2024 at 17:44)</a>:</h4>
+<p>No, bootstrap init script does not look that it started to run.</p>
+
+
+
+<a name="439266823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266823">(May 17 2024 at 17:44)</a>:</h4>
+<p>I mean, I've very quick to kill and rm all containers and start over again. But it sounds like things are slow for you.</p>
+
+
+
+<a name="439266903"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439266903" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439266903">(May 17 2024 at 17:45)</a>:</h4>
+<p>I just mean that I don't usually run configbaker separately, later. Usually, I just let it all run at once. But it might work.</p>
+
+
+
+<a name="439267098"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267098" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267098">(May 17 2024 at 17:46)</a>:</h4>
+<p>JP, I'm not sure why you're seeing that weird error on deployment. At least Victoria is able to deploy. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="439267400"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267400" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267400">(May 17 2024 at 17:48)</a>:</h4>
+<p>Extremely slow. I started configbaker-1  waiting for localhost:8080 to react.</p>
+
+
+
+<a name="439267729"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267729" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267729">(May 17 2024 at 17:51)</a>:</h4>
+<p>It seems like the slowness is the biggest problem. Maybe configbaker timed out. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="439267746"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267746" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267746">(May 17 2024 at 17:51)</a>:</h4>
+<p>Other containers run ok for you?</p>
+
+
+
+<a name="439267751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267751">(May 17 2024 at 17:51)</a>:</h4>
+<p>It seems to take 50% of memory and 70% CPU</p>
+
+
+
+<a name="439267916"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267916" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267916">(May 17 2024 at 17:52)</a>:</h4>
+<p>Yes, other containers seems to be running.</p>
+
+
+
+<a name="439267944"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439267944" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439267944">(May 17 2024 at 17:52)</a>:</h4>
+<p>Just for fun, could you please kill and rm all containers and try demo version instead? <a href="https://guides.dataverse.org/en/6.2/container/running/demo.html#quickstart">https://guides.dataverse.org/en/6.2/container/running/demo.html#quickstart</a></p>
+
+
+
+<a name="439268398"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439268398" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439268398">(May 17 2024 at 17:55)</a>:</h4>
+<p>Last time I run demo version it was ok. But I will try it again.</p>
+
+
+
+<a name="439268445"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439268445" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439268445">(May 17 2024 at 17:55)</a>:</h4>
+<p>Oh! Interesting. That's good, I guess, that the demo works.</p>
+
+
+
+<a name="439268633"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439268633" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439268633">(May 17 2024 at 17:56)</a>:</h4>
+<p>There's a lot of extra stuff developers don't need day to day in docker-compose-dev.yml: Keycloak, MinIO, LocalStack. Maybe we could remove some of that and see if it helps.</p>
+
+
+
+<a name="439269129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269129">(May 17 2024 at 17:59)</a>:</h4>
+<p>Bootstrap runs but it has a timer</p>
+
+
+
+<a name="439269149"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269149" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269149">(May 17 2024 at 17:59)</a>:</h4>
+<p>so it checks for the version api</p>
+
+
+
+<a name="439269234"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269234" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269234">(May 17 2024 at 18:00)</a>:</h4>
+<p>but as I mentioned, it takes more than 15 minutes on windows for DV to start</p>
+
+
+
+<a name="439269335"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269335" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269335">(May 17 2024 at 18:00)</a>:</h4>
+<p>who has time for that?</p>
+
+
+
+<a name="439269392"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269392" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269392">(May 17 2024 at 18:00)</a>:</h4>
+<p>The other error I posted was an additional test I made trying to do a manual deployment of the application since there are some weird things on the logs when it starts</p>
+
+
+
+<a name="439269474"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269474" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269474">(May 17 2024 at 18:01)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="648750">Juan Pablo Tosca Villanueva</span> <a href="#narrow/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E/near/439231033">said</a>:</p>
+<blockquote>
+<p>So looking at the full log, here are some of the things that caught my eye: </p>
+<div class="codehilite"><pre><span></span><code>|SEVERE|
+ ERROR StatusLogger Log4j2 could not find a logging implementation. Please add log4j-core to the classpath. Using SimpleLogger to log to the console.
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>|INFO|
+ No deployment transformer implementation found.
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code>|WARNING|
+expected resource not found: /META-INF/javamail.default.address.map
+</code></pre></div>
+<p><div class="codehilite"><pre><span></span><code>|INFO|
+PER01003: Deployment encountered SQL Exceptions:
+PER01000: Got SQLException executing statement &quot;ALTER TABLE fileaccessrequests ADD CONSTRAINT FK_fileaccessrequests_DATAFILE_ID FOREIGN KEY (DATAFILE_ID) REFERENCES DVOBJECT (ID)&quot;: org.postgresql.util.PSQLException: ERROR: constraint &quot;fk_fileaccessrequests_datafile_id&quot; for relation &quot;fileaccessrequests&quot; already exists
+</code></pre></div><br>
+</p>
+</blockquote>
+
+
+
+<a name="439269537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439269537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan Pablo Tosca Villanueva <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439269537">(May 17 2024 at 18:01)</a>:</h4>
+<p>That is what made me thing to try a manual deploy</p>
+
+
+
+<a name="439270374"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439270374" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439270374">(May 17 2024 at 18:06)</a>:</h4>
+<p>Looking at your full log, you mean, right?</p>
+
+
+
+<a name="439270918"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439270918" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439270918">(May 17 2024 at 18:11)</a>:</h4>
+<p>Demo looks much better. I was able to login. Although I see some errors in log, some solr error and also again "jakarta.ejb.EJBException: getSingleResult() did not retrieve any entities."</p>
+
+
+
+<a name="439271110"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439271110" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439271110">(May 17 2024 at 18:12)</a>:</h4>
+<p>the solr error "2024-05-17 18:08:21.247 ERROR (qtp1997702454-27) [] o.a.s.s.HttpSolrCall 500 Exception =&gt; org.apache.solr.core.SolrCoreInitializationException: SolrCore 'collection1' is not available due to init failure: Could not load conf for core collection1: Can't load schema null: Error fetching schema"</p>
+
+
+
+<a name="439271147"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439271147" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439271147">(May 17 2024 at 18:13)</a>:</h4>
+<p>But UI seems functional.</p>
+
+
+
+<a name="439271666"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439271666" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439271666">(May 17 2024 at 18:17)</a>:</h4>
+<p>Was it reasonably fast to spin up?</p>
+
+
+
+<a name="439272198"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439272198" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439272198">(May 17 2024 at 18:20)</a>:</h4>
+<p>Yes, solr definetly has some issues though. Should I be able create datasets with demo. I tried and after pressing Save dataset it turns like white screen frozen.</p>
+
+
+
+<a name="439272391"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439272391" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439272391">(May 17 2024 at 18:22)</a>:</h4>
+<p>I might be related to Solr having trouble.</p>
+
+
+
+<a name="439272414"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439272414" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439272414">(May 17 2024 at 18:22)</a>:</h4>
+<p>But could this demo env work for you? Or do you need a dev env?</p>
+
+
+
+<a name="439272964"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439272964" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439272964">(May 17 2024 at 18:26)</a>:</h4>
+<p>I need to eun develop branch, I was added to another project (Geoportal) that only runs on Windows and got new windows laptop. I still have old Ubuntu machine, but I thought If dataverse docker will work, I will be able to do occasional simple dev work on one machine instead of two :)</p>
+
+
+
+<a name="439273248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439273248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439273248">(May 17 2024 at 18:28)</a>:</h4>
+<p>Ok, sounds like we should focus on the dev env, then. Should we try removing Keycloak, etc.</p>
+
+
+
+<a name="439273506"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439273506" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439273506">(May 17 2024 at 18:30)</a>:</h4>
+<p>Ok</p>
+
+
+
+<a name="439273801"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439273801" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439273801">(May 17 2024 at 18:32)</a>:</h4>
+<p>Do you want to try? Do you need any guidance?</p>
+
+
+
+<a name="439274336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439274336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439274336">(May 17 2024 at 18:36)</a>:</h4>
+<p>You could see if this is any better: <a href="/user_uploads/53090/BMokGYI0Edd0OYngwo2NsbJ1/docker-compose-dev.yml">docker-compose-dev.yml</a></p>
+<p>I removed these:</p>
+<ul>
+<li>dev_keycloak</li>
+<li>dev_localstack</li>
+<li>dev_minio</li>
+</ul>
+
+
+
+<a name="439274367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439274367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439274367">(May 17 2024 at 18:37)</a>:</h4>
+<p>... and it seems to work fine. I'm able to log in, etc.</p>
+
+
+
+<a name="439274647"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439274647" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439274647">(May 17 2024 at 18:39)</a>:</h4>
+<p>Ok, I will try that.</p>
+
+
+
+<a name="439274693"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439274693" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439274693">(May 17 2024 at 18:39)</a>:</h4>
+<p>Great, I hope it's faster somehow. <span aria-label="shrug" class="emoji emoji-1f937" role="img" title="shrug">:shrug:</span></p>
+
+
+
+<a name="439281336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439281336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439281336">(May 17 2024 at 19:33)</a>:</h4>
+<p>So i took yours  [docker-compose-dev.yml, renamed it as compose.yml and run  $docker compose up. Does not to seem to work properly though.  It deploys, I see it in payara console admin, but localhost:8080 still shows only payara page. Or maybe I am not doing things correctly?</p>
+
+
+
+<a name="439281429"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439281429" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439281429">(May 17 2024 at 19:34)</a>:</h4>
+<p>Configbaker running though this time.</p>
+
+
+
+<a name="439281808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439281808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439281808">(May 17 2024 at 19:37)</a>:</h4>
+<p>Hmm, I don't THINK renaming the file should cause any problem.</p>
+
+
+
+<a name="439281897"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439281897" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439281897">(May 17 2024 at 19:38)</a>:</h4>
+<p>Can you please send the output again? Is it faster?</p>
+
+
+
+<a name="439283976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439283976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439283976">(May 17 2024 at 19:57)</a>:</h4>
+<p>Yes, seems to be a little bit faster, although still slow. <br>
+<a href="/user_uploads/53090/Kds-4lsUUjp5twNGxaE-pGrF/dataverse_docker_win_dev.log">dataverse_docker_win_dev.log</a></p>
+
+
+
+<a name="439284279"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439284279" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439284279">(May 17 2024 at 20:00)</a>:</h4>
+<p>The log looks pretty good.</p>
+
+
+
+<a name="439284332"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439284332" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439284332">(May 17 2024 at 20:00)</a>:</h4>
+<p>Did configbaker run?</p>
+
+
+
+<a name="439284708"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439284708" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439284708">(May 17 2024 at 20:04)</a>:</h4>
+<p>Yes</p>
+
+
+
+<a name="439284994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439284994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439284994">(May 17 2024 at 20:06)</a>:</h4>
+<p>I don't see it in the log.</p>
+
+
+
+<a name="439285014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439285014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439285014">(May 17 2024 at 20:06)</a>:</h4>
+<p>Not all the setup anyway. Creating the root collection, etc.</p>
+
+
+
+<a name="439286611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439286611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439286611">(May 17 2024 at 20:20)</a>:</h4>
+<p>After the long wait I get the same error "Page not found"</p>
+
+
+
+<a name="439286739"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439286739" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439286739">(May 17 2024 at 20:20)</a>:</h4>
+<p>Is there more output?</p>
+
+
+
+<a name="439287447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439287447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439287447">(May 17 2024 at 20:27)</a>:</h4>
+<p><a href="/user_uploads/53090/X9hoJ5VzSo013ssP3Ta-o5wJ/dataverse_docker_win_dev_more_errors.log">dataverse_docker_win_dev_more_errors.log</a></p>
+
+
+
+<a name="439288706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439288706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439288706">(May 17 2024 at 20:38)</a>:</h4>
+<p>Huh. Nothing helpful there, unfortunately. Really I want to see what configbaker logged. Can you please run <code>docker logs</code> on it?</p>
+
+
+
+<a name="439289548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439289548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439289548">(May 17 2024 at 20:45)</a>:</h4>
+<p>Configbaker I see on docker images. dataverse container has dev_smtp, dev_bootstrap (not running) , dev_postgres, dev_solr_initializer (not running), dev_dv_initializer (not running), dev_solr, dev_dataverse and dataverse-dev-proxy1</p>
+
+
+
+<a name="439289720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439289720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439289720">(May 17 2024 at 20:47)</a>:</h4>
+<p>Which of their  logs do you want to see?</p>
+
+
+
+<a name="439289934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439289934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439289934">(May 17 2024 at 20:49)</a>:</h4>
+<p>Can you please try <code>docker logs configbaker-1</code>?</p>
+
+
+
+<a name="439290268"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439290268" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439290268">(May 17 2024 at 20:52)</a>:</h4>
+<p>there is no container configbaker-1, it is in images gdcc/configbaker</p>
+
+
+
+<a name="439290501"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439290501" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439290501">(May 17 2024 at 20:54)</a>:</h4>
+<p>Can you click whatever it's called in Docker Desktop and see logs? Like this:<br>
+<a href="/user_uploads/53090/9xCZ3i3aUggxSZS52ZnbN8Ot/Screenshot-2024-05-17-at-4.53.52-PM.png">Screenshot-2024-05-17-at-4.53.52-PM.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/9xCZ3i3aUggxSZS52ZnbN8Ot/Screenshot-2024-05-17-at-4.53.52-PM.png" title="Screenshot-2024-05-17-at-4.53.52-PM.png"><img src="/user_uploads/53090/9xCZ3i3aUggxSZS52ZnbN8Ot/Screenshot-2024-05-17-at-4.53.52-PM.png"></a></div>
+
+
+
+<a name="439290911"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439290911" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439290911">(May 17 2024 at 20:58)</a>:</h4>
+<p><a href="/user_uploads/53090/23vRKUevNVtsyiEzfssmwGmN/dataverse_log.log">dataverse_log.log</a><br>
+<a href="/user_uploads/53090/rh4teEAaAPzEhVbUExq9ZCRz/Screenshot-2024-05-17-165838.png">Screenshot-2024-05-17-165838.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/rh4teEAaAPzEhVbUExq9ZCRz/Screenshot-2024-05-17-165838.png" title="Screenshot-2024-05-17-165838.png"><img src="/user_uploads/53090/rh4teEAaAPzEhVbUExq9ZCRz/Screenshot-2024-05-17-165838.png"></a></div>
+
+
+
+<a name="439294955"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439294955" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439294955">(May 17 2024 at 21:37)</a>:</h4>
+<p>Ok, it looks like configbaker is called "dev_bootstrap". Can you please try <code>docker logs dev_bootstrap</code>?</p>
+
+
+
+<a name="439864048"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439864048" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439864048">(May 21 2024 at 17:14)</a>:</h4>
+<p>I get the following log<br>
+<a href="/user_uploads/53090/k9X1BGUWSmpZ0X5fKX8rEONM/Screenshot-2024-05-21-131326.png">Screenshot-2024-05-21-131326.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/k9X1BGUWSmpZ0X5fKX8rEONM/Screenshot-2024-05-21-131326.png" title="Screenshot-2024-05-21-131326.png"><img src="/user_uploads/53090/k9X1BGUWSmpZ0X5fKX8rEONM/Screenshot-2024-05-21-131326.png"></a></div>
+
+
+
+<a name="439864503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439864503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439864503">(May 21 2024 at 17:17)</a>:</h4>
+<p>i tried to install dataverse using wsl. It looked like it was working. I was able to login, create dataverse. But it fails on creating dataset. It said in the log that it cannot create persistent identifier " Command [DatasetCreate dataset:null] failed: Cannot invoke "edu.harvard.iq.dataverse.pidproviders.PidProvider.generatePid(edu.harvard.iq.dataverse.DvObject)" because "pidProvider" is null<br>
+edu.harvard.iq.dataverse.engine.command.exception.CommandException: Command [DatasetCreate dataset:null] failed: Cannot invoke "edu.harvard.iq.dataverse.pidproviders.PidProvider.generatePid(edu.harvard.iq.dataverse.DvObject)" because "pidProvider" is null<br>
+        at edu.harvard.iq.dataverse.EjbDataverseEngine.submit(EjbDataverseEngine.java:287)" I use fake publishing.</p>
+
+
+
+<a name="439864689"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439864689" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439864689">(May 21 2024 at 17:18)</a>:</h4>
+<p>It looked that wsl is a more promissing way to have dataverse on windows, but I still did not figured out the dataset creation part.</p>
+
+
+
+<a name="439865009"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439865009" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439865009">(May 21 2024 at 17:20)</a>:</h4>
+<p>these are my pid jvm options:<br>
+-Ddataverse.pid.providers=fake<br>
+-Ddataverse.pid.fake.type=FAKE<br>
+-Ddataverse.pid.fake.label=Fake DOI Provider<br>
+-Ddataverse.pid.fake.authority=10.5072<br>
+-Ddataverse.pid.fake.shoulder=FK2/</p>
+
+
+
+<a name="439865633"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439865633" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439865633">(May 21 2024 at 17:24)</a>:</h4>
+<p>More logs for docker bootstap: <br>
+2024-05-21 13:22:14 Waiting for <a href="http://dataverse:8080">http://dataverse:8080</a> to become ready in max 3m.<br>
+2024-05-21 13:22:25 2024-05-21T17:22:25Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:22:28 2024-05-21T17:22:28Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s<br>
+2024-05-21 13:22:36 2024-05-21T17:22:36Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:22:39 2024-05-21T17:22:39Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s<br>
+2024-05-21 13:22:47 2024-05-21T17:22:47Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:22:50 2024-05-21T17:22:50Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s<br>
+2024-05-21 13:22:58 2024-05-21T17:22:58Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:23:01 2024-05-21T17:23:01Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s<br>
+2024-05-21 13:23:09 2024-05-21T17:23:09Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:23:12 2024-05-21T17:23:12Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s<br>
+2024-05-21 13:23:20 2024-05-21T17:23:20Z INF [HTTP] Checking the <a href="http://dataverse:8080/api/info/version">http://dataverse:8080/api/info/version</a> ...<br>
+2024-05-21 13:23:23 2024-05-21T17:23:23Z ERR Expectation failed error="timed out while making an http call, caused by: Get \"<a href="http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version\</a>": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" timeout=3s</p>
+
+
+
+<a name="439868942"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439868942" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439868942">(May 21 2024 at 17:42)</a>:</h4>
+<p>Oh! You're so close! Can you please add this one?</p>
+<p>-Ddataverse.pid.default-provider=fake</p>
+
+
+
+<a name="439869328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439869328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439869328">(May 21 2024 at 17:44)</a>:</h4>
+<p>It should be there already...</p>
+<div class="codehilite"><pre><span></span><code>$ grep default-provider docker-compose-dev.yml -B1 -A4
+        -Ddataverse.pid.providers=fake
+        -Ddataverse.pid.default-provider=fake
+        -Ddataverse.pid.fake.type=FAKE
+        -Ddataverse.pid.fake.label=FakeDOIProvider
+        -Ddataverse.pid.fake.authority=10.5072
+        -Ddataverse.pid.fake.shoulder=FK2/
+</code></pre></div>
+
+
+
+<a name="439878070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439878070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439878070">(May 21 2024 at 18:34)</a>:</h4>
+<p>yes, it worked! I was able to create a dataset. So wsl is working, that is good enough for me. Thanks Philip for help. Just need to check how it works with S3.</p>
+
+
+
+<a name="439882137"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439882137" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439882137">(May 21 2024 at 18:56)</a>:</h4>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> fantastic! Please, please can you make a pull request for the container guide to add something helpful for the next Windows user?</p>
+
+
+
+<a name="439884146"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439884146" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Victoria Lubitch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439884146">(May 21 2024 at 19:06)</a>:</h4>
+<p>Ok, I will add guide for using WSL in Windows for dataverse installation here <a href="https://guides.dataverse.org/en/latest/developers/windows.html">https://guides.dataverse.org/en/latest/developers/windows.html</a>  It should be enough for development on windows machine.<br>
+Although Docker in windows does not work yet unfortunately.</p>
+
+
+
+<a name="439890254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/439890254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#439890254">(May 21 2024 at 19:41)</a>:</h4>
+<p>Sounds great! Thanks!</p>
+
+
+
+<a name="463797397"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/463797397" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#463797397">(Aug 20 2024 at 19:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="737390">@Bethany Seeger</span> heads up that <span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> recently added some instructions for setting up a dev environment on Windows. For now you can preview them at <a href="https://preview.guides.gdcc.io/en/develop/developers/windows.html">https://preview.guides.gdcc.io/en/develop/developers/windows.html</a></p>
+
+
+
+<a name="463797664"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/463797664" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#463797664">(Aug 20 2024 at 19:58)</a>:</h4>
+<p>The PR is <a href="https://github.com/IQSS/dataverse/issues/10608">#10608</a> and it will be part of the 6.4 guides. The above is just a preview.</p>
+
+
+
+<a name="463810079"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/463810079" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#463810079">(Aug 20 2024 at 20:52)</a>:</h4>
+<p>Great! Thanks, <span class="user-mention" data-user-id="598112">@Philip Durbin</span> !</p>
+
+
+
+<a name="524483611"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/524483611" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#524483611">(Jun 17 2025 at 15:50)</a>:</h4>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> thanks for sitting with me during the DCM25 hackathon.</p>
+<p>As we discussed, I just made this PR:</p>
+<p>use WSL not cmd.exe for Windows dev, simplify guides <a href="https://github.com/IQSS/dataverse/issues/11583">#11583</a></p>
+
+
+
+<a name="524483640"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/524483640" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#524483640">(Jun 17 2025 at 15:50)</a>:</h4>
+<p>Please take a look and let me know if you want any changes.</p>
+
+
+
+<a name="524483745"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/524483745" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#524483745">(Jun 17 2025 at 15:51)</a>:</h4>
+<p><span class="user-mention" data-user-id="737390">@Bethany Seeger</span> I forget, were you looking for help getting a dev environment on Windows as well? Nice meeting you last week by the way!</p>
+
+
+
+<a name="530428012"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/530428012" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#530428012">(Jul 23 2025 at 20:30)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  I had been thinking about it, but not for quite a while.   I have some good dev and test space in our servers, so I haven't had a huge need for it.  But, I will read though this PR to learn more. </p>
+<p>It was nice to meet you as well!  :)</p>
+
+
+
+<a name="530428188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/530428188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#530428188">(Jul 23 2025 at 20:31)</a>:</h4>
+<p>Awesome. That PR was tested by <span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> <span class="user-mention" data-user-id="648750">@Juan Pablo Tosca Villanueva</span> and Jim so I'm feeling pretty good about it (even though I don't have Windows and can't test it myself). <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="530428226"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Current%20steps%20required%20for%20windows%20development./near/530428226" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Current.20steps.20required.20for.20windows.20development.2E.html#530428226">(Jul 23 2025 at 20:32)</a>:</h4>
+<p>And yes, always nice to put a name with a face. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

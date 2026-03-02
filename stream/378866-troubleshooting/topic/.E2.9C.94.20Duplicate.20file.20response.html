@@ -1,0 +1,108 @@
+<html>
+<head><meta charset="utf-8"><title>✔ Duplicate file response · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html">✔ Duplicate file response</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="439241986"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439241986" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439241986">(May 17 2024 at 15:05)</a>:</h4>
+<p>When uploading a file that already exists, the <code>message</code> property of the response contains another sub-object with <code>message</code> in it. Is this on purpose? It differs from all the other responses, and I was wondering if this is intentional or a bug.</p>
+<p><a href="/user_uploads/53090/UlTWSOmaBOJZQfNRoLzYnqK4/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/UlTWSOmaBOJZQfNRoLzYnqK4/image.png" title="image.png"><img src="/user_uploads/53090/UlTWSOmaBOJZQfNRoLzYnqK4/image.png"></a></div>
+
+
+
+<a name="439242270"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439242270" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439242270">(May 17 2024 at 15:06)</a>:</h4>
+<p>Also, is there a way to ensure that the response throws an error if the file already exists, instead of creating a new one?</p>
+
+
+
+<a name="439242868"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439242868" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439242868">(May 17 2024 at 15:09)</a>:</h4>
+<p>I see what you mean:</p>
+<div class="codehilite"><pre><span></span><code>message:
+    message:
+</code></pre></div>
+<p>How strange. Sounds like a mistake.</p>
+
+
+
+<a name="439242957"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439242957" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439242957">(May 17 2024 at 15:10)</a>:</h4>
+<p>Shall I open an issue?</p>
+
+
+
+<a name="439244580"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439244580" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439244580">(May 17 2024 at 15:18)</a>:</h4>
+<p>Sure. I can reproduce it with <code>mvn test -Dtest=FilesIT#test_001_AddFileGood</code> if I add this: <code>addTwiceResponse.prettyPrint()</code>. Here's the output:</p>
+<div class="codehilite"><pre><span></span><code>{
+    &quot;status&quot;: &quot;OK&quot;,
+    &quot;message&quot;: {
+        &quot;message&quot;: &quot;This file has the same content as dataverseproject.png that is in the dataset. &quot;
+    },
+    &quot;data&quot;: {
+        &quot;files&quot;: [
+            {
+                &quot;description&quot;: &quot;&quot;,
+                &quot;label&quot;: &quot;dataverseproject.png&quot;,
+</code></pre></div>
+
+
+
+<a name="439244690"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439244690" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439244690">(May 17 2024 at 15:19)</a>:</h4>
+<p>But what outcome do you want? Do you want us to change the API in a backward-incompatible way?</p>
+
+
+
+<a name="439244744"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439244744" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439244744">(May 17 2024 at 15:19)</a>:</h4>
+<p>Or are you thinking we should clean this up if we ever release a v2 of the API?</p>
+
+
+
+<a name="439245924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439245924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439245924">(May 17 2024 at 15:25)</a>:</h4>
+<p>Yes, definitely only when a V2 is released. I just noticed it and thought I'd share it.</p>
+
+
+
+<a name="439246049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439246049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439246049">(May 17 2024 at 15:26)</a>:</h4>
+<p>Thought I may miss out on sth when modelling the response <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="439249164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439249164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439249164">(May 17 2024 at 15:42)</a>:</h4>
+<p>I feel like we should be gathering issues like this for a v2.</p>
+
+
+
+<a name="439249193"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439249193" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439249193">(May 17 2024 at 15:42)</a>:</h4>
+<p>I'm not sure I want an issue for each little thing though.</p>
+
+
+
+<a name="439249238"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/439249238" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#439249238">(May 17 2024 at 15:43)</a>:</h4>
+<p>But for now, please go ahead and create it. More for the pile! <span aria-label="poop" class="emoji emoji-1f4a9" role="img" title="poop">:poop:</span></p>
+
+
+
+<a name="440255864"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20Duplicate%20file%20response/near/440255864" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20Duplicate.20file.20response.html#440255864">(May 23 2024 at 06:27)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

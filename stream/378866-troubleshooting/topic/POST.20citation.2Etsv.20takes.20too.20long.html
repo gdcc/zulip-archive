@@ -1,0 +1,283 @@
+<html>
+<head><meta charset="utf-8"><title>POST citation.tsv takes too long · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html">POST citation.tsv takes too long</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="544203522"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544203522" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544203522">(Oct 10 2025 at 15:57)</a>:</h4>
+<p>Hi, I have recently updated Dataverse to version 6.5 and I noticed that updating citation.tsv, something that could be done in a few seconds, now takes too long as you can check bellow. I assume that this behavior has started because of the new values added for the Language datasetfield.</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="nb">time</span><span class="w"> </span>curl<span class="w"> </span><span class="s2">"http://localhost:8080/api/admin/datasetfield/load"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>--upload-file<span class="w"> </span>/tmp/dvinstall/data/metadatablocks/citation.tsv<span class="w"> </span>-H<span class="w"> </span><span class="s2">"Content-type: text/tab-separated-values"</span>
+real<span class="w">    </span>27m33.218s
+user<span class="w">    </span>0m0.059s
+sys<span class="w">     </span>0m0.094s
+</code></pre></div>
+<p>Is there any alternative that can speed up this process for future updates or is this behavior solved in a newer version?</p>
+
+
+
+<a name="544203904"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544203904" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544203904">(Oct 10 2025 at 15:59)</a>:</h4>
+<p>Yes, exactly, it's because of all the new languages in <a href="https://github.com/IQSS/dataverse/issues/10762">#10762</a>, added in Dataverse 6.4.</p>
+
+
+
+<a name="544204295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544204295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544204295">(Oct 10 2025 at 16:01)</a>:</h4>
+<p>Hmm starting with <a href="https://github.com/IQSS/dataverse/releases/tag/v6.6">https://github.com/IQSS/dataverse/releases/tag/v6.6</a> we say this:</p>
+<p>"Expect the loading of the citation block to take several seconds <br>
+because of its size (especially due to the number of languages)."</p>
+
+
+
+<a name="544204603"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544204603" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544204603">(Oct 10 2025 at 16:02)</a>:</h4>
+<p>I just added this to <a href="https://github.com/IQSS/dataverse/releases/tag/v6.4">https://github.com/IQSS/dataverse/releases/tag/v6.4</a> which is where <a href="https://github.com/IQSS/dataverse/issues/10762">#10762</a> was merged.</p>
+
+
+
+<a name="544204732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544204732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544204732">(Oct 10 2025 at 16:03)</a>:</h4>
+<p>At <a href="https://github.com/IQSS/dataverse/releases/tag/v6.5">https://github.com/IQSS/dataverse/releases/tag/v6.5</a> I didn't add anything because we don't ask you to reload citation.tsv.</p>
+
+
+
+<a name="544205007"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544205007" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544205007">(Oct 10 2025 at 16:04)</a>:</h4>
+<p>27 minutes is crazy though! Is that right?!? For me, it takes maybe 5-10 seconds which was enough to annoy me and prompt me to add that note about several seconds.</p>
+
+
+
+<a name="544205158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544205158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544205158">(Oct 10 2025 at 16:05)</a>:</h4>
+<p>Yes, it took me 27 minutes.</p>
+
+
+
+<a name="544205748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544205748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544205748">(Oct 10 2025 at 16:08)</a>:</h4>
+<p>Can you please say a little more about your hardware?</p>
+
+
+
+<a name="544206030"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544206030" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544206030">(Oct 10 2025 at 16:10)</a>:</h4>
+<p>I am monitoring the machine and I don't see any load increase. I am running the container on a machine with 64GB of RAM and 32 cores.</p>
+
+
+
+<a name="544206206"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544206206" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544206206">(Oct 10 2025 at 16:11)</a>:</h4>
+<p>a pretty beefy machine</p>
+
+
+
+<a name="544206309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544206309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544206309">(Oct 10 2025 at 16:11)</a>:</h4>
+<p>Please feel free to create an issue: <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a></p>
+
+
+
+<a name="544228608"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544228608" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544228608">(Oct 10 2025 at 18:43)</a>:</h4>
+<p>This is well known from my experiments with migrations in containers. Please make sure to recheck your resource allocations for the Postgres and Dataverse container. I found more RAM and a few CPU cores helped. Depending on your setup you may have a beefy machine but not necessarily use all of it.</p>
+
+
+
+<a name="544228855"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544228855" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544228855">(Oct 10 2025 at 18:45)</a>:</h4>
+<p>And <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> I kinda disbelieve about the seconds stuff for this change. Even after adding a lot more hardware it was still well into minutes.</p>
+
+
+
+<a name="544229068"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544229068" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544229068">(Oct 10 2025 at 18:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="622863">@César Ferreira</span> I ran all of these migrations tests on a snapshot of prod, so less anxiousness involved <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="544229752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544229752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544229752">(Oct 10 2025 at 18:53)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long/near/544228855">said</a>:</p>
+<blockquote>
+<p>And <span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> I kinda disbelieve about the seconds stuff for this change. Even after adding a lot more hardware it was still well into minutes.</p>
+</blockquote>
+<p>On my laptop it takes 13 seconds:</p>
+<p><code>% time curl http://localhost:8080/api/admin/datasetfield/load -H "Content-type: text/tab-separated-values" -X POST --upload-file scripts/api/data/metadatablocks/citation.tsv</code></p>
+<p><code>0.01s user 0.01s system 0% cpu 12.791 total</code></p>
+
+
+
+<a name="544230008"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544230008" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544230008">(Oct 10 2025 at 18:54)</a>:</h4>
+<p>That's where I write the release notes. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="544230130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544230130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544230130">(Oct 10 2025 at 18:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="760290">@Omer M Fahim</span> how long does it take on any of our test servers, would you say? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="544233417"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544233417" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Omer M Fahim <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544233417">(Oct 10 2025 at 19:19)</a>:</h4>
+<p>your times align with mines</p>
+
+
+
+<a name="544240943"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544240943" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544240943">(Oct 10 2025 at 20:16)</a>:</h4>
+<p>Whaaaaaat <span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span><span aria-label="flushed" class="emoji emoji-1f633" role="img" title="flushed">:flushed:</span></p>
+
+
+
+<a name="544241077"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241077" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241077">(Oct 10 2025 at 20:17)</a>:</h4>
+<p><span class="user-mention" data-user-id="637063">@Leo Andreev</span> is saying it's much slower when you go from 200 langs to 8000.</p>
+<p>Versus staying at 8000, I mean, which is what I just tested.</p>
+
+
+
+<a name="544241093"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241093" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241093">(Oct 10 2025 at 20:17)</a>:</h4>
+<p>Is this a fresh DB or a snapshot of an existing instance?</p>
+
+
+
+<a name="544241117"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241117" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241117">(Oct 10 2025 at 20:17)</a>:</h4>
+<p>For me a fresh db.</p>
+
+
+
+<a name="544241211"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241211" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241211">(Oct 10 2025 at 20:18)</a>:</h4>
+<p>Hmm that may make difference with updating all the datasets and have 8000 new entries. Not sure. Might need some more testing again...</p>
+
+
+
+<a name="544241352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241352">(Oct 10 2025 at 20:20)</a>:</h4>
+<p>Oh wait - you mean it takes 13 secs now that you had it loaded before to reload the block again? That would make sense...</p>
+
+
+
+<a name="544241386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241386">(Oct 10 2025 at 20:20)</a>:</h4>
+<p>Yeah, exactly.</p>
+
+
+
+<a name="544241398"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241398" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Omer M Fahim <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241398">(Oct 10 2025 at 20:20)</a>:</h4>
+<p>ehh gonna run a test right now</p>
+
+
+
+<a name="544241421"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544241421" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544241421">(Oct 10 2025 at 20:20)</a>:</h4>
+<p>Then I probably misunderstood earlier. Sry</p>
+
+
+
+<a name="544243049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544243049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544243049">(Oct 10 2025 at 20:33)</a>:</h4>
+<p>No worries.</p>
+
+
+
+<a name="544243280"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544243280" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544243280">(Oct 10 2025 at 20:34)</a>:</h4>
+<p>If I drop my database and add this to scripts/api/setup-datasetfields.sh</p>
+<div class="codehilite"><pre><span></span><code>+echo &quot;BEGIN loading citation&quot;
++date
+ curl &quot;${DATAVERSE_URL}/api/admin/datasetfield/load&quot; -X POST --data-binary @&quot;$SCRIPT_PATH&quot;/data/metadatablocks/citation.tsv -H &quot;Content-type: text/tab-separated-values&quot;
++date
++echo &quot;END loading citation&quot;
+</code></pre></div>
+<p>I get this:</p>
+<div class="codehilite"><pre><span></span><code>dev_bootstrap&gt; BEGIN loading citation
+dev_bootstrap&gt; Fri Oct 10 20:25:01 UTC 2025
+dev_bootstrap&gt; {&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;added&quot;:[{&quot;name&quot;:&quot;citation&quot;...
+dev_bootstrap&gt; Fri Oct 10 20:25:14 UTC 2025
+dev_bootstrap&gt; END loading citation
+</code></pre></div>
+<p>So also 13 seconds for an initial load of citation.tsv. <img alt=":shrugdog:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/86c833ef.png" title="shrugdog"></p>
+
+
+
+<a name="544499066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544499066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544499066">(Oct 13 2025 at 09:10)</a>:</h4>
+<p>Thank you for all the feedback, I will try to adjust container resources as <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> suggested. I did the same test on another "fresh" instance, it only has one dataset, and POST time was 1m30s. Could this time be increased by the number of existing datasets?</p>
+
+
+
+<a name="544537223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544537223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544537223">(Oct 13 2025 at 12:19)</a>:</h4>
+<p>After some tests I suspect that these POST requests are taking too long because of the filesystem. We have our Dataverse instances running on Openstack and we have found out previously, while stress testing our main instance, that PostgreSQL doesn't work well with the Openstack filesystem. Because of that our production instance has a DB running outside of Openstack and the POST request takes 1m25s without any resource tuning.</p>
+
+
+
+<a name="544556231"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544556231" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544556231">(Oct 13 2025 at 13:40)</a>:</h4>
+<p>What filesystem are you using in your Openstack?</p>
+
+
+
+<a name="544556506"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544556506" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544556506">(Oct 13 2025 at 13:40)</a>:</h4>
+<p>Also are we talking Cinder or Mantis? (I hope Cinder <span aria-label="alien" class="emoji emoji-1f47d" role="img" title="alien">:alien:</span>)</p>
+
+
+
+<a name="544557064"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544557064" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544557064">(Oct 13 2025 at 13:42)</a>:</h4>
+<p>If you're looking into running some FS statistics, maybe this little tool I put together in a container helps. <a href="https://jugit.fz-juelich.de/fdm/k8s/k8s-storage-benchmark">https://jugit.fz-juelich.de/fdm/k8s/k8s-storage-benchmark</a></p>
+
+
+
+<a name="544557727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544557727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544557727">(Oct 13 2025 at 13:45)</a>:</h4>
+<p>We're on Openstack as well and use Cinder block devices backed by Ceph librbd mounts. I'd rather have krbd because it has even better performance, but it's not bad either. The storage link is a 10G per OpenStack Nova Host and they run a 2-replica config in Ceph.</p>
+
+
+
+<a name="544559454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544559454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544559454">(Oct 13 2025 at 13:53)</a>:</h4>
+<p>I am not sure but I think it is Cinder. I can ask my colleague in charge of Openstack for more details. When we detected issues with Openstack we also ran some performance tests with Ansible. We generated test files with the command <code>head -c {{ filesize }} /dev/zero | tr '\000' '\377'</code> and we used <a href="https://github.com/scottchiefbaker/dool/">dool</a> for filesystem monitoring.</p>
+
+
+
+<a name="544768333"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544768333" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544768333">(Oct 14 2025 at 14:41)</a>:</h4>
+<p>I deployed Dataverse on a different Openstack with newer hardware and I got better results. The other Openstack instance has older hardware and that could be one of the reasons for the bad performance. Now the POST only takes 1-2min. I get the same times either if it is a fresh install or if the database already exists. I even tried run it locally and I got the same results.</p>
+
+
+
+<a name="544769581"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544769581" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544769581">(Oct 14 2025 at 14:46)</a>:</h4>
+<p>That's good. Please remind me, is the going from ~200 langs to ~8000? Or from 8k to 8k?</p>
+
+
+
+<a name="544770761"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544770761" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> César Ferreira <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544770761">(Oct 14 2025 at 14:50)</a>:</h4>
+<p>From 8k to 8k. My citations.tsv also has about 300 more subjects, but I also test with the one on GitHub and results were the same.<br>
+<a href="/user_uploads/53090/aOFC2C6UO25oJhGoBcLB6B3e/citation.tsv">citation.tsv</a></p>
+
+
+
+<a name="544770893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/POST%20citation.tsv%20takes%20too%20long/near/544770893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long.html#544770893">(Oct 14 2025 at 14:51)</a>:</h4>
+<p>Ok, thanks. I'm just thinking we should update our release notes to say minutes instead of seconds.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

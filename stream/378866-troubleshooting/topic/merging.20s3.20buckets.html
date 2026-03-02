@@ -1,0 +1,119 @@
+<html>
+<head><meta charset="utf-8"><title>merging s3 buckets · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html">merging s3 buckets</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="570165016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570165016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570165016">(Jan 26 2026 at 18:43)</a>:</h4>
+<p>So at UCLA we're still working on updateing from 5.14.   One of the issues is that historically we've had separate s3 buckets for direct-uploading and regular uploads.  Since that's no longer necessary we'd like to merge thiese.</p>
+<p>Any suggestions on how to proceed?</p>
+<p>Thank you,</p>
+<p>jamie</p>
+
+
+
+<a name="570173558"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570173558" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570173558">(Jan 26 2026 at 19:33)</a>:</h4>
+<p>Hmm, <a href="https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3">https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3</a> is somewhat related. <span class="user-mention" data-user-id="626369">@Don Sizemore</span> added it a while back, in <a href="https://github.com/IQSS/dataverse/issues/6789">#6789</a>.</p>
+
+
+
+<a name="570173800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570173800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570173800">(Jan 26 2026 at 19:35)</a>:</h4>
+<p>Oh good, I see you asked here as well: <a href="https://groups.google.com/g/dataverse-community/c/zONHkY6gJMM/m/xxNSQT28GQAJ">https://groups.google.com/g/dataverse-community/c/zONHkY6gJMM/m/xxNSQT28GQAJ</a></p>
+
+
+
+<a name="570176541"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570176541" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570176541">(Jan 26 2026 at 19:51)</a>:</h4>
+<p>Fortunately I have a test system I can backup incase I break it.    </p>
+<p>I posed the question on chatgpt,  for what it's worth this is the suggestion:<br>
+**</p>
+<h4>Option B: True merge (advanced, risky)</h4>
+<p>You must:</p>
+<ol>
+<li>
+<p>Copy objects into a single bucket</p>
+</li>
+<li>
+<p>Update database references to the bucket name</p>
+</li>
+<li>
+<p>Reindex and test every dataset</p>
+</li>
+</ol>
+<p>Typical SQL (example only):</p>
+<p>UPDATE datafile</p>
+<p>SET storageidentifier = REPLACE(storageidentifier,</p>
+<p>'s3://old-bucket/',</p>
+<p>'s3://new-bucket/');</p>
+<p><span aria-label="warning" class="emoji emoji-26a0" role="img" title="warning">:warning:</span> Risks:</p>
+<ul>
+<li>
+<p>Broken downloads</p>
+</li>
+<li>
+<p>Corrupt previews</p>
+</li>
+<li>
+<p>Dataset integrity failures</p>
+</li>
+</ul>
+<p>This should only be done with:</p>
+<ul>
+<li>
+<p>Full DB backup</p>
+</li>
+<li>
+<p>Test environment</p>
+</li>
+</ul>
+<p>Reindex after (bin/reindex.sh)**</p>
+
+
+
+<a name="570200677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570200677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570200677">(Jan 26 2026 at 22:32)</a>:</h4>
+<p>I am rather sure (95%) that ChatGPT is wrong about reindexing the datasets.</p>
+
+
+
+<a name="570200808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570200808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570200808">(Jan 26 2026 at 22:33)</a>:</h4>
+<p>I looked at the search/index code and schema and the storage identifier is nowhere to be found expect for one place, but then it is queried from DvObject which comes from the DB and not Solr.</p>
+
+
+
+<a name="570200920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570200920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570200920">(Jan 26 2026 at 22:34)</a>:</h4>
+<p>(Also, it's in SolrSearchResult.json(), so very likely to be unrelated)</p>
+
+
+
+<a name="570200997"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570200997" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570200997">(Jan 26 2026 at 22:35)</a>:</h4>
+<p>Aside from that: yes, you will need to change your storage identifiers by upgrading the location.</p>
+
+
+
+<a name="570201083"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570201083" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570201083">(Jan 26 2026 at 22:35)</a>:</h4>
+<p>Keep in mind that the storage identifier has changed a bit over the versions, so take a look at the patterns your identifiers use first</p>
+
+
+
+<a name="570213832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/merging%20s3%20buckets/near/570213832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/merging.20s3.20buckets.html#570213832">(Jan 27 2026 at 00:33)</a>:</h4>
+<p>I assume that chatgpt is questionable but there was this in documentation, file-to-s3 transfer:<br>
+(<a href="https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3">https://guides.dataverse.org/en/6.9/developers/deployment.html#migrating-datafiles-from-local-storage-to-s3</a>)</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

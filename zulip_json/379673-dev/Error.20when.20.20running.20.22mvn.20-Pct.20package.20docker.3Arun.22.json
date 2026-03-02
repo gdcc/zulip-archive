@@ -1,0 +1,332 @@
+[
+    {
+        "content": "<p>Hi, </p>\n<p>I'm working on a PR <a href=\"https://github.com/IQSS/dataverse/issues/9926\">https://github.com/IQSS/dataverse/issues/9926</a> and wanted to add and run a test, but I'm having trouble starting my Dataverse locally... When I run <code>mvn -Pct package docker:run</code>, it fails with the following error:</p>\n<p><code>[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-build) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : \"The command '/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}' returned a non-zero code: 8\"  -&gt; [Help 1]</code></p>\n<p>I have the current <code>develop</code> branch checked out.</p>\n<p>Could someone help me troubleshoot?</p>",
+        "id": 392527871,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695392036
+    },
+    {
+        "content": "<p>Absolutely. Let me pull the latest from develop (3b7d824) and check.</p>",
+        "id": 392528171,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392116
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> actually, as a sanity check, could you please add \"clean\"? Like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>mvn -Pct clean package docker:run\n</code></pre></div>",
+        "id": 392529057,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392346
+    },
+    {
+        "content": "<p>I worked for me without the \"clean\". Hmm. I wonder what's different. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 392529816,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392558
+    },
+    {
+        "content": "<p>Something else to try, building just the configbaker image:</p>\n<div class=\"codehilite\"><pre><span></span><code>mvn -Pct docker:build -Ddocker.filter=dev_bootstrap\n</code></pre></div>",
+        "id": 392530028,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392617
+    },
+    {
+        "content": "<p>Are you on Mac, Linux or Windows?</p>",
+        "id": 392530182,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392658
+    },
+    {
+        "content": "<p>I tried running it with <code>clean</code> before, same error. And building the configbaker image results in the same error as well.</p>",
+        "id": 392530240,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695392676
+    },
+    {
+        "content": "<p>I am on Linux</p>",
+        "id": 392530250,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695392679
+    },
+    {
+        "content": "<p>Hmm, if it works for you, it must be some kind of issue with some cache or something on my end?</p>",
+        "id": 392530385,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695392716
+    },
+    {
+        "content": "<p>There's some docker command like system prune that blows away the cache. Not sure if it will help.</p>",
+        "id": 392531090,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392885
+    },
+    {
+        "content": "<p>When you try to build just configbaker, is there any more output? Any clues?</p>",
+        "id": 392531222,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695392927
+    },
+    {
+        "content": "<p>Just ran <code>docker rmi $(docker images -a --filter=dangling=true -q)</code> and <code>docker rm $(docker ps --filter=status=exited --filter=status=created -q)</code> to try and clear any caches (found here: <a href=\"https://forums.docker.com/t/how-to-delete-cache/5753/2\">https://forums.docker.com/t/how-to-delete-cache/5753/2</a>) but no change</p>",
+        "id": 392532827,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695393351
+    },
+    {
+        "content": "<p>The full output is:</p>\n<div class=\"codehilite\"><pre><span></span><code>~/Documents/dataverse$ mvn -Pct docker:build -Ddocker.filter=dev_bootstrap\n[INFO] Scanning for projects...\n[INFO]\n[INFO] ----------------------&lt; edu.harvard.iq:dataverse &gt;----------------------\n[INFO] Building dataverse 6.0\n[INFO] ----------------------------[ docker-build ]----------------------------\n[INFO]\n[INFO] --- docker-maven-plugin:0.43.0:build (default-cli) @ dataverse ---\n[INFO] Reading assembly descriptor: /home/clemens/Documents/dataverse/modules/container-configbaker/assembly.xml\n[INFO] Copying files to /home/clemens/Documents/dataverse/target/docker/gdcc/configbaker/unstable/build/maven\n[INFO] Building tar: /home/clemens/Documents/dataverse/target/docker/gdcc/configbaker/unstable/tmp/docker-build.tar\n[INFO] DOCKER&gt; [gdcc/configbaker:unstable] &quot;dev_bootstrap&quot;: Created docker-build.tar in 180 milliseconds\n[ERROR] DOCKER&gt; Unable to build image [gdcc/configbaker:unstable] : &quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot;  [&quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot; ]\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD FAILURE\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  14.375 s\n[INFO] Finished at: 2023-09-22T16:35:24+02:00\n[INFO] ------------------------------------------------------------------------\n[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-cli) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : &quot;The command &#39;/bin/sh -c true &amp;&amp;   apk add --no-cache ${APK_PACKAGES} &amp;&amp;   mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}&#39; returned a non-zero code: 8&quot;  -&gt; [Help 1]\n[ERROR]\n[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.\n[ERROR] Re-run Maven using the -X switch to enable full debug logging.\n[ERROR]\n[ERROR] For more information about the errors and possible solutions, please read the following articles:\n[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException\n</code></pre></div>",
+        "id": 392532856,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695393360
+    },
+    {
+        "content": "<p>It's Feierabend time now, thank you for your help so far. Will keep trying on Monday :)</p>",
+        "id": 392533403,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695393489
+    },
+    {
+        "content": "<p>Ha, I've heard of Feierabend but for Monday. Maybe you can edit modules/container-configbaker/Dockerfile and try splitting up the following onto different RUN lines:</p>\n<div class=\"codehilite\"><pre><span></span><code>RUN true &amp;&amp; \\\n  # Install necessary software and tools\n  apk add --no-cache ${APK_PACKAGES} &amp;&amp; \\\n  # Make our working directories\n  mkdir -p ${SCRIPT_DIR} ${SECRETS_DIR} ${SOLR_TEMPLATE}\n</code></pre></div>",
+        "id": 392534030,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695393639
+    },
+    {
+        "content": "<p>Have a good weekend!</p>",
+        "id": 392534066,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695393648
+    },
+    {
+        "content": "<p>Hope you had a good weekend as well!</p>",
+        "id": 392947928,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695631721
+    },
+    {
+        "content": "<p>That narrows it down to:</p>\n<p><code>[ERROR] Failed to execute goal io.fabric8:docker-maven-plugin:0.43.0:build (default-cli) on project dataverse: Unable to build image [gdcc/configbaker:unstable] : \"The command '/bin/sh -c apk add --no-cache ${APK_PACKAGES}' returned a non-zero code: 8\"  -&gt; [Help 1]</code></p>",
+        "id": 392947973,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695631730
+    },
+    {
+        "content": "<p>(btw: what is the purpose of the <code>true &amp;&amp;</code>?)</p>",
+        "id": 392948107,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695631761
+    },
+    {
+        "content": "<p>More clues: I just ran <code>$ docker build . --build-arg SOLR_VERSION=8.3.0</code> in <code>modules/container-configbaker</code> and this is the output:</p>\n<div class=\"codehilite\"><pre><span></span><code>Sending build context to Docker daemon  24.06kB\nStep 1/18 : ARG SOLR_VERSION\nStep 2/18 : FROM solr:${SOLR_VERSION} AS solr\n ---&gt; 17dcf43eea9e\nStep 3/18 : FROM alpine:3\n ---&gt; c1aabb73d233\nStep 4/18 : ENV SCRIPT_DIR=&quot;/scripts&quot;     SECRETS_DIR=&quot;/secrets&quot;     SOLR_TEMPLATE=&quot;/template&quot;\n ---&gt; Using cache\n ---&gt; 45d9286c2a05\nStep 5/18 : ENV PATH=&quot;${PATH}:${SCRIPT_DIR}&quot;     BOOTSTRAP_DIR=&quot;${SCRIPT_DIR}/bootstrap&quot;\n ---&gt; Using cache\n ---&gt; 36e58a2ed9a8\nStep 6/18 : ARG APK_PACKAGES=&quot;curl bind-tools netcat-openbsd jq bash dumb-init wait4x ed&quot;\n ---&gt; Using cache\n ---&gt; 4a2b261b3f13\nStep 7/18 : RUN true\n ---&gt; Using cache\n ---&gt; 625bfdb14a4d\nStep 8/18 : RUN apk add --no-cache ${APK_PACKAGES}\n ---&gt; Running in fd628057a6d8\nfetch https://dl-cdn.alpinelinux.org/alpine/v3.18/main/x86_64/APKINDEX.tar.gz\nWARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.18/main: temporary error (try again later)\nfetch https://dl-cdn.alpinelinux.org/alpine/v3.18/community/x86_64/APKINDEX.tar.gz\nWARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.18/community: temporary error (try again later)\nERROR: unable to select packages:\n  bash (no such package):\n    required by: world[bash]\n  bind-tools (no such package):\n    required by: world[bind-tools]\n  curl (no such package):\n    required by: world[curl]\n  dumb-init (no such package):\n    required by: world[dumb-init]\n  ed (no such package):\n    required by: world[ed]\n  jq (no such package):\n    required by: world[jq]\n  netcat-openbsd (no such package):\n    required by: world[netcat-openbsd]\n  wait4x (no such package):\n    required by: world[wait4x]\nThe command &#39;/bin/sh -c apk add --no-cache ${APK_PACKAGES}&#39; returned a non-zero code: 8\n</code></pre></div>",
+        "id": 392967125,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695636689
+    },
+    {
+        "content": "<p>I ran the <code>docker build</code> command again with <code>--network host</code> and the installation no longer failed. So, there seems to be some network connectivity issue during the <code>mvn docker:build</code>...</p>",
+        "id": 392967411,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695636765
+    },
+    {
+        "content": "<p>Success: <code>$ DOCKER_HOST=unix:///var/run/docker.sock mvn -Pct clean package docker:run</code> fixed the problem. But still the Dataverse doesn't start:</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_bootstrap&gt; 2023-09-25T10:27:06Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:06Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:14Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:14Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:22Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:22Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:30Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:30Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:38Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:38Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:46Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:46Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:27:54Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:27:54Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:02Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:02Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:10Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:10Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:18Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:18Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:26Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:26Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:34Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:34Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:42Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:42Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:50Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:50Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:28:58Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:28:58Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; 2023-09-25T10:29:06Z INF [HTTP] Checking the http://dataverse:8080/api/info/version ...\ndev_bootstrap&gt; 2023-09-25T10:29:06Z ERR Expectation failed error=&quot;the status code doesn&#39;t expect&quot; actual=404 expect=200\ndev_bootstrap&gt; Error: context deadline exceeded\n</code></pre></div>",
+        "id": 392976476,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695639691
+    },
+    {
+        "content": "<p>What if you increase the timeout from 3m in modules/container-configbaker/scripts/bootstrap.sh?</p>",
+        "id": 393003445,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695646024
+    },
+    {
+        "content": "<p>Also, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> probably has some ideas. And can probably explain why he added the \"true\" you mentioned. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> I found this: <a href=\"https://stackoverflow.com/questions/73301757/run-true-in-dockerfile\">https://stackoverflow.com/questions/73301757/run-true-in-dockerfile</a></p>",
+        "id": 393004350,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695646266
+    },
+    {
+        "content": "<p>Trying with an increased timeout right now... But after looking more closely at the log, I think this may be the problem:</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_dataverse&gt; [#|2023-09-25T10:27:00.705+0000|SEVERE|Payara 5.2022.4|javax.enterprise.system.core|_ThreadID=46;_ThreadName=RunLevelControllerThread-1695637590671;_TimeMillis=1695637620705;_LevelValue=1000;|\ndev_dataverse&gt;   Exception while loading the app|#]\ndev_dataverse&gt;\ndev_dataverse&gt; [#|2023-09-25T10:27:00.729+0000|SEVERE|Payara 5.2022.4|javax.enterprise.system.core|_ThreadID=46;_ThreadName=RunLevelControllerThread-1695637590671;_TimeMillis=1695637620729;_LevelValue=1000;|\ndev_dataverse&gt;   Exception while loading the app : Class edu.harvard.iq.dataverse.settings.spi.AliasConfigSourceProvider has unsupported major or minor version numbers, which are greater than those found in the Java Runtime Environment version 11.0.18|#]\n</code></pre></div>",
+        "id": 393008906,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695647301
+    },
+    {
+        "content": "<p>I see, interesting :) (about the <code>true</code>)</p>",
+        "id": 393009725,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695647480
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> are you running on Java 17? It sure doesn't look like...</p>",
+        "id": 393012274,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695648134
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> hmm maybe not, I ran <code>update-java-alternatives</code> to switch in case I wasn't, now <code>java -version</code> prints \"openjdk version \"17.0.8.1\" 2023-08-24\", but the above error remains the same</p>",
+        "id": 393014899,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695648729
+    },
+    {
+        "content": "<p>Sorry, I know very little about Java <span aria-label=\"face in clouds\" class=\"emoji emoji-1f636-200d-1f32b\" role=\"img\" title=\"face in clouds\">:face_in_clouds:</span></p>",
+        "id": 393015152,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695648801
+    },
+    {
+        "content": "<p>Shouldn't the version of Java used be set by the Dockerfiles somehow? The one used inside the container at least? Not sure why the error message says something about Java version 11</p>",
+        "id": 393015475,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695648870
+    },
+    {
+        "content": "<p>You are definitely not using an up to date base image - I see Payara 5.2022.4 in there and Java 11. So if you compile with 17, you'll be in trouble.</p>",
+        "id": 393020680,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695650123
+    },
+    {
+        "content": "<p>Please go ahead and re-pull the base image from the hub</p>",
+        "id": 393020734,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695650137
+    },
+    {
+        "content": "<p>Ahh I see, thanks!</p>",
+        "id": 393169520,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695709428
+    },
+    {
+        "content": "<p>That is looking better but still not loading. Here's the error messages I see now:</p>\n<p>SOLR:</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_solr&gt; 2023-09-26 06:18:56.818 ERROR (coreContainerWorkExecutor-2-thread-1) [   ] o.a.s.c.CoreContainer Error waiting for SolrCore to be loaded on startup =&gt; java.util.concurrent.ExecutionException: org.apache.solr.common.SolrException: Unable to create core [collection1]\n</code></pre></div>\n<p>Flyway:</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_dataverse&gt; [#|2023-09-26T06:19:54.148+0000|SEVERE|Payara 6.2023.8|javax.enterprise.system.core|_ThreadID=50;_ThreadName=RunLevelControllerThread-1695709140312;_TimeMillis=1695709194148;_LevelValue=1000;|\ndev_dataverse&gt;   Exception while loading the app : jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator\ndev_dataverse&gt; jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator\n...\ndev_dataverse&gt; Caused by: org.flywaydb.core.api.exception.FlywayValidateException: Validate failed: Migrations have failed validation\ndev_dataverse&gt; Detected resolved migration not applied to database: 5.13.0.1.\ndev_dataverse&gt; To ignore this migration, set -ignoreMigrationPatterns=&#39;*:ignored&#39;. To allow executing this migration, set -outOfOrder=true.\ndev_dataverse&gt; Detected resolved migration not applied to database: 5.13.0.2.\ndev_dataverse&gt; To ignore this migration, set -ignoreMigrationPatterns=&#39;*:ignored&#39;. To allow executing this migration, set -outOfOrder=true.\ndev_dataverse&gt; Need more flexibility with validation rules? Learn more: https://rd.gt/3AbJUZE\n...\ndev__dataverse&gt; [#|2023-09-26T06:19:54.155+0000|WARNING|Payara 6.2023.8|fish.payara.boot.runtime.BootCommand|_ThreadID=50;_ThreadName=RunLevelControllerThread-1695709140312;_TimeMillis=1695709194155;_LevelValue=900;|\ndev_dataverse&gt;   Boot Command deploy failed PlainTextActionReporterFAILUREDescription: deploy AdminCommandError occurred during deployment: Exception while loading the app : jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator. Please see server.log for more details.\ndev_dataverse&gt;     [name=dataverse\ndev_dataverse&gt;\ndev_dataverse&gt;\ndev_dataverse&gt; PER01003: Deployment encountered SQL Exceptions:\ndev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE TABLE EXTERNALTOOLTYPE (ID  SERIAL NOT NULL, TYPE VARCHAR(255) NOT NULL, EXTERNALTOOL_ID BIGINT NOT NULL, PRIMARY KEY (ID))&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;externaltooltype&quot; already exists\ndev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE INDEX INDEX_EXTERNALTOOLTYPE_externaltool_id ON EXTERNALTOOLTYPE (externaltool_id)&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;index_externaltooltype_externaltool_id&quot; already exists\ndev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE TABLE DATAVERSETHEME (ID  SERIAL NOT NULL, BACKGROUNDCOLOR VARCHAR(255), LINKCOLOR VARCHAR(255), LINKURL VARCHAR(255), LOGO VARCHAR(255), LOGOALIGNMENT VARCHAR(255), LOGOBACKGROUNDCOLOR VARCHAR(255), LOGOFOOTER VARCHAR(255), LOGOFOOTERALIGNMENT INTEGER, LOGOFOOTERBACKGROUNDCOLOR VARCHAR(255), LOGOFORMAT VARCHAR(255), TAGLINE VARCHAR(255), TEXTCOLOR VARCHAR(255), dataverse_id BIGINT, PRIMARY KEY (ID))&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;dataversetheme&quot; already exists\ndev_dataverse&gt;  PER01000: Got SQLException executing statement &quot;CREATE INDEX INDEX_DATAVERSETHEME_dataverse_id ON DATAVERSETHEME (dataverse_id)&quot;: org.postgresql.util.PSQLException: ERROR: relation &quot;index_dataversetheme_dataverse_id&quot; already exists\n...\n</code></pre></div>",
+        "id": 393169626,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695709459
+    },
+    {
+        "content": "<p>OK, fixed those errors with <code>sudo rm -r docker-dev-volumes</code>, now it's running :) I ran <code>docker volume prune</code> before, which somehow didn't do the trick... Thanks a lot for your help!</p>",
+        "id": 393171018,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695710214
+    },
+    {
+        "content": "<p>PR is posted <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span> <a href=\"https://github.com/IQSS/dataverse/pull/9956\">https://github.com/IQSS/dataverse/pull/9956</a></p>",
+        "id": 393176412,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695712815
+    },
+    {
+        "content": "<p>Fantastic! Thanks for sticking with it!</p>",
+        "id": 393212686,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695727332
+    },
+    {
+        "content": "<p>So what were the biggest problems getting the dev environment up? Not having the required version of Java? Anything else?</p>",
+        "id": 393212772,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695727372
+    },
+    {
+        "content": "<p>You also needed this, which I don't seem to need on Mac:</p>\n<div class=\"codehilite\"><pre><span></span><code>DOCKER_HOST=unix:///var/run/docker.sock mvn\n</code></pre></div>",
+        "id": 393212857,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695727417
+    },
+    {
+        "content": "<p>Yes, I think in summary the fixes to my issues were 1. setting the DOCKER_HOST (otherwise the <code>apk add</code> in the Dockerfile fails due to no network connectivity), 2. pulling the most current version of the base image, and 3. removing the old postgres data in <code>docker-dev-volumes</code> (I assume those were leftovers from a dev environment I had running month(s) ago).</p>",
+        "id": 393213871,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695727835
+    },
+    {
+        "content": "<p>Oh, interesting, did you have a base image saved from a few weeks (or months) ago? Before we released Dataverse 6.0 (which uses Payara 6 in the base image).</p>",
+        "id": 393214287,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695728031
+    },
+    {
+        "content": "<p>Yes, pretty sure I did.</p>",
+        "id": 393214389,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695728062
+    },
+    {
+        "content": "<p>Ok. Any thoughts on how to document this? Maybe right after the quickstart at <a href=\"https://guides.dataverse.org/en/6.0/developers/dev-environment.html\">https://guides.dataverse.org/en/6.0/developers/dev-environment.html</a> we could say \"If you have any trouble, please see the troubleshooting section.\"</p>\n<p>And \"troubleshooting\" would be a link, of course.</p>",
+        "id": 393214721,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695728189
+    },
+    {
+        "content": "<p>Hmm, I just re-checked whether the DOCKER_HOST actually fixed the network issue and apparently not. It was something else.</p>\n<p>I noticed because I reverted the change of splitting the RUN command into three RUNs, and the network error re-occured even with the DOCKER_HOST set.</p>\n<p>I guess it only appeared as if setting the DOCKER_HOST fixed the issue because the real fix allowed the result of the <code>apk add</code> to be cached.</p>\n<p>Here's what the real fix was: running <code>docker build modules/container-configbaker/ --build-arg SOLR_VERSION=8.3.0 --network host</code>, then re-running the <code>mvn</code> command.</p>\n<p>Tbh this seems kind of hacky to me. <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> do you have an idea how this network issue should be properly fixed?</p>",
+        "id": 393218201,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695729493
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/379673-dev/topic/Error.20when.20.20running.20.22mvn.20-Pct.20package.20docker.3Arun.22/near/393214721\">said</a>:</p>\n<blockquote>\n<p>Ok. Any thoughts on how to document this? Maybe right after the quickstart at <a href=\"https://guides.dataverse.org/en/6.0/developers/dev-environment.html\">https://guides.dataverse.org/en/6.0/developers/dev-environment.html</a> we could say \"If you have any trouble, please see the troubleshooting section.\"</p>\n<p>And \"troubleshooting\" would be a link, of course.</p>\n</blockquote>\n<p>That sounds good. <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span> Once we have the above thing properly figured out I can try and draft something and submit it as a PR if you'd like</p>",
+        "id": 393218669,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695729647
+    },
+    {
+        "content": "<p>Adding <code>&lt;network&gt;host&lt;/network&gt;</code> to the dev_bootstrap image in pom.xml (see <a href=\"https://dmp.fabric8.io/#build-configuration\">https://dmp.fabric8.io/#build-configuration</a>) fixes the issue for me, but not sure if that breaks anything for anybody else...</p>",
+        "id": 393223157,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695731444
+    },
+    {
+        "content": "<p>To me, all of this sounds like some local specialty in your Docker setup interfering with the build. Something like the host mode for network is really weird. Are you doing this on Win, Linux or Mac?</p>",
+        "id": 393236864,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695735923
+    },
+    {
+        "content": "<p>Linux (I already asked).</p>",
+        "id": 393237032,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695735968
+    },
+    {
+        "content": "<p>Maybe we should say, \"If you have any trouble, come tell us in <a href=\"http://chat.dataverse.org\">chat.dataverse.org</a>!\" <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 393237115,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1695735994
+    },
+    {
+        "content": "<p>I'm on Linux as well and don't need any of these specials. Today I did have a problem with my Docker not being able to pull images when coming from Maven, but was when doing it via CLI</p>",
+        "id": 393238182,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695736299
+    },
+    {
+        "content": "<p>Solution was to restart the Docker daemon - looks like the DNS server was cached and could not be reached any longer.</p>",
+        "id": 393238308,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1695736325
+    },
+    {
+        "content": "<p>Yes. Linux inside a VM though, maybe that changes things</p>",
+        "id": 393244251,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1695737900
+    },
+    {
+        "content": "<p>Related: mvn -Pct clean package docker:run error <a href=\"https://github.com/IQSS/dataverse/issues/10011\">#10011</a></p>",
+        "id": 397726355,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697813401
+    },
+    {
+        "content": "<p>I just got the same error. I tried the docker install like 4 month ago and so I had old base images. After removing and reloading the images, now it works.</p>\n<p>I wonder if there maybe a way for the docker:run target to check whether the currently available base image is compatible with the rest of the build (Java version, Dataverse version, etc)?</p>",
+        "id": 399047293,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1698496907
+    },
+    {
+        "content": "<p>Hmm, I'm reminded of this PR by <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>  feat(ct): add labels with service dependency versions to images <a href=\"https://github.com/IQSS/dataverse/issues/9930\">#9930</a> </p>\n<p>Not sure if it would help or not but the app image now at least knows what versions of PostgreSQL and Solr it need.</p>",
+        "id": 399303744,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698673213
+    }
+]

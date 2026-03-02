@@ -1,0 +1,147 @@
+<html>
+<head><meta charset="utf-8"><title>✔ bearer token troubleshooting: OIDC and MCP · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html">✔ bearer token troubleshooting: OIDC and MCP</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="544763095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544763095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544763095">(Oct 14 2025 at 14:21)</a>:</h4>
+<p>Dear all, I am currently trying to set up OIDC for an MCP server to access datasets in draft state. I am currently using the development compose, which includes Keycloak as IdP. The auth flow through the browser and retrieval of the bearer token works fine. However, once I am trying to use the bearer token in a request header it says it is an unauthorized bearer token. </p>
+<p>Is the bearer token returned to a user by KeyCloak generally usable by other resources, or am I missing something? I sense that I may have different expectations of how it works and would be happy about advice. Here is the setup and outputs:</p>
+<p><strong>FastMCP OIDC Setup</strong></p>
+<div class="codehilite" data-code-language="Python"><pre><span></span><code><span class="n">auth</span> <span class="o">=</span> <span class="n">OIDCProxy</span><span class="p">(</span>
+    <span class="n">config_url</span><span class="o">=</span><span class="s2">"http://localhost:8090/realms/test/.well-known/openid-configuration"</span><span class="p">,</span>
+    <span class="n">client_id</span><span class="o">=</span><span class="s2">"test"</span><span class="p">,</span>
+    <span class="n">client_secret</span><span class="o">=</span><span class="s2">"&lt;SECRET&gt;"</span><span class="p">,</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">"http://localhost:8000"</span><span class="p">,</span>
+    <span class="n">redirect_path</span><span class="o">=</span><span class="s2">"/mcp/auth/callback"</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p><strong>Bearer Token Auth</strong></p>
+<div class="codehilite" data-code-language="Python"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">McpOIDCAuth</span><span class="p">(</span><span class="n">Auth</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""An authentication handler to add an OIDC token as the Authorization header."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Adds the Authorization header with the OIDC token and yields the original :class:`httpx.Request`."""</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.server.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_http_headers</span>
+
+            <span class="n">headers</span> <span class="o">=</span> <span class="n">get_http_headers</span><span class="p">()</span> <span class="c1"># Retrieves the bearer token from the MCP client</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">request</span>
+</code></pre></div>
+<div class="codehilite"><pre><span></span><code># The header that is provided by the client (e.g. Cursor)
+{'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOi [...]
+</code></pre></div>
+<p><strong>Recognized MCP Tools (Auth working here)</strong><br>
+<a href="/user_uploads/53090/igUSfEgQsP0sWuXwoWNXRlfo/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/igUSfEgQsP0sWuXwoWNXRlfo/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="1160x542" src="/user_uploads/thumbnail/53090/igUSfEgQsP0sWuXwoWNXRlfo/image.png/840x560.webp"></a></div><p><strong>Error message when sending Bearer</strong></p>
+<p><a href="/user_uploads/53090/_80cktLKBXNxNOpx4Ey2VMTA/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/_80cktLKBXNxNOpx4Ey2VMTA/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="830x80" src="/user_uploads/thumbnail/53090/_80cktLKBXNxNOpx4Ey2VMTA/image.png/840x560.webp"></a></div>
+
+
+
+<a name="544765058"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544765058" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544765058">(Oct 14 2025 at 14:29)</a>:</h4>
+<p>Hmm, <span class="user-mention" data-user-id="617722">@Johannes D</span> might know.</p>
+
+
+
+<a name="544766148"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544766148" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544766148">(Oct 14 2025 at 14:33)</a>:</h4>
+<p>Here is the decoded JWT as well:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1760444360</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1760444060</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"auth_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">1760442552</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"jti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"onrtac:0b13ddb4-a96b-65a9-883d-0e8e1e0a2645"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:8090/realms/test"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"aud"</span><span class="p">:</span><span class="w"> </span><span class="s2">"account"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e5531496-cfb8-498c-a902-50c98d649e79"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"typ"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"azp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"test"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"42d4dd12-6a8d-44a5-b9be-f3a231f9aa44"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"acr"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"realm_access"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">"default-roles-test"</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"offline_access"</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">"uma_authorization"</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"resource_access"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"account"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"manage-account"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"manage-account-links"</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">"view-profile"</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"profile email"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"email_verified"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dataverse Curator"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"preferred_username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"curator"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"given_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dataverse"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"family_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Curator"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dataverse-curator@mailinator.com"</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+<a name="544766904"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544766904" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544766904">(Oct 14 2025 at 14:36)</a>:</h4>
+<p>Does your bearer token work with this <code>/api/users/:me</code> test? <a href="https://guides.dataverse.org/en/6.8/api/auth.html#bearer-tokens">https://guides.dataverse.org/en/6.8/api/auth.html#bearer-tokens</a></p>
+
+
+
+<a name="544767583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544767583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544767583">(Oct 14 2025 at 14:39)</a>:</h4>
+<p>No, does not work. Looking at the decoded token I suspect that this might be due to the "localhost" and Dataverse checks for the aliased reference to KeyCloack à la "<a href="https://keycloack:8090">https://keycloack:8090</a>" instead of "<a href="https://localhost:8090">https://localhost:8090</a>". Could this be the case?</p>
+
+
+
+<a name="544769254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544769254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544769254">(Oct 14 2025 at 14:44)</a>:</h4>
+<p>Maybe? <img alt=":shrugdog:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/86c833ef.png" title="shrugdog"> <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="544778299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544778299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544778299">(Oct 14 2025 at 15:19)</a>:</h4>
+<p>Well, the actual problem is the human in front of the machine <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> I have provided an alias on my system for keycloak to have everything in sync, but I havent passed that one to the OIDC Proxy. No wonder it is not working ...</p>
+<p>Working now! <img alt=":dataverse_woman:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/e231c302.png" title="dataverse woman"> </p>
+<p><a href="/user_uploads/53090/TG9Wm75T149Fkv8eyu7oXS3E/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/TG9Wm75T149Fkv8eyu7oXS3E/image.png" title="image.png"><img data-original-content-type="image/png" data-original-dimensions="2122x1854" src="/user_uploads/thumbnail/53090/TG9Wm75T149Fkv8eyu7oXS3E/image.png/840x560.webp"></a></div>
+
+
+
+<a name="544778684"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544778684" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544778684">(Oct 14 2025 at 15:21)</a>:</h4>
+<p>Working now? Great!</p>
+
+
+
+<a name="544778985"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544778985" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544778985">(Oct 14 2025 at 15:22)</a>:</h4>
+<p>Yes, it is working now <span aria-label="raised hands" class="emoji emoji-1f64c" role="img" title="raised hands">:raised_hands:</span></p>
+
+
+
+<a name="544779144"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/%E2%9C%94%20bearer%20token%20troubleshooting%3A%20OIDC%20and%20MCP/near/544779144" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/.E2.9C.94.20bearer.20token.20troubleshooting.3A.20OIDC.20and.20MCP.html#544779144">(Oct 14 2025 at 15:23)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599841">Jan Range</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,213 @@
+<html>
+<head><meta charset="utf-8"><title>Changes in the files API endpoint for replacing files? · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html">Changes in the files API endpoint for replacing files?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="478646456"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/478646456" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adina Wagner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#478646456">(Oct 24 2024 at 07:06)</a>:</h4>
+<p>Hi all! :) Sorry if this is in the wrong channel - feel free to point to a better fitting one!<br>
+I noticed that two of datalad-dataverses tests against <a href="http://demo.dataverse.org">demo.dataverse.org</a> started to fail 24 days ago, i.e., when Dataverse 6.4 was released. There were no changes in pyDataverse or DataLad-dataverse, and the error code is a bad request that previously was successful - so I'm suspecting that there was an API change that we or pyDataverse need to account for:</p>
+<div class="codehilite"><pre><span></span><code>E       httpx.HTTPStatusError: Client error &#39;400 Bad Request&#39; for url &#39;https://demo.dataverse.org/api/v1/files/2422933/replace&#39;
+</code></pre></div>
+<p>I read through the changelog, diff'ed the Native API's "Replacing files" user guide between the current and previous version, and browsed the milestone PRs, but did not spot anything that looked like a change in this API. Does someone know where I'd need to look? </p>
+<p>Many thanks in advance!</p>
+
+
+
+<a name="478656041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/478656041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sebastian Höffner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#478656041">(Oct 24 2024 at 08:06)</a>:</h4>
+<p>You have come to the right place, the only other place I can think of is the issue tracker ;-)</p>
+<p>There were <a href="https://github.com/IQSS/dataverse/blame/develop/src/main/java/edu/harvard/iq/dataverse/api/Files.java#L173-L325">no significant changes in the last years</a> except an (so it seems) innocent <a href="https://github.com/IQSS/dataverse/commit/50c84bff48467b492b42b4aaaedc77b14b56d2a9#diff-b9b9549891a5d1cff96324904d1f2ba91b220ce5bfb55ae76ce55a8cdd5081adR213">Merge from remote 8 months ago</a> which changed the response status enum but nothing behavior-wise it seems. Plus, <a href="https://github.com/IQSS/dataverse/commit/c0527738abd7b13053eeccfbff60e283ea98d602#diff-b9b9549891a5d1cff96324904d1f2ba91b220ce5bfb55ae76ce55a8cdd5081adR186">a commit 4 months ago which added OpenAPI specs</a>, which I would assume not to change the behavior either. Apart from those changes, the changes are more than a year back (usually from 8 years ago) – and if I <a href="https://github.com/IQSS/dataverse/compare/v6.3...v6.4#diff-c00d28e2e06fbbb12be325a3fedd920b4de324196e24e0f4ce37ee3bb1ec167bR35">diff 6.3 to 6.4</a>, there seem to be no changes to the Files.java.</p>
+<p>Do you have a status message for the error so we could narrow down the cause? Otherwise we would need to figure out which string might not be set in the bundle, if another handler already returns the error, or if the AddReplaceFileHelper throws for some reason.</p>
+<p>Is it possible to show us which request (including request headers minus auth) is failing or create a failing example?</p>
+
+
+
+<a name="478688410"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/478688410" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#478688410">(Oct 24 2024 at 11:04)</a>:</h4>
+<p>Hmm, yes, 24 days ago we released Dataverse 6.4 and deployed it to <a href="https://demo.dataverse.org">https://demo.dataverse.org</a></p>
+
+
+
+<a name="478688967"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/478688967" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#478688967">(Oct 24 2024 at 11:08)</a>:</h4>
+<p>What is file id 2422933? I'm also getting a 404 at <a href="https://demo.dataverse.org/file.xhtml?fileId=2422933">https://demo.dataverse.org/file.xhtml?fileId=2422933</a></p>
+<p>Was the file simply deleted? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="478690018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/478690018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#478690018">(Oct 24 2024 at 11:13)</a>:</h4>
+<p>Like we say on the demo homepage, "Datasets older than 30 days will be deleted at 5am EST on the first day of each month." That would have been the day after the 6.4 release.</p>
+
+
+
+<a name="479241706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479241706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adina Wagner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479241706">(Oct 28 2024 at 10:27)</a>:</h4>
+<p>Apologies for the late response, I missed your responses (I probably disabled email notifications or something - will check)!</p>
+<p>Just very briefly, here's what gets send in the request of a minimalistic test that started to fail (taken from a python debugger within pyDataverse, sorry for the odd formatting):</p>
+<div class="codehilite"><pre><span></span><code>(PdB) p kwargs
+{&#39;url&#39;: &#39;https://demo.dataverse.org/api/v1/files/2431409/replace&#39;,
+&#39;headers&#39;: {&#39;User-Agent&#39;: &#39;pydataverse&#39;},
+&#39;params&#39;: None, &#39;files&#39;: {&#39;file&#39;: &lt;_io.BufferedReader name=&#39;/tmp/pytest-of-adina/pytest-3/test_file_handling0/replace_source.txt&#39;&gt;},
+&#39;data&#39;: {&#39;jsonData&#39;: &#39;{\n  &quot;label&quot;: &quot;replace_source.txt&quot;,\n  &quot;directoryLabel&quot;: &quot;downstairs&quot;,\n  &quot;pid&quot;: &quot;doi:10.70122/FK2/KJM2V2&quot;,\n  &quot;filename&quot;: &quot;replace_source.txt&quot;\n}&#39;}}
+</code></pre></div>
+<p>The message is "Failed to add file to dataset"</p>
+<div class="codehilite"><pre><span></span><code>(Pdb) res = method(**kwargs, auth=self.auth, follow_redirects=True, timeout=None)
+(Pdb) p res
+&lt;Response [400 Bad Request]&gt;
+(Pdb) p res.json()
+{&#39;status&#39;: &#39;ERROR&#39;, &#39;message&#39;: &#39;Failed to add file to dataset.&#39;}
+</code></pre></div>
+<p>The tests set up datasets in <a href="http://demo.dataverse.org">demo.dataverse.org</a>, but they also clean up after themselves, so a file ID not being on <a href="http://demo.dataverse.org">demo.dataverse.org</a> is expected after the test ends.</p>
+<p>If it helps, I'll check if I can show this error with curl only?</p>
+
+
+
+<a name="479261913"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479261913" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479261913">(Oct 28 2024 at 12:17)</a>:</h4>
+<p>Ok, so from looking at <a href="https://demo.dataverse.org/file.xhtml?fileId=2431409">https://demo.dataverse.org/file.xhtml?fileId=2431409</a> (I had to log in as a superuser since it's unpublished), you're trying to replace a text file called "mykey" that has "some_content" in it. That should work. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="479262130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479262130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479262130">(Oct 28 2024 at 12:18)</a>:</h4>
+<p>"replace_source.txt" is also a text file with a little bit of text in it?</p>
+
+
+
+<a name="479262301"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479262301" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479262301">(Oct 28 2024 at 12:19)</a>:</h4>
+<p>"Failed to add file to dataset" is not a very helpful error. <img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"> Why? Why?</p>
+
+
+
+<a name="479262893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479262893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479262893">(Oct 28 2024 at 12:22)</a>:</h4>
+<p>I was hoping our server.log file on the demo server would have more details but I don't see the file id (2431409) anywhere.</p>
+
+
+
+<a name="479267765"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479267765" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479267765">(Oct 28 2024 at 12:49)</a>:</h4>
+<p>the error is:</p>
+<div class="codehilite"><pre><span></span><code>Local Exception Stack:
+Exception [EclipseLink-4002] (Eclipse Persistence Services - 4.0.1.payara-p2.v202310250827): org.eclipse.persistence.exceptions.DatabaseException
+Internal Exception: org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint &quot;unq_dvobject_0&quot;
+  Detail: Key (authority, protocol, identifier)=(10.70122, doi, FK2/KJM2V2/VNI8PM) already exists.
+Error Code: 0
+</code></pre></div>
+
+
+
+<a name="479270765"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479270765" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479270765">(Oct 28 2024 at 13:04)</a>:</h4>
+<p>Ah, thanks, <span class="user-mention" data-user-id="626369">@Don Sizemore</span>. Interesting.</p>
+
+
+
+<a name="479271255"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479271255" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479271255">(Oct 28 2024 at 13:06)</a>:</h4>
+<p>"Pre-Publish File DOI Reservation" is new as of 6.4: <a href="https://github.com/IQSS/dataverse/releases/tag/v6.4">https://github.com/IQSS/dataverse/releases/tag/v6.4</a></p>
+
+
+
+<a name="479271722"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479271722" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479271722">(Oct 28 2024 at 13:09)</a>:</h4>
+<p>This PR: Reserve File Pids <a href="https://github.com/IQSS/dataverse/issues/7334">#7334</a></p>
+
+
+
+<a name="479281908"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479281908" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479281908">(Oct 28 2024 at 13:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="738886">@Adina Wagner</span> since you offered, I'm interested if you can reproduce it with curl on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> . Here are the docs to get you started: <a href="https://guides.dataverse.org/en/6.4/api/native-api.html#replacing-files">https://guides.dataverse.org/en/6.4/api/native-api.html#replacing-files</a></p>
+<p>If it fails with curl, it's definitely a bug and you'd be very welcome to create an issue about this at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a></p>
+
+
+
+<a name="479288049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479288049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479288049">(Oct 28 2024 at 14:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="738886">@Adina Wagner</span> I've reproduced this on <a href="http://demo.dataverse.org">demo.dataverse.org</a> - would you like for me to open an issue, or would you prefer to?</p>
+
+
+
+<a name="479289965"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479289965" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adina Wagner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479289965">(Oct 28 2024 at 14:33)</a>:</h4>
+<p>done: <a href="https://github.com/IQSS/dataverse/issues/10975">https://github.com/IQSS/dataverse/issues/10975</a></p>
+
+
+
+<a name="479290066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479290066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adina Wagner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479290066">(Oct 28 2024 at 14:34)</a>:</h4>
+<p>please add anything I've missed :)</p>
+
+
+
+<a name="479291334"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479291334" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479291334">(Oct 28 2024 at 14:40)</a>:</h4>
+<p><span class="user-mention" data-user-id="738886">@Adina Wagner</span> excellent bug report! Thank you!</p>
+
+
+
+<a name="479294785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479294785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479294785">(Oct 28 2024 at 14:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="738886">@Adina Wagner</span> here's a thought as a potential work around for you.</p>
+<p>What if you use <a href="https://guides.dataverse.org/en/6.4/api/native-api.html#change-collection-attributes">https://guides.dataverse.org/en/6.4/api/native-api.html#change-collection-attributes</a> to change <code>filePIDsEnabled</code> to false for the collection you're using. This one, currently: <a href="https://demo.dataverse.org/dataverse/dv-7194db59-950f-11ef-8832-a002a54c8dc6">https://demo.dataverse.org/dataverse/dv-7194db59-950f-11ef-8832-a002a54c8dc6</a></p>
+
+
+
+<a name="479300502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479300502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Adina Wagner <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479300502">(Oct 28 2024 at 15:22)</a>:</h4>
+<p>Thanks for the thought! I don't think that the work around is doable for us, though, users of datalad-dataverse will very likely not have superuser privileges. Even if, I would be hesitant to apply such a setting internally instead of having users do it explicitly themselves</p>
+
+
+
+<a name="479303651"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/479303651" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#479303651">(Oct 28 2024 at 15:37)</a>:</h4>
+<p>That makes sense. I was thinking about any automated testing that might be failing on our end, if you want to get it passing again with a work around. I agree it's a different story with end users.</p>
+
+
+
+<a name="488985374"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/488985374" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Kai König <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#488985374">(Dec 14 2024 at 11:21)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="738886">Adina Wagner</span> <a href="#narrow/channel/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F/near/479241706">schrieb</a>:</p>
+<blockquote>
+<p><div class="codehilite"><pre><span></span><code>(Pdb) res = method(**kwargs, auth=self.auth, follow_redirects=True, timeout=None)
+(Pdb) p res
+&lt;Response [400 Bad Request]&gt;
+(Pdb) p res.json()
+{&#39;status&#39;: &#39;ERROR&#39;, &#39;message&#39;: &#39;Failed to add file to dataset.&#39;}
+</code></pre></div><br>
+</p>
+</blockquote>
+<p>I had the same error message when trying to upload a tar.gz: <a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/uploading.20.2Etar.2Egz.20files.20via.20API">#community &gt; uploading .tar.gz files via API</a> </p>
+<p>Insights into the server logs would help me out a lot</p>
+
+
+
+<a name="489273162"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/489273162" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#489273162">(Dec 16 2024 at 15:53)</a>:</h4>
+<p><span class="user-mention" data-user-id="784992">@Kai König</span> would you mind posting the code here?</p>
+
+
+
+<a name="498857999"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/498857999" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#498857999">(Feb 10 2025 at 20:40)</a>:</h4>
+<p><span class="user-mention" data-user-id="738886">@Adina Wagner</span> last week we merged <a href="https://github.com/IQSS/dataverse/issues/10979">#10979</a> to fix the issue you opened: <a href="https://github.com/IQSS/dataverse/issues/10975">#10975</a></p>
+
+
+
+<a name="498858131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Changes%20in%20the%20files%20API%20endpoint%20for%20replacing%20files%3F/near/498858131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Changes.20in.20the.20files.20API.20endpoint.20for.20replacing.20files.3F.html#498858131">(Feb 10 2025 at 20:40)</a>:</h4>
+<p>It'll be part of Dataverse 6.6. For details on the timeline, please see <a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/Release.206.2E6.20Timeline">#community &gt; Release 6.6 Timeline</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

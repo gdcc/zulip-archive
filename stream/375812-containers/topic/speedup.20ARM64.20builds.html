@@ -1,0 +1,233 @@
+<html>
+<head><meta charset="utf-8"><title>speedup ARM64 builds · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html">speedup ARM64 builds</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="432721267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432721267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432721267">(Apr 11 2024 at 14:39)</a>:</h4>
+<p>The ARM64 builds using QEMU on AMD64 Github Runners are a pain...</p>
+
+
+
+<a name="432721346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432721346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432721346">(Apr 11 2024 at 14:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> <span class="user-mention" data-user-id="598112">@Philip Durbin</span> how about we use an AWS T4g or M6g machine as a remote builder?</p>
+
+
+
+<a name="432721367"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432721367" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432721367">(Apr 11 2024 at 14:39)</a>:</h4>
+<p>(Not as a Github runner!)</p>
+
+
+
+<a name="432722113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722113">(Apr 11 2024 at 14:42)</a>:</h4>
+<p>If you look at <a href="https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/blob/2f605efb9ac22614bce7cc4b9acf718ba2d66b3b/ec2/ec2-create-instance.sh#L213C1-L213C315">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/blob/2f605efb9ac22614bce7cc4b9acf718ba2d66b3b/ec2/ec2-create-instance.sh#L213C1-L213C315</a> you can see how we spin up images:</p>
+<p><code>INSTANCE_ID=$(aws $PROFILE ec2 run-instances --image-id $AMI_ID --security-groups $AWS_SG $TAGARG --count 1 --instance-type $SIZE --key-name $KEY_NAME --query 'Instances[0].InstanceId' --block-device-mappings '[ { "DeviceName": "/dev/sda1", "Ebs": { "DeleteOnTermination": true, "VolumeSize": 20 } } ]' | tr -d \")</code></p>
+
+
+
+<a name="432722171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722171">(Apr 11 2024 at 14:42)</a>:</h4>
+<p>I see!</p>
+
+
+
+<a name="432722179"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722179" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722179">(Apr 11 2024 at 14:42)</a>:</h4>
+<p>So maybe you could give us an AMI id, etc.</p>
+
+
+
+<a name="432722232"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722232" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722232">(Apr 11 2024 at 14:43)</a>:</h4>
+<p>It looks like you folks already gave me an AWS access back in the day...</p>
+
+
+
+<a name="432722267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722267">(Apr 11 2024 at 14:43)</a>:</h4>
+<p>oh dear!</p>
+
+
+
+<a name="432722555"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722555" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722555">(Apr 11 2024 at 14:44)</a>:</h4>
+<p>The account is in the name of one Matthew Dunlap...</p>
+
+
+
+<a name="432722577"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722577" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722577">(Apr 11 2024 at 14:44)</a>:</h4>
+<p>Does that seem right????</p>
+
+
+
+<a name="432722756"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432722756" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432722756">(Apr 11 2024 at 14:45)</a>:</h4>
+<p>Hmm, we should update that. Thanks.</p>
+
+
+
+<a name="432732308"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432732308" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432732308">(Apr 11 2024 at 15:27)</a>:</h4>
+<p>OK I created <a href="https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#InstanceDetails:instanceId=i-0d27e1b1fc1c0a8db">https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#InstanceDetails:instanceId=i-0d27e1b1fc1c0a8db</a>. Named it "github-docker-buildx-arm64"</p>
+
+
+
+<a name="432732434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432732434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432732434">(Apr 11 2024 at 15:28)</a>:</h4>
+<p>I'm heading out now, will play with it tomorrow morning <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="432835950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432835950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432835950">(Apr 12 2024 at 06:16)</a>:</h4>
+<p>Wow this is really hacky... I need to manually give DMP a buildx instance configuration to make it pick up the remote builder...</p>
+
+
+
+<a name="432836127"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432836127" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432836127">(Apr 12 2024 at 06:18)</a>:</h4>
+<p>I probably need to develop another extension for the plugin to push nodes config from the outside...</p>
+
+
+
+<a name="432837191"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432837191" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432837191">(Apr 12 2024 at 06:27)</a>:</h4>
+<p>It takes about 500 MB of RAM peak when the base image starts the Payara instance. Almost 2 CPU cores are used</p>
+
+
+
+<a name="432837587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432837587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432837587">(Apr 12 2024 at 06:31)</a>:</h4>
+<p><a href="/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png" title="image.png"><img src="/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png"></a></div>
+
+
+
+<a name="432837961"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432837961" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432837961">(Apr 12 2024 at 06:34)</a>:</h4>
+<p>Someone definitely needs to explain to me how the AWS flavor says t4g.micro has 1 GB of RAM and it ends up with 815 MB</p>
+
+
+
+<a name="432838430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432838430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432838430">(Apr 12 2024 at 06:39)</a>:</h4>
+<p>Oh wow it looks like we can even scale up one more and get a machine for free till 2024-12-31: <a href="https://aws.amazon.com/ec2/faqs//#t4g-instances">https://aws.amazon.com/ec2/faqs//#t4g-instances</a></p>
+
+
+
+<a name="432838469"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432838469" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432838469">(Apr 12 2024 at 06:39)</a>:</h4>
+<p>I can definitely say that this is MUCH faster</p>
+
+
+
+<a name="432838480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432838480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432838480">(Apr 12 2024 at 06:39)</a>:</h4>
+<p>Let me try inject this into a CI config</p>
+
+
+
+<a name="432858520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432858520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432858520">(Apr 12 2024 at 08:39)</a>:</h4>
+<p>Seems like we can cut the runtime to at least half:<br>
+<a href="/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png" title="image.png"><img src="/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png"></a></div>
+
+
+
+<a name="432860272"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432860272" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432860272">(Apr 12 2024 at 08:50)</a>:</h4>
+<p>(Both v6.2 and develop do not have the injected builder config because the feature branch isn't merged and obviously for the tag this will never happen. But for scheduled rebuilds I don't care about build time in the middle of the night. This is important for pushes to develop only. v6.0 and v6.1 base image builds are skipped on purpose)</p>
+
+
+
+<a name="432869118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432869118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432869118">(Apr 12 2024 at 09:48)</a>:</h4>
+<p>I changed the setup on purpose to hit the builder with 3 jobs at once...</p>
+
+
+
+<a name="432869189"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432869189" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432869189">(Apr 12 2024 at 09:49)</a>:</h4>
+<p>That made it go cry for resources and two of three jobs failed (OOM killed the processes). So let's see what happens if we double the RAM</p>
+
+
+
+<a name="432877371"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432877371" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432877371">(Apr 12 2024 at 10:45)</a>:</h4>
+<p>With a t4g.small this works perfect for 3 parallel jobs!</p>
+
+
+
+<a name="432877503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432877503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432877503">(Apr 12 2024 at 10:46)</a>:</h4>
+<p>We can still use the QEMU variant when doing scheduled builds (because we don't need to care about buildtime on sunday nights), but there is a chance multiple PRs come in at the same time and require the builder</p>
+
+
+
+<a name="432883868"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432883868" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432883868">(Apr 12 2024 at 11:32)</a>:</h4>
+<p>Twice as fast? Great! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="432883987"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432883987" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432883987">(Apr 12 2024 at 11:33)</a>:</h4>
+<p>Even a bit more than twice <span aria-label="smile cat" class="emoji emoji-1f638" role="img" title="smile cat">:smile_cat:</span></p>
+
+
+
+<a name="432916503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/432916503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#432916503">(Apr 12 2024 at 14:30)</a>:</h4>
+<p>TODO for the runner: add a cronjob that on every day stops the builder process and deletes the volumes (docker volume prune -a), as we don't have much space on the disk</p>
+
+
+
+<a name="436046279"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436046279" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436046279">(Apr 29 2024 at 13:31)</a>:</h4>
+<p><a href="https://github.blog/2024-04-26-github-actions-arm64-and-the-future-of-automotive-software-development/">https://github.blog/2024-04-26-github-actions-arm64-and-the-future-of-automotive-software-development/</a> seems related at least. I didn't really did into the details.</p>
+
+
+
+<a name="436050038"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436050038" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436050038">(Apr 29 2024 at 13:45)</a>:</h4>
+<p>It's going on and on about how they now provide ARM based runners and GPU enabled runners in lots of industry/sales buzzwords.</p>
+
+
+
+<a name="436050122"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436050122" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436050122">(Apr 29 2024 at 13:46)</a>:</h4>
+<p>That was my sense too. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="436050328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436050328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436050328">(Apr 29 2024 at 13:46)</a>:</h4>
+<p>It's kind of non-related to us if we're not willing to make the pipeline a lot more complex to ship the images built on ARM64 and glue them together manually</p>
+
+
+
+<a name="436050462"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436050462" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436050462">(Apr 29 2024 at 13:47)</a>:</h4>
+<p>It would be an awesome feature to have a sidecar runner available that you can interact with from a job</p>
+
+
+
+<a name="436050489"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/speedup%20ARM64%20builds/near/436050489" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/speedup.20ARM64.20builds.html#436050489">(Apr 29 2024 at 13:47)</a>:</h4>
+<p>Right. Sounds like we should stay the course. Sorry for the noise!</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

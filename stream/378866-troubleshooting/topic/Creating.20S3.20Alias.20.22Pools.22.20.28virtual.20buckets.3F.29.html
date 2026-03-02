@@ -1,0 +1,114 @@
+<html>
+<head><meta charset="utf-8"><title>Creating S3 Alias &quot;Pools&quot; (virtual buckets?) · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html">Creating S3 Alias &quot;Pools&quot; (virtual buckets?)</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="521333617"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521333617" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521333617">(May 30 2025 at 16:38)</a>:</h4>
+<p>UVa wants to create a "virtual" S3 bucket... or an alias??</p>
+<p>We only have one S3 bucket, but want to allow users of one collection the ability to upload max filesize 100GB, while keeping the default bucket for all other collections at 6GB.</p>
+<p>I'm not sure which JVM options are needed to define this virtual pool.</p>
+<p>And would CORS be needed to be set up on the "virtual" bucket - or since it is already set up on the real bucket - the virtual one will use it?</p>
+
+
+
+<a name="521342189"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521342189" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521342189">(May 30 2025 at 17:33)</a>:</h4>
+<p>Harvard Dataverse does this. We have several stores pointed at the same bucket. The upload limits for each store can be configured separately.</p>
+
+
+
+<a name="521350976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521350976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521350976">(May 30 2025 at 18:30)</a>:</h4>
+<p>Can you send me the JVM lines for Harvard's default set up and one of the virtual ones? I'm confused as to what is "s3" that specifies the Amazon S3 versus the &lt;id&gt; s3 in our JVM lines.</p>
+<p>Not sure which ones we need for virtual ones.</p>
+<p>We have this now, only one store:</p>
+<blockquote>
+<p>-Ddataverse.files.s3.type=s3<br>
+-Ddataverse.files.s3.label=Dataverse S3 Storage<br>
+-Ddataverse.files.s3.bucket-name=dataverse-storage-production<br>
+-Ddataverse.files.s3.download-redirect=true<br>
+-Ddataverse.files.storage-driver-id=s3<br>
+-Ddataverse.files.s3.upload-redirect=true<br>
+-Ddataverse.files.s3.profile=default<br>
+-Ddataverse.files.s3.url-expiration-minutes=480</p>
+</blockquote>
+<p>So I was assuming we add lines (w/ "3d" as the ID for our new virtual store):<br>
+For the new "3d" (id=3d) store:<br>
+(the following lines like "s3" above, except "storage-driver" that is only for the default, which is still "s3"??)<br>
+<strong>?? And the bucket name stays the same... or is that different???</strong></p>
+<blockquote>
+<p>-Ddataverse.files.3d.type=s3<br>
+-Ddataverse.files.3d.label=3D Cultural Heritage<br>
+-Ddataverse.files.3d.bucket-name=dataverse-storage-production<br>
+-Ddataverse.files.3d.download-redirect=true<br>
+-Ddataverse.files.3d.upload-redirect=true<br>
+-Ddataverse.files.3d.profile=default<br>
+-Ddataverse.files.3d.url-expiration-minutes=480</p>
+</blockquote>
+
+
+
+<a name="521351449"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521351449" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521351449">(May 30 2025 at 18:32)</a>:</h4>
+<p>I'm pretty sure the bucket name stays the same.</p>
+
+
+
+<a name="521351763"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521351763" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521351763">(May 30 2025 at 18:35)</a>:</h4>
+<p>I'm refreshing myself at <a href="https://guides.dataverse.org/en/6.6/installation/config.html#multi-store-basics">https://guides.dataverse.org/en/6.6/installation/config.html#multi-store-basics</a> but yes "storage-driver" is how you set the default store, it looks like.</p>
+
+
+
+<a name="521357457"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/521357457" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#521357457">(May 30 2025 at 19:17)</a>:</h4>
+<p>It looks like Jim is saying similar stuff at <a href="https://groups.google.com/g/dataverse-community/c/ZCIJU-IknGg/m/dmSXCMFuAAAJ">https://groups.google.com/g/dataverse-community/c/ZCIJU-IknGg/m/dmSXCMFuAAAJ</a></p>
+
+
+
+<a name="524592583"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/524592583" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#524592583">(Jun 17 2025 at 20:37)</a>:</h4>
+<p>Can someone send me how Harvard.dataverse has setup virtual storage "pools"? Maybe just the output of what the files JVM settings are? </p>
+<p>The output of this command:<br>
+<code>bin/asadmin list-jvm-options | grep files</code> </p>
+<p>I'm really having trouble trying to figure out which JVM lines to use for the storage alias. I tried just two, "type" and "label" and got things really messed up, then I added a third defining the bucket name (same as our S3), made our system happy again.... but getting errors about the storage and AWS, see error from log file at end:</p>
+<p>I added these 3 commands, seems that I am missing a few options, see error message:<br>
+<code>./asadmin create-jvm-options "-Ddataverse.files.3d.type=s3"</code></p>
+<p><code>./asadmin create-jvm-options "-Ddataverse.files.3d.label=3D Cultural Heritage"</code></p>
+<p><code>./asadmin create-jvm-options "-Ddataverse.files.3d.bucket-name=dataverse-storage-production"</code></p>
+<blockquote>
+<p>[2025-06-17T20:18:39.212+0000] [Payara 6.2025.2] [WARNING] [] [edu.harvard.iq.dataverse.ThumbnailServiceWrapper] [tid: _ThreadID=90 _ThreadName=http-thread-pool::jk-connector(4)] [timeMillis: 1750191519212] [levelValue: 900] [[<br>
+  getDatasetCardImageAsUrl(): Failed to initialize dataset StorageIO for 3d://10.80100/FK2/EUJETR (S3AccessIO: Failed to cache auxilary object : dataset_logo_original)]]</p>
+</blockquote>
+
+
+
+<a name="524593372"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/524593372" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#524593372">(Jun 17 2025 at 20:43)</a>:</h4>
+<p>I'd ask Leonid but he's super busy right now. <span class="user-mention" data-user-id="760572">@Steven Winship</span> is there anything you could copy/paste from domain.xml? No passwords, etc. please!</p>
+
+
+
+<a name="524594118"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/524594118" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#524594118">(Jun 17 2025 at 20:49)</a>:</h4>
+<p>Thanks <span class="user-mention" data-user-id="598112">@Philip Durbin</span> <br>
+I just saw you were off on vacation.</p>
+<p>These are my last few days at UVA, retirement starts after Friday.</p>
+
+
+
+<a name="524594465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Creating%20S3%20Alias%20%22Pools%22%20%28virtual%20buckets%3F%29/near/524594465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Creating.20S3.20Alias.20.22Pools.22.20.28virtual.20buckets.3F.29.html#524594465">(Jun 17 2025 at 20:52)</a>:</h4>
+<p>Right, right, I just warmed up <a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/News.20from.20Sherry.20Lake.20.28UVA.29/with/509737115">#community &gt; News from Sherry Lake (UVA)</a> <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

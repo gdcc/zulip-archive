@@ -1,0 +1,127 @@
+<html>
+<head><meta charset="utf-8"><title>Region issue for dataverse using AWS S3 direct upload · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html">Region issue for dataverse using AWS S3 direct upload</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="441069419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/441069419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#441069419">(May 28 2024 at 15:56)</a>:</h4>
+<p>I want to run a containerized Dataverse instance using a direct upload s3 storage. I want to run it pointing to a real AWS account and bucket, that is, without localstack and minio.</p>
+<p>I have used the microprofile config options for setting the AWS credentials (files.&lt;id&gt;.access-key and files.&lt;id&gt;.secret-key) and added them in the JVM_ARGS Dataverse env variable.</p>
+<div class="codehilite" data-code-language="YAML"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test_dataverse</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="s">'test_dataverse'</span>
+<span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataverse</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DATAVERSE_IMAGE_REGISTRY}/gdcc/dataverse:${DATAVERSE_IMAGE_TAG}</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+<span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">payara</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">DATAVERSE_DB_HOST</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres</span>
+<span class="w">      </span><span class="nt">DATAVERSE_DB_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">secret</span>
+<span class="w">      </span><span class="nt">DATAVERSE_DB_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DATAVERSE_DB_USER}</span>
+<span class="w">      </span><span class="nt">JVM_ARGS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.storage-driver-id=file1</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.providers=fake</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.default-provider=fake</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.fake.type=FAKE</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.fake.label=FakeDOIProvider</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.fake.authority=10.5072</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.pid.fake.shoulder=FK2/</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.type=s3</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.label=XXX</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.bucket-name=XXX</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.upload-redirect=true</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.download-redirect=true</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.ingestsizelimit=50000000</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.url-expiration-minutes=60</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.connection-pool-size=2048</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.access-key=XXX</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">-Ddataverse.files.s3.secret-key=XXX</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain"># No mpconfig for region?</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'8080:8080'</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataverse</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test_postgres</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test_solr</span>
+<span class="w">    </span><span class="nt">tmpfs</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dumps:mode=770,size=2052M,uid=1000,gid=1000</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/tmp:mode=770,size=2052M,uid=1000,gid=1000</span>
+<span class="w">    </span><span class="nt">mem_limit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2147483648</span><span class="w"> </span><span class="c1"># 2 GiB</span>
+<span class="w">    </span><span class="nt">mem_reservation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1024m</span>
+<span class="w">    </span><span class="nt">privileged</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<p>When I run the containers and Dataverse tries to access S3  an SdkClientException is thrown, describing that it could not find the region <br>
+<a href="/user_uploads/53090/O0ve2NzIovKs5d_VDzILxp2U/Screenshot-2024-05-28-at-16.34.22.png">Screenshot-2024-05-28-at-16.34.22.png</a><br>
+How can I specify the region?</p>
+<div class="message_inline_image"><a href="/user_uploads/53090/O0ve2NzIovKs5d_VDzILxp2U/Screenshot-2024-05-28-at-16.34.22.png" title="Screenshot-2024-05-28-at-16.34.22.png"><img src="/user_uploads/53090/O0ve2NzIovKs5d_VDzILxp2U/Screenshot-2024-05-28-at-16.34.22.png"></a></div>
+
+
+
+<a name="443225156"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443225156" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443225156">(Jun 07 2024 at 07:02)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598442">@Guillermo Portas</span>. Please note that the storage subsystem has not yet been completely MPCONFIG enabled. The only options enabled to use MPCONFIG are the keys.</p>
+
+
+
+<a name="443225329"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443225329" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443225329">(Jun 07 2024 at 07:03)</a>:</h4>
+<p>It seems like the option to configure a "real" region is actually missing from the <a href="https://guides.dataverse.org/en/latest/installation/config.html#list-of-s3-storage-options">S3 configuration options</a>!</p>
+
+
+
+<a name="443225504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443225504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443225504">(Jun 07 2024 at 07:04)</a>:</h4>
+<p>You can define a <code>custom-region</code> though. Let me check what's in the code for this and if you can use it to override things.</p>
+
+
+
+<a name="443225596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443225596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443225596">(Jun 07 2024 at 07:05)</a>:</h4>
+<p>Otherwise, the only other option to configure these regions I'm aware of would be a <code>~/.aws/config</code> entry</p>
+
+
+
+<a name="443226018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443226018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443226018">(Jun 07 2024 at 07:08)</a>:</h4>
+<p>Nope - the custom endpoint region thing is only available when using a custom endpoint URL</p>
+
+
+
+<a name="443226066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443226066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443226066">(Jun 07 2024 at 07:08)</a>:</h4>
+<p>You could try to define the official endpoint URL as custom URL <span aria-label="smile cat" class="emoji emoji-1f638" role="img" title="smile cat">:smile_cat:</span></p>
+
+
+
+<a name="443280318"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443280318" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443280318">(Jun 07 2024 at 11:44)</a>:</h4>
+<p>Yes, we talked about this on May 30th at a container meeting: <a href="https://harvard.zoom.us/rec/share/FVYyxSpMkOLX-jo9TLCBek0KhkZiFZ6e4v4Nka7M4eSpbVczSxrn5vLcKHG9if9x.cBqXOiQlyKpDN8pD">https://harvard.zoom.us/rec/share/FVYyxSpMkOLX-jo9TLCBek0KhkZiFZ6e4v4Nka7M4eSpbVczSxrn5vLcKHG9if9x.cBqXOiQlyKpDN8pD</a></p>
+
+
+
+<a name="443280383"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443280383" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443280383">(Jun 07 2024 at 11:44)</a>:</h4>
+<p>As Oliver is saying, one has to use <code>custom-region</code> for now.</p>
+
+
+
+<a name="443764504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443764504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443764504">(Jun 10 2024 at 12:54)</a>:</h4>
+<p>Thank you <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span>  and <span class="user-mention" data-user-id="598112">@Philip Durbin</span> !</p>
+
+
+
+<a name="443764757"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Region%20issue%20for%20dataverse%20using%20AWS%20S3%20direct%20upload/near/443764757" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Guillermo Portas <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Region.20issue.20for.20dataverse.20using.20AWS.20S3.20direct.20upload.html#443764757">(Jun 10 2024 at 12:55)</a>:</h4>
+<p>I finally decided to use localstack for my testing setup, but I will take your comments into account for the future.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

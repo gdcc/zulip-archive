@@ -1,0 +1,109 @@
+<html>
+<head><meta charset="utf-8"><title>failed to look up S3 bucket · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html">failed to look up S3 bucket</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="479417870"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479417870" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Király Péter <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479417870">(Oct 29 2024 at 07:46)</a>:</h4>
+<p>Hi, I have a problem. Just upgraded Dataverse from 5.14 to 6.0. I followed the release notes, and I ran into a trouble. Those dataverses that are configured to work with S3 (we use CEPH S3 not AWS), are inaccessible, they produce the following on the web side:</p>
+<div class="codehilite"><pre><span></span><code>XML Parsing Error: mismatched tag. Expected: &lt;/br&gt;.
+Location: https://data.goettingen-research-online.de/dataverse/pkiraly
+Line Number 355, Column 9:
+      &lt;/div&gt;
+--------^
+</code></pre></div>
+<p>Payara server.log says: "java.io.IOException: ERROR: S3AccessIO - Failed to look up bucket gro-data (is AWS properly configured?): null (Service: Amazon S3; Status Code: 400; Error Code: InvalidArgument; Request ID: tx00000feb01b793cfaf500-0067208fa0-5263351e-default; S3 Extended Request ID: 5263351e-default-default; Proxy: null).<br>
+I can access the bucket with command line:</p>
+<div class="codehilite"><pre><span></span><code>aws --endpoint=https://s3.gwdg.de s3 ls --human-readable --summarize s3://gro-data/
+</code></pre></div>
+<p>and I have the following JVM options:</p>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.files.s3.bucket-name=gro-data
+-Ddataverse.files.s3.custom-endpoint-url=https://s3.gwdg.de
+-Ddataverse.files.s3.download-redirect=true
+-Ddataverse.files.s3.ingestsizelimit=1073741824
+-Ddataverse.files.s3.label=S3 storage
+-Ddataverse.files.s3.type=s3
+-Ddataverse.files.s3.upload-redirect=true
+</code></pre></div>
+<p>I rechecked Dataverse config guide, but I do not found what is the problem. Do you have any suggestion what to check/restart? Many thanks for any suggestions!</p>
+
+
+
+<a name="479445858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479445858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479445858">(Oct 29 2024 at 10:28)</a>:</h4>
+<p><a href="#narrow/channel/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket/near/479417870">A message</a> was moved here from <a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/AWS.20S3.20and.20class.20transitions">#community &gt; AWS S3 and class transitions</a> by <span class="user-mention silent" data-user-id="598112">Philip Durbin 🐉</span>.</p>
+
+
+
+<a name="479445930"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479445930" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479445930">(Oct 29 2024 at 10:29)</a>:</h4>
+<p><span class="user-mention" data-user-id="772415">@Király Péter</span> hmm, it looks like the error is coming from here: <a href="https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L117">https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L117</a></p>
+
+
+
+<a name="479445976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479445976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479445976">(Oct 29 2024 at 10:29)</a>:</h4>
+<p><code>throw new IOException("ERROR: S3AccessIO - Failed to look up bucket "+bucketName+" (is AWS properly configured?): " + sce.getMessage());</code></p>
+
+
+
+<a name="479446041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479446041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479446041">(Oct 29 2024 at 10:29)</a>:</h4>
+<p><code>bucketName</code> is null for you.</p>
+
+
+
+<a name="479446529"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479446529" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479446529">(Oct 29 2024 at 10:32)</a>:</h4>
+<p>Perhaps you could add some additional print line debugging? From a quick look your JVM settings look ok to me. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="479449063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479449063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Király Péter <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479449063">(Oct 29 2024 at 10:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🐉</span> Many thanks for the tip, but I disagree this time. The error message starts with "Failed to look up bucket gro-data (is AWS properly configured?)", so the <code>bucketName</code> is  <code>gro-data</code>.  The <code>null</code> comes from the <code>sce.getMessage()</code> call, but it is not clear from there what is null. In the details one value is null: the Proxy. In dataverse documentation there is a optional configuration for proxy:<br>
+JVM Option: dataverse.files.&lt;id&gt;.proxy-url<br>
+Value: &lt;?&gt;<br>
+Description: URL of a proxy protecting the S3 store. Optional.<br>
+Default value: (none)</p>
+
+
+
+<a name="479450409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479450409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Király Péter <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479450409">(Oct 29 2024 at 10:54)</a>:</h4>
+<p>Is there probably a service I should restart?</p>
+
+
+
+<a name="479453473"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479453473" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479453473">(Oct 29 2024 at 11:12)</a>:</h4>
+<p>Oh, sorry, sorry, you're right. The <code>bucketName</code> is not null, obviously.</p>
+
+
+
+<a name="479454829"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479454829" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479454829">(Oct 29 2024 at 11:19)</a>:</h4>
+<p>So a <code>SdkClientException</code> is being caught but its <code>getMessage() method</code> is null? But the message shows "null" and keeps going (<code>...properly configured?): null (Service: Amazon S3; Status...</code>). Strange. Are you able to add any extra debugging? I'm not sure what to say about the proxy. I don't believe I've ever used it myself.</p>
+
+
+
+<a name="479455013"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479455013" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479455013">(Oct 29 2024 at 11:20)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/8285">#8285</a> by <span class="user-mention" data-user-id="626369">@Don Sizemore</span> show a non-null message from SdkClientException</p>
+
+
+
+<a name="479469086"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/failed%20to%20look%20up%20S3%20bucket/near/479469086" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Leo Andreev <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket.html#479469086">(Oct 29 2024 at 12:37)</a>:</h4>
+<p>Let's eliminate all the straightforward/simple possibilities. Could you please confirm that the new Payara 6 is running under the same user as Payara 5/Dataverse 5.14 used to (presumably the same user for whom the aws command line is still working).</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

@@ -1,0 +1,417 @@
+<html>
+<head><meta charset="utf-8"><title>Collection custom metadata &amp; DCAT-AP · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html">Collection custom metadata &amp; DCAT-AP</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="560361917"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560361917" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560361917">(Nov 26 2025 at 11:02)</a>:</h4>
+<p>Thanks.</p>
+<p>I have raised this issue in Paul Boon's repo for the DCAT-AP exporter: <a href="https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1">https://github.com/Dans-labs/dataverse-exporter-dcatap/issues/1</a></p>
+<p>We can find the metadata export function in the UI for individual datasets which uses the ordinary API, but we cannot find the exporter in our list of OAI metadata exporters. See: <a href="https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats">https://demo.dataverse.deic.dk/oai?verb=ListMetadataFormats</a></p>
+<p>Do you have a take on why that is?</p>
+
+
+
+<a name="560385589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560385589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560385589">(Nov 26 2025 at 13:06)</a>:</h4>
+<p>Hi, just improved that exporter, now it also has isHarvestable return true, should make it available via OAI then. <br>
+The code and Jar is here: <a href="https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0">https://github.com/Dans-labs/dataverse-exporter-dcatap/releases/tag/v0.1.0</a></p>
+
+
+
+<a name="560386476"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560386476" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560386476">(Nov 26 2025 at 13:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> I hope you understand that plugin loading better that I do, because I do have some issues with the class loading. When I run it from my dev environment (just the maven test via that clean install) I do get different results from running it via the Dataverse application. Somehow it usess different implementation of libs, even though I build a 'fat' jar with all libs in it.</p>
+
+
+
+<a name="560389204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560389204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560389204">(Nov 26 2025 at 13:24)</a>:</h4>
+<p>Getting the basic DCAT-AP in RDF (XML) does not look to complicated because there are not many mandatory fields. Those DCAT-AP extensions however are problematic, also because some information must be extracted from custom metadatablocks, as indicated by <span class="user-mention" data-user-id="617722">@Johannes D</span> .  <br>
+But, before continuing with making the plugin more fexible I want to have the RDF eyeballed by some RDF experts...</p>
+
+
+
+<a name="560625503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/560625503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#560625503">(Nov 27 2025 at 15:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Is it possible for an exporter plugin to be in the OAI output; I see this line in the <code>OAIServlet.java</code>: <code>if (exporter != null &amp;&amp; (exporter instanceof XMLExporter) &amp;&amp; exporter.isHarvestable()) </code>. <br>
+And that plugin is a <code>io.gdcc.spi.export.Exporter</code>. Should the test look for <code>MediaType.APPLICATION_XML</code> instead?</p>
+
+
+
+<a name="561150423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561150423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561150423">(Dec 01 2025 at 12:53)</a>:</h4>
+<p>Ok, I will try with <code>io.gdcc.spi.export.XMLExporter</code>, that should work.</p>
+
+
+
+<a name="561180349"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561180349" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561180349">(Dec 01 2025 at 14:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> any luck? How's it going?</p>
+
+
+
+<a name="561491428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561491428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561491428">(Dec 02 2025 at 18:31)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Somehow it is not working, so I changed back to Exporter and started improving the RDF output. But I will try to wrap things up by the end of the week. Thanks for asking.</p>
+
+
+
+<a name="561631746"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561631746" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561631746">(Dec 03 2025 at 11:57)</a>:</h4>
+<p>I have found the file for the OAI DDI exporter in the Dataverse source code for inspiration, if this might help:<br>
+<a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/export/OAI_DDIExporter.java">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/export/OAI_DDIExporter.java</a></p>
+
+
+
+<a name="561646602"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561646602" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561646602">(Dec 03 2025 at 13:08)</a>:</h4>
+<p>The main problem, I think, is that RDF/XML is not compatible with the OAI format, which needs an XML schema (xsd file), which we cannot provide. <br>
+The alternative (for harvesting clients) might be to use OAI harvesting to retrieve the identifiers and use those to retrieve the individual DCAT-AP metadata from the API. <br>
+So, it might be that we won't provide OAI for the DCAT-AP at all!</p>
+
+
+
+<a name="561653428"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561653428" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561653428">(Dec 03 2025 at 13:37)</a>:</h4>
+<p>Huh. Interesting. <span class="user-mention" data-user-id="637063">@Leo Andreev</span> check this out ^^</p>
+
+
+
+<a name="561654947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561654947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561654947">(Dec 03 2025 at 13:43)</a>:</h4>
+<p>Maybe I am wrong; I would like to have that RDF/XML in there;</p>
+<div class="codehilite"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; ...&gt;
+    &lt;GetRecord&gt;
+        &lt;record&gt;
+            &lt;header&gt;
+                &lt;identifier&gt;oai:example.org:item123&lt;/identifier&gt;
+                &lt;datestamp&gt;2025-12-02&lt;/datestamp&gt;
+                &lt;metadataFormat&gt;RDF&lt;/metadataFormat&gt;
+            &lt;/header&gt;
+            &lt;metadata&gt;
+                &lt;!-- RDF Content Here --&gt;
+            &lt;/metadata&gt;
+        &lt;/record&gt;
+    &lt;/GetRecord&gt;
+&lt;/OAI-PMH&gt;
+</code></pre></div>
+
+
+
+<a name="561661445"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561661445" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561661445">(Dec 03 2025 at 14:11)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> as someone who did a lot of work on the OAI-PMH lib we use (XOAI) I am fairly familiar with the protocol. When you say you need an XSD, what exactly are you talking about? (I'm not sure I follow... <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> )</p>
+
+
+
+<a name="561662207"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561662207" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561662207">(Dec 03 2025 at 14:14)</a>:</h4>
+<p>Does the example at <a href="https://www.openarchives.org/OAI/openarchivesprotocol.html#Record">https://www.openarchives.org/OAI/openarchivesprotocol.html#Record</a> help clear up the situation? (Assuming you're talking about how to provide the namespace URLs and attach the schemaLocations to it)</p>
+
+
+
+<a name="561662784"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561662784" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561662784">(Dec 03 2025 at 14:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> The <code>oai?verb=ListMetadataFormats</code> returns this:</p>
+<div class="codehilite"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd&quot;&gt;
+&lt;responseDate&gt;2025-12-03T14:07:45Z&lt;/responseDate&gt;
+&lt;request verb=&quot;ListMetadataFormats&quot;&gt;https://dev.dataverse.nl/oai&lt;/request&gt;
+&lt;ListMetadataFormats&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;dcatap&lt;/metadataPrefix&gt;
+&lt;schema/&gt;
+&lt;metadataNamespace/&gt;
+&lt;/metadataFormat&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;Datacite&lt;/metadataPrefix&gt;
+&lt;schema&gt;http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.5/metadata.xsd&lt;/schema&gt;
+&lt;metadataNamespace&gt;http://datacite.org/schema/kernel-4&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;oai_dc&lt;/metadataPrefix&gt;
+&lt;schema&gt;http://www.openarchives.org/OAI/2.0/oai_dc.xsd&lt;/schema&gt;
+&lt;metadataNamespace&gt;http://www.openarchives.org/OAI/2.0/oai_dc/&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;oai_datacite&lt;/metadataPrefix&gt;
+&lt;schema&gt;http://schema.datacite.org/meta/kernel-4.1/metadata.xsd&lt;/schema&gt;
+&lt;metadataNamespace&gt;http://datacite.org/schema/kernel-4&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;oai_ddi&lt;/metadataPrefix&gt;
+&lt;schema&gt;https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd&lt;/schema&gt;
+&lt;metadataNamespace&gt;ddi:codebook:2_5&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;dataverse_json&lt;/metadataPrefix&gt;
+&lt;schema&gt;https://dataverse.org/schema/core.xsd&lt;/schema&gt;
+&lt;metadataNamespace&gt;https://dataverse.org/schema/core&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+&lt;/ListMetadataFormats&gt;
+&lt;/OAI-PMH&gt;
+</code></pre></div>
+<p>So it has <code>dcatap</code>, but with no shema and no namspace...<br>
+Then if I request for the records; <code>oai?verb=ListRecords&amp;metadataPrefix=dcatap</code> I get: </p>
+<div class="codehilite"><pre><span></span><code>&lt;OAI-PMH xmlns=&quot;http://www.openarchives.org/OAI/2.0/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd&quot;&gt;
+&lt;responseDate&gt;2025-12-03T14:11:32Z&lt;/responseDate&gt;
+&lt;request&gt;https://dataverse.nl/oai&lt;/request&gt;
+&lt;error code=&quot;cannotDisseminateFormat&quot;&gt;Format &#39;dcatap&#39; not applicable in this context&lt;/error&gt;
+&lt;/OAI-PMH&gt;
+</code></pre></div>
+<p>So it might be because it has no schema?</p>
+
+
+
+<a name="561663073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561663073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561663073">(Dec 03 2025 at 14:17)</a>:</h4>
+<p>Code code code I need code <span aria-label="smiley" class="emoji emoji-1f603" role="img" title="smiley">:smiley:</span> Can you point me to a repo with your exporter code?</p>
+
+
+
+<a name="561663509"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561663509" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561663509">(Dec 03 2025 at 14:19)</a>:</h4>
+<p>(BTW why "dcatap" and not just "dcat"?)</p>
+
+
+
+<a name="561664060"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561664060" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561664060">(Dec 03 2025 at 14:21)</a>:</h4>
+<p>Code its here: <a href="https://github.com/PaulBoon/dataverse-exporter-dcatap/tree/FixOAIExport">https://github.com/PaulBoon/dataverse-exporter-dcatap/tree/FixOAIExport</a><br>
+The format is DCAT-AP; <a href="https://semiceu.github.io/DCAT-AP/releases/3.0.0">https://semiceu.github.io/DCAT-AP/releases/3.0.0</a></p>
+
+
+
+<a name="561664233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561664233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561664233">(Dec 03 2025 at 14:22)</a>:</h4>
+<p>Let me suggest using "dcat_ap" in this case then. As they use "oai_dc" to make it more readable.</p>
+
+
+
+<a name="561664748"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561664748" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561664748">(Dec 03 2025 at 14:24)</a>:</h4>
+<p>Let me also suggest using <a href="https://github.com/gdcc/dataverse-exporters">https://github.com/gdcc/dataverse-exporters</a> as the Parent POM. It's not strictly necessary, but it may be useful to have an intermediate parent pom for all of the exporters. I'm happy to hear contra arguments! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="561665249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561665249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561665249">(Dec 03 2025 at 14:25)</a>:</h4>
+<p>WRT to no schemas being announced... I think I know the culprit. While you are using XMLExporter (good!), you're returning empty values for these: <a href="https://github.com/PaulBoon/dataverse-exporter-dcatap/blob/e12307d3ba32e5178610acebae3cdf6a3068dc1d/src/main/java/io/gdcc/spi/export/dcatap/DCATAPExporter.java#L94-L107">https://github.com/PaulBoon/dataverse-exporter-dcatap/blob/e12307d3ba32e5178610acebae3cdf6a3068dc1d/src/main/java/io/gdcc/spi/export/dcatap/DCATAPExporter.java#L94-L107</a></p>
+
+
+
+<a name="561665331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561665331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561665331">(Dec 03 2025 at 14:26)</a>:</h4>
+<p>I'd have a hard time figuring this out as library, too <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="561666351"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561666351" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561666351">(Dec 03 2025 at 14:29)</a>:</h4>
+<p>Exactly, empty values, because I don't have a schema...</p>
+
+
+
+<a name="561666454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561666454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561666454">(Dec 03 2025 at 14:30)</a>:</h4>
+<p>But you will need a namespace!</p>
+
+
+
+<a name="561666872"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561666872" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561666872">(Dec 03 2025 at 14:31)</a>:</h4>
+<p>The RDF output starts like this:</p>
+<div class="codehilite"><pre><span></span><code>&lt;rdf:RDF
+    xmlns:dct=&quot;http://purl.org/dc/terms/&quot;
+    xmlns:spdx=&quot;http://spdx.org/rdf/terms#&quot;
+    xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+    xmlns:dcatap=&quot;http://data.europa.eu/r5r/&quot;
+    xmlns:vcard=&quot;http://www.w3.org/2006/vcard/ns#&quot;
+    xmlns:dcat=&quot;http://www.w3.org/ns/dcat#&quot;
+    xmlns:rdfs=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;
+    xmlns:foaf=&quot;http://xmlns.com/foaf/0.1/&quot;&gt;
+  &lt;rdf:Description rdf:about=&quot;https://doi.org/10.5072/FK2/6ZUDGC&quot;&gt;
+...
+</code></pre></div>
+
+
+
+<a name="561666879"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561666879" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561666879">(Dec 03 2025 at 14:31)</a>:</h4>
+<p>Also, you're want to use the DCAT-AP namespace, aye?</p>
+
+
+
+<a name="561666995"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561666995" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561666995">(Dec 03 2025 at 14:32)</a>:</h4>
+<p>Yeah that seems right</p>
+
+
+
+<a name="561667053"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561667053" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561667053">(Dec 03 2025 at 14:32)</a>:</h4>
+<p>All the namespaces properly defined</p>
+
+
+
+<a name="561667406"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561667406" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561667406">(Dec 03 2025 at 14:33)</a>:</h4>
+<p>We may need to extend XOAI's model classes here. Currently, they expect 1 metadata format to have 1 namespace and 1 schemaLocation.</p>
+
+
+
+<a name="561667457"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561667457" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561667457">(Dec 03 2025 at 14:33)</a>:</h4>
+<p>With RDF, that may no longer be the case.</p>
+
+
+
+<a name="561667545"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561667545" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561667545">(Dec 03 2025 at 14:34)</a>:</h4>
+<p>Also, the XMLExporter interface may need an extension to reflect these facts.</p>
+
+
+
+<a name="561668006"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561668006" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561668006">(Dec 03 2025 at 14:35)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I guess it is somewhere validating the XML and discovers it's not valid, then throws an error?<br>
+I mean, there is no workaround ?</p>
+
+
+
+<a name="561668386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561668386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561668386">(Dec 03 2025 at 14:37)</a>:</h4>
+<p>Not sure about that.</p>
+
+
+
+<a name="561668566"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561668566" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561668566">(Dec 03 2025 at 14:38)</a>:</h4>
+<p>I'd need to dive in deeper, can't tell from the top of my head what'll happen with empty strings like that.</p>
+
+
+
+<a name="561668696"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561668696" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561668696">(Dec 03 2025 at 14:38)</a>:</h4>
+<p>The XML bit is usually just copied from the export (which is cached) and then written. There usually is no more validation happening.</p>
+
+
+
+<a name="561669578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561669578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561669578">(Dec 03 2025 at 14:42)</a>:</h4>
+<p>See <a href="https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/harvest/server/xoai/DataverseXoaiItemRepository.java#L258-L258">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/harvest/server/xoai/DataverseXoaiItemRepository.java#L258-L258</a> - there's the bit that simple takes the exported data, reads it and then dumps it into the OAI metadata record.</p>
+
+
+
+<a name="561671198"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561671198" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561671198">(Dec 03 2025 at 14:48)</a>:</h4>
+<p>Looks like I need to use the debugger...</p>
+
+
+
+<a name="561671834"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561671834" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561671834">(Dec 03 2025 at 14:50)</a>:</h4>
+<p>I'd try to get the metadata format available first.</p>
+
+
+
+<a name="561671887"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561671887" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561671887">(Dec 03 2025 at 14:50)</a>:</h4>
+<p>It's in the list, but not completed.</p>
+
+
+
+<a name="561671918"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561671918" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561671918">(Dec 03 2025 at 14:50)</a>:</h4>
+<p>This may be a problem.</p>
+
+
+
+<a name="561673105"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673105" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673105">(Dec 03 2025 at 14:54)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP/near/561664748">said</a>:</p>
+<blockquote>
+<p>Let me also suggest using <a href="https://github.com/gdcc/dataverse-exporters">https://github.com/gdcc/dataverse-exporters</a> as the Parent POM. It's not strictly necessary, but it may be useful to have an intermediate parent pom for all of the exporters. I'm happy to hear contra arguments! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+</blockquote>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> please don't forget that it's still using the legacy ossrh config: <a href="https://github.com/gdcc/dataverse-exporters/issues/54">https://github.com/gdcc/dataverse-exporters/issues/54</a></p>
+
+
+
+<a name="561673379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673379">(Dec 03 2025 at 14:55)</a>:</h4>
+<p>Yikes <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="561673423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673423">(Dec 03 2025 at 14:55)</a>:</h4>
+<p>Wasn't me</p>
+
+
+
+<a name="561673468"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673468" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673468">(Dec 03 2025 at 14:55)</a>:</h4>
+<p><span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="561673589"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673589" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673589">(Dec 03 2025 at 14:56)</a>:</h4>
+<p>Someone should change that... <span aria-label="speak no evil" class="emoji emoji-1f64a" role="img" title="speak no evil">:speak_no_evil:</span> <span aria-label="hear no evil" class="emoji emoji-1f649" role="img" title="hear no evil">:hear_no_evil:</span> <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="561673599"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561673599" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561673599">(Dec 03 2025 at 14:56)</a>:</h4>
+<p>Well, it was never updated. ossrh was the right way to do things back in the day. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="561682952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561682952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561682952">(Dec 03 2025 at 15:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="928678">@Paul Boon</span> I should also mention that you should not put the exporters in the SPI package. It should be its own package. Here's an example: <a href="https://github.com/gdcc/exporter-ddipdf/tree/main/src/main/java/io/gdcc/export/ddipdf">https://github.com/gdcc/exporter-ddipdf/tree/main/src/main/java/io/gdcc/export/ddipdf</a></p>
+
+
+
+<a name="561707369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/561707369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paul Boon <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#561707369">(Dec 03 2025 at 17:00)</a>:</h4>
+<p>Uhm, seems to be working... was looking at the wrong server, Sorry, my bad! <span aria-label="exploding head" class="emoji emoji-1f92f" role="img" title="exploding head">:exploding_head:</span><br>
+Only that empty <code>schema</code> in the <code>ListMetadataFormats</code>, but we mayeb harvesting clients have no troubles with that.</p>
+
+
+
+<a name="562089684"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/562089684" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Asbjørn Skødt <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#562089684">(Dec 05 2025 at 12:30)</a>:</h4>
+<p>Yes, we have a breakthrough! Awesome.</p>
+<p>We get this info from list of metadata formats:</p>
+<div class="codehilite"><pre><span></span><code>&lt;metadataFormat&gt;
+&lt;metadataPrefix&gt;dcat_ap&lt;/metadataPrefix&gt;
+&lt;schema/&gt;
+&lt;metadataNamespace&gt;http://purl.org/dc/terms/ http://spdx.org/rdf/terms# http://www.w3.org/1999/02/22-rdf-syntax-ns# http://data.europa.eu/r5r/ http://www.w3.org/2006/vcard/ns# http://www.w3.org/ns/dcat# http://www.w3.org/2000/01/rdf-schema# http://xmlns.com/foaf/0.1/&lt;/metadataNamespace&gt;
+&lt;/metadataFormat&gt;
+</code></pre></div>
+<p>Why does the namespace list several namespaces? The namespace for DCAT-AP according to the spec is:<br>
+<code>http://data.europa.eu/r5r/</code></p>
+<p>source:</p>
+<blockquote>
+<h2>5. Terminology</h2>
+<p><a href="https://semiceu.github.io/DCAT-AP/r5r/releases/3.0.0/#specterminology">https://semiceu.github.io/DCAT-AP/r5r/releases/3.0.0/#specterminology</a><br>
+The namespace for this vocabulary is <code>http://data.europa.eu/r5r/</code> .</p>
+</blockquote>
+
+
+
+<a name="566539437"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Collection%20custom%20metadata%20%26%20DCAT-AP/near/566539437" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Collection.20custom.20metadata.20.26.20DCAT-AP.html#566539437">(Jan 06 2026 at 13:01)</a>:</h4>
+<p>Sorry for the short notice but in two hours <span class="user-mention" data-user-id="928391">@Sjaak Derksen</span> will be talking about DCAT at the community call: <a href="https://groups.google.com/g/dataverse-community/c/sM5Kdwy1lT0/m/2Z-7a8fcBQAJ">https://groups.google.com/g/dataverse-community/c/sM5Kdwy1lT0/m/2Z-7a8fcBQAJ</a></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

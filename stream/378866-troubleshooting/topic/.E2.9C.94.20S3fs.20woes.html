@@ -1,0 +1,247 @@
+<html>
+<head><meta charset="utf-8"><title>✔ S3fs woes · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html">✔ S3fs woes</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="396081662"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396081662" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396081662">(Oct 11 2023 at 12:47)</a>:</h4>
+<p>Hitting some troubles with moving existing envs to s3fs. The gameplan:</p>
+<ol>
+<li>Mount s3 bucket to local folder via s3fs</li>
+<li>Copy existing stuff on existing Dataverse folder to mount, keeping file/folder structure intact.</li>
+<li>Since java talks to operating system file system - if I replace the Dataverse data folder with the mount, it should work out of the box.</li>
+<li>Replace via fstab, reboot</li>
+<li>Mount works, files are accessible via cli.</li>
+<li>Beer</li>
+</ol>
+<p>Step 6 is interrupted unfortunately, because I'm seeing IOErrors when opening and uploading files:</p>
+<div class="codehilite"><pre><span></span><code>[#|2023-10-11T14:35:32.161+0200|WARNING|Payara 5.2022.3|edu.harvard.iq.dataverse.dataaccess.ImageThumbConverter|_ThreadID=95;_ThreadName=http-thread-pool::jk-connector(1);_TimeMillis=1697027732161;_LevelValue=900;|
+  caught IOException trying to open an input stream for file://18b13f045f2-ef595f3a5aa6java.io.IOException: Failed to open local file file:///data/dataverse/files/10.5072/TAR/Y05ZDI/18b13f045f2-ef595f3a5aa6|#]
+
+[#|2023-10-11T14:35:45.004+0200|SEVERE|Payara 5.2022.3|edu.harvard.iq.dataverse.util.FileUtil|_ThreadID=98;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1697027745004;_LevelValue=1000;|
+  Failed to create filesTempDirectory: /data/dataverse/files/temp|#]
+
+[#|2023-10-11T14:35:45.004+0200|WARNING|Payara 5.2022.3|edu.harvard.iq.dataverse.EditDatafilesPage|_ThreadID=98;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1697027745004;_LevelValue=900;|
+  Failed to process and/or save the file blank_template_melting_bard.jpg; Temp directory is not configured.|#]
+</code></pre></div>
+<p>Thoughts? : )</p>
+
+
+
+<a name="396083008"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083008" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083008">(Oct 11 2023 at 12:54)</a>:</h4>
+<p>It kind of looks like  that the S3 file sytem cannot create a folder for the temp file dir</p>
+
+
+
+<a name="396083060"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083060" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083060">(Oct 11 2023 at 12:55)</a>:</h4>
+<p>Is it writable?</p>
+
+
+
+<a name="396083169"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083169" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083169">(Oct 11 2023 at 12:55)</a>:</h4>
+<p>Can you actually create a directory in s3fs without any content? (In S3 AFAIK folders are just a concept like we do it in Dataverse, it's metadata of a file object)</p>
+
+
+
+<a name="396083230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083230">(Oct 11 2023 at 12:56)</a>:</h4>
+<p>I'm not sure about the first one</p>
+
+
+
+<a name="396083271"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083271" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083271">(Oct 11 2023 at 12:56)</a>:</h4>
+<p>That could come from different things...</p>
+
+
+
+<a name="396083336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083336">(Oct 11 2023 at 12:56)</a>:</h4>
+<p>Yeap, can confirm if I just use <code>mkdir</code> on the mount directly.</p>
+
+
+
+<a name="396083353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083353">(Oct 11 2023 at 12:56)</a>:</h4>
+<p>Not sure how your config and your mounts look like...</p>
+
+
+
+<a name="396083379"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083379" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083379">(Oct 11 2023 at 12:57)</a>:</h4>
+<p>Also as user dataverse?</p>
+
+
+
+<a name="396083409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083409">(Oct 11 2023 at 12:57)</a>:</h4>
+<p>(Or payara, as we might talk containers)</p>
+
+
+
+<a name="396083537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083537">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>I'm debugging with umask at 000 at present, shouldn't be a permission issue (though can be). It's a thread to pull at.</p>
+
+
+
+<a name="396083580"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083580" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083580">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>I am tempted to move this to <a class="stream" data-stream-id="378866" href="/#narrow/stream/378866-troubleshooting">#troubleshooting</a> ... It's not a dev topic (yet?)</p>
+
+
+
+<a name="396083600"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083600" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083600">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>Yes, please move.</p>
+
+
+
+<a name="396083613"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083613" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083613">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>This topic was moved here from <a class="stream-topic" data-stream-id="379673" href="/#narrow/stream/379673-dev/topic/S3fs.20woes">#dev &gt; S3fs woes</a> by <span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span>.</p>
+
+
+
+<a name="396083626"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083626" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083626">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>Apologies for creating it here in the first place : )</p>
+
+
+
+<a name="396083673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083673">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>Apologies for starting in dev in the first place.</p>
+
+
+
+<a name="396083702"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083702" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083702">(Oct 11 2023 at 12:58)</a>:</h4>
+<p>I briefly am about to get yelled at, brb after this.</p>
+
+
+
+<a name="396083710"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083710" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083710">(Oct 11 2023 at 12:58)</a>:</h4>
+<p><a href="#narrow/stream/378866-troubleshooting/topic/S3fs.20woes/near/396083626">A message</a> was moved here from <a class="stream-topic" data-stream-id="379673" href="/#narrow/stream/379673-dev/topic/S3fs.20woes">#dev &gt; S3fs woes</a> by <span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span>.</p>
+
+
+
+<a name="396083999"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396083999" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396083999">(Oct 11 2023 at 13:00)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601950">Thomas van Erven</span> <a href="#narrow/stream/378866-troubleshooting/topic/S3fs.20woes/near/396083537">said</a>:</p>
+<blockquote>
+<p>I'm debugging with umask at 000 at present, shouldn't be a permission issue (though can be). It's a thread to pull at.</p>
+</blockquote>
+<p>Well what happens in the background is that if you upload a file and the temp dir does not yet exist, it will create it for you before storing the upload for further processing</p>
+
+
+
+<a name="396084131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396084131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396084131">(Oct 11 2023 at 13:01)</a>:</h4>
+<p>So if Dataverse cannot create this directory for you, but you can directories on the mounted FS, this certainly indicates some sort of permission problem</p>
+
+
+
+<a name="396094736"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396094736" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396094736">(Oct 11 2023 at 13:55)</a>:</h4>
+<p>Temp directory exists; it booms at creating the file.</p>
+
+
+
+<a name="396094908"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396094908" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396094908">(Oct 11 2023 at 13:56)</a>:</h4>
+<p>Side note; when in a discussion with management, do not say "of course management idea quality is poor, I wouldn't expect anything else from management". <span aria-label="smiling face with tear" class="emoji emoji-1f972" role="img" title="smiling face with tear">:smiling_face_with_tear:</span></p>
+
+
+
+<a name="396096698"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396096698" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396096698">(Oct 11 2023 at 14:04)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601950">Thomas van Erven</span> <a href="#narrow/stream/378866-troubleshooting/topic/S3fs.20woes/near/396094736">said</a>:</p>
+<blockquote>
+<p>Temp directory exists; it booms at creating the file.</p>
+</blockquote>
+<p>That's not what the error message is telling us...? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="396099188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396099188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396099188">(Oct 11 2023 at 14:15)</a>:</h4>
+<p>The error sits on a throne of lies:</p>
+<div class="codehilite"><pre><span></span><code>[#|2023-10-11T16:15:03.480+0200|SEVERE|Payara 5.2022.3|edu.harvard.iq.dataverse.util.FileUtil|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(2);_TimeMillis=1697033703480;_LevelValue=1000;|
+  Failed to create filesTempDirectory: /data/dataverse/files/temp|#]
+
+[#|2023-10-11T16:15:03.480+0200|WARNING|Payara 5.2022.3|edu.harvard.iq.dataverse.EditDatafilesPage|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(2);_TimeMillis=1697033703480;_LevelValue=900;|
+  Failed to process and/or save the file DeanSpencer-spotcol-dwarfforge.jpg; Temp directory is not configured.|#]
+
+[root@tar31 temp]# pwd
+/data/dataverse/files/temp
+</code></pre></div>
+
+
+
+<a name="396099509"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396099509" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396099509">(Oct 11 2023 at 14:17)</a>:</h4>
+<p>However, you gave me an excellent idea. Ownership.</p>
+
+
+
+<a name="396099558"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396099558" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396099558">(Oct 11 2023 at 14:17)</a>:</h4>
+<p>As concept, not as a file property, you understand )</p>
+
+
+
+<a name="396099813"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396099813" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396099813">(Oct 11 2023 at 14:18)</a>:</h4>
+<p>See that's why I am introducing the startup checks in <a href="https://github.com/IQSS/dataverse/pull/9819">https://github.com/IQSS/dataverse/pull/9819</a></p>
+
+
+
+<a name="396101905"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396101905" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396101905">(Oct 11 2023 at 14:27)</a>:</h4>
+<p>I'm glad the yelling was brief! <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="396107504"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396107504" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396107504">(Oct 11 2023 at 14:55)</a>:</h4>
+<p>It wasn't permission issue either.</p>
+
+
+
+<a name="396107584"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396107584" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396107584">(Oct 11 2023 at 14:55)</a>:</h4>
+<p>But; I've got a slightly different error, which suggests it might be rights orientated.</p>
+
+
+
+<a name="396859454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396859454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396859454">(Oct 16 2023 at 09:26)</a>:</h4>
+<p>You were correct; it works now. Topic may be resolved.</p>
+
+
+
+<a name="396859791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396859791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396859791">(Oct 16 2023 at 09:28)</a>:</h4>
+<p>(As a side note; the dataverse file behaviours for temp/draft/final take quite long in terms of the interface that keeps loading, for large files and larger sets of files. I suspect I'm going to consult your migration scripts and use the Keystone implementation directly, rather than a fuse mount).</p>
+
+
+
+<a name="396911160"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20S3fs%20woes/near/396911160" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20S3fs.20woes.html#396911160">(Oct 16 2023 at 14:07)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="601950">Thomas van Erven</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

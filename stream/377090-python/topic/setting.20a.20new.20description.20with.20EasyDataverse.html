@@ -1,0 +1,118 @@
+<html>
+<head><meta charset="utf-8"><title>setting a new description with EasyDataverse · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html">setting a new description with EasyDataverse</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="493667087"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493667087" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493667087">(Jan 14 2025 at 20:45)</a>:</h4>
+<p>I know I can add a description to a dataset that doesn't have one like this:</p>
+<p><code>dataset.citation.add_ds_description(value="This is a description of the dataset")</code></p>
+<p>But if I've loaded an existing dataset (<code>dataset = dataverse.load_dataset(pid)</code>) how do I update the description? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="493917345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493917345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493917345">(Jan 15 2025 at 12:42)</a>:</h4>
+<p>You can edit the object directly, by using the following:</p>
+<div class="codehilite" data-code-language="Python"><pre><span></span><code><span class="n">dataset</span><span class="o">.</span><span class="n">citation</span><span class="o">.</span><span class="n">ds_description</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">"New description"</span>
+</code></pre></div>
+<p>The adder functions are more or less for convenience  to not have to "dig-out" the expected type and then set it to the appropriate attribute. In general, you can apply any Python OOP techniques for metadata blocks .</p>
+
+
+
+<a name="493918095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493918095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493918095">(Jan 15 2025 at 12:46)</a>:</h4>
+<p>I thought I tried that! I will, as soon as I get to my desk. Is this documented? I couldn't find it anywhere. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="493918496"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493918496" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493918496">(Jan 15 2025 at 12:48)</a>:</h4>
+<p>It is kind of documented within this <a href="https://github.com/gdcc/easyDataverse/blob/main/examples/EasyDataverseBasics.ipynb">Jupyter notebook</a> but only for the primitive and no compound case, but that should work as the Dataverse JSON is constructed from the given <code>Dataset</code> object.</p>
+
+
+
+<a name="493919447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493919447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493919447">(Jan 15 2025 at 12:52)</a>:</h4>
+<p>What about the fact that description is multi-valued? The code above would update the first description?</p>
+
+
+
+<a name="493920000"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493920000" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493920000">(Jan 15 2025 at 12:54)</a>:</h4>
+<p>Oh you are right! In this case you'd need to add an index as the attribute is of type <code>List</code>. Here's an update:</p>
+<div class="codehilite" data-code-language="Python"><pre><span></span><code><span class="n">dataset</span><span class="o">.</span><span class="n">citation</span><span class="o">.</span><span class="n">ds_description</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">"New description"</span>
+</code></pre></div>
+
+
+
+<a name="493920336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493920336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493920336">(Jan 15 2025 at 12:56)</a>:</h4>
+<p>On another note, if the <code>Citation</code> block is consistent across versions and instances, we could add convenience functions for commonly used fields such as description and title</p>
+
+
+
+<a name="493922104"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493922104" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493922104">(Jan 15 2025 at 13:04)</a>:</h4>
+<p>Ah ha. Do we need to add docs for this?</p>
+
+
+
+<a name="493922266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493922266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493922266">(Jan 15 2025 at 13:05)</a>:</h4>
+<p>Technically, a description can have a date. I don't want to set a date but off the top of your head, do you think this is possible?</p>
+
+
+
+<a name="493973436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493973436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493973436">(Jan 15 2025 at 16:52)</a>:</h4>
+<p>Ok, here's the final versions that works:</p>
+<div class="codehilite"><pre><span></span><code># Update the metadata fields
+dataset.citation.title = title
+dataset.citation.subject = [&quot;Other&quot;]
+dataset.metadatablocks[&quot;citation&quot;].ds_description[0].value = description
+dataset.metadatablocks[&quot;citation&quot;].author[0].name = author_name
+dataset.metadatablocks[&quot;citation&quot;].author[0].affiliation = None
+dataset.metadatablocks[&quot;citation&quot;].dataset_contact[0].name = &quot;Dataverse Support&quot;
+dataset.metadatablocks[&quot;citation&quot;].dataset_contact[0].email = &quot;support@dataverse.org&quot;
+dataset.metadatablocks[&quot;citation&quot;].origin_of_sources = &#39;&lt;a href=&quot;&#39; + access_link_url + &#39;&quot;&gt;&#39; + access_link_name + &#39;&lt;/a&gt;&#39;
+</code></pre></div>
+
+
+
+<a name="493973647"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493973647" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493973647">(Jan 15 2025 at 16:53)</a>:</h4>
+<p>In short, you should use the <code>dataset.metadatablocks</code> trick for direct access to the part of the dict you need to change.</p>
+
+
+
+<a name="493973800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493973800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493973800">(Jan 15 2025 at 16:54)</a>:</h4>
+<p>Also this is super helpful for figuring out which values need to be set:</p>
+<p><code>print(dataverse.list_metadatablocks(detailed=True))</code></p>
+
+
+
+<a name="493973984"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493973984" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493973984">(Jan 15 2025 at 16:55)</a>:</h4>
+<p>And you can print out the dataset as a dict:</p>
+<p><code>print(dataset.dataverse_dict())</code></p>
+<p>Or in JSON format (with optional indenting):</p>
+<p><code>print(dataset.dataverse_json(4))</code></p>
+
+
+
+<a name="493974186"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/setting%20a%20new%20description%20with%20EasyDataverse/near/493974186" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/setting.20a.20new.20description.20with.20EasyDataverse.html#493974186">(Jan 15 2025 at 16:56)</a>:</h4>
+<p>Huge thanks to <span class="user-mention" data-user-id="599841">@Jan Range</span> for the live troubleshooting this morning. This is a good reason to attend the pyDataverse meeting! (<a class="stream-topic" data-stream-id="377090" href="/#narrow/channel/377090-python/topic/meetings">#python &gt; meetings</a> ) <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

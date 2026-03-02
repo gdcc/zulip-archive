@@ -1,0 +1,960 @@
+<html>
+<head><meta charset="utf-8"><title>Dataverse filesystem-like extension · python · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/index.html">python</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html">Dataverse filesystem-like extension</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="432852800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432852800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432852800">(Apr 12 2024 at 08:04)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> had the idea of providing a custom filesystem to remotely access and upload files via PyDataverse.  This works already and will soon be put into a PR. </p>
+<p>Another idea was to allow crawling ZIP files, similar to the Zip Previewer. Unfortunately the previewer initially downloads the Zip file and then displays the content. Hence my question, is there a way or could you think of providing this as a Dataverse endpoint? At least listing the content would be beneficial.</p>
+
+
+
+<a name="432885844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432885844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432885844">(Apr 12 2024 at 11:42)</a>:</h4>
+<p>I may not be following very well..</p>
+<p>I did see this issue about a PyFilesystem implementation: <a href="https://github.com/gdcc/pyDataverse/issues/178">https://github.com/gdcc/pyDataverse/issues/178</a></p>
+<p>But now you're asking about zip files? You want to preview the contents from pyDataverse?</p>
+
+
+
+<a name="432886046"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886046" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886046">(Apr 12 2024 at 11:43)</a>:</h4>
+<p>Exactly! The idea goes like this: someone wants to use a single file from a ZIP living on Dataverse. Using the ZIP Pyfilesystem backed by the Dataverse Pyfilesystem, you would be able to retrieve it, without downloading all of it.</p>
+
+
+
+<a name="432886245"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886245" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886245">(Apr 12 2024 at 11:45)</a>:</h4>
+<p>Does the existing HTTP Range header support help here? Or do we need a new API endpoint? You just want the list of contents in the zip file, right?</p>
+
+
+
+<a name="432886346"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886346" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886346">(Apr 12 2024 at 11:45)</a>:</h4>
+<p>I'm not sure how the ZIP file previewer does it</p>
+
+
+
+<a name="432886405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886405">(Apr 12 2024 at 11:46)</a>:</h4>
+<p>It uses HTTPRange too</p>
+
+
+
+<a name="432886436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886436">(Apr 12 2024 at 11:46)</a>:</h4>
+<p>It must extract the list of files from the ZIP to display it</p>
+
+
+
+<a name="432886515"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886515" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886515">(Apr 12 2024 at 11:46)</a>:</h4>
+<p>And then probably has coded in the ranges to be able to download a single file from the ZIP without downloading the whole ZIP file first</p>
+
+
+
+<a name="432886547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886547">(Apr 12 2024 at 11:47)</a>:</h4>
+<p>I have never used HTTP Range though. Would need to dig a bit into this.</p>
+
+
+
+<a name="432886758"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886758" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886758">(Apr 12 2024 at 11:48)</a>:</h4>
+<p>Range has your name on it! Please see <a href="https://guides.dataverse.org/en/6.2/api/dataaccess.html#headers">https://guides.dataverse.org/en/6.2/api/dataaccess.html#headers</a></p>
+
+
+
+<a name="432886832"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886832" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886832">(Apr 12 2024 at 11:49)</a>:</h4>
+<p>Hehe should be familiar thing to me <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="432886913"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432886913" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432886913">(Apr 12 2024 at 11:49)</a>:</h4>
+<p>In my imagination the zip previewer/downloader uses the Range header to get the listing of files. Then it presents the list to the user. When the user clicks a file to download, it usese the Range header again to download just the bytes for that file.</p>
+
+
+
+<a name="432887016"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432887016" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432887016">(Apr 12 2024 at 11:50)</a>:</h4>
+<p>I don't think it downloads the entire zip file to get the listing of files. I sure hope not.</p>
+
+
+
+<a name="432887024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432887024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432887024">(Apr 12 2024 at 11:50)</a>:</h4>
+<p>Maybe there is something to deal with this already present in PyFilesystems. Will check!</p>
+
+
+
+<a name="432887936"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432887936" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432887936">(Apr 12 2024 at 11:56)</a>:</h4>
+<p>Probably <a href="https://docs.pyfilesystem.org/en/latest/_modules/fs/zipfs.html#ZipFS">https://docs.pyfilesystem.org/en/latest/_modules/fs/zipfs.html#ZipFS</a> does not support remote ZIP files or range requests...</p>
+
+
+
+<a name="432888038"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888038" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888038">(Apr 12 2024 at 11:56)</a>:</h4>
+<p>I have found another library that supports opening remote S3 and I guess HTTP too:</p>
+<p><a href="https://pypi.org/project/smart-open/">https://pypi.org/project/smart-open/</a></p>
+
+
+
+<a name="432888057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888057">(Apr 12 2024 at 11:57)</a>:</h4>
+<p>Giving it a try now</p>
+
+
+
+<a name="432888254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888254">(Apr 12 2024 at 11:58)</a>:</h4>
+<p>Oh wow!</p>
+
+
+
+<a name="432888267"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888267" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888267">(Apr 12 2024 at 11:58)</a>:</h4>
+<p>Looks amazing!</p>
+
+
+
+<a name="432888286"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888286" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888286">(Apr 12 2024 at 11:58)</a>:</h4>
+<p>The unicorn we needed <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="432888461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888461">(Apr 12 2024 at 12:00)</a>:</h4>
+<p>Hmm does it support ZIP?</p>
+
+
+
+<a name="432888606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888606">(Apr 12 2024 at 12:00)</a>:</h4>
+<p>Loads ZIPs very well from remote! At least we are getting some binary. Checking the content now</p>
+
+
+
+<a name="432888628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888628">(Apr 12 2024 at 12:00)</a>:</h4>
+<p><a href="/user_uploads/53090/a7K5-lEzXwN7Vn-TpJ3ZvD1q/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/a7K5-lEzXwN7Vn-TpJ3ZvD1q/image.png" title="image.png"><img src="/user_uploads/53090/a7K5-lEzXwN7Vn-TpJ3ZvD1q/image.png"></a></div>
+
+
+
+<a name="432888683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888683">(Apr 12 2024 at 12:01)</a>:</h4>
+<p>Might need to add a compression handler...</p>
+
+
+
+<a name="432888730"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432888730" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432888730">(Apr 12 2024 at 12:01)</a>:</h4>
+<p>Remote file was a <code>tar</code> file btw.</p>
+
+
+
+<a name="432889081"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432889081" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432889081">(Apr 12 2024 at 12:02)</a>:</h4>
+<p>From looking at the library, Im not sure it supports extracting the list of files and extracting parts of the ZIP file via HTTP range requests</p>
+
+
+
+<a name="432889307"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432889307" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432889307">(Apr 12 2024 at 12:04)</a>:</h4>
+<p>Yes, that seems impossible. I can't find any documentation about this, and there is no dedicated method. Would it be a contender for the S3 download though? Seems pretty simple to me</p>
+
+
+
+<a name="432889677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432889677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432889677">(Apr 12 2024 at 12:06)</a>:</h4>
+<p>Related and Interesting: <a href="https://github.com/piskvorky/smart_open/issues/725">https://github.com/piskvorky/smart_open/issues/725</a></p>
+
+
+
+<a name="432890699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432890699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432890699">(Apr 12 2024 at 12:13)</a>:</h4>
+<p>I suppose the ZIP file previewer is loading a few kilobytes from the end of the zip file (the size is known from metadata IIRC or maybe ranges support negative values)</p>
+
+
+
+<a name="432890869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432890869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432890869">(Apr 12 2024 at 12:14)</a>:</h4>
+<p>If you find the central directory header signature you know you got it all (0x02014b50) and can start browsing for the files</p>
+
+
+
+<a name="432890887"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432890887" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432890887">(Apr 12 2024 at 12:14)</a>:</h4>
+<p><a href="https://en.wikipedia.org/wiki/ZIP_(file_format)">https://en.wikipedia.org/wiki/ZIP_(file_format)</a></p>
+
+
+
+<a name="432891038"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432891038" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432891038">(Apr 12 2024 at 12:15)</a>:</h4>
+<p>Oh wait it actually is even easier when you know the last byte... There is a record about the central directory at the end of it all</p>
+
+
+
+<a name="432891235"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432891235" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432891235">(Apr 12 2024 at 12:17)</a>:</h4>
+<p>Again, it should be possible to see what the ZIP file previewer is doing and try to transfer that to Python</p>
+
+
+
+<a name="432891321"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432891321" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432891321">(Apr 12 2024 at 12:17)</a>:</h4>
+<p>Cool! Learned something new today <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span> Going to check it out!</p>
+
+
+
+<a name="432891517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432891517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432891517">(Apr 12 2024 at 12:19)</a>:</h4>
+<p>Feels so good to do some coding again after a week full of enzyme catalysis stuff <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="432898102"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432898102" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432898102">(Apr 12 2024 at 12:56)</a>:</h4>
+<p>Some StackOverflow digging has helped!</p>
+<p><a href="https://stackoverflow.com/a/17434121">https://stackoverflow.com/a/17434121</a> (especially the last section with <code>ZipFile</code>)</p>
+
+
+
+<a name="432900437"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432900437" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432900437">(Apr 12 2024 at 13:07)</a>:</h4>
+<p><span class="user-mention" data-user-id="652521">@Markus Haarländer</span> created the zip previewer/downloader. Maybe he can help.</p>
+
+
+
+<a name="432901365"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432901365" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432901365">(Apr 12 2024 at 13:12)</a>:</h4>
+<p>I think I have it!</p>
+<p><a href="/user_uploads/53090/KD0FOQrevKRbcNDuCCQX2uva/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/KD0FOQrevKRbcNDuCCQX2uva/image.png" title="image.png"><img src="/user_uploads/53090/KD0FOQrevKRbcNDuCCQX2uva/image.png"></a></div>
+
+
+
+<a name="432901472"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432901472" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432901472">(Apr 12 2024 at 13:13)</a>:</h4>
+<p>Original file - <a href="https://darus.uni-stuttgart.de/file.xhtml?persistentId=doi:10.18419/darus-3372/7">https://darus.uni-stuttgart.de/file.xhtml?persistentId=doi:10.18419/darus-3372/7</a></p>
+
+
+
+<a name="432901806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432901806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432901806">(Apr 12 2024 at 13:15)</a>:</h4>
+<p>That looks promising!</p>
+
+
+
+<a name="432901898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432901898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432901898">(Apr 12 2024 at 13:16)</a>:</h4>
+<p>It might be necessary to repeat the reading of 256k if the ZIP file is large</p>
+
+
+
+<a name="432902056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902056">(Apr 12 2024 at 13:17)</a>:</h4>
+<p>Yes, I will add an iterative process. According to StackOverflow ZipFile will raise an error if it is not enough. Hence, I would just repeat and increment until there is no error.</p>
+
+
+
+<a name="432902136"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902136" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902136">(Apr 12 2024 at 13:17)</a>:</h4>
+<p>Sounds good to me!</p>
+
+
+
+<a name="432902215"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902215" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902215">(Apr 12 2024 at 13:18)</a>:</h4>
+<p>So this would be a feature of DataverseFS, right?</p>
+
+
+
+<a name="432902287"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902287" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902287">(Apr 12 2024 at 13:18)</a>:</h4>
+<p>Yes, would be a great feature to have! Next challenge though is to extract a specific file</p>
+
+
+
+<a name="432902337"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902337" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902337">(Apr 12 2024 at 13:19)</a>:</h4>
+<p>Oh and what about retrieval of a file from the ZIP? You didn't take a look at that yet, right?</p>
+
+
+
+<a name="432902363"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902363" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902363">(Apr 12 2024 at 13:19)</a>:</h4>
+<p>I would suggest to first nail this down on the example and then generalize it in DataverseFS</p>
+
+
+
+<a name="432902368"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902368" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902368">(Apr 12 2024 at 13:19)</a>:</h4>
+<p>Ha! You beat me to it <span aria-label="racecar" class="emoji emoji-1f3ce" role="img" title="racecar">:racecar:</span></p>
+
+
+
+<a name="432902375"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902375" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902375">(Apr 12 2024 at 13:19)</a>:</h4>
+<p>Haha</p>
+
+
+
+<a name="432902530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902530">(Apr 12 2024 at 13:20)</a>:</h4>
+<p>Will look into this. Guess the ZIP Preview has some ideas already</p>
+
+
+
+<a name="432902714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432902714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432902714">(Apr 12 2024 at 13:21)</a>:</h4>
+<p>Probably they extract the byte locations from the ZIP directory and merge it all into a request including the range</p>
+
+
+
+<a name="432903056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432903056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432903056">(Apr 12 2024 at 13:23)</a>:</h4>
+<p>That makes sense</p>
+
+
+
+<a name="432903070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432903070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432903070">(Apr 12 2024 at 13:23)</a>:</h4>
+<p>Maybe ZipFile has some nice utilities for that</p>
+
+
+
+<a name="432904400"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432904400" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Markus Haarländer <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432904400">(Apr 12 2024 at 13:30)</a>:</h4>
+<p>Hi guys. <br>
+Seems you already mastered most of it. Yes, the ZipPreviewer utilizes HTTP Range Requests to read the central directory of a ZIP file first, and to download and extract single files from the ZIP (using ranges from the central directory). It makes use of a great JavaScript Library which can do all of these things: <a href="https://github.com/gildas-lormeau/zip.js">https://github.com/gildas-lormeau/zip.js</a>. But I don't know about a Python library</p>
+
+
+
+<a name="432932679"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432932679" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432932679">(Apr 12 2024 at 15:49)</a>:</h4>
+<p><span class="user-mention" data-user-id="652521">@Markus Haarländer</span> thanks for the info! Glad to hear we are on the right track <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="432933056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432933056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432933056">(Apr 12 2024 at 15:50)</a>:</h4>
+<p>Coincidentally, right after reading your message I stumbled across something similar to <code>zip.js</code> and it does exactly what we want! The library is called <a href="https://github.com/gtsystem/python-remotezip">remotezip</a></p>
+<p><a href="/user_uploads/53090/HDaSz1IyRUxTJgrXXHdgawzd/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/HDaSz1IyRUxTJgrXXHdgawzd/image.png" title="image.png"><img src="/user_uploads/53090/HDaSz1IyRUxTJgrXXHdgawzd/image.png"></a></div>
+
+
+
+<a name="432933220"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432933220" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432933220">(Apr 12 2024 at 15:51)</a>:</h4>
+<p>mmm, pythonic <span aria-label="yum" class="emoji emoji-1f60b" role="img" title="yum">:yum:</span></p>
+
+
+
+<a name="432933950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432933950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432933950">(Apr 12 2024 at 15:55)</a>:</h4>
+<p>For reference, this is a 2.8 GB file, and even this works pretty well/fast. Super nice!!</p>
+<p><a href="/user_uploads/53090/-cmGQ9PYFRLLX6BzncsYnRhm/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/-cmGQ9PYFRLLX6BzncsYnRhm/image.png" title="image.png"><img src="/user_uploads/53090/-cmGQ9PYFRLLX6BzncsYnRhm/image.png"></a></div>
+
+
+
+<a name="432934347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432934347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432934347">(Apr 12 2024 at 15:57)</a>:</h4>
+<p>We're going to have a lot to talk about at the next pyDataverse meeting. <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="432934471"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/432934471" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#432934471">(Apr 12 2024 at 15:57)</a>:</h4>
+<p>True <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="433243732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433243732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433243732">(Apr 15 2024 at 09:37)</a>:</h4>
+<p>The code for listing the contents of a ZIP file and downloading specific parts is working well. I have separated the Dataverse and Zip Filesystem, so passing a <code>DataFile</code> object to the ZIP filesystem is necessary. Here is a working example:</p>
+<p><a href="/user_uploads/53090/pdBCvnUvWoVfZ2Hg2BHBdFHK/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/pdBCvnUvWoVfZ2Hg2BHBdFHK/image.png" title="image.png"><img src="/user_uploads/53090/pdBCvnUvWoVfZ2Hg2BHBdFHK/image.png"></a></div>
+
+
+
+<a name="433243973"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433243973" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433243973">(Apr 15 2024 at 09:38)</a>:</h4>
+<p>On the left sidebar, you can see the downloaded part of the ZIP file. Once I have implemented the <code>write</code> method to upload data files, I will create a pull request <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="433245718"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433245718" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433245718">(Apr 15 2024 at 09:47)</a>:</h4>
+<p>This looks amazing!</p>
+
+
+
+<a name="433245904"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433245904" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433245904">(Apr 15 2024 at 09:48)</a>:</h4>
+<p>Question: should the name of the ZipFS rather be "RemoteZipFS" to make it more obvious what this is about? Someone might want to combine it with the ZipFS shipped with PyFilesystem</p>
+
+
+
+<a name="433246004"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433246004" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433246004">(Apr 15 2024 at 09:48)</a>:</h4>
+<p>Yes, that makes sense! Will rename it <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="433267003"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433267003" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433267003">(Apr 15 2024 at 11:39)</a>:</h4>
+<p>Upload works too <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span> </p>
+<p><a href="/user_uploads/53090/OgPgE8Qfoa_iLGqIrvPJXN-F/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/OgPgE8Qfoa_iLGqIrvPJXN-F/image.png" title="image.png"><img src="/user_uploads/53090/OgPgE8Qfoa_iLGqIrvPJXN-F/image.png"></a></div>
+
+
+
+<a name="433268121"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433268121" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433268121">(Apr 15 2024 at 11:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin</span> Would Stefano be interested in putting the "Compute on Data" logic into the filesystem? I think this would be the right place</p>
+
+
+
+<a name="433524948"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433524948" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433524948">(Apr 16 2024 at 13:39)</a>:</h4>
+<p>Maybe! Let's see what <span class="user-mention" data-user-id="637063">@Leo Andreev</span> thinks.</p>
+
+
+
+<a name="433669823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433669823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433669823">(Apr 17 2024 at 06:13)</a>:</h4>
+<p>I think the filesystem is pretty close to the finish. It is now possible to write files similar to regular filesystems using the <code>open("my.file", "w")</code> way. Will create a new data file upon closing and also supports S3 due to DVUploader. Here is an example:</p>
+<p><a href="/user_uploads/53090/AsoYd0YE1F1aEx8UQfTd2e88/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/AsoYd0YE1F1aEx8UQfTd2e88/image.png" title="image.png"><img src="/user_uploads/53090/AsoYd0YE1F1aEx8UQfTd2e88/image.png"></a></div>
+
+
+
+<a name="433670183"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433670183" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433670183">(Apr 17 2024 at 06:14)</a>:</h4>
+<p>Feels almost like you are writing files to the hard drive <span aria-label="stuck out tongue" class="emoji emoji-1f61b" role="img" title="stuck out tongue">:stuck_out_tongue:</span></p>
+
+
+
+<a name="433677844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677844">(Apr 17 2024 at 06:41)</a>:</h4>
+<p>Would it be an option to have a "with" thing? So on any close the file automatically gets uploaded?</p>
+
+
+
+<a name="433677881"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677881" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677881">(Apr 17 2024 at 06:41)</a>:</h4>
+<p>Do you mean for the filesystem itself?</p>
+
+
+
+<a name="433677947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677947">(Apr 17 2024 at 06:42)</a>:</h4>
+<p>Or is this already happening?</p>
+
+
+
+<a name="433677950"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677950" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677950">(Apr 17 2024 at 06:42)</a>:</h4>
+<p>The with operation is already available for files itself</p>
+
+
+
+<a name="433677989"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677989" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677989">(Apr 17 2024 at 06:42)</a>:</h4>
+<p>You can either use the with to close automatically or invoke it by yourself afterwards for the upload</p>
+
+
+
+<a name="433677998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433677998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433677998">(Apr 17 2024 at 06:42)</a>:</h4>
+<p>Ah! So the second loop already does the upload in the background</p>
+
+
+
+<a name="433678034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678034">(Apr 17 2024 at 06:42)</a>:</h4>
+<p><a href="/user_uploads/53090/IOCJ5z6Xa5Jb3XjaZBbaWDHQ/image.png">image.png</a></p>
+<div class="message_inline_image"><a href="/user_uploads/53090/IOCJ5z6Xa5Jb3XjaZBbaWDHQ/image.png" title="image.png"><img src="/user_uploads/53090/IOCJ5z6Xa5Jb3XjaZBbaWDHQ/image.png"></a></div>
+
+
+
+<a name="433678046"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678046" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678046">(Apr 17 2024 at 06:42)</a>:</h4>
+<p>And the third loop is just an example to upload other files on disk?</p>
+
+
+
+<a name="433678054"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678054" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678054">(Apr 17 2024 at 06:43)</a>:</h4>
+<p>Yes, exactly <span aria-label="smile" class="emoji emoji-1f642" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="433678067"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678067" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678067">(Apr 17 2024 at 06:43)</a>:</h4>
+<p>Great!</p>
+
+
+
+<a name="433678080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678080">(Apr 17 2024 at 06:43)</a>:</h4>
+<p>This is really great!</p>
+
+
+
+<a name="433678126"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678126" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678126">(Apr 17 2024 at 06:43)</a>:</h4>
+<p>I thought it would make sense to have a local file option too, since the usual <code>open</code> operation is blocking and yet cant be parallelized</p>
+
+
+
+<a name="433678138"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678138" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678138">(Apr 17 2024 at 06:43)</a>:</h4>
+<p>Does it support remote files (for download), too?</p>
+
+
+
+<a name="433678203"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678203" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678203">(Apr 17 2024 at 06:44)</a>:</h4>
+<p>Yes, you can download any file from a dataset including zip members</p>
+
+
+
+<a name="433678239"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678239" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678239">(Apr 17 2024 at 06:44)</a>:</h4>
+<p>No I meant files that are in a remote store.</p>
+
+
+
+<a name="433678258"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678258" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678258">(Apr 17 2024 at 06:44)</a>:</h4>
+<p>So not in S3 and not stored in Dataverse</p>
+
+
+
+<a name="433678273"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678273" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678273">(Apr 17 2024 at 06:44)</a>:</h4>
+<p>But referenced using a URL</p>
+
+
+
+<a name="433678300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678300">(Apr 17 2024 at 06:45)</a>:</h4>
+<p>Ah alright, I have not tested this yet, but I am sure there are ways to integrate it</p>
+
+
+
+<a name="433678331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678331">(Apr 17 2024 at 06:45)</a>:</h4>
+<p>It would be great to enable registering URL handlers here</p>
+
+
+
+<a name="433678401"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678401" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678401">(Apr 17 2024 at 06:46)</a>:</h4>
+<p>You mean in a way to transfer from a remote store to dataverse?</p>
+
+
+
+<a name="433678446"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678446" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678446">(Apr 17 2024 at 06:46)</a>:</h4>
+<p>Would be great if there is a way to not have to download the intermediate file then</p>
+
+
+
+<a name="433678451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678451">(Apr 17 2024 at 06:46)</a>:</h4>
+<p>So people could store something using git-annex and receive the file when they execute the python script</p>
+
+
+
+<a name="433678502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678502">(Apr 17 2024 at 06:47)</a>:</h4>
+<p>Do you have an example for this? Havent used git-annex yet</p>
+
+
+
+<a name="433678506"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678506" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678506">(Apr 17 2024 at 06:47)</a>:</h4>
+<p>That way they could very naturally interact with the files and they would be fetched as necessary</p>
+
+
+
+<a name="433678526"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678526" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678526">(Apr 17 2024 at 06:47)</a>:</h4>
+<p>Ha storing the git annex thing was a wild idea at distribits</p>
+
+
+
+<a name="433678547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678547">(Apr 17 2024 at 06:47)</a>:</h4>
+<p>For now there might be examples using HTTP and Globus links</p>
+
+
+
+<a name="433678672"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433678672" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433678672">(Apr 17 2024 at 06:48)</a>:</h4>
+<p>Let me get to work then I'll try to cook some better example. Typing this on my mobile is hard...</p>
+
+
+
+<a name="433688545"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433688545" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433688545">(Apr 17 2024 at 07:15)</a>:</h4>
+<p>Alright. From <a href="https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api">https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api</a> we know that files registered as remote files contain lots of information about the file. The most important bit is probably the storage identifier.</p>
+
+
+
+<a name="433689084"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433689084" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433689084">(Apr 17 2024 at 07:16)</a>:</h4>
+<p>It will contain a URL that has been configured as a valid base url in the store plus a path within that location</p>
+
+
+
+<a name="433689190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433689190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433689190">(Apr 17 2024 at 07:16)</a>:</h4>
+<p>The filesystem will be presented with this information when downloading the file metadata</p>
+
+
+
+<a name="433689229"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433689229" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433689229">(Apr 17 2024 at 07:17)</a>:</h4>
+<p>So it would know about the files and folder structures</p>
+
+
+
+<a name="433689263"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433689263" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433689263">(Apr 17 2024 at 07:17)</a>:</h4>
+<p>But it could not download the file from the Dataverse instance</p>
+
+
+
+<a name="433689878"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433689878" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433689878">(Apr 17 2024 at 07:21)</a>:</h4>
+<p>Which means that the filesystem would need to understand how to resolve the URLs into a file</p>
+
+
+
+<a name="433690048"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433690048" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433690048">(Apr 17 2024 at 07:22)</a>:</h4>
+<p>The example JSON to register the remote file has the example storage ID <code>trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png</code></p>
+
+
+
+<a name="433690134"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433690134" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433690134">(Apr 17 2024 at 07:23)</a>:</h4>
+<p>Users of the filesystem would need some means to register a handler that knows how to deal with protocol "trsa://" and the rest of the URL</p>
+
+
+
+<a name="433690222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433690222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433690222">(Apr 17 2024 at 07:24)</a>:</h4>
+<p>In case of Datalad, the idea is to store "git-annex://" URLs that encode a git-annex remote file reference as a URL.</p>
+
+
+
+<a name="433690265"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433690265" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433690265">(Apr 17 2024 at 07:24)</a>:</h4>
+<p>Using a handler to access the git-annex URL and download the file would be great</p>
+
+
+
+<a name="433732855"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433732855" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433732855">(Apr 17 2024 at 11:30)</a>:</h4>
+<p>Okay, got it. Sounds great! How can I set up my local instance to test it? Can I add any remote store I want? Tried it using the docs, but I have not gotten it to work.</p>
+
+
+
+<a name="433737932"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433737932" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433737932">(Apr 17 2024 at 11:58)</a>:</h4>
+<p>I've added these JVM args:</p>
+<div class="codehilite"><pre><span></span><code>        -Ddataverse.files.trsa.type=remote
+        -Ddataverse.files.trsa.label=SomeRemoteStorage
+        -Ddataverse.files.trsa.base-url=trsa://
+        -Ddataverse.files.trsa.base-store=trsa
+</code></pre></div>
+<p>The script:</p>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">API_TOKEN</span><span class="o">=</span>7a51588f-8422-4868-bc66-c791016e4a30
+<span class="nb">export</span><span class="w"> </span><span class="nv">SERVER_URL</span><span class="o">=</span>http://localhost:8080
+<span class="nb">export</span><span class="w"> </span><span class="nv">PERSISTENT_ID</span><span class="o">=</span>doi:10.5072/FK2/ZTXNOV
+<span class="nb">export</span><span class="w"> </span><span class="nv">JSON_DATA</span><span class="o">=</span><span class="k">$(</span>&lt;body.json<span class="k">)</span>
+
+curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">"X-Dataverse-key: </span><span class="nv">$API_TOKEN</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$SERVER_URL</span><span class="s2">/api/datasets/:persistentId/add?persistentId=</span><span class="nv">$PERSISTENT_ID</span><span class="s2">"</span><span class="w"> </span>-F<span class="w"> </span><span class="s2">"jsonData=</span><span class="nv">$JSON_DATA</span><span class="s2">"</span>
+</code></pre></div>
+<p>The request body:</p>
+<div class="codehilite" data-code-language="JSON"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A remote image."</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"storageIdentifier"</span><span class="p">:</span><span class="w"> </span><span class="s2">"trsa://hello/testlogo.png"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"checksumType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MD5"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"md5Hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"509ef88afa907eaf2c17c1c8d8fde77e"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"testlogo.png"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"fileName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"testlogo.png"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"mimeType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"image/png"</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+<a name="433737964"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433737964" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433737964">(Apr 17 2024 at 11:58)</a>:</h4>
+<p>Pretty sure I am doing sth wrong <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="433749793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433749793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433749793">(Apr 17 2024 at 12:57)</a>:</h4>
+<p>I receive the following message every time I try to add a remote file:</p>
+<p><code>{"status":"ERROR","message":"Dataset store configuration does not allow provided storageIdentifier."}</code></p>
+<p>The storage identifier follows the base URL scheme but does not match.</p>
+
+
+
+<a name="433750018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433750018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433750018">(Apr 17 2024 at 12:58)</a>:</h4>
+<p>Tried setting the collection storage to the remote store, but without an effect</p>
+
+
+
+<a name="433753582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433753582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433753582">(Apr 17 2024 at 13:14)</a>:</h4>
+<p>I'm not sure if the helps but we have a test on the Java side (that isn't exercised regularly): <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java</a></p>
+
+
+
+<a name="433753920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433753920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433753920">(Apr 17 2024 at 13:16)</a>:</h4>
+<p>Awesome! Thanks for the hint. Could it be that I am missing this line?</p>
+<p><code>-Ddataverse.files.trsa.base-store=file</code></p>
+<p>I thought it had a default, but I will give it a try!</p>
+
+
+
+<a name="433755006"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/433755006" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#433755006">(Apr 17 2024 at 13:20)</a>:</h4>
+<p>Could be. I'm pretty sure you need a base store for thumbnails, etc.</p>
+
+
+
+<a name="434036705"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434036705" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434036705">(Apr 18 2024 at 12:37)</a>:</h4>
+<p>Stupid idea, but how would it be if we define this filesystem instance-wide? Instead of connecting to a single dataset, you could access all the datasets. I would think of something like this:</p>
+<div class="codehilite" data-code-language="Python"><pre><span></span><code><span class="kn">from</span> <span class="nn">dataversefs</span> <span class="kn">import</span> <span class="n">DataverseFS</span>
+
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">DataverseFS</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="s2">"https://demo.dataverse.org"</span><span class="p">)</span>
+<span class="n">fs</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"doi:10.70122/FK2/TDI8JO://some/dir"</span><span class="p">)</span>
+
+<span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"doi:10.70122/FK2/TDI8JO://some/dir/myfile.txt"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+<a name="434036936"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434036936" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434036936">(Apr 18 2024 at 12:38)</a>:</h4>
+<p>You don't even need the ://</p>
+
+
+
+<a name="434036989"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434036989" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434036989">(Apr 18 2024 at 12:39)</a>:</h4>
+<p>It's not a resolvable DOI UIR but who cares</p>
+
+
+
+<a name="434037087"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037087" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037087">(Apr 18 2024 at 12:39)</a>:</h4>
+<p>Maybe there is a better way, but I think it would be cool to grab from any dataset you want.</p>
+
+
+
+<a name="434037172"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037172" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037172">(Apr 18 2024 at 12:40)</a>:</h4>
+<p>Maybe for the sake of validity go for <code>doi:10.70122/FK2/TDI8JO?file=/path/to/file</code></p>
+
+
+
+<a name="434037195"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037195" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037195">(Apr 18 2024 at 12:40)</a>:</h4>
+<p>Thats nice!</p>
+
+
+
+<a name="434037278"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037278" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037278">(Apr 18 2024 at 12:40)</a>:</h4>
+<p>It becomes a valid URI this way but is simple to parse because of the "separator string"</p>
+
+
+
+<a name="434037380"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037380" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037380">(Apr 18 2024 at 12:41)</a>:</h4>
+<p>If you don't want a parameter, you could use anchors</p>
+
+
+
+<a name="434037409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037409">(Apr 18 2024 at 12:41)</a>:</h4>
+<p>True that, havent thought about this. The idea just popped in my head <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="434037427"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037427" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037427">(Apr 18 2024 at 12:41)</a>:</h4>
+<p><code>doi:10.70122/FK2/TDI8JO#...</code></p>
+
+
+
+<a name="434037469"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037469" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037469">(Apr 18 2024 at 12:41)</a>:</h4>
+<p>Absolutely! Makes a lot of sense.</p>
+
+
+
+<a name="434037575"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037575" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037575">(Apr 18 2024 at 12:42)</a>:</h4>
+<p>I am a fan of the hash - Looks smooth</p>
+
+
+
+<a name="434037581"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037581" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037581">(Apr 18 2024 at 12:42)</a>:</h4>
+<p>Maybe support both. The names are much shorter when not always needing the full qualified one</p>
+
+
+
+<a name="434037635"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037635" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037635">(Apr 18 2024 at 12:42)</a>:</h4>
+<p>There might be character limitations for anchors!</p>
+
+
+
+<a name="434037749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037749">(Apr 18 2024 at 12:43)</a>:</h4>
+<p>I will hack sth. New material for the weekend <span aria-label="grinning face with smiling eyes" class="emoji emoji-1f601" role="img" title="grinning face with smiling eyes">:grinning_face_with_smiling_eyes:</span></p>
+
+
+
+<a name="434037758"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037758" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037758">(Apr 18 2024 at 12:43)</a>:</h4>
+<p>Sorry the correct term is "fragment"</p>
+
+
+
+<a name="434037803"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037803" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037803">(Apr 18 2024 at 12:43)</a>:</h4>
+<p>Which even makes more sense here - you want a fragment of a dataset</p>
+
+
+
+<a name="434037920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434037920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434037920">(Apr 18 2024 at 12:43)</a>:</h4>
+<p>Dataset Fragments sounds nice <span aria-label="grinning" class="emoji emoji-1f600" role="img" title="grinning">:grinning:</span></p>
+
+
+
+<a name="434038186"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434038186" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434038186">(Apr 18 2024 at 12:45)</a>:</h4>
+<blockquote>
+<p>The characters slash ("/") and question mark ("?") are allowed to    represent data within the fragment identifier.  Beware that some    older, erroneous implementations may not handle this data correctly    when it is used as the base URI for relative references (<a href="https://www.rfc-editor.org/rfc/rfc3986#section-5.1">Section</a>    <a href="https://www.rfc-editor.org/rfc/rfc3986#section-5.1">5.1</a>).</p>
+</blockquote>
+<p><a href="https://www.rfc-editor.org/rfc/rfc3986#page-24">https://www.rfc-editor.org/rfc/rfc3986#page-24</a></p>
+
+
+
+<a name="434038738"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434038738" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434038738">(Apr 18 2024 at 12:48)</a>:</h4>
+<p>You could even support having a query part</p>
+
+
+
+<a name="434038850"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434038850" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434038850">(Apr 18 2024 at 12:48)</a>:</h4>
+<p><code>doi:10.70122/FK2/TDI8JO?direct-download=false#path/to/file.ext</code></p>
+
+
+
+<a name="434039528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/434039528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#434039528">(Apr 18 2024 at 12:52)</a>:</h4>
+<p>Wouldn't it be nice if we had a Dataverse API endpoint like this?</p>
+
+
+
+<a name="519407738"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519407738" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519407738">(May 20 2025 at 14:57)</a>:</h4>
+<p><span class="user-mention" data-user-id="599841">@Jan Range</span> have you ever tried benchmarking the pyfilesystem? Wondering what kind of performance one could get using the underlying S3 and potentially caching the files locally to make sure multiple usage of a file doesn't reload over and over.</p>
+
+
+
+<a name="519408167"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519408167" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519408167">(May 20 2025 at 14:58)</a>:</h4>
+<p>Had a discussion with a few RSEs today that do Electron Microscopy. Their sensors stream a solid 2GiB/s and I was wondering if once they put that kind of data into S3 (maybe Dataverse in the mix) what kind of speed they could achieve reading the data back again.</p>
+
+
+
+<a name="519408283"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519408283" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519408283">(May 20 2025 at 14:59)</a>:</h4>
+<p>Currently they heavily rely on filesystems and direct IO to avoid page table madness...</p>
+
+
+
+<a name="519408578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519408578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519408578">(May 20 2025 at 15:00)</a>:</h4>
+<p>But they also want to expose data to analysis stations using SMB/NFS, so going through a network stack. Wondering if the S3 direct download stuff with PyFilesystem2 would be able to compete.</p>
+
+
+
+<a name="519592552"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519592552" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519592552">(May 21 2025 at 11:54)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I have not benchmarked it yet, but I can test it in the upcoming weeks. </p>
+<p>I’ve checked the source code, and the <code>fs-s3fs</code> package that provides S3 support in <code>pyFileSystem</code> uses <code>boto3</code>, the official AWS SDK. According to the implementation, it automatically utilizes the Range header and parallel downloads, which should make it noticeably faster than a standard sequential download.</p>
+<p>However, when I tried using both <code>boto3</code> and <code>pyFileSystem</code>’s S3 backend, I ran into an issue: these libraries require AWS credentials, even for publicly accessible files. I attempted to extract credentials or any required information from the S3 redirect URL, but that wasn’t sufficient to get these libraries working. Do you have any ideas on how we could make this work using only the pre-signed URL?</p>
+<p>That said, I believe we could still achieve better download speeds by leveraging Range headers and parallelizing the download process ourselves. For reference, I ran a quick benchmark comparing the current, non-parallelized PyDataverse download of a 1.5 GB file to a Rust implementation that uses Range requests for parallel downloading.</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Size</th>
+<th>Time Taken</th>
+<th>Gb/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PyDataverse</td>
+<td>1.5gb</td>
+<td>~90s</td>
+<td>~0.01</td>
+</tr>
+<tr>
+<td>DVCLI (Rust)</td>
+<td>1.5gb</td>
+<td>~30s</td>
+<td>~0.05</td>
+</tr>
+</tbody>
+</table>
+<p>The Rust implementation follows the S3 redirect and uses the Range header to enable partial downloads. It splits the file into 5 MB chunks and distributes the workload across 64 workers, which turned out to be the optimal configuration in my tests. To ensure realistic results, I used a file from production as the test case.</p>
+<p><a href="https://darus.uni-stuttgart.de/file.xhtml?persistentId=doi:10.18419/DARUS-444/1&amp;version=1.0">https://darus.uni-stuttgart.de/file.xhtml?persistentId=doi:10.18419/DARUS-444/1&amp;version=1.0</a></p>
+<p>I am not sure if we can get any faster, since the AWS libraries practically do the same thing. Do you have any ideas how we could match the insane 2gb/s <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="519592945"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/377090-python/topic/Dataverse%20filesystem-like%20extension/near/519592945" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Jan Range <a href="https://gdcc.github.io/zulip-archive/stream/377090-python/topic/Dataverse.20filesystem-like.20extension.html#519592945">(May 21 2025 at 11:56)</a>:</h4>
+<p>It could be that my WiFi is not the best to benchmark. I could imagine having a direct cable-based connection would perform even better.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>

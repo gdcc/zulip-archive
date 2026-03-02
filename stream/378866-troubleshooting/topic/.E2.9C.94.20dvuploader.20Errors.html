@@ -1,0 +1,132 @@
+<html>
+<head><meta charset="utf-8"><title>✔ dvuploader Errors · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html">✔ dvuploader Errors</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="501560036"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501560036" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501560036">(Feb 24 2025 at 14:35)</a>:</h4>
+<p>I have a feeling this will need to go to Jim (and I will ask this in the Google group too, for him to see) - getting an error when using DVUploader.<br>
+First file is the dvuploader command and ensuing error message:<br>
+<a href="/user_uploads/53090/E-D3NbwGNhBBde86Ol-bKBHI/dvuploader_cmd_error.txt">dvuploader_cmd_error.txt</a></p>
+<p>Second file is the section for this job in the server logs:<br>
+<a href="/user_uploads/53090/7Qocl9Ipl1u4fJfiPagF1zIv/error_log.txt">error_log.txt</a></p>
+<p>So......</p>
+<p>What happened? </p>
+<blockquote>
+<p>FYI:<br>
+MaxFileUploadSizeInBytes.  = 107374182400<br>
+This file = 15616921658 bytes</p>
+</blockquote>
+<p>Where are the files? On S3?</p>
+<p>Should we delete them and start over?<br>
+OR since they are on S3, how can we get the dataset to know them?</p>
+
+
+
+<a name="501569153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501569153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501569153">(Feb 24 2025 at 15:09)</a>:</h4>
+<p>Yes, thanks for posting at <a href="https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs/m/36_tPhM2AgAJ">https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs/m/36_tPhM2AgAJ</a> as well.</p>
+
+
+
+<a name="501569288"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501569288" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501569288">(Feb 24 2025 at 15:10)</a>:</h4>
+<p>For my part, I'm looking at the line that's throwing the error: <a href="https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/datasetutility/AddReplaceFileHelper.java#L2148">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/datasetutility/AddReplaceFileHelper.java#L2148</a></p>
+
+
+
+<a name="501569405"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501569405" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501569405">(Feb 24 2025 at 15:10)</a>:</h4>
+<p>at edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper.addFiles(AddReplaceFileHelper.java:2148)</p>
+
+
+
+<a name="501569683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501569683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501569683">(Feb 24 2025 at 15:11)</a>:</h4>
+<p>When we see errors like this...</p>
+<p>"jakarta.ejb.EJBException: One or more Bean Validation constraints were violated while executing Automatic Bean Validation on callback event: prePersist for class: edu.harvard.iq.dataverse.DatasetFieldValue. Please refer to the embedded constraint violations for details."</p>
+<p>... it often means that values were saved in the database and then later the rules were made more restrictive.</p>
+
+
+
+<a name="501569873"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501569873" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501569873">(Feb 24 2025 at 15:12)</a>:</h4>
+<p>But I'm not seeing anything at <a href="https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ESQBIY">https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ESQBIY</a> that's suspicious.</p>
+
+
+
+<a name="501570045"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501570045" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501570045">(Feb 24 2025 at 15:12)</a>:</h4>
+<p>Do you think you'd be able to easily replicate this on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> ?</p>
+
+
+
+<a name="501570823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501570823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501570823">(Feb 24 2025 at 15:15)</a>:</h4>
+<p>This dataset had the "bounding box" metadata (after upgrading 6.? became "incomplete metadata"). So the info in that metadata field was removed - in the latest version.<br>
+But I am not sure if that metadata field was "fixed" and version saved BEFORE the files were uploaded.</p>
+
+
+
+<a name="501571101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501571101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501571101">(Feb 24 2025 at 15:16)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin ☃️</span> <a href="#narrow/channel/378866-troubleshooting/topic/dvuploader.20Errors/near/501570045">said</a>:</p>
+<blockquote>
+<p>Do you think you'd be able to easily replicate this on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a> ?</p>
+</blockquote>
+<p>What is the MaxFileSizeLimit on demo.dataverse?<br>
+And demo.dataverse doesn't use S3 direct upload?<br>
+So could would trying to replicate work?</p>
+
+
+
+<a name="501591884"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501591884" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501591884">(Feb 24 2025 at 16:34)</a>:</h4>
+<p>I see. Hmm. I'm wondering if it would be best to republish just the fix for the bounding box.</p>
+
+
+
+<a name="501591975"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501591975" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501591975">(Feb 24 2025 at 16:34)</a>:</h4>
+<p>And then, once we clear that hurdle, try try to upload the files.</p>
+
+
+
+<a name="501592238"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501592238" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501592238">(Feb 24 2025 at 16:35)</a>:</h4>
+<p>Also, if this is definitely the bounding box, I'd say it's a bug that Dataverse produces such a cryptic error.</p>
+
+
+
+<a name="501652464"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501652464" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Sherry Lake <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501652464">(Feb 24 2025 at 21:32)</a>:</h4>
+<p>Maybe the problem wouldn't have occurred if we had fixed the bounding box first, but the 70+GB files were already in our S3bucket (after we checked per Jim's advice)<br>
+<a href="https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs">https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs</a></p>
+<p>Luckily, the fix was to run the API "add file" command using the instructions here:<br>
+<a href="https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a></p>
+<p>And since we had the DVUploader output , we had all the parameters for the JSON file.</p>
+<p>All files accounted for: <br>
+<a href="https://doi.org/10.18130/V3/ESQBIY">https://doi.org/10.18130/V3/ESQBIY</a></p>
+
+
+
+<a name="501652628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501652628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501652628">(Feb 24 2025 at 21:33)</a>:</h4>
+<p>I'm glad you fixed it! <img alt=":dataverse_woman:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/e231c302.png" title="dataverse woman"></p>
+
+
+
+<a name="501654035"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20dvuploader%20Errors/near/501654035" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20dvuploader.20Errors.html#501654035">(Feb 24 2025 at 21:43)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="599826">Sherry Lake</span> has marked this topic as resolved.</p>
+
+
+
+<hr><p>Last updated: Mar 02 2026 at 13:56 UTC</p>
+</html>
