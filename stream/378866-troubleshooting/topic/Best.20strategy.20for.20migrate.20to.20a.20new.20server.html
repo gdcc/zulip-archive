@@ -1,0 +1,102 @@
+<html>
+<head><meta charset="utf-8"><title>Best strategy for migrate to a new server · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html">Best strategy for migrate to a new server</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="578680538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578680538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Carlos Perez-Miguel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578680538">(Mar 11 2026 at 16:00)</a>:</h4>
+<p>Hi, not sure if this will fit into this channel, sorry if not.</p>
+<p>At DIPC we have been working with an old server as our Dataverse installation for the last year. Now we have purchased a new one and I am looking into the best strategy for migrating all the contents from our ancient server to the new one.</p>
+<ul>
+<li>Is there any guide about this?</li>
+<li>Is there any tool?</li>
+<li>What would be the required steps?</li>
+</ul>
+<p>I saw that there is a backup script on the dataverse repo but it is quite old.</p>
+<p>Thank you!</p>
+
+
+
+<a name="578681700"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578681700" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578681700">(Mar 11 2026 at 16:04)</a>:</h4>
+<p>Hi! Will you be keeping the same version of Dataverse, for now? That will make things easier, I would think. Fewer changes.</p>
+
+
+
+<a name="578682937"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578682937" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578682937">(Mar 11 2026 at 16:09)</a>:</h4>
+<p>Once you installed your new server's operating system, it shouldn't be that hard to migrate the installation. It will require planned downtime though.</p>
+<p>Here's some things you'll need to consider (not necessarily complete):</p>
+<ul>
+<li>Shutdown the application, database and index before attempting any copy operations.</li>
+<li>Depending on where you store your data at rest, you may need to copy the data from old to new. You're taking the easy way when you store your data on S3 or some network file system. For local filesystems, you will need a copy &amp; sync job, probably with rsync. You could also start by only migrating your data to a new network filesystem in case you have it now on a local disk, that will make the transition easier.</li>
+<li>Depending on how you installed Postgres and Solr, you can probably just use rsync to copy your installation's files (minus the actual data) from the old to the new server. When you used some package to install Postgres or Solr, you'll need to install them in the new location and then do a data migration with those. Not to hard, but you should read up on that.</li>
+<li>Take care of any Cronjobs and Startup Scripts. Depending on your current OS you might need to adapt (e.g. because of SystemD changes). Cronjobs are usually easy to copy and paste between servers.</li>
+</ul>
+<p>I can only highly recommend to automate such tasks to make it easier in case of necessary recovery.<br>
+Probably <span class="user-mention" data-user-id="626369">@Don Sizemore</span> has more thoughts on this.</p>
+
+
+
+<a name="578683042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578683042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578683042">(Mar 11 2026 at 16:09)</a>:</h4>
+<p>Also - what Phil said. Don't make a migration and an upgrade at the same time. Avoid too many moving parts at once.</p>
+
+
+
+<a name="578858484"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578858484" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Carlos Perez-Miguel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578858484">(Mar 12 2026 at 08:27)</a>:</h4>
+<p>So basically we could say these steps apply?</p>
+<ol>
+<li>stop payara</li>
+<li>backup Solr</li>
+<li>backup Postgres</li>
+<li>install Dataverse on new server</li>
+<li>copy collection files to new server</li>
+<li>restore Solr and Postgres backup on new server</li>
+</ol>
+
+
+
+<a name="578894167"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578894167" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578894167">(Mar 12 2026 at 11:18)</a>:</h4>
+<p>Basically, yes. You'll also want to copy over logos for collections (dataverses), if you have any of those. The are usually stored in <code>/usr/local/payara6/glassfish/domains/domain1/docroot/logos</code></p>
+
+
+
+<a name="578894386"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578894386" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578894386">(Mar 12 2026 at 11:19)</a>:</h4>
+<p>That's one of the steps in <a href="https://github.com/IQSS/dataverse/issues/12043">#12043</a> which is about upgrading from Payara 6 to 7. (This pull request hasn't been merged yet.) See this file in that pull request: doc/release-notes/12020-Payara-and-Java-updates.md</p>
+
+
+
+<a name="578897412"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578897412" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Carlos Perez-Miguel <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578897412">(Mar 12 2026 at 11:34)</a>:</h4>
+<p>If I copy the entire <code>/usr/local/payara6/glassfish/</code> between installations, will payara still work?</p>
+
+
+
+<a name="578903218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578903218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578903218">(Mar 12 2026 at 12:04)</a>:</h4>
+<p>I'm not sure, but it's probably worth a shot!</p>
+
+
+
+<a name="578906111"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Best%20strategy%20for%20migrate%20to%20a%20new%20server/near/578906111" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server.html#578906111">(Mar 12 2026 at 12:18)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1044607">Carlos Perez-Miguel</span> <a href="#narrow/channel/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server/near/578897412">said</a>:</p>
+<blockquote>
+<p>If I copy the entire <code>/usr/local/payara6/glassfish/</code> between installations, will payara still work?</p>
+</blockquote>
+<p>You can probably do that, yes, but on a new system I'd exclude <code>/usr/local/payara6/glassfish/domains/domain1/generated/</code> <code>/usr/local/payara6/glassfish/domains/domain1/osgi-cache/</code> and possibly <code>lib/databases/ejb/</code></p>
+
+
+
+<hr><p>Last updated: Mar 15 2026 at 19:22 UTC</p>
+</html>
