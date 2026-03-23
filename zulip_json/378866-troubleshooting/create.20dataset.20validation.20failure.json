@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>A user wanted to create a new dataset draft via API with incomplete metadata. I did enable <code>dataverse.api.allow-incomplete-metadata</code>. </p>\n<p><code>curl -H \"X-Dataverse-key:$API_TOKEN\" -X POST \"$SERVER_URL/api/dataverses/$PARENT/datasets?doNotValidate=true\" -H 'Content-type:application/json' --upload-file test.json</code> </p>\n<p>This is the response we get:</p>\n<div class=\"codehilite\" data-code-language=\"JSON\"><pre><span></span><code><span class=\"p\">{</span>\n<span class=\"w\">  </span><span class=\"nt\">\"status\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"ERROR\"</span><span class=\"p\">,</span>\n<span class=\"w\">  </span><span class=\"nt\">\"message\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"Command [DatasetCreate dataset:null] failed: Exception thrown from bean: jakarta.validation.ConstraintViolationException: One or more Bean Validation constraints were violated while executing Automatic Bean Validation on callback event: prePersist for class: edu.harvard.iq.dataverse.DatasetFieldValue. Please refer to the embedded constraint violations for details.\"</span>\n<span class=\"p\">}</span>\n</code></pre></div>\n<p>This is what I see in the logs:  <a href=\"/user_uploads/53090/UvU3CdmKO4WPbCI-QRNNJcpn/PastedText.txt\">server.log</a><br>\nHere's the JSON file: <a href=\"/user_uploads/53090/oeCEoAg1YaNUaH9ahUSYNVU-/test.json\">test.json</a></p>\n<p>A) This response doesn't make much sense. This looks like a bug to me, as we should catch the exception and unwrap it before sending a response.<br>\nB) I don't see any obvious reasons why this should fail and the logs aren't helping. Ideas?</p>",
+        "id": 570117371,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769440162
+    },
+    {
+        "content": "<p>Ah if we do validate (drop the parameter), I think the reason may be a bug in the URL parsing for \"alternativeUrl\":</p>\n<div class=\"codehilite\" data-code-language=\"JSON\"><pre><span></span><code><span class=\"p\">{</span>\n<span class=\"w\">  </span><span class=\"nt\">\"status\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"ERROR\"</span><span class=\"p\">,</span>\n<span class=\"w\">  </span><span class=\"nt\">\"message\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"Validation Failed: Data Source is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Institute is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Storage Location URL is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), PoF IV topic is required. (Invalid value:edu.harvard.iq.dataverse.DatasetField[ id=null ]), Alternative URL http://localhost:5000/objects/8  is not a valid URL. (Invalid value:edu.harvard.iq.dataverse.DatasetFieldValueValue[ id=null ]).java.util.stream.ReferencePipeline$3@55dfb73c\"</span>\n<span class=\"p\">}</span>\n</code></pre></div>",
+        "id": 570118191,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769440341
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> looks like 2 issues to me, right?</p>",
+        "id": 570118317,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769440371
+    },
+    {
+        "content": "<p>The user created an issue for us: <a href=\"https://github.com/IQSS/dataverse/issues/12114\">https://github.com/IQSS/dataverse/issues/12114</a></p>",
+        "id": 570120461,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769440900
+    },
+    {
+        "content": "<p>I'm not sure if this should be split into two - these are two very independent problems.</p>",
+        "id": 570120583,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769440923
+    },
+    {
+        "content": "<p>Two issues is probably better.</p>",
+        "id": 570122121,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769441264
+    },
+    {
+        "content": "<p>There may even be a third. I see he gets an error 403.</p>",
+        "id": 570122209,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769441283
+    },
+    {
+        "content": "<p>Yeah me too</p>",
+        "id": 570122384,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769441329
+    },
+    {
+        "content": "<p>So it's three issues.</p>",
+        "id": 570122411,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769441335
+    },
+    {
+        "content": "<p>The error 403 was also reported by <span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> in a different issue: <a href=\"https://github.com/IQSS/dataverse/issues/12113\">https://github.com/IQSS/dataverse/issues/12113</a></p>",
+        "id": 570123433,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769441571
+    },
+    {
+        "content": "<p>Yeah, I just replied on that one.</p>",
+        "id": 570125166,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769442000
+    }
+]
