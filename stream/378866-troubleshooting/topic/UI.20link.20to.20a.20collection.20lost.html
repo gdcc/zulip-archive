@@ -1,0 +1,260 @@
+<html>
+<head><meta charset="utf-8"><title>UI link to a collection lost · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html">UI link to a collection lost</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="590547111"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/590547111" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#590547111">(Apr 23 2026 at 19:07)</a>:</h4>
+<p>This happened while I was consolidating the s3 buckets for <a href="http://test.dataverse.ucla.edu">test.dataverse.ucla.edu</a>.</p>
+<p>The collection for geospatial gets a 500 and I can't seem to find a way to fix it.<br>
+<a href="https://test.dataverse.ucla.edu/dataverse/geospatial">https://test.dataverse.ucla.edu/dataverse/geospatial</a></p>
+<p>Sort of remaking the collection,  is there any way to fix a broken connection link.</p>
+<p>The alias exists:<br>
+dvndb=# SELECT alias FROM dataverse WHERE alias = 'geospatial';<br>
+   alias</p>
+<hr>
+<p>geospatial<br>
+(1 row)</p>
+<p>ELECT <a href="http://d.id">d.id</a>, d.alias, o.dtype, o.owner_id<br>
+dvndb-# FROM dataverse d, dvobject o<br>
+dvndb-# WHERE <a href="http://d.id">d.id</a> = <a href="http://o.id">o.id</a> AND d.alias = 'geospatial';<br>
+  id  |   alias    |   dtype   | owner_id<br>
+------+------------+-----------+----------<br>
+ 4949 | geospatial | Dataverse |        1<br>
+(1 row)</p>
+<p>If this wasn't the test system I guess one fix would be to recreate the dataset.</p>
+
+
+
+<a name="590768478"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/590768478" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#590768478">(Apr 24 2026 at 17:38)</a>:</h4>
+<p>It seems that it is still physically there.   I can view with the api:<br>
+**</p>
+<p>curl "<a href="https://test.dataverse.ucla.edu/api/dataverses/geospatial">https://test.dataverse.ucla.edu/api/dataverses/geospatial</a>"</p>
+<p>{"status":"OK","data":{"id":4949,"alias":"geospatial","name":"Geospatial","affiliation":"University of California, Los Angeles","dataverseContacts":[{"displayOrder":0,"contactEmail":"datascience@ucla.edu"}],"permissionRoot":false,"dataverseType":"LABORATORY","ownerId":1,"creationDate":"2019-02-25T19:45:16Z","theme":{"id":1,"linkColor":"428BCA","textColor":"888888","backgroundColor":"FFFFFF"},"storageDriverLabel":"test-dataverse-oregon"}}(base)<br>
+**</p>
+
+
+
+<a name="591398052"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591398052" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591398052">(Apr 28 2026 at 14:20)</a>:</h4>
+<p><span class="user-mention" data-user-id="653479">@jamie jamison</span> thanks for also cross-posting to <a href="https://groups.google.com/g/dataverse-community/c/4AdxU1w1M1w/m/YMQtL-qFAQAJ">https://groups.google.com/g/dataverse-community/c/4AdxU1w1M1w/m/YMQtL-qFAQAJ</a></p>
+
+
+
+<a name="591398108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591398108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591398108">(Apr 28 2026 at 14:20)</a>:</h4>
+<p>I'm glad that <a href="https://test.dataverse.ucla.edu/api/dataverses/geospatial">https://test.dataverse.ucla.edu/api/dataverses/geospatial</a> returns JSON cleanly.</p>
+
+
+
+<a name="591398324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591398324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591398324">(Apr 28 2026 at 14:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="653479">@jamie jamison</span> can you please go to <a href="https://test.dataverse.ucla.edu/dataverse/geospatial">https://test.dataverse.ucla.edu/dataverse/geospatial</a> and grab the stacktrace from server.log? You can either paste it here or email it to <a href="mailto:support@dataverse.org">support@dataverse.org</a></p>
+
+
+
+<a name="591445314"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591445314" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591445314">(Apr 28 2026 at 17:36)</a>:</h4>
+<p>I'm attaching a test file - it's too long to past here<br>
+<a href="/user_uploads/53090/LgQph07_YoonNDnfrvoq_G8c/server-log.txt">server-log.txt</a><br>
+~<br>
+~</p>
+
+
+
+<a name="591446979"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591446979" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591446979">(Apr 28 2026 at 17:44)</a>:</h4>
+<p>Interesting. <code>java.io.IOException: ERROR: S3AccessIO - You must create and configure a bucket before creating datasets</code></p>
+
+
+
+<a name="591447270"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447270" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447270">(Apr 28 2026 at 17:46)</a>:</h4>
+<p><code>at edu.harvard.iq.dataverse.dataaccess.S3AccessIO.&lt;init&gt;(S3AccessIO.java:114)</code> which for you is <a href="https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L114">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L114</a></p>
+
+
+
+<a name="591447460"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447460" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447460">(Apr 28 2026 at 17:47)</a>:</h4>
+<p>But the bucket is already there.  I merged the old lariac (geospatial) bucket  into the all-purpose test bucket,  s3   test.dataverse.orgegon.</p>
+<p>I must have missed a step.  Everything with the merge worked on production</p>
+
+
+
+<a name="591447648"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447648" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447648">(Apr 28 2026 at 17:47)</a>:</h4>
+<p>gotcha</p>
+
+
+
+<a name="591447694"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447694" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447694">(Apr 28 2026 at 17:47)</a>:</h4>
+<p>well, one of these is true:</p>
+<p><code>if (bucketName == null || !s3.doesBucketExistV2(bucketName))</code></p>
+
+
+
+<a name="591447930"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447930" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447930">(Apr 28 2026 at 17:48)</a>:</h4>
+<p>Or can it be changed in postgres?  I've gotten lots of practice with the database. One of you guys pointed me to a site that has all the tables.</p>
+
+
+
+<a name="591447986"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591447986" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591447986">(Apr 28 2026 at 17:49)</a>:</h4>
+<p>sorry for the bad typing, I'm doing this in a meeting</p>
+
+
+
+<a name="591448014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448014">(Apr 28 2026 at 17:49)</a>:</h4>
+<p>ha, no worries</p>
+
+
+
+<a name="591448143"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448143" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448143">(Apr 28 2026 at 17:49)</a>:</h4>
+<p>SchemaSpy. I'm glad you enjoy it! For your version: <a href="https://guides.dataverse.org/en/5.14/schemaspy/index.html">https://guides.dataverse.org/en/5.14/schemaspy/index.html</a></p>
+
+
+
+<a name="591448253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448253">(Apr 28 2026 at 17:50)</a>:</h4>
+<p>helps with troubleshooting</p>
+
+
+
+<a name="591448308"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448308" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448308">(Apr 28 2026 at 17:50)</a>:</h4>
+<p>Other collections are fine?</p>
+
+
+
+<a name="591448418"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448418" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448418">(Apr 28 2026 at 17:51)</a>:</h4>
+<p>yes, only the geospatial.  I made an empty geospatial2 to try and see what's different</p>
+
+
+
+<a name="591448667"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448667" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448667">(Apr 28 2026 at 17:52)</a>:</h4>
+<p>In postgres can you please compare <code>storagedriver</code> under this table? <a href="https://guides.dataverse.org/en/5.14/schemaspy/tables/dataverse.html">https://guides.dataverse.org/en/5.14/schemaspy/tables/dataverse.html</a></p>
+
+
+
+<a name="591448823"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591448823" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591448823">(Apr 28 2026 at 17:52)</a>:</h4>
+<p>ok, may have to wait till meeting is done</p>
+
+
+
+<a name="591471413"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591471413" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591471413">(Apr 28 2026 at 19:51)</a>:</h4>
+<p>dvndb=# SELECT id, alias, name, storagedriver<br>
+FROM dataverse<br>
+WHERE alias IN ('geospatial', 'geospatial2');<br>
+  id  |    alias    |      name       | storagedriver<br>
+------+-------------+-----------------+---------------<br>
+ 4949 | geospatial  | Geospatial      | s3<br>
+ 5669 | geospatial2 | Geospatial Test | s3<br>
+(2 rows)</p>
+
+
+
+<a name="591471606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591471606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591471606">(Apr 28 2026 at 19:52)</a>:</h4>
+<p>still not working, I'm trying to find all the jvm options that mention s3 <br>
+ &lt;system-property name="dataverse.db.port" value="5432"&gt;&lt;/system-property&gt;<br>
+      &lt;system-property name="dataverse.files.storage-drivers" value="s3"&gt;&lt;/system-property&gt;<br>
+      &lt;system-property name="dataverse.files.dataverse-test-oregon.type" value="s3"&gt;&lt;/system-property&gt;<br>
+      &lt;system-property name="dataverse.files.dataverse-test-oregon.bucket" value="dataverse-test-oregon"&gt;&lt;/system-property&gt;<br>
+      &lt;system-property name="dataverse.files.dataverse-test-oregon.region" value="us-west-2"&gt;&lt;/system-property&gt;<br>
+      &lt;system-property name="dataverse.files.dataverse-test-oregon.download-redirect" value="true"&gt;&lt;/system-property&gt;</p>
+<p>&lt;jvm-options&gt;-Ddataverse.files.s3.url-expiration-minutes=120&lt;/jvm-options&gt;</p>
+<div class="codehilite"><pre><span></span><code>    &lt;jvm-options&gt;-Ddataverse.files.s3.bucket-name=dataverse-test-oregon&lt;/jvm-options&gt;
+
+    &lt;jvm-options&gt;-Ddataverse.files.storage-driver-id=s3&lt;/jvm-options&gt;
+
+&lt;jvm-options&gt;-Ddataverse.files.s3.type=s3&lt;/jvm-options&gt;
+</code></pre></div>
+
+<p>&lt;jvm-options&gt;-Ddataverse.files.s3.region=us-west-2&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Ddataverse.files.s3.label=dataverse-test-oregon&lt;/jvm-options&gt;</p>
+
+
+
+<a name="591471703"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591471703" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591471703">(Apr 28 2026 at 19:52)</a>:</h4>
+<p><a href="/user_uploads/53090/YvTi66E2GrXY8DkuXu-4U_AP/server-log2.txt">server-log2.txt</a></p>
+
+
+
+<a name="591472101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591472101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591472101">(Apr 28 2026 at 19:54)</a>:</h4>
+<p>Fortunately it's the test system</p>
+
+
+
+<a name="591473300"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591473300" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591473300">(Apr 28 2026 at 20:01)</a>:</h4>
+<p>4 messages were moved here from <a class="stream-topic" data-stream-id="378866" href="/#narrow/channel/378866-troubleshooting/topic/dvndb.3D.23.20SELECT.20id.2C.20alias.2C.20name.2C.20storagedriver.20FROM.20dataverse">#troubleshooting &gt; dvndb=# SELECT id, alias, name, storagedriver FROM dataverse</a> by <span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span>.</p>
+
+
+
+<a name="591474042"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591474042" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591474042">(Apr 28 2026 at 20:05)</a>:</h4>
+<p>The stacktrace is similar, thanks.</p>
+
+
+
+<a name="591478751"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591478751" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591478751">(Apr 28 2026 at 20:32)</a>:</h4>
+<p>This probably isn't worth taking too much of your time.  Though I would like to know how I broke it , if that was the case and if so how to fix.</p>
+
+
+
+<a name="591479424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591479424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591479424">(Apr 28 2026 at 20:36)</a>:</h4>
+<p>Sure. You said everything is ok in production, right?</p>
+
+
+
+<a name="591479559"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591479559" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591479559">(Apr 28 2026 at 20:37)</a>:</h4>
+<p>Yes, production is ok, other than being behind in 5.14</p>
+
+
+
+<a name="591479850"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591479850" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591479850">(Apr 28 2026 at 20:39)</a>:</h4>
+<p>phew</p>
+
+
+
+<a name="591479900"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591479900" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591479900">(Apr 28 2026 at 20:39)</a>:</h4>
+<p>Time to rebuild the test server based on the latest in production. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="591480295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591480295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591480295">(Apr 28 2026 at 20:41)</a>:</h4>
+<p>I'd rather do that.  Tim is working on an ansible script to install dataverse and update the database</p>
+
+
+
+<a name="591654969"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/UI%20link%20to%20a%20collection%20lost/near/591654969" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/UI.20link.20to.20a.20collection.20lost.html#591654969">(Apr 28 2026 at 23:44)</a>:</h4>
+<p>Just as an experiment, I'm copying over metadata from collection geospatial (the broken one) to geospatial2.</p>
+
+
+
+<hr><p>Last updated: Apr 29 2026 at 05:48 UTC</p>
+</html>

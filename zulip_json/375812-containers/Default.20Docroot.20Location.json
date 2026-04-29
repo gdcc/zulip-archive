@@ -1,0 +1,44 @@
+[
+    {
+        "content": "<p>To add files and stuff for branding, I need to put files into the docroot.</p>\n<p>For a few things like sitemaps, logos etc we have setup \"alternatedocroot_&lt;n&gt;\"  in <code>glassfish-web.xml</code>:</p>\n<div class=\"codehilite\" data-code-language=\"XML\"><pre><span></span><code><span class=\"nt\">&lt;property</span><span class=\"w\"> </span><span class=\"na\">name=</span><span class=\"s\">\"alternatedocroot_1\"</span><span class=\"w\"> </span><span class=\"na\">value=</span><span class=\"s\">\"from=/guides/* dir=${MPCONFIG=dataverse.files.docroot:./docroot}\"</span><span class=\"nt\">/&gt;</span>\n<span class=\"w\">  </span><span class=\"nt\">&lt;property</span><span class=\"w\"> </span><span class=\"na\">name=</span><span class=\"s\">\"alternatedocroot_2\"</span><span class=\"w\"> </span><span class=\"na\">value=</span><span class=\"s\">\"from=/dataexplore/* dir=${MPCONFIG=dataverse.files.docroot:./docroot}\"</span><span class=\"nt\">/&gt;</span>\n<span class=\"w\">  </span><span class=\"nt\">&lt;property</span><span class=\"w\"> </span><span class=\"na\">name=</span><span class=\"s\">\"alternatedocroot_3\"</span><span class=\"w\"> </span><span class=\"na\">value=</span><span class=\"s\">\"from=/logos/* dir=${MPCONFIG=dataverse.files.docroot:./docroot}\"</span><span class=\"nt\">/&gt;</span>\n<span class=\"w\">  </span><span class=\"nt\">&lt;property</span><span class=\"w\"> </span><span class=\"na\">name=</span><span class=\"s\">\"alternatedocroot_4\"</span><span class=\"w\"> </span><span class=\"na\">value=</span><span class=\"s\">\"from=/sitemap/* dir=${MPCONFIG=dataverse.files.docroot:./docroot}\"</span><span class=\"nt\">/&gt;</span>\n</code></pre></div>\n<p>For the Logo Customization and other bits, I need to put files in either the default docroot (which is by default the domaindir/docroot folder) or one of the alternate docroots. As it's a bad practice to put files into the base image filesystem, I think I've got three options:</p>\n<ol>\n<li>Mount a folder to the default docroot under /opt/payara/glassfish/server/domains/domain1/docroot</li>\n<li>Add another alternate docroot for the branding and setup the all path to use it</li>\n<li>Change the default docroot in the base image to make it configurable</li>\n</ol>\n<p>Seeing that we already suggest people use /dv/docroot the put stuff for the alternate docroots, I'm leaning towards option 3, as it seems the cleanest. I'd like to hear more opinions!</p>",
+        "id": 566930123,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1767875115
+    },
+    {
+        "content": "<p>I'm not sure what the best option is but this all sounds highly related to this gotcha we document at <a href=\"https://guides.dataverse.org/en/6.9/installation/advanced.html#multiple-app-servers\">https://guides.dataverse.org/en/6.9/installation/advanced.html#multiple-app-servers</a></p>\n<ul>\n<li>When users upload a logo or footer for their Dataverse collection using the “theme” feature described in the <a href=\"https://guides.dataverse.org/en/6.9/user/dataverse-management.html\">Dataverse Collection Management</a> section of the User Guide, these logos are stored only on the app server the user happened to be on when uploading the logo. By default these logos and footers are written to the directory <code>/usr/local/payara6/glassfish/domains/domain1/docroot/logos</code>.</li>\n</ul>",
+        "id": 566966593,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767885183
+    },
+    {
+        "content": "<p>As all \"logos\" are already under an \"alternatedocroot\", we can have these on some other location already. So yes, related, but not part of the problem. As long as you put these logos on a ReadWriteMany type of filesystem (NFS/SMB/...), you're good to go. As it is configurable, you don't have to mount it to a \"logos\" subfolder of the docroot.</p>",
+        "id": 566968381,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1767885637
+    },
+    {
+        "content": "<p>I put this on the agenda for the next ct call but do you want to do a quick zoom?</p>",
+        "id": 566969314,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767885852
+    },
+    {
+        "content": "<p>Agenda sounds good. Room sounds good, too <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 566969448,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1767885883
+    },
+    {
+        "content": "<p><a href=\"https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09\">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>",
+        "id": 566970596,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767886161
+    },
+    {
+        "content": "<p>Phil pointed out a very valid 4th option: use a static webserver and serve the file from there. Benefit: can be cached locally and also serve more stuff later (previewers, SPA, ...)</p>",
+        "id": 566977900,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1767888105
+    }
+]

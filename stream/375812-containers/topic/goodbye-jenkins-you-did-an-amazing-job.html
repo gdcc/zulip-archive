@@ -1,0 +1,1349 @@
+<html>
+<head><meta charset="utf-8"><title>goodbye-jenkins-you-did-an-amazing-job · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html">goodbye-jenkins-you-did-an-amazing-job</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="584520232"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584520232" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584520232">(Apr 09 2026 at 18:55)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  .Just wanted to get your thoughts on something.</p>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span>  has tasked me now with figuring out a way to permanently move away from Jenkins and use GA.</p>
+<p>So this is how the workflow might look</p>
+<ol>
+<li>On commit to develop and on any PRs that target develop, a GitHub Actions run starts up. GitHub Actions is free and unlimited for GitHub public repos so no matter how many, it shouldn't be an issue no matter how many spin up.</li>
+<li>A GitHub Actions runner boots up, and it builds Dataverse as a container and runs the maven tests on the container Dataverse</li>
+<li>The jacoco test reports are extracted by the runner after the tests finish running</li>
+</ol>
+<p>Currently afaik, there is no good way in which we can display BOTH develop branch commit reports and PR commit reports directly on GitHub. So, we will have to feed the JaCoCo reports somewhere, maybe that could be a different website with a backend that is hosted on GitHub Pages. If that is the route we decide to go in, I will build the website myself too. I have a prototype workflow too, and it works mostly as intended with some additional tweaking I'll be doing in the coming weeks.</p>
+<p>What do you think? Any thoughts/improvements/suggestions about this workflow?</p>
+
+
+
+<a name="584520676"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584520676" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584520676">(Apr 09 2026 at 18:58)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> I love it! But, yes, you're right that the reporting might be difficult. Any idea what other projects do? Jacoco is fairly popular, I believe. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="584521772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584521772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584521772">(Apr 09 2026 at 19:04)</a>:</h4>
+<p>Most corporate and open source projects that I am aware of use a separate reporting dashboard. In our case that is Jenkins, others use Codecov or Coveralls or SonarCloud.</p>
+<p>Codecov for example is a paid option BUT it is free forever for public repositories with unlimited users. We would have to set it up org-side. But just like with GitHub Actions we dunno if Microsoft or Codecov will ever change their minds and remove the unlimited runs part.</p>
+<p>With our own dashboard that we could build for Dataverse, the initial time cost of building it and maintaining it will be high, but in return IQSS retains permanent control over the reporting.</p>
+
+
+
+<a name="584521893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584521893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584521893">(Apr 09 2026 at 19:05)</a>:</h4>
+<p>We do use Coveralls already, if that helps: <a href="https://coveralls.io/github/IQSS/dataverse">https://coveralls.io/github/IQSS/dataverse</a></p>
+
+
+
+<a name="584522032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522032">(Apr 09 2026 at 19:06)</a>:</h4>
+<p>Coveralls fully supports JaCoCo reports! We could place them there.</p>
+
+
+
+<a name="584522089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522089">(Apr 09 2026 at 19:07)</a>:</h4>
+<p>Great! And I believe we already do. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="584522233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522233">(Apr 09 2026 at 19:08)</a>:</h4>
+<p>Please check this out: <a href="https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/maven_unit_test.yml#L153-L163">https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/maven_unit_test.yml#L153-L163</a></p>
+
+
+
+<a name="584522293"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522293" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522293">(Apr 09 2026 at 19:08)</a>:</h4>
+<p>Oh. We don't need Jenkins at all then?</p>
+
+
+
+<a name="584522528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522528">(Apr 09 2026 at 19:09)</a>:</h4>
+<p>Well, the goal is to retire Jenkins, it sounds like. We still use it today, obviously, for our CI and for building the guides.</p>
+
+
+
+<a name="584522628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522628">(Apr 09 2026 at 19:10)</a>:</h4>
+<p>When I first setup Coveralls it was in Travis. But <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> moved it to GitHub Actions in <a href="https://github.com/IQSS/dataverse/issues/7944">#7944</a>.</p>
+
+
+
+<a name="584522699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522699">(Apr 09 2026 at 19:10)</a>:</h4>
+<p>Seems like the existing GitHub Actions cover everything Jenkins does, that's why I was confused.</p>
+
+
+
+<a name="584522866"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522866" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522866">(Apr 09 2026 at 19:11)</a>:</h4>
+<p>If there's anything that Jenkins specifically does that GA isn't doing already, then I could work on filling that gap. But seems like y'all have already thought of this!</p>
+
+
+
+<a name="584522897"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584522897" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584522897">(Apr 09 2026 at 19:12)</a>:</h4>
+<p>The small thing that Jenkins is doing for us now is building the guides: <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>
+<p>The big thing that Jenkins does for us is running the API test suite.</p>
+
+
+
+<a name="584523044"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523044" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523044">(Apr 09 2026 at 19:12)</a>:</h4>
+<p>... and it sounds like you'd like to run the API test suite in containers, right? Sounds great!</p>
+
+
+
+<a name="584523056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523056">(Apr 09 2026 at 19:12)</a>:</h4>
+<p>Oh so we need 1. Integration Tests running in GA and 2. Guides built in GA for Jenkins to be redundant. Is that accurate?</p>
+
+
+
+<a name="584523221"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523221" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523221">(Apr 09 2026 at 19:13)</a>:</h4>
+<p>Yes. I tend to call them API tests. <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> gets grumpy about me calling tests the wrong things. Maybe we can name them his way this time! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="584523525"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523525" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523525">(Apr 09 2026 at 19:15)</a>:</h4>
+<p>Thank you so much! That clarifies a lot.</p>
+
+
+
+<a name="584523756"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523756" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523756">(Apr 09 2026 at 19:17)</a>:</h4>
+<p>One last stupid question, is there already a workflow to build the guides or would you need one for that too?</p>
+
+
+
+<a name="584523800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584523800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584523800">(Apr 09 2026 at 19:17)</a>:</h4>
+<p>Sure! I don't know if this helps or complicates things but <a href="https://github.com/gdcc/api-test-runner">https://github.com/gdcc/api-test-runner</a> used to work. By that I mean that I could run API tests against the develop branch (for example) against Dataverse running in containers.</p>
+
+
+
+<a name="584524005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584524005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584524005">(Apr 09 2026 at 19:18)</a>:</h4>
+<p>I will take a look and see if we can reuse that</p>
+
+
+
+<a name="584524629"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584524629" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584524629">(Apr 09 2026 at 19:21)</a>:</h4>
+<p>Currently, we build the production version of the guides with Jenkins. Here's how: <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>
+<p>So yes, if we're going to retire Jenkins, we'll need something else.</p>
+<p>We do already have two checks in GitHub for guides....</p>
+<p><img alt="Screenshot 2026-04-09 at 3.21.18 PM.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="816x112" data-original-src="/user_uploads/53090/_nfCbIu7grJn6FRomPjQLNgJ/Screenshot-2026-04-09-at-3.21.18PM.png" src="/user_uploads/thumbnail/53090/_nfCbIu7grJn6FRomPjQLNgJ/Screenshot-2026-04-09-at-3.21.18PM.png/840x560.webp"></p>
+<p>... but they don't deploy to <a href="https://guides.dataverse.org">https://guides.dataverse.org</a> . Only Jenkins does that.</p>
+
+
+
+<a name="584524927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584524927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584524927">(Apr 09 2026 at 19:23)</a>:</h4>
+<p>Afaik GAs should be able to cover this, I'll let you know how it goes Phil. Thank you once again, you've been a great help. Otherwise I would've been chasing my own tail.</p>
+
+
+
+<a name="584525085"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584525085" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584525085">(Apr 09 2026 at 19:24)</a>:</h4>
+<p>Oh, sure, I set up all this stuff (with <span class="user-mention" data-user-id="626369">@Don Sizemore</span>) that you're keen to retire. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> </p>
+<p>I know where the bodies are buried! <span aria-label="scream" class="emoji emoji-1f631" role="img" title="scream">:scream:</span></p>
+
+
+
+<a name="584526744"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584526744" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584526744">(Apr 09 2026 at 19:35)</a>:</h4>
+<p>Want me to explain the two checks for the guides? Of course you do! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="584527180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584527180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584527180">(Apr 09 2026 at 19:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> created the "Guides Build Status" one in <a href="https://github.com/IQSS/dataverse/issues/7838">#7838</a>. If there's a syntax problem in a PR, it will catch it. Here's how it looks as of this writing: <a href="https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/guides_build_sphinx.yml">https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/guides_build_sphinx.yml</a></p>
+
+
+
+<a name="584527540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/584527540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#584527540">(Apr 09 2026 at 19:40)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> created the "docs/readthedocs.org" one. As explained in <a href="https://github.com/IQSS/dataverse/issues/8650">#8650</a>, it's for previewing doc changes in HTML format for pull requests. We talk about it here: <a href="https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#quick-fix">https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#quick-fix</a></p>
+<p>Instead of a GitHub Action, it uses a webhook, which looks like this:</p>
+<p><img alt="Screenshot 2026-04-09 at 3.40.13 PM.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="1183x572" data-original-src="/user_uploads/53090/BH1xzX65reAqPkC-qBTb6jtb/Screenshot-2026-04-09-at-3.40.13PM.png" src="/user_uploads/thumbnail/53090/BH1xzX65reAqPkC-qBTb6jtb/Screenshot-2026-04-09-at-3.40.13PM.png/840x560.webp"></p>
+
+
+
+<a name="588675670"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588675670" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588675670">(Apr 21 2026 at 16:52)</a>:</h4>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="m">2026</span>-04-21T14:30:41.0336131Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>Tests<span class="w"> </span>run:<span class="w"> </span><span class="m">20</span>,<span class="w"> </span>Failures:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>Errors:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">288</span>.2<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!<span class="w"> </span>--<span class="w"> </span><span class="k">in</span><span class="w"> </span>edu.harvard.iq.dataverse.api.SearchIT
+<span class="m">2026</span>-04-21T14:30:41.0344827Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>edu.harvard.iq.dataverse.api.SearchIT.testSearchFilesAndUrlImages<span class="w"> </span>--<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">8</span>.977<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!
+<span class="m">2026</span>-04-21T14:30:41.0346353Z<span class="w"> </span>java.lang.AssertionError:
+<span class="m">2026</span>-04-21T14:30:41.0346993Z<span class="w"> </span><span class="m">1</span><span class="w"> </span>expectation<span class="w"> </span>failed.
+<span class="m">2026</span>-04-21T14:30:41.0347594Z<span class="w"> </span>JSON<span class="w"> </span>path<span class="w"> </span>data.items<span class="o">[</span><span class="m">0</span><span class="o">]</span>.image_url<span class="w"> </span>doesn<span class="err">'</span>t<span class="w"> </span>match.
+<span class="m">2026</span>-04-21T14:30:41.0348219Z<span class="w"> </span>Expected:<span class="w"> </span>a<span class="w"> </span>string<span class="w"> </span>containing<span class="w"> </span><span class="s2">"/logo"</span>
+<span class="m">2026</span>-04-21T14:30:41.0348763Z<span class="w">   </span>Actual:<span class="w"> </span>null
+<span class="m">2026</span>-04-21T14:30:41.0349029Z
+<span class="m">2026</span>-04-21T14:30:41.0349856Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class="o">(</span>DirectConstructorHandleAccessor.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0351353Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class="o">(</span>Constructor.java:502<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0355704Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class="o">(</span>Constructor.java:486<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0357117Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class="o">(</span>CachedConstructor.java:73<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0358655Z<span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>,<span class="w"> </span><span class="m">2026</span><span class="w"> </span><span class="m">2</span>:30:41<span class="w"> </span>PM<span class="w"> </span>edu.harvard.iq.dataverse.api.UtilIT<span class="w"> </span>getRestAssuredBaseUri
+<span class="m">2026</span>-04-21T14:30:41.0359995Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class="nv">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class="o">(</span>ConstructorSite.java:108<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0361688Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class="o">(</span>AbstractCallSite.java:277<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0363367Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure</span>.validate<span class="o">(</span>ResponseSpecificationImpl.groovy:512<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0365065Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure$validate$1</span>.call<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0367098Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class="o">(</span>ResponseSpecificationImpl.groovy:696<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0368918Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class="nv">$2$validateResponseIfRequired</span><span class="o">(</span>ResponseSpecificationImpl.groovy<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0370555Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class="o">(</span>DirectMethodHandleAccessor.java:103<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0371725Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0372954Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class="o">(</span>PlainObjectMetaMethodSite.java:43<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0374747Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class="nv">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class="o">(</span>PogoMetaMethodSite.java:198<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0376766Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class="o">(</span>PogoMetaMethodSite.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0378198Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class="o">(</span>AbstractCallSite.java:185<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0379579Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.body<span class="o">(</span>ResponseSpecificationImpl.groovy:270<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0380891Z<span class="w">  </span>at<span class="w"> </span>io.restassured.specification.ResponseSpecification<span class="nv">$body$1</span>.callCurrent<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0382200Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallCurrent<span class="o">(</span>CallSiteArray.java:49<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0383491Z<span class="w">  </span>at<span class="w"> </span>io.restassured.specification.ResponseSpecification<span class="nv">$body$1</span>.callCurrent<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0384814Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.body<span class="o">(</span>ResponseSpecificationImpl.groovy:117<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0386456Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.body<span class="o">(</span>ValidatableResponseOptionsImpl.java:244<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0387859Z<span class="w">  </span>at<span class="w"> </span>edu.harvard.iq.dataverse.api.SearchIT.testSearchFilesAndUrlImages<span class="o">(</span>SearchIT.java:2032<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0389033Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0389846Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:30:41.0390654Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+</code></pre></div>
+
+
+
+<a name="588675730"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588675730" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588675730">(Apr 21 2026 at 16:53)</a>:</h4>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="m">2026</span>-04-21T14:17:53.1497050Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>Tests<span class="w"> </span>run:<span class="w"> </span><span class="m">5</span>,<span class="w"> </span>Failures:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>Errors:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">0</span>.549<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!<span class="w"> </span>--<span class="w"> </span><span class="k">in</span><span class="w"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT
+<span class="m">2026</span>-04-21T14:17:53.1498527Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT.testMakeDataCountGetMetric<span class="w"> </span>--<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">0</span>.416<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!
+<span class="m">2026</span>-04-21T14:17:53.1499477Z<span class="w"> </span>java.lang.AssertionError:
+<span class="m">2026</span>-04-21T14:17:53.1499851Z<span class="w"> </span><span class="m">1</span><span class="w"> </span>expectation<span class="w"> </span>failed.
+<span class="m">2026</span>-04-21T14:17:53.1500200Z<span class="w"> </span>Expected<span class="w"> </span>status<span class="w"> </span>code<span class="w"> </span>&lt;<span class="m">200</span>&gt;<span class="w"> </span>but<span class="w"> </span>was<span class="w"> </span>&lt;<span class="m">400</span>&gt;.
+<span class="m">2026</span>-04-21T14:17:53.1500478Z
+<span class="m">2026</span>-04-21T14:17:53.1501183Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class="o">(</span>DirectConstructorHandleAccessor.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1502406Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class="o">(</span>Constructor.java:502<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1503292Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class="o">(</span>Constructor.java:486<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1503930Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class="o">(</span>CachedConstructor.java:73<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1504712Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class="nv">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class="o">(</span>ConstructorSite.java:108<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1505998Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class="o">(</span>AbstractCallSite.java:277<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1506869Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure</span>.validate<span class="o">(</span>ResponseSpecificationImpl.groovy:512<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1507702Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure$validate$1</span>.call<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1508531Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class="o">(</span>ResponseSpecificationImpl.groovy:696<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1509411Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class="nv">$2$validateResponseIfRequired</span><span class="o">(</span>ResponseSpecificationImpl.groovy<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1510408Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class="o">(</span>DirectMethodHandleAccessor.java:103<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1511244Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1511851Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class="o">(</span>PlainObjectMetaMethodSite.java:43<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1512742Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class="nv">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class="o">(</span>PogoMetaMethodSite.java:198<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1513612Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class="o">(</span>PogoMetaMethodSite.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1514323Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class="o">(</span>AbstractCallSite.java:185<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1515045Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class="o">(</span>ResponseSpecificationImpl.groovy:135<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1516000Z<span class="w">  </span>at<span class="w"> </span>io.restassured.specification.ResponseSpecification<span class="nv">$statusCode$0</span>.callCurrent<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1516876Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class="o">(</span>ResponseSpecificationImpl.groovy:143<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1517730Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.statusCode<span class="o">(</span>ValidatableResponseOptionsImpl.java:89<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1518528Z<span class="w">  </span>at<span class="w"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT.testMakeDataCountGetMetric<span class="o">(</span>MakeDataCountApiIT.java:68<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1519124Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:17:53.1519506Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+</code></pre></div>
+
+
+
+<a name="588675757"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588675757" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588675757">(Apr 21 2026 at 16:53)</a>:</h4>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="m">2026</span>-04-21T14:11:46.7179540Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>Tests<span class="w"> </span>run:<span class="w"> </span><span class="m">62</span>,<span class="w"> </span>Failures:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>Errors:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">4</span>,<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">377</span>.5<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!<span class="w"> </span>--<span class="w"> </span><span class="k">in</span><span class="w"> </span>edu.harvard.iq.dataverse.api.DatasetsIT
+<span class="m">2026</span>-04-21T14:11:46.7206380Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>edu.harvard.iq.dataverse.api.DatasetsIT.testUpdateMultipleFileMetadata<span class="w"> </span>--<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">4</span>.884<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!
+<span class="m">2026</span>-04-21T14:11:46.7207686Z<span class="w"> </span>java.lang.AssertionError:
+<span class="m">2026</span>-04-21T14:11:46.7208133Z<span class="w"> </span><span class="m">1</span><span class="w"> </span>expectation<span class="w"> </span>failed.
+<span class="m">2026</span>-04-21T14:11:46.7208502Z<span class="w"> </span>Expected<span class="w"> </span>status<span class="w"> </span>code<span class="w"> </span>&lt;<span class="m">200</span>&gt;<span class="w"> </span>but<span class="w"> </span>was<span class="w"> </span>&lt;<span class="m">403</span>&gt;.
+<span class="m">2026</span>-04-21T14:11:46.7208807Z
+<span class="m">2026</span>-04-21T14:11:46.7209497Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class="o">(</span>DirectConstructorHandleAccessor.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7210765Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class="o">(</span>Constructor.java:502<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7211950Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class="o">(</span>Constructor.java:486<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7212874Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class="o">(</span>CachedConstructor.java:73<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7214250Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class="nv">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class="o">(</span>ConstructorSite.java:108<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7216042Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor<span class="o">(</span>CallSiteArray.java:57<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7217338Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class="o">(</span>AbstractCallSite.java:263<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7218635Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class="o">(</span>AbstractCallSite.java:277<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7220130Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure</span>.validate<span class="o">(</span>ResponseSpecificationImpl.groovy:512<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7221653Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl<span class="nv">$HamcrestAssertionClosure$validate$1</span>.call<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7223517Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class="o">(</span>ResponseSpecificationImpl.groovy:696<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7225112Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class="nv">$2$validateResponseIfRequired</span><span class="o">(</span>ResponseSpecificationImpl.groovy<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7226842Z<span class="w">  </span>at<span class="w"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class="o">(</span>DirectMethodHandleAccessor.java:103<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7227881Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7228974Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class="o">(</span>PlainObjectMetaMethodSite.java:43<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7230638Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class="nv">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class="o">(</span>PogoMetaMethodSite.java:198<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7232200Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class="o">(</span>PogoMetaMethodSite.java:62<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7233474Z<span class="w">  </span>at<span class="w"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class="o">(</span>AbstractCallSite.java:185<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7234784Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class="o">(</span>ResponseSpecificationImpl.groovy:135<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7236305Z<span class="w">  </span>at<span class="w"> </span>io.restassured.specification.ResponseSpecification<span class="nv">$statusCode$0</span>.callCurrent<span class="o">(</span>Unknown<span class="w"> </span>Source<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7237581Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class="o">(</span>ResponseSpecificationImpl.groovy:143<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7239003Z<span class="w">  </span>at<span class="w"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.statusCode<span class="o">(</span>ValidatableResponseOptionsImpl.java:89<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7240544Z<span class="w">  </span>at<span class="w"> </span>edu.harvard.iq.dataverse.api.DatasetsIT.testUpdateMultipleFileMetadata<span class="o">(</span>DatasetsIT.java:7105<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7241519Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7242200Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:11:46.7242856Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+</code></pre></div>
+
+
+
+<a name="588675924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588675924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588675924">(Apr 21 2026 at 16:54)</a>:</h4>
+<div class="codehilite" data-code-language="Bash"><pre><span></span><code><span class="m">2026</span>-04-21T14:14:40.2467362Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>Tests<span class="w"> </span>run:<span class="w"> </span><span class="m">5</span>,<span class="w"> </span>Failures:<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>Errors:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Skipped:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">65</span>.16<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!<span class="w"> </span>--<span class="w"> </span><span class="k">in</span><span class="w"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT
+<span class="m">2026</span>-04-21T14:14:40.2469046Z<span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>,<span class="w"> </span><span class="m">2026</span><span class="w"> </span><span class="m">2</span>:14:40<span class="w"> </span>PM<span class="w"> </span>edu.harvard.iq.dataverse.api.UtilIT<span class="w"> </span>getRestAssuredBaseUri
+<span class="m">2026</span>-04-21T14:14:40.2469845Z<span class="w"> </span>INFO:<span class="w"> </span>Base<span class="w"> </span>URL<span class="w"> </span><span class="k">for</span><span class="w"> </span>tests:<span class="w"> </span>http://localhost:8080
+<span class="m">2026</span>-04-21T14:14:40.2471146Z<span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT.testRetrieveMyDataCollections<span class="w"> </span>--<span class="w"> </span>Time<span class="w"> </span>elapsed:<span class="w"> </span><span class="m">11</span>.05<span class="w"> </span>s<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="w"> </span>FAILURE!
+<span class="m">2026</span>-04-21T14:14:40.2472441Z<span class="w"> </span>org.opentest4j.AssertionFailedError:<span class="w"> </span>expected:<span class="w"> </span>&lt;<span class="m">16</span>&gt;<span class="w"> </span>but<span class="w"> </span>was:<span class="w"> </span>&lt;<span class="m">17</span>&gt;
+<span class="m">2026</span>-04-21T14:14:40.2473482Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.AssertionFailureBuilder.build<span class="o">(</span>AssertionFailureBuilder.java:151<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2475008Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow<span class="o">(</span>AssertionFailureBuilder.java:132<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2476363Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.AssertEquals.failNotEqual<span class="o">(</span>AssertEquals.java:197<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2477309Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.AssertEquals.assertEquals<span class="o">(</span>AssertEquals.java:150<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2478284Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.AssertEquals.assertEquals<span class="o">(</span>AssertEquals.java:145<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2479393Z<span class="w">  </span>at<span class="w"> </span>org.junit.jupiter.api.Assertions.assertEquals<span class="o">(</span>Assertions.java:531<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2480455Z<span class="w">  </span>at<span class="w"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT.testRetrieveMyDataCollections<span class="o">(</span>DataRetrieverApiIT.java:164<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2481466Z<span class="w">  </span>at<span class="w"> </span>java.base/java.lang.reflect.Method.invoke<span class="o">(</span>Method.java:580<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2482062Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+<span class="m">2026</span>-04-21T14:14:40.2482645Z<span class="w">  </span>at<span class="w"> </span>java.base/java.util.ArrayList.forEach<span class="o">(</span>ArrayList.java:1596<span class="o">)</span>
+</code></pre></div>
+
+
+
+<a name="588676121"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588676121" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588676121">(Apr 21 2026 at 16:55)</a>:</h4>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/blob/container-testing-workflow/.github/workflows/container_integration_tests_workflow.yml">https://github.com/IQSS-Dataverse-Development/dataverse/blob/container-testing-workflow/.github/workflows/container_integration_tests_workflow.yml</a></p>
+
+
+
+<a name="588676404"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588676404" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588676404">(Apr 21 2026 at 16:56)</a>:</h4>
+<p>These are the four integration tests that fail on every attempt</p>
+
+
+
+<a name="588683708"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/588683708" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#588683708">(Apr 21 2026 at 17:34)</a>:</h4>
+<p>we think we need to cobble in some more DB settings and jvm-options from Dataverse-Ansible and we should be good!</p>
+
+
+
+<a name="591221575"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591221575" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591221575">(Apr 27 2026 at 20:01)</a>:</h4>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25013696261">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25013696261</a></p>
+
+
+
+<a name="591222256"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591222256" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591222256">(Apr 27 2026 at 20:05)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Hi Phil! Hope you're doing good!</p>
+<p>These three tests seem to fail no matter what, and I am not entirely sure if its just configuration or requires test code changes, think anyone can lend me a hand for a few minutes to quickly see what's up with these?</p>
+
+
+
+<a name="591222447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591222447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591222447">(Apr 27 2026 at 20:06)</a>:</h4>
+<p>Just 3 tests flaking on us out of 2511, so we're almost there</p>
+
+
+
+<a name="591224403"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591224403" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591224403">(Apr 27 2026 at 20:18)</a>:</h4>
+<p>I'm back, I'm back! Only 3?!? We're almost there! Good job! <img alt=":dataverse_man:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/c7b94a03.png" title="dataverse man"> <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="591224674"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591224674" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591224674">(Apr 27 2026 at 20:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> how do I see the details for the SearchIT failure, for example? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591224763"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591224763" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591224763">(Apr 27 2026 at 20:20)</a>:</h4>
+<p>Oops my bad. <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73261506538">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73261506538</a></p>
+
+
+
+<a name="591224853"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591224853" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591224853">(Apr 27 2026 at 20:20)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>Expected: a string containing &quot;/logo&quot;
+  Actual: null
+</code></pre></div>
+<p>Thanks!</p>
+
+
+
+<a name="591229311"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591229311" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591229311">(Apr 27 2026 at 20:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> can we see if this helps? <a href="https://github.com/IQSS-Dataverse-Development/dataverse/pull/4">https://github.com/IQSS-Dataverse-Development/dataverse/pull/4</a></p>
+
+
+
+<a name="591230911"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591230911" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591230911">(Apr 27 2026 at 20:54)</a>:</h4>
+<p>will start the workflow soon</p>
+
+
+
+<a name="591232522"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591232522" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591232522">(Apr 27 2026 at 21:04)</a>:</h4>
+<p>Hi Phil, could you please resubmit PR directly to the develop branch?</p>
+
+
+
+<a name="591232540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591232540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591232540">(Apr 27 2026 at 21:04)</a>:</h4>
+<p>then the workflow can run</p>
+
+
+
+<a name="591232994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591232994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591232994">(Apr 27 2026 at 21:06)</a>:</h4>
+<p>Sure, here you go: <a href="https://github.com/IQSS-Dataverse-Development/dataverse/pull/5">https://github.com/IQSS-Dataverse-Development/dataverse/pull/5</a></p>
+
+
+
+<a name="591234080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591234080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591234080">(Apr 27 2026 at 21:13)</a>:</h4>
+<p>Running: <a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25019823115">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25019823115</a></p>
+
+
+
+<a name="591238128"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591238128" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591238128">(Apr 27 2026 at 21:45)</a>:</h4>
+<p>Hi Phil, it still seems to fail. But please no pressure, and no rush on this, Jenkins still works, we can figure this out slowly <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="591240373"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591240373" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591240373">(Apr 27 2026 at 22:04)</a>:</h4>
+<p>I think my PR fixed SearchIT. We're now down to two failures: <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436</a></p>
+
+
+
+<a name="591241812"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591241812" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591241812">(Apr 27 2026 at 22:17)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591240373">said</a>:</p>
+<blockquote>
+<p>I think my PR fixed SearchIT. We're now down to two failures: <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436</a></p>
+</blockquote>
+<p>oops looked at the wrong run, you're absolutely right, tysm!</p>
+
+
+
+<a name="591248254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591248254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591248254">(Apr 27 2026 at 23:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> any idea why <a href="https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/util/MailSessionProducerIT.java#L258">https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/util/MailSessionProducerIT.java#L258</a> is failing?</p>
+
+
+
+<a name="591248374"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591248374" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591248374">(Apr 27 2026 at 23:19)</a>:</h4>
+<p>I'm not sure why the actual was 17 instead of 16 at <a href="https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164">https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164</a></p>
+
+
+
+<a name="591361780"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591361780" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591361780">(Apr 28 2026 at 12:09)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> Ash noted that there was a root element, but I'm curious why these tests pass in a VM but fail in containers. One difference is the underlying OS (Rocky-&gt;Ubuntu) which has posed charset problems here and there over the years.</p>
+
+
+
+<a name="591365542"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591365542" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591365542">(Apr 28 2026 at 12:24)</a>:</h4>
+<p>Hey folks, just catching up on this.</p>
+
+
+
+<a name="591365614"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591365614" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591365614">(Apr 28 2026 at 12:24)</a>:</h4>
+<p>Should I still look into this or are y'all good?</p>
+
+
+
+<a name="591365841"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591365841" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591365841">(Apr 28 2026 at 12:25)</a>:</h4>
+<p>I am pretty sure that I (who wrote the MailSessionProducerIT) did test with a container at the time.</p>
+
+
+
+<a name="591366231"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591366231" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591366231">(Apr 28 2026 at 12:27)</a>:</h4>
+<p>Also happy do some pair programming over VC if that helps.</p>
+
+
+
+<a name="591369210"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591369210" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591369210">(Apr 28 2026 at 12:38)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> yeah, if you could look at MailSessionProducerIT, I'd appreciate it</p>
+
+
+
+<a name="591370438"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591370438" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591370438">(Apr 28 2026 at 12:43)</a>:</h4>
+<p>Hmm the MaSePrIT is no API test, but a real integration test. So it should already run as part of the regular jobs on IQSS. Is it failing over there, too?</p>
+
+
+
+<a name="591370833"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591370833" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591370833">(Apr 28 2026 at 12:45)</a>:</h4>
+<p>Nope, all good over there. (See <a href="https://github.com/IQSS/dataverse/actions/runs/25045635432/job/73360393320">https://github.com/IQSS/dataverse/actions/runs/25045635432/job/73360393320</a> for an example)</p>
+
+
+
+<a name="591371921"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591371921" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591371921">(Apr 28 2026 at 12:49)</a>:</h4>
+<p>I'm wondering why the test is even executed. While the original Jenkins job used <code>mvn test</code> (surefire), you've opted to use failsafe now (mvn verify). It looks like failsafe picks up the actual integration tests and not just the API tests as intended. (This doesn't answer the why it fails, but still)</p>
+
+
+
+<a name="591372269"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591372269" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591372269">(Apr 28 2026 at 12:50)</a>:</h4>
+<p>To me it looks like the "-Dtest=..." is a noop for failsafe, looking at their documentation. <a href="https://maven.apache.org/surefire/maven-failsafe-plugin/verify-mojo.html">https://maven.apache.org/surefire/maven-failsafe-plugin/verify-mojo.html</a></p>
+
+
+
+<a name="591373151"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591373151" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591373151">(Apr 28 2026 at 12:54)</a>:</h4>
+<p>Yeah, for failsafe it has to be "-Dit.test", not "-Dtest".</p>
+
+
+
+<a name="591373252"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591373252" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591373252">(Apr 28 2026 at 12:54)</a>:</h4>
+<p>We really should use &lt;group&gt; instead and put a @Tag on the test classes.</p>
+
+
+
+<a name="591376924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591376924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591376924">(Apr 28 2026 at 13:08)</a>:</h4>
+<p>Omg amazing catch <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> I did not realize surefire, and failsafe accepted different flags</p>
+
+
+
+<a name="591376977"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591376977" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591376977">(Apr 28 2026 at 13:08)</a>:</h4>
+<p>pushed the fix</p>
+
+
+
+<a name="591377946"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591377946" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591377946">(Apr 28 2026 at 13:11)</a>:</h4>
+<p>you might've just saved me a whole day of banging my head on the wall</p>
+
+
+
+<a name="591378324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591378324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591378324">(Apr 28 2026 at 13:12)</a>:</h4>
+<p>I did? Why? <span aria-label="blushing" class="emoji emoji-1f633" role="img" title="blushing">:blushing:</span></p>
+
+
+
+<a name="591378659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591378659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591378659">(Apr 28 2026 at 13:14)</a>:</h4>
+<p>OK moving on... I can't find a reasonable explanation why this wouldn't work so far. Educated guess: the setup somehow has some more system properties being set.</p>
+
+
+
+<a name="591378811"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591378811" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591378811">(Apr 28 2026 at 13:14)</a>:</h4>
+<p>These real integration tests do not even touch a single Dataverse container, they just run within the local JVM</p>
+
+
+
+<a name="591378998"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591378998" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591378998">(Apr 28 2026 at 13:15)</a>:</h4>
+<p>Should we pursue this further or do we stop investigating to concentrate on the API tests?</p>
+
+
+
+<a name="591379801"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591379801" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591379801">(Apr 28 2026 at 13:18)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> do you mind switching of the unit tests? -DskipUnitTests</p>
+
+
+
+<a name="591380831"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591380831" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591380831">(Apr 28 2026 at 13:22)</a>:</h4>
+<p>on it</p>
+
+
+
+<a name="591381048"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381048" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381048">(Apr 28 2026 at 13:23)</a>:</h4>
+<p>done</p>
+
+
+
+<a name="591381576"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381576" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381576">(Apr 28 2026 at 13:24)</a>:</h4>
+<p>BTW this makes no sense. - name: Build Dataverse containers via Maven</p>
+<p>run: |</p>
+<p>set -euo pipefail</p>
+<h1>Force unit tests to run, generate coverage, and ignore failures so the build continues</h1>
+<p>mvn clean package -Pct -P all-unit-tests \<br>
+-DskipUnitTests=true \<br>
+-Djacoco.skip=false \<br>
+-Dmaven.test.failure.ignore=true</p>
+
+
+
+<a name="591381643"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381643" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381643">(Apr 28 2026 at 13:25)</a>:</h4>
+<p>On the one hand you are including via profile all the unit tests</p>
+
+
+
+<a name="591381694"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381694" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381694">(Apr 28 2026 at 13:25)</a>:</h4>
+<p>But then you skip them all in package</p>
+
+
+
+<a name="591381774"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381774" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381774">(Apr 28 2026 at 13:25)</a>:</h4>
+<p>What will happen anyway, because that's default for profile ct</p>
+
+
+
+<a name="591381860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381860">(Apr 28 2026 at 13:25)</a>:</h4>
+<p>But the comment says "force unit tests to run"</p>
+
+
+
+<a name="591381908"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381908" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381908">(Apr 28 2026 at 13:25)</a>:</h4>
+<p><span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591381966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591381966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591381966">(Apr 28 2026 at 13:26)</a>:</h4>
+<p>I switched them off rn, the tests skip by default</p>
+
+
+
+<a name="591382027"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382027" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382027">(Apr 28 2026 at 13:26)</a>:</h4>
+<p>cause you asked me to switch them off?</p>
+
+
+
+<a name="591382071"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382071" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382071">(Apr 28 2026 at 13:26)</a>:</h4>
+<p>hehehe in mvn verify <span aria-label="wink" class="emoji emoji-1f609" role="img" title="wink">:wink:</span></p>
+
+
+
+<a name="591382107"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382107" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382107">(Apr 28 2026 at 13:26)</a>:</h4>
+<p>No point in running the unit tests there</p>
+
+
+
+<a name="591382140"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382140" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382140">(Apr 28 2026 at 13:27)</a>:</h4>
+<p>At least for now they are only creating loads of clutter</p>
+
+
+
+<a name="591382207"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382207" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382207">(Apr 28 2026 at 13:27)</a>:</h4>
+<p>mvn verify doesn't run the unit tests</p>
+
+
+
+<a name="591382230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382230">(Apr 28 2026 at 13:27)</a>:</h4>
+<p>only the integration tests</p>
+
+
+
+<a name="591382246"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382246" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382246">(Apr 28 2026 at 13:27)</a>:</h4>
+<p>Nope</p>
+
+
+
+<a name="591382292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382292">(Apr 28 2026 at 13:27)</a>:</h4>
+<p>mvn verify means mvn test phase runs, too</p>
+
+
+
+<a name="591382408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382408">(Apr 28 2026 at 13:28)</a>:</h4>
+<p><a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html</a></p>
+
+
+
+<a name="591382459"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382459" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382459">(Apr 28 2026 at 13:28)</a>:</h4>
+<p>give the workflow a few minutes</p>
+
+
+
+<a name="591382492"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382492" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382492">(Apr 28 2026 at 13:28)</a>:</h4>
+<p>you'll see the two thousand tests or so disappear</p>
+
+
+
+<a name="591382740"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382740" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382740">(Apr 28 2026 at 13:29)</a>:</h4>
+<p>Are we looking at the same thing? I'm looking at <a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow</a></p>
+
+
+
+<a name="591382772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591382772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591382772">(Apr 28 2026 at 13:29)</a>:</h4>
+<p>Job is currently running</p>
+
+
+
+<a name="591383025"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591383025" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591383025">(Apr 28 2026 at 13:30)</a>:</h4>
+<p>THere is no skipUnitTests on <a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow#L209-L217">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow#L209-L217</a>, so Maven will happily go through the test phase of the life cycle and execute the unit tests.</p>
+
+
+
+<a name="591383204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591383204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591383204">(Apr 28 2026 at 13:30)</a>:</h4>
+<p>my bad, I was looking at a different workflow</p>
+
+
+
+<a name="591383230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591383230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591383230">(Apr 28 2026 at 13:31)</a>:</h4>
+<p>test phase -&gt; surefire, picks up *Test.java<br>
+verify phase -&gt; failsafe, picks up *IT.java</p>
+
+
+
+<a name="591386319"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591386319" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591386319">(Apr 28 2026 at 13:41)</a>:</h4>
+<p>Oh oh... No more tests detected...</p>
+
+
+
+<a name="591386739"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591386739" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591386739">(Apr 28 2026 at 13:43)</a>:</h4>
+<p>I genuinely have no idea what just happened</p>
+
+
+
+<a name="591386842"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591386842" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591386842">(Apr 28 2026 at 13:43)</a>:</h4>
+<p>I may have an idea.</p>
+
+
+
+<a name="591387262"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591387262" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591387262">(Apr 28 2026 at 13:44)</a>:</h4>
+<p>Yeah I suspect the default group create a problem here</p>
+
+
+
+<a name="591387373"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591387373" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591387373">(Apr 28 2026 at 13:45)</a>:</h4>
+<p>The it.test is an additional filter, not overriding the group</p>
+
+
+
+<a name="591387498"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591387498" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591387498">(Apr 28 2026 at 13:45)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>&lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;groups&gt;${it.groups}&lt;/groups&gt;
+                    &lt;!--
+                        Note: The @{} syntax here is used for late variable binding.
+                              Otherwise we would not be able to override the defaults in &lt;properties&gt; with prepare-agent above.
+                              See also https://www.jacoco.org/jacoco/trunk/doc/prepare-agent-mojo.html
+                              It&#39;s ignored by IntelliJ argLine parsing.
+                    --&gt;
+                    &lt;argLine&gt;@{failsafe.jacoco.args} ${argLine}&lt;/argLine&gt;
+                    &lt;skip&gt;${skipIntegrationTests}&lt;/skip&gt;
+                    &lt;systemPropertyVariables&gt;
+                        &lt;postgresql.server.version&gt;${postgresql.server.version}&lt;/postgresql.server.version&gt;
+                    &lt;/systemPropertyVariables&gt;
+                &lt;/configuration&gt;
+                &lt;executions&gt;
+                    &lt;execution&gt;
+                        &lt;goals&gt;
+                            &lt;goal&gt;integration-test&lt;/goal&gt;
+                            &lt;goal&gt;verify&lt;/goal&gt;
+                        &lt;/goals&gt;
+                    &lt;/execution&gt;
+                &lt;/executions&gt;
+            &lt;/plugin&gt;
+</code></pre></div>
+
+
+
+<a name="591387688"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591387688" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591387688">(Apr 28 2026 at 13:46)</a>:</h4>
+<p>So far we only had the "real integration tests" in scope for this, as so far, the API tests were always executed by surefire as part of <code>mvn test -Dtest=...</code></p>
+
+
+
+<a name="591388204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591388204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591388204">(Apr 28 2026 at 13:47)</a>:</h4>
+<p>we need all the ~2500 Jenkins tests running in this workflow right?</p>
+
+
+
+<a name="591388294"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591388294" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591388294">(Apr 28 2026 at 13:48)</a>:</h4>
+<p>That depends.</p>
+
+
+
+<a name="591390390"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390390" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390390">(Apr 28 2026 at 13:54)</a>:</h4>
+<p>let me poke around a little with the workflow</p>
+
+
+
+<a name="591390411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390411">(Apr 28 2026 at 13:55)</a>:</h4>
+<p>Should we carve out some time to talk about testing during tech hours this afternoon? Thanks for all the hard work!</p>
+
+
+
+<a name="591390461"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390461" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390461">(Apr 28 2026 at 13:55)</a>:</h4>
+<p>I did a lot of things already to split up the Jacoco bits</p>
+
+
+
+<a name="591390531"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390531" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390531">(Apr 28 2026 at 13:55)</a>:</h4>
+<p>So we can just run the API tests</p>
+
+
+
+<a name="591390585"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390585" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390585">(Apr 28 2026 at 13:55)</a>:</h4>
+<p>And then merge the Jacoco reports for unit, integration and API tests</p>
+
+
+
+<a name="591390708"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390708" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390708">(Apr 28 2026 at 13:56)</a>:</h4>
+<p>This might make things easier and faster, as we don't have to keep repeating all of them</p>
+
+
+
+<a name="591390806"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390806" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390806">(Apr 28 2026 at 13:56)</a>:</h4>
+<p>We already have the unit and integration testing job in maven_unit_test.yml</p>
+
+
+
+<a name="591390970"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591390970" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591390970">(Apr 28 2026 at 13:56)</a>:</h4>
+<p>Which BTW then hands over the container workflow to build the containers</p>
+
+
+
+<a name="591391073"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591391073" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591391073">(Apr 28 2026 at 13:57)</a>:</h4>
+<p>We should probably integrate these pipelines more</p>
+
+
+
+<a name="591391109"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591391109" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591391109">(Apr 28 2026 at 13:57)</a>:</h4>
+<p>But that is a good next step</p>
+
+
+
+<a name="591391240"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591391240" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591391240">(Apr 28 2026 at 13:57)</a>:</h4>
+<p>For now, we'd only need to decide how we wanna go about executing which tests</p>
+
+
+
+<a name="591401336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591401336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591401336">(Apr 28 2026 at 14:32)</a>:</h4>
+<p>If I can figure out a way to get those 2 tests to pass in this workflow, then honestly we wouldn't need to do much else in the way of combined reports or touching other workflows, it would make life easier for everyone. As I understand, there's no hurry to replace Jenkins immediately so I'm sure eventually we can get all of them to pass in a single workflow <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+<p>I'll look at Jenkins, and the already existing workflows to see if there's a config mismatch or something.</p>
+
+
+
+<a name="591442524"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591442524" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591442524">(Apr 28 2026 at 17:23)</a>:</h4>
+<p>down to one failing test</p>
+
+
+
+<a name="591442533"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591442533" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591442533">(Apr 28 2026 at 17:23)</a>:</h4>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729</a></p>
+
+
+
+<a name="591444434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591444434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591444434">(Apr 28 2026 at 17:33)</a>:</h4>
+<p>That pesky <a href="https://github.com/IQSS-Dataverse-Development/dataverse/blob/b9f5589f4edf7c674c094b875875093bc995cf02/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164">DataRetrieverApiIT</a>. Hmm. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591444865"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591444865" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591444865">(Apr 28 2026 at 17:34)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>// User1 gets the list of Dataverses/Collections it has access to
+retrieveMyCollectionListResponse = UtilIT.retrieveMyCollectionList(User1ApiToken, null);
+retrieveMyCollectionListResponse.prettyPrint();
+// The count should show the list size to be User1&#39;s + Root Dataverse count
+items = retrieveMyCollectionListResponse.getBody().jsonPath().getList(&quot;data.items&quot;);
+assertEquals(rootCount + user1DataverseCount, items.size());//BOOM!💣
+</code></pre></div>
+
+
+
+<a name="591445420"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591445420" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591445420">(Apr 28 2026 at 17:37)</a>:</h4>
+<p>Can we just put a greater than or equal to there</p>
+
+
+
+<a name="591445454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591445454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591445454">(Apr 28 2026 at 17:37)</a>:</h4>
+<p>Like y'all do for the superuser</p>
+
+
+
+<a name="591445598"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591445598" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591445598">(Apr 28 2026 at 17:38)</a>:</h4>
+<p>I mean if there's more data collections than expected, that still means the test is valid right?</p>
+
+
+
+<a name="591449257"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591449257" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591449257">(Apr 28 2026 at 17:54)</a>:</h4>
+<p><code>mvn test -Dtest=DataRetrieverApiIT#testRetrieveMyDataCollections</code> works on my machine <span aria-label="trademark" class="emoji emoji-2122" role="img" title="trademark">:trademark:</span></p>
+
+
+
+<a name="591449940"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591449940" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591449940">(Apr 28 2026 at 17:58)</a>:</h4>
+<p><span class="user-mention" data-user-id="980865">@Steven Winship</span> you wrote these tests. Any ideas?</p>
+
+
+
+<a name="591451299"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451299" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451299">(Apr 28 2026 at 18:03)</a>:</h4>
+<p>The test is failing because user1 has access to an extra collection. It created 15 and has access to the root collection. So it should have access to 16 collections but it has access to 17 collections for some reason. <img alt=":shrugdog:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/86c833ef.png" title="shrugdog"></p>
+
+
+
+<a name="591451652"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451652" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451652">(Apr 28 2026 at 18:05)</a>:</h4>
+<p>This seems to be the extra collection: "id": 449</p>
+
+
+
+<a name="591451752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451752">(Apr 28 2026 at 18:05)</a>:</h4>
+<p>I'm trying to comb through the logs for: dv89758e93 which is id 449</p>
+
+
+
+<a name="591451762"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451762" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451762">(Apr 28 2026 at 18:05)</a>:</h4>
+<p>I say this because the 15 that were created for the test have higher numbers and were all in sequence, from 727 to 741.</p>
+
+
+
+<a name="591451862"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451862" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451862">(Apr 28 2026 at 18:06)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> this container is no longer up, right? I assume it gets destroyed at the end.</p>
+
+
+
+<a name="591451877"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451877" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451877">(Apr 28 2026 at 18:06)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>2026-04-28T17:07:12.390204076Z [#|2026-04-28T17:07:12.390+0000[1;93m|WARNING|[0mPayara 7.2026.2|[1;94medu.harvard.iq.dataverse.DataverseServiceBean|[0m_ThreadID=267;_ThreadName=http-thread-pool::http-listener-1(37);_TimeMillis=1777396032390;_LevelValue=900;|
+2026-04-28T17:07:12.390228021Z   Unable to find a single dataverse using alias &quot;dv89758e93&quot;: jakarta.persistence.NoResultException: getSingleResult() did not retrieve any entities.|#]
+</code></pre></div>
+
+
+
+<a name="591451969"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451969" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591451969">(Apr 28 2026 at 18:06)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451862">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> this container is no longer up, right? I assume it gets destroyed at the end.</p>
+</blockquote>
+<p>yep, it gets destroyed every single time, but I make sure every single execution log is saved</p>
+
+
+
+<a name="591452047"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591452047" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591452047">(Apr 28 2026 at 18:07)</a>:</h4>
+<p>Can I see that log, please?</p>
+
+
+
+<a name="591452243"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591452243" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591452243">(Apr 28 2026 at 18:07)</a>:</h4>
+<p><a href="/user_uploads/53090/hAVg9h6qGIIesQg57PEQKENZ/docker-logs-2.zip">docker-logs (2).zip</a></p>
+
+
+
+<a name="591452424"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591452424" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591452424">(Apr 28 2026 at 18:09)</a>:</h4>
+<p>Thanks. This is available online as well?</p>
+
+
+
+<a name="591452579"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591452579" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591452579">(Apr 28 2026 at 18:10)</a>:</h4>
+<p>yep</p>
+
+
+
+<a name="591452596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591452596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591452596">(Apr 28 2026 at 18:10)</a>:</h4>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729</a></p>
+
+
+
+<a name="591453330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591453330">(Apr 28 2026 at 18:14)</a>:</h4>
+<p>Well, it's reproducible. For the <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436">earlier run</a> it was also id 449, like the <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73438279431">current run</a>. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> But why? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> What's different about running this in GitHub Actions vs Jenkins and local? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591453567"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453567" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591453567">(Apr 28 2026 at 18:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> pointed out that it might be that Solr is not getting enough time to index because thread.sleep is flaky on GitHub Actions, so I increased the timeout from 4000 to 40000 just to test if that's the issue</p>
+
+
+
+<a name="591453647"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453647" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591453647">(Apr 28 2026 at 18:16)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> when I click "raw output" I see the output for just that one failing test, which is great. Is it possible to also get all the output in one file?</p>
+
+
+
+<a name="591453906"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453906" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591453906">(Apr 28 2026 at 18:17)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453567">said</a>:</p>
+<blockquote>
+<p>Solr</p>
+</blockquote>
+<p>Yeah, it's calling into <code>/api/mydata/retrieve/collectionList</code> which is powered by Solr, I'm pretty sure.</p>
+
+
+
+<a name="591454305"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591454305" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591454305">(Apr 28 2026 at 18:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> by the way, I think you're solving this issue for us, which is huge:</p>
+<p>Let contributors know why tests are failing <a href="https://github.com/IQSS/dataverse/issues/9916">#9916</a></p>
+<p>I just tried an incognito window and I can see all the juicy details. <span aria-label="lemon" class="emoji emoji-1f34b" role="img" title="lemon">:lemon:</span></p>
+
+
+
+<a name="591454565"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591454565" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591454565">(Apr 28 2026 at 18:20)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453647">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> when I click "raw output" I see the output for just that one failing test, which is great. Is it possible to also get all the output in one file?</p>
+</blockquote>
+<p>It probably is, let me look into it.</p>
+
+
+
+<a name="591455292"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591455292" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591455292">(Apr 28 2026 at 18:24)</a>:</h4>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729/job/73432388515">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729/job/73432388515</a></p>
+<p>If you go to the failed job, click the gear icon next to the workflow name, you will see an option named download log archive</p>
+
+
+
+<a name="591455324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591455324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591455324">(Apr 28 2026 at 18:25)</a>:</h4>
+<p>That contains the full execution log</p>
+
+
+
+<a name="591455819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591455819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591455819">(Apr 28 2026 at 18:28)</a>:</h4>
+<p>12.6 MB. Thanks!</p>
+
+
+
+<a name="591456715"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591456715" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591456715">(Apr 28 2026 at 18:32)</a>:</h4>
+<p>This is a little sus to me...</p>
+<div class="codehilite"><pre><span></span><code>2026-04-28T17:07:12.7763138Z         {
+2026-04-28T17:07:12.7763303Z             &quot;id&quot;: 334,
+2026-04-28T17:07:12.7763536Z             &quot;assignee&quot;: &quot;:authenticated-users&quot;,
+2026-04-28T17:07:12.7763863Z             &quot;assigneeName&quot;: &quot;Anyone with a Dataverse account&quot;,
+2026-04-28T17:07:12.7764158Z             &quot;roleId&quot;: 5,
+2026-04-28T17:07:12.7764383Z             &quot;roleName&quot;: &quot;Dataset Creator&quot;,
+2026-04-28T17:07:12.7764751Z             &quot;roleDescription&quot;: &quot;A person who can add datasets within a dataverse.&quot;,
+2026-04-28T17:07:12.7765134Z             &quot;_roleAlias&quot;: &quot;dsContributor&quot;,
+2026-04-28T17:07:12.7765388Z             &quot;definitionPointId&quot;: 449,
+2026-04-28T17:07:12.7765658Z             &quot;definitionPointName&quot;: &quot;dv89758e93&quot;,
+2026-04-28T17:07:12.7765941Z             &quot;definitionPointType&quot;: &quot;Dataverse&quot;
+2026-04-28T17:07:12.7766189Z         }
+</code></pre></div>
+<p>... I wonder why all authenticated users have access to id 449. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591457301"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457301" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457301">(Apr 28 2026 at 18:35)</a>:</h4>
+<p>I had the exact same thought, but if that were not the intended behavior then all tests should've thrown one extra. Only user1's does.</p>
+
+
+
+<a name="591457432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457432">(Apr 28 2026 at 18:36)</a>:</h4>
+<p>Yeah, it's still a puzzle... what's different about this env? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591457715"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457715" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457715">(Apr 28 2026 at 18:37)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> we've seen <code>DataRetrieverApiIT</code> fail twice for sure. Has it failed other times? Does it always fail? Do you want to run it again just for fun? Can we run just that test class in isolation? I'm just grasping at straws here. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="591457788"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457788" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457788">(Apr 28 2026 at 18:37)</a>:</h4>
+<p>it has been failing since the first time I wrote the workflow</p>
+
+
+
+<a name="591457814"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457814" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457814">(Apr 28 2026 at 18:37)</a>:</h4>
+<p>boo</p>
+
+
+
+<a name="591457920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591457920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591457920">(Apr 28 2026 at 18:38)</a>:</h4>
+<p>I even thought it might be a multi-threaded race condition, and forced the entire suite to run single-core single-thread, but that did not fix it either</p>
+
+
+
+<a name="591458018"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591458018" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591458018">(Apr 28 2026 at 18:38)</a>:</h4>
+<p>bleh</p>
+
+
+
+<a name="591458080"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591458080" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591458080">(Apr 28 2026 at 18:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="980865">@Steven Winship</span> can we just delete that test? <span aria-label="crazy" class="emoji emoji-1f61c" role="img" title="crazy">:crazy:</span></p>
+
+
+
+<a name="591459447"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459447" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459447">(Apr 28 2026 at 18:46)</a>:</h4>
+<p>You can comment it out and see if the other tests pass</p>
+
+
+
+<a name="591459519"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459519" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459519">(Apr 28 2026 at 18:47)</a>:</h4>
+<p>yep, everything except that does pass</p>
+
+
+
+<a name="591459551"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459551" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459551">(Apr 28 2026 at 18:47)</a>:</h4>
+<p>or add <code>@Disabled</code></p>
+
+
+
+<a name="591459582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459582">(Apr 28 2026 at 18:47)</a>:</h4>
+<p>@Disabled</p>
+
+
+
+<a name="591459610"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459610" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459610">(Apr 28 2026 at 18:47)</a>:</h4>
+<p>that way we can punt on this until another day <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="591459631"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459631" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459631">(Apr 28 2026 at 18:48)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> do you want a PR to add <code>@Disabled</code> or have you got it?</p>
+
+
+
+<a name="591459728"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459728" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459728">(Apr 28 2026 at 18:48)</a>:</h4>
+<p>Is it always the same alias/id? or is it a newly created dataverse each time?</p>
+
+
+
+<a name="591459844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591459844">(Apr 28 2026 at 18:49)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453330">said</a>:</p>
+<blockquote>
+<p>Well, it's reproducible. For the <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436">earlier run</a> it was also id 449, like the <a href="https://github.com/IQSS-Dataverse-Development/dataverse/runs/73438279431">current run</a>. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> But why? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> What's different about running this in GitHub Actions vs Jenkins and local? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+</blockquote>
+<p><span class="user-mention" data-user-id="980865">@Steven Winship</span> for two runs, at least, the id was 449. ^^</p>
+
+
+
+<a name="591460081"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460081" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460081">(Apr 28 2026 at 18:50)</a>:</h4>
+<p>Then that tells me we don't blow away the DB for each run. As we should</p>
+
+
+
+<a name="591460125"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460125" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460125">(Apr 28 2026 at 18:50)</a>:</h4>
+<p>Most tests do not clean up</p>
+
+
+
+<a name="591460138"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460138" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460138">(Apr 28 2026 at 18:50)</a>:</h4>
+<p>for every failed run, it is the same id 449 although the alias changes</p>
+
+
+
+<a name="591460260"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460260" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460260">(Apr 28 2026 at 18:51)</a>:</h4>
+<p>Makes sense since the dataverses are created in the same order</p>
+
+
+
+<a name="591460319"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460319" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460319">(Apr 28 2026 at 18:51)</a>:</h4>
+<p>They would have the same id but not alias</p>
+
+
+
+<a name="591460375"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460375" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460375">(Apr 28 2026 at 18:51)</a>:</h4>
+<p>changing assertsequal to greater than or equal also fixes it. I think the same is done for superuser</p>
+
+
+
+<a name="591460775"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460775" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460775">(Apr 28 2026 at 18:53)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459631">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> do you want a PR to add <code>@Disabled</code> or have you got it?</p>
+</blockquote>
+<p>I got it, but the workflow ain't in prod rn, so no hurry yet?</p>
+
+
+
+<a name="591460785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460785">(Apr 28 2026 at 18:53)</a>:</h4>
+<p>Since we probably can't get it to fail locally changing it to &gt;= is fine with me</p>
+
+
+
+<a name="591460886"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591460886" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591460886">(Apr 28 2026 at 18:54)</a>:</h4>
+<p>It's better than skipping it</p>
+
+
+
+<a name="591461813"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591461813" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591461813">(Apr 28 2026 at 18:59)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> right, no hurry but please go ahead with any of the suggestions above! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> I want to see it go green! <span aria-label="green heart" class="emoji emoji-1f49a" role="img" title="green heart">:green_heart:</span></p>
+
+
+
+<a name="591514799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591514799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591514799">(Apr 28 2026 at 20:59)</a>:</h4>
+<p>Tests: Green</p>
+<p><a href="https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25075466484">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25075466484</a></p>
+
+
+
+<a name="591515435"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591515435" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591515435">(Apr 28 2026 at 21:00)</a>:</h4>
+<p>Had to disable the whole test, unfortunately</p>
+
+
+
+<a name="591516791"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591516791" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591516791">(Apr 28 2026 at 21:00)</a>:</h4>
+<p>but the rest 2497 of them run like butter</p>
+
+
+
+<a name="591516938"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591516938" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591516938">(Apr 28 2026 at 21:00)</a>:</h4>
+<p>Green? Yay! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span> </p>
+<p>Don't worry, <span class="user-mention" data-user-id="980865">@Steven Winship</span> will fix it later. <span aria-label="crazy" class="emoji emoji-1f61c" role="img" title="crazy">:crazy:</span></p>
+
+
+
+<a name="591517706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591517706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591517706">(Apr 28 2026 at 21:01)</a>:</h4>
+<p>now its upto IQSS team to decide if this workflow is a good substitute for what Jenkins does, or if something is missing</p>
+
+
+
+<a name="591519358"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591519358" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591519358">(Apr 28 2026 at 21:02)</a>:</h4>
+<p>I mean, we might as well merge it, right? Belt and suspenders, for now! Are you planning to make a pull request?</p>
+
+
+
+<a name="591520263"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591520263" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591520263">(Apr 28 2026 at 21:02)</a>:</h4>
+<p>yep opening one right now</p>
+
+
+
+<a name="591520734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591520734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591520734">(Apr 28 2026 at 21:02)</a>:</h4>
+<p>after I clean up the commit history</p>
+
+
+
+<a name="591521114"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591521114" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591521114">(Apr 28 2026 at 21:02)</a>:</h4>
+<p>or is it okay even like this?</p>
+
+
+
+<a name="591526409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591526409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591526409">(Apr 28 2026 at 21:05)</a>:</h4>
+<p>actually the PR has to come from <a href="https://github.com/uncch-rdmc/dataverse">https://github.com/uncch-rdmc/dataverse</a> and I don't have perms there to create a new branch and make a PR, I'll do it tomorrow, and clean up the commit history at the same time</p>
+
+
+
+<a name="591527150"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591527150" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591527150">(Apr 28 2026 at 21:06)</a>:</h4>
+<p>Massive thank you to all of you for helping me work through this even though you're busy and have other responsibilities</p>
+
+
+
+<a name="591527683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591527683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job.html#591527683">(Apr 28 2026 at 21:06)</a>:</h4>
+<p>Happy to help! Great work! So exciting! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<hr><p>Last updated: Apr 29 2026 at 05:48 UTC</p>
+</html>

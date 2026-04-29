@@ -1,0 +1,734 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> thanks for chatting about <a href=\"https://github.com/IQSS/dataverse/issues/11753\">#11753</a> yesterday!</p>\n<p>I suppose the next step is to figure out  a good API to unset (set to null) the list of allowed dataset types for a collection. Any suggestions?</p>\n<p>These are the docs I'm looking at but I don't see anything about unsetting an attribute:</p>\n<ul>\n<li><a href=\"https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#collection-attributes-api\">https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#collection-attributes-api</a></li>\n<li><a href=\"https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#update-dataverse-api\">https://dataverse-guide--11753.org.readthedocs.build/en/11753/api/native-api.html#update-dataverse-api</a></li>\n</ul>",
+        "id": 573549339,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909526
+    },
+    {
+        "content": "<p>This should be a DELETE REST endpoint, shouldn't it?</p>",
+        "id": 573549515,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909576
+    },
+    {
+        "content": "<p>Hmm, so you're thinking a new API or at least a new verb. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 573549636,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909609
+    },
+    {
+        "content": "<p>Also, should it be allowed to actually not allow any types?</p>",
+        "id": 573549688,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909621
+    },
+    {
+        "content": "<p>I was trying to reuse existing functionality. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 573549706,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909625
+    },
+    {
+        "content": "<p>This doesn't make much sense from a business perspective, does it?</p>",
+        "id": 573549753,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909639
+    },
+    {
+        "content": "<p>Well, if it's null, it only allows the \"dataset\" dataset type.</p>",
+        "id": 573549819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909656
+    },
+    {
+        "content": "<p>But that's mostly due to backward compatibility, isn't it?</p>",
+        "id": 573549943,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909690
+    },
+    {
+        "content": "<p>yeah</p>",
+        "id": 573549961,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909695
+    },
+    {
+        "content": "<p>I'm trying to take a light touch with this feature.</p>",
+        "id": 573550035,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909721
+    },
+    {
+        "content": "<p>How about making this more explicit? Have a migration that will add the dataset type to all that have none configured.</p>",
+        "id": 573550081,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909735
+    },
+    {
+        "content": "<p>That would rule out the \"null\" case</p>",
+        "id": 573550117,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909745
+    },
+    {
+        "content": "<p>But now that I'm converting allowedDatasetTypes from a string to a ManyToMany list, things are getting more complicated. I need to be able to unset the list.</p>",
+        "id": 573550144,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909753
+    },
+    {
+        "content": "<p>That's what we did at the dataset level when we introduced dataset types. All existing datasets were set to the \"dataset\" dataset type (using Flyway).</p>",
+        "id": 573550317,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909799
+    },
+    {
+        "content": "<p>Here's an idea: what if for now we make the list non-optional and a migration adds the minimum default to all. At a future point in time, deleting the list and replacing it with null or empty would mean \"inherit\"</p>",
+        "id": 573550707,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909900
+    },
+    {
+        "content": "<p>So we can add any other calls that are necessary to do that in a new iteration</p>",
+        "id": 573550795,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770909922
+    },
+    {
+        "content": "<p>Actually, that gives me an idea. I was trying to unset the list but maybe I can just explicitly set the list to a dataset type that I'm not trying to delete.</p>",
+        "id": 573551012,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770909982
+    },
+    {
+        "content": "<p>At the moment, I'm just trying to get DatasetTypesIT to pass along with the change from a String to a List for allowedDatasetTypes.</p>",
+        "id": 573551601,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910132
+    },
+    {
+        "content": "<p>Yes! It works! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 573552672,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910370
+    },
+    {
+        "content": "<p>Yeah my suggestion about not allowing \"null\" or empty list for now was going in this direction of \"set the list to a type that still makes sense\"</p>",
+        "id": 573552980,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910429
+    },
+    {
+        "content": "<p>What happens if you delete a type itself that has been used? It shouldn't be allowed to be dropped, right?</p>",
+        "id": 573553124,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910463
+    },
+    {
+        "content": "<p>\"message\": \"java.lang.IllegalStateException: Dataset type with id 6 is referenced and cannot be deleted.\"</p>",
+        "id": 573553319,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910516
+    },
+    {
+        "content": "<p>but now I have the workaround above, which I'm documenting</p>",
+        "id": 573553417,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910536
+    },
+    {
+        "content": "<p>Referenced by whom? The collection or a dataset?</p>",
+        "id": 573553466,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910547
+    },
+    {
+        "content": "<p>IMHO that is an important distinction.</p>",
+        "id": 573553532,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770910562
+    },
+    {
+        "content": "<p>Well, this worked before so I'm assuming it's the new List relationship to the collection.</p>",
+        "id": 573553808,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910627
+    },
+    {
+        "content": "<p>Woo-hoo! Tests passing! I'll clean this up, commit, and push.</p>",
+        "id": 573555141,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770910951
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is this incrementally better? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span>  <a href=\"https://github.com/IQSS/dataverse/pull/11753/changes/d2f12dfd9eec3d782e68493b6f9293fecaf60b9e\">https://github.com/IQSS/dataverse/pull/11753/changes/d2f12dfd9eec3d782e68493b6f9293fecaf60b9e</a> - switch allowedDatasetTypes in entity from String to a ManyToMany List</p>",
+        "id": 573570521,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770914394
+    },
+    {
+        "content": "<p>I need to look into our new storage option that (finally) came through today, so won't be able to look now.</p>",
+        "id": 573570933,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770914496
+    },
+    {
+        "content": "<p>No worries, I'll look through other stuff to fix that we talked about. Thanks again!</p>",
+        "id": 573571292,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770914605
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I just noticed you still have requested changes on <a href=\"https://github.com/IQSS/dataverse/pull/11753\">https://github.com/IQSS/dataverse/pull/11753</a> . Is that right? Or should I click \"dismiss review\"?</p>\n<p>Also, <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> picked up that PR to review it.</p>",
+        "id": 575819396,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772037497
+    },
+    {
+        "content": "<p>I have not looked at the remarks and the changes you made again. Maybe Gustavo can decide what he thinks about them.</p>",
+        "id": 575819602,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772037555
+    },
+    {
+        "content": "<p>We might have a zoom call if you'd like to join. Not sure when.</p>",
+        "id": 575820804,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772037850
+    },
+    {
+        "content": "<p>Sure. Today would be a good fit for that.</p>",
+        "id": 575820958,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772037897
+    },
+    {
+        "content": "<p>I made those changes for you <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 576030606,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772114518
+    },
+    {
+        "content": "<p>Let me take another look. Posters are printed. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 576030981,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772114610
+    },
+    {
+        "content": "<p>Done.</p>",
+        "id": 576063623,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772122081
+    },
+    {
+        "content": "<p>Thanks!! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 576067625,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772123013
+    },
+    {
+        "content": "<p>I did my best to reply to open questions and found a few other issues.</p>",
+        "id": 576067751,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772123042
+    },
+    {
+        "content": "<p>The most important one is certainly the missing equals() and hashCode() on DatasetType.</p>",
+        "id": 576067845,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772123062
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is just <code>id</code> and <code>name</code> enough? This is what VS Code is suggesting:</p>\n<p><a href=\"/user_uploads/53090/DLKHu0usMo4skoq6glIfJ6Mc/Screenshot-2026-03-02-at-3.42.27PM.png\">Screenshot 2026-03-02 at 3.42.27 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/DLKHu0usMo4skoq6glIfJ6Mc/Screenshot-2026-03-02-at-3.42.27PM.png\" title=\"Screenshot 2026-03-02 at 3.42.27 PM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"884x274\" src=\"/user_uploads/thumbnail/53090/DLKHu0usMo4skoq6glIfJ6Mc/Screenshot-2026-03-02-at-3.42.27PM.png/840x560.webp\"></a></div><p>If I check just <code>id</code> and <code>name</code>, it shows generates this:</p>\n<div class=\"codehilite\"><pre><span></span><code>    @Override\n    public int hashCode() {\n        final int prime = 31;\n        int result = 1;\n        result = prime * result + ((id == null) ? 0 : id.hashCode());\n        result = prime * result + ((name == null) ? 0 : name.hashCode());\n        return result;\n    }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (this == obj)\n            return true;\n        if (obj == null)\n            return false;\n        if (getClass() != obj.getClass())\n            return false;\n        DatasetType other = (DatasetType) obj;\n        if (id == null) {\n            if (other.id != null)\n                return false;\n        } else if (!id.equals(other.id))\n            return false;\n        if (name == null) {\n            if (other.name != null)\n                return false;\n        } else if (!name.equals(other.name))\n            return false;\n        return true;\n    }\n</code></pre></div>",
+        "id": 576825002,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772484846
+    },
+    {
+        "content": "<p>Anyway, pushed: <a href=\"https://github.com/IQSS/dataverse/pull/11753#discussion_r2874633026\">https://github.com/IQSS/dataverse/pull/11753#discussion_r2874633026</a></p>",
+        "id": 576825534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772485031
+    },
+    {
+        "content": "<p>And this: <a href=\"https://github.com/IQSS/dataverse/pull/11753/changes#r2874761915\">https://github.com/IQSS/dataverse/pull/11753/changes#r2874761915</a></p>",
+        "id": 576834083,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772488253
+    },
+    {
+        "content": "<p>Sorry I was out with <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> in Stuttgart. We had a fab diner at a local Brauhaus!</p>",
+        "id": 576834300,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772488338
+    },
+    {
+        "content": "<p>Do you still want input?</p>",
+        "id": 576834381,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772488350
+    },
+    {
+        "content": "<p>For the other stuff, <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> and I decided we'd punt. I'm going to create a tech debt issue for dataset types. Maybe you can help edit the description, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>, and we'll decide on the scope and size of the next push, whenever it is.</p>\n<p>And I'm still open to adding small things to the PR we're working on now.</p>",
+        "id": 576834382,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772488350
+    },
+    {
+        "content": "<p>Sounds good to me! I'm just the messenger pointing at things, you decide the course, cap'n <span aria-label=\"man rowing boat\" class=\"emoji emoji-1f6a3-200d-2642\" role=\"img\" title=\"man rowing boat\">:man_rowing_boat:</span></p>",
+        "id": 576834617,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772488432
+    },
+    {
+        "content": "<p>Ha. I'll let you know when I've created it.</p>",
+        "id": 576834651,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772488448
+    },
+    {
+        "content": "<p>I literally wrote \"create issue about corners that were cut\" <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 576834725,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772488478
+    },
+    {
+        "content": "<p>But on the plus side, hopefully we'll get <a href=\"https://github.com/IQSS/dataverse/issues/11753\">#11753</a> merged in time for 6.10.</p>",
+        "id": 576834798,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772488508
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I'm clicking \"re-request review\" on <a href=\"https://github.com/IQSS/dataverse/pull/11753\">https://github.com/IQSS/dataverse/pull/11753</a></p>\n<p><a href=\"/user_uploads/53090/GU4p8fC0OT5JaLcAdxShyEmV/Screenshot-2026-03-03-at-2.22.59PM.png\">Screenshot 2026-03-03 at 2.22.59 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/GU4p8fC0OT5JaLcAdxShyEmV/Screenshot-2026-03-03-at-2.22.59PM.png\" title=\"Screenshot 2026-03-03 at 2.22.59 PM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"929x438\" src=\"/user_uploads/thumbnail/53090/GU4p8fC0OT5JaLcAdxShyEmV/Screenshot-2026-03-03-at-2.22.59PM.png/840x560.webp\"></a></div><p>I don't want this to be a blocker for merging. (I know that worst case, we can always dismiss your review.)</p>",
+        "id": 577056303,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772565835
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> hi, just checking in. Merging is blocked:</p>\n<p><a href=\"/user_uploads/53090/I1zOD0I4pF669_dSCQmB5D2W/Screenshot-2026-03-04-at-7.41.25AM.png\">Screenshot 2026-03-04 at 7.41.25 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/I1zOD0I4pF669_dSCQmB5D2W/Screenshot-2026-03-04-at-7.41.25AM.png\" title=\"Screenshot 2026-03-04 at 7.41.25 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1776x434\" src=\"/user_uploads/thumbnail/53090/I1zOD0I4pF669_dSCQmB5D2W/Screenshot-2026-03-04-at-7.41.25AM.png/840x560.webp\"></a></div>",
+        "id": 577209405,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628123
+    },
+    {
+        "content": "<p>Just today I had a request by a researcher asking for Instruments support. Any objections to add those? <a href=\"https://support.datacite.org/docs/can-i-register-a-doi-for-an-instrument\">https://support.datacite.org/docs/can-i-register-a-doi-for-an-instrument</a></p>",
+        "id": 577210990,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772628657
+    },
+    {
+        "content": "<p>(Not as a part of this PR)</p>",
+        "id": 577211147,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772628713
+    },
+    {
+        "content": "<p>Any types can be added freely.</p>",
+        "id": 577211350,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628777
+    },
+    {
+        "content": "<p>Just cook up a JSON file.</p>",
+        "id": 577211393,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628788
+    },
+    {
+        "content": "<p>But we'd need to extend the enum for resourceTypeGeneral, don't we?</p>",
+        "id": 577211484,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772628814
+    },
+    {
+        "content": "<p>Well, sure.</p>",
+        "id": 577211525,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628825
+    },
+    {
+        "content": "<p>Like you did for reviews</p>",
+        "id": 577211571,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772628839
+    },
+    {
+        "content": "<p>If you want it to be sent to DataCite or show up in the CSL citation export.</p>",
+        "id": 577211577,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628841
+    },
+    {
+        "content": "<p>Yeah, I'd like that. DataCite has native support for Instruments these days and it would be great to keep the data and instruments in the same place.</p>",
+        "id": 577211700,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772628877
+    },
+    {
+        "content": "<p>Sure. Future PR, though,  please! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Code freeze is tomorrow.</p>",
+        "id": 577212128,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772628987
+    },
+    {
+        "content": "<p>I think I said that above <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 577212189,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772629005
+    },
+    {
+        "content": "<p>So we're trying to get this one tested and merged.</p>",
+        "id": 577212195,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772629006
+    },
+    {
+        "content": "<p>Are you still thinking about the \"merging is blocked\" question above? <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 577212441,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772629082
+    },
+    {
+        "content": "<p>You sort of avoided talking about it. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 577212508,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772629094
+    },
+    {
+        "content": "<p>Sorry at a conference.</p>",
+        "id": 577212546,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772629104
+    },
+    {
+        "content": "<p>I am just doing the review in parallel to a session</p>",
+        "id": 577212596,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772629118
+    },
+    {
+        "content": "<p>Worst case we'll dismiss your review so we can merge.</p>",
+        "id": 577212620,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772629123
+    },
+    {
+        "content": "<p>(As you may have noticed)</p>",
+        "id": 577212636,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772629127
+    },
+    {
+        "content": "<p>I just revisited my main concerns and find them all covered now. Approved. <span aria-label=\"check\" class=\"emoji emoji-2705\" role=\"img\" title=\"check\">:check:</span> Thanks for working on this and bearing with my lengthy remarks.</p>",
+        "id": 577213539,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772629358
+    },
+    {
+        "content": "<p>Sure! To be honest, I need to do a little more testing, so I'll be back on that branch when I get to work.</p>",
+        "id": 577221465,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772631603
+    },
+    {
+        "content": "<p>So if there's anything small you want, lemme know.</p>",
+        "id": 577221572,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772631629
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/379673-dev/topic/datasetType.20.28software.2C.20workflow.2C.20review.2C.20etc.2E.29/near/577212128\">said</a>:</p>\n<blockquote>\n<p>Sure. Future PR, though,  please! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Code freeze is tomorrow.</p>\n</blockquote>\n<p>In Spain -and I’ve heard also in Latin America, and I think in  <a href=\"https://entrepot.recherche.data.gouv.fr/dataverse/root/?q=dmp\">France</a> as well-, we are receiving petitions to upload <a href=\"https://datacite-metadata-schema.readthedocs.io/en/4.7/appendices/appendix-1/resourceTypeGeneral/#outputmanagementplan\">Data Management Plans</a> to our Dataverse instances.</p>\n<p>Could Data Management Plan be considered a new dataSetType? Should I open a new PR?</p>",
+        "id": 577224568,
+        "sender_full_name": "Juan",
+        "timestamp": 1772632414
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> interesting! I'm think we should have a different topic about DMPs. Do you want to create one? Maybe in <a class=\"stream\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community\">#community</a>? I'm sure <span class=\"user-mention\" data-user-id=\"1021808\">@Viviane Veiga</span> and many others will be interested. By the way, in <a href=\"https://github.com/IQSS/dataverse/issues/12000\">#12000</a> we're adding this:</p>\n<p>As shown in a video &lt;<a href=\"https://www.researchspace.com/blog/dmptool-rspace-eln-dataverse-integration\">https://www.researchspace.com/blog/dmptool-rspace-eln-dataverse-integration</a>&gt;, a Data Management Plan (DPM) can be added into RSpace and the research records and associated data can then be sent to Dataverse. Dataverse generates a Persistent Identifier (PID, often a DOI) for the dataset, and RSpace automatically puts the PID link under \"Research Outputs\" in the DPM.</p>\n<p>(Thanks to <span class=\"user-mention\" data-user-id=\"672129\">@Tilo Mathes</span> and <span class=\"user-mention\" data-user-id=\"699717\">@Vaida Plankytė 🎨</span> and the rest of RSpace for that integration!)</p>",
+        "id": 577233631,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772634633
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>, I will watch the video and open the new topic tomorrow. I have meetings for the rest of my workday.</p>",
+        "id": 577236829,
+        "sender_full_name": "Juan",
+        "timestamp": 1772635358
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> DataCite has support for a \"OutputManagementPlan\" type these days.</p>",
+        "id": 577243012,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636671
+    },
+    {
+        "content": "<p>I saw that. Interesting.</p>",
+        "id": 577243100,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772636692
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> should we discuss in a new GH issue if the resource type general should be a configurable type and not hardcoded?</p>",
+        "id": 577243188,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636717
+    },
+    {
+        "content": "<p>Or maybe a design doc? I started this one called \"Resource Types\" back in October: <a href=\"https://docs.google.com/document/d/1xUbOj0vQ629_YF0nMM3OUnfjY4QBw3WVsD_MnrMMBYI/edit?usp=sharing\">https://docs.google.com/document/d/1xUbOj0vQ629_YF0nMM3OUnfjY4QBw3WVsD_MnrMMBYI/edit?usp=sharing</a></p>",
+        "id": 577243389,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772636771
+    },
+    {
+        "content": "<p>With output management plans comes to mind that there are DMPs and SMPs and maybe more in the future.</p>",
+        "id": 577243408,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636777
+    },
+    {
+        "content": "<p>Sure.</p>",
+        "id": 577243488,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636795
+    },
+    {
+        "content": "<p>(I don't find GitHub issues to be great for long discussions.)</p>",
+        "id": 577243512,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772636803
+    },
+    {
+        "content": "<p>It would be good to collect use cases and think some more about where we wanna go with this</p>",
+        "id": 577243572,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636817
+    },
+    {
+        "content": "<p>Should we keep the existing design doc and add another chapter/part to it?</p>",
+        "id": 577243764,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636859
+    },
+    {
+        "content": "<p>Well, remember we have an even earlier design doc: Proposal: Supporting Multiple Dataset Types in Dataverse - <a href=\"https://docs.google.com/document/d/16RvGXmaPQK9DGsEEbrrFEu8mjUrN93YY_yh7ZONyMDI/edit?usp=sharing\">https://docs.google.com/document/d/16RvGXmaPQK9DGsEEbrrFEu8mjUrN93YY_yh7ZONyMDI/edit?usp=sharing</a></p>",
+        "id": 577243942,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772636907
+    },
+    {
+        "content": "<p>Oh so we already have multiple. We can always link between them for tracking the history</p>",
+        "id": 577244143,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772636957
+    },
+    {
+        "content": "<p>I'm fine with whatever. New doc. New Zulip topic. A meeting. Anything but trying to have a discussion in a GitHub issue. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 577244148,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772636958
+    },
+    {
+        "content": "<p>5 messages were moved from this topic to <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/channel/379673-dev/topic/Architecture.20Decision.20Records.20.28ADRs.29/with/577245898\">#dev &gt; Architecture Decision Records (ADRs)</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 577245900,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1772637437
+    },
+    {
+        "content": "<p>So sorry <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> but I did find a small thing. <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span> Stumbled over this just this morning while looking for other things in the DataCite rTG vocabulary. <a href=\"https://github.com/IQSS/dataverse/pull/11753/changes#r2888545716\">https://github.com/IQSS/dataverse/pull/11753/changes#r2888545716</a></p>",
+        "id": 577445552,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772701599
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> thanks, I just replied</p>",
+        "id": 577495020,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772716404
+    },
+    {
+        "content": "<p>Want me to add a comment in the code?</p>",
+        "id": 577507089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772719521
+    },
+    {
+        "content": "<p>That may be good, as others may have the same question. Should this go into the docs as well?</p>",
+        "id": 577529501,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772724237
+    },
+    {
+        "content": "<p>Maybe. Where?</p>",
+        "id": 577531757,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772724756
+    },
+    {
+        "content": "<p>On the train ride home now. Let me take a look.</p>",
+        "id": 577538833,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772726439
+    },
+    {
+        "content": "<p>I left a few (three) suggestions on the user doc.</p>",
+        "id": 577543489,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772727568
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I don't suppose you have time for a call</p>",
+        "id": 577554969,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772730427
+    },
+    {
+        "content": "<p>The <code>name</code> is \"dataset\" and the <code>displayName</code> is \"Dataset\". Maybe I can edit your suggestion to make this clear.</p>",
+        "id": 577555124,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772730471
+    },
+    {
+        "content": "<p>In a public no-phone environment at the moment... Sorry. Will be back to desk later if that helps.</p>",
+        "id": 577555173,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772730483
+    },
+    {
+        "content": "<p>I was suggesting to use \"Dataset\" as this is the user documentation and users will see \"Dataset\" in the UI</p>",
+        "id": 577555268,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772730513
+    },
+    {
+        "content": "<p>Feel free to ignore any suggestions that don't resonate with you</p>",
+        "id": 577555347,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772730532
+    },
+    {
+        "content": "<p>I don't feel strongly about any of this.</p>",
+        "id": 577555368,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1772730538
+    },
+    {
+        "content": "<p>Actually, since that suggestion isn't in the API Guide, I'll take it.</p>",
+        "id": 577555544,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772730589
+    },
+    {
+        "content": "<p>Actually, I took it but I'm going to change it back to lower case \"dataset\" because that's what is shown in the search facet (as of this PR).</p>",
+        "id": 577556771,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772730893
+    },
+    {
+        "content": "<p>Ok, I think I'm done making changes: <a href=\"https://github.com/IQSS/dataverse/pull/11753/commits\">https://github.com/IQSS/dataverse/pull/11753/commits</a></p>",
+        "id": 577559443,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772731581
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"663397\">Juan</span> <a href=\"#narrow/channel/379673-dev/topic/datasetType.20.28software.2C.20workflow.2C.20review.2C.20etc.2E.29/near/577236829\">said</a>:</p>\n<blockquote>\n<p>Thanks <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span>, I will watch the video and open the new topic tomorrow. I have meetings for the rest of my workday.</p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> thanks for kicking off <a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/A.20new.20supported.20datasetType.20for.20Data.20Management.20Plans.3F/with/577546807\">#community &gt; A new supported datasetType for Data Management Plans?</a> !</p>",
+        "id": 577559603,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772731623
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> since you're obviously using dataset types (or plan to), I wanted to give you (and others) a heads that in <a href=\"https://github.com/IQSS/dataverse/issues/11753\">#11753</a> the following backward-incompatible change is coming:</p>\n<p>In previous releases of Dataverse, as soon as additional dataset types were added (such as \"software\", \"workflow\", etc.), they could be used by all users when creating datasets (via API only). As of this release, on a per-collection basis, superusers must allow these dataset types to be used. See <a href=\"https://github.com/IQSS/dataverse/issues/12115\">#12115</a> and <a href=\"https://github.com/IQSS/dataverse/issues/11753\">#11753</a>.</p>",
+        "id": 577560039,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772731744
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> , We will migrate to v6.10 before starting to use dataset types.</p>",
+        "id": 577590981,
+        "sender_full_name": "Juan",
+        "timestamp": 1772742124
+    },
+    {
+        "content": "<p>Ok, phew <span aria-label=\"relieved\" class=\"emoji emoji-1f60c\" role=\"img\" title=\"relieved\">:relieved:</span></p>",
+        "id": 577591376,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772742272
+    },
+    {
+        "content": "<p>Longer term, maybe dataset types should turn into resource types. I don't know. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>\n<p>It would be an architectural change. I gave you comment access on the Resource Types doc I mentioned above. But that doc need a lot more work.</p>",
+        "id": 577591443,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772742295
+    },
+    {
+        "content": "<p>Perfect. Thanks</p>",
+        "id": 577591975,
+        "sender_full_name": "Juan",
+        "timestamp": 1772742477
+    },
+    {
+        "content": "<p>Have you played with Zenodo? They allow you to create a bunch of different resource types.</p>",
+        "id": 577592055,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772742505
+    },
+    {
+        "content": "<p>A little bit, but we like much more Dataverse <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> . But we will need to add at the moment DMPs, and software. Perhaps another resource types in the future.</p>",
+        "id": 577592467,
+        "sender_full_name": "Juan",
+        "timestamp": 1772742644
+    },
+    {
+        "content": "<p>Here's the Zenodo UI:</p>\n<p><a href=\"/user_uploads/53090/B55Dfs-dlmt9brlxYdMDu9gR/zenodo.png\">zenodo.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/B55Dfs-dlmt9brlxYdMDu9gR/zenodo.png\" title=\"zenodo.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"866x670\" src=\"/user_uploads/thumbnail/53090/B55Dfs-dlmt9brlxYdMDu9gR/zenodo.png/840x560.webp\"></a></div>",
+        "id": 577594158,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772743398
+    },
+    {
+        "content": "<p>The OSF UI:</p>\n<p><a href=\"/user_uploads/53090/8D6Phh75xgCzUE4tHpz1Zvri/osf.png\">osf.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/8D6Phh75xgCzUE4tHpz1Zvri/osf.png\" title=\"osf.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"538x417\" src=\"/user_uploads/thumbnail/53090/8D6Phh75xgCzUE4tHpz1Zvri/osf.png/840x560.webp\"></a></div>",
+        "id": 577595053,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772743809
+    },
+    {
+        "content": "<p>It seems that they do not have a specific resource type for DMPs. Even the DMPs imported from Argos have \"Other\" resource type: <a href=\"https://zenodo.org/records/3980771\">https://zenodo.org/records/3980771</a> . Argos and Zenodo are OpenAIRE tools.</p>",
+        "id": 577595074,
+        "sender_full_name": "Juan",
+        "timestamp": 1772743816
+    },
+    {
+        "content": "<p>They both seem to have the option for Output Management Plan (which, if you squint, might look like a DMP <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> ):</p>\n<p><a href=\"/user_uploads/53090/lIrFyP8Zvwy6wMNM3jDgBumW/omp.png\">omp.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/lIrFyP8Zvwy6wMNM3jDgBumW/omp.png\" title=\"omp.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1030x670\" src=\"/user_uploads/thumbnail/53090/lIrFyP8Zvwy6wMNM3jDgBumW/omp.png/840x560.webp\"></a></div>",
+        "id": 577595505,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772743987
+    },
+    {
+        "content": "<p>Any objections if I move all these messages into the main topic (for dataset types)?</p>\n<p>Update: moved! Sorry if it's messy! I moved the messages about potential DMP and instrument dataset types here.</p>",
+        "id": 577595671,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772744051
+    },
+    {
+        "content": "<p>Yes, you are absolutely right. I didn't find it under publication.</p>",
+        "id": 577595914,
+        "sender_full_name": "Juan",
+        "timestamp": 1772744146
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> I just posted more about nullable true vs false for displayName at <a href=\"https://github.com/IQSS/dataverse/pull/11753/changes#r2788164627\">https://github.com/IQSS/dataverse/pull/11753/changes#r2788164627</a></p>",
+        "id": 577776794,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772811117
+    },
+    {
+        "content": "<p>I might take another run at making displayName nullable=false. Wish me luck!</p>",
+        "id": 577776886,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772811145
+    },
+    {
+        "content": "<p>Wait, wait, it's already nullable=false:</p>\n<div class=\"codehilite\"><pre><span></span><code>@Column(nullable = false, columnDefinition = &quot;VARCHAR(255) DEFAULT &#39;&#39;&quot;)\nprivate String displayName;\n</code></pre></div>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is there anything to fix here? Or in the following?</p>\n<div class=\"codehilite\"><pre><span></span><code>-- Add displayname column to datasettype table\nALTER TABLE datasettype ADD COLUMN IF NOT EXISTS displayname VARCHAR(255) NOT NULL DEFAULT &#39;&#39;;\n-- Populate displayname with name but capitalize it (name=dataset becomes displayname=Dataset)\nUPDATE datasettype SET displayname = CONCAT(UPPER(SUBSTRING(name, 1, 1)), SUBSTRING(name, 2));\n</code></pre></div>",
+        "id": 577784610,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1772813224
+    }
+]
