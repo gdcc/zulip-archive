@@ -1,0 +1,595 @@
+<html>
+<head><meta charset="utf-8"><title>Docker mode when spinning up EC2 instances · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html">Docker mode when spinning up EC2 instances</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="591807528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591807528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591807528">(Apr 29 2026 at 14:07)</a>:</h4>
+<p><a href="https://github.com/gdcc/dataverse-ansible/issues/268">https://github.com/gdcc/dataverse-ansible/issues/268</a> has the details but in short:</p>
+<ul>
+<li>Currently our "spin up" scripts create an EC2 instance and deploy Dataverse in classic (non-Docker) mode.</li>
+<li>We'd like to offer the option to deploy Dataverse within Docker instead.</li>
+</ul>
+
+
+
+<a name="591807882"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591807882" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591807882">(Apr 29 2026 at 14:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> thanks for working on this! In the issue you asked for more details.</p>
+<p>Yes, I think this should be an additional flag.</p>
+
+
+
+<a name="591807922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591807922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591807922">(Apr 29 2026 at 14:08)</a>:</h4>
+<p>Here are the current flags:</p>
+<div class="codehilite"><pre><span></span><code>% ./ec2-create-instance.sh -h
+Usage: ./ec2-create-instance.sh -b &lt;branch&gt; -r &lt;repo&gt; -p &lt;pem_path&gt; -g &lt;group_vars&gt; -a &lt;dataverse-ansible branch&gt; -i aws_image -u aws_user -s aws_size -t aws_tag -f aws_security group -e aws_profile -l local_log_path -d -v
+default branch is develop
+default repo is https://github.com/IQSS/dataverse
+default .pem location is /Users/pdurbin
+example group_vars may be retrieved from https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/develop/defaults/main.yml
+default AWS AMI ID is ami-08ace1224b75d38c1, find the full list at https://rockylinux.org/ami/
+default AWS user is rocky
+default AWS instance size is t3a.large
+default AWS security group is dataverse-sg
+local log path will rsync Payara, Jacoco, Maven and other logs back to the specified path
+-d will destroy (terminate) the AWS instance once testing and reporting completes
+-v increases Ansible output verbosity
+</code></pre></div>
+
+
+
+<a name="591808085"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591808085" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591808085">(Apr 29 2026 at 14:09)</a>:</h4>
+<p>How about <code>-c</code> for "container mode"? (<code>-d</code> is already used for "destroy".)</p>
+
+
+
+<a name="591810463"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591810463" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591810463">(Apr 29 2026 at 14:17)</a>:</h4>
+<p>Putting my shell dev hat on: -c sounds reasonable.<br>
+Putting my devops hat on: dropping the script and replacing it with OpenTofu and potentially some Ansible sounds like a better plan than maintaining a shell script.</p>
+
+
+
+<a name="591810787"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591810787" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591810787">(Apr 29 2026 at 14:18)</a>:</h4>
+<p>(Ansible is probably no longer necessary when using OpenTofu to create all the AWS stuff and using cloud-init to bootstrap the node. But it may still come in handy.)</p>
+
+
+
+<a name="591811161"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591811161" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591811161">(Apr 29 2026 at 14:20)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> yeah? Are you thinking greenfield? <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> Don't hack on the existing script? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591811465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591811465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591811465">(Apr 29 2026 at 14:21)</a>:</h4>
+<p>Here's where we document the existing script, by the way: <a href="https://guides.dataverse.org/en/6.10.1/developers/deployment.html#deploying-the-dataverse-software-to-amazon-web-services-aws">https://guides.dataverse.org/en/6.10.1/developers/deployment.html#deploying-the-dataverse-software-to-amazon-web-services-aws</a></p>
+
+
+
+<a name="591811516"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591811516" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591811516">(Apr 29 2026 at 14:21)</a>:</h4>
+<p>If we write a new script, we could just document it under a different heading, or otherwise tweak those docs so that they make sense.</p>
+
+
+
+<a name="591811875"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591811875" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591811875">(Apr 29 2026 at 14:22)</a>:</h4>
+<p>OpenTofu != Script. Open Tofu means Infrastructure as Code, using a declarative language to define the infrastructure and then create it. It usually keeps a state, too, which might not be that relevant for ephemeral deployments.</p>
+
+
+
+<a name="591812076"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812076" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812076">(Apr 29 2026 at 14:23)</a>:</h4>
+<p>But again: that's just me. If y'all feel just adding "-c" is good enough, do it!</p>
+
+
+
+<a name="591812242"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812242" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812242">(Apr 29 2026 at 14:23)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> can you please remind us... some of the environments we spin up with the existing script are not especially ephemeral, right? I'm think you may have created <a href="http://beta.dataverse.org">beta.dataverse.org</a> with it. <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<a name="591812388"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812388" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812388">(Apr 29 2026 at 14:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> imagine if we spin up beta or <a href="http://demo.dataverse.org">demo.dataverse.org</a> on Docker some day.</p>
+
+
+
+<a name="591812465"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812465" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812465">(Apr 29 2026 at 14:24)</a>:</h4>
+<p>Please don't.</p>
+
+
+
+<a name="591812544"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812544" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812544">(Apr 29 2026 at 14:25)</a>:</h4>
+<p>A mere docker thing is not very scalable</p>
+
+
+
+<a name="591812624"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591812624" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591812624">(Apr 29 2026 at 14:25)</a>:</h4>
+<p>For anything that is meant for production, you need probably more sophisticated things.</p>
+
+
+
+<a name="591813193"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591813193" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591813193">(Apr 29 2026 at 14:26)</a>:</h4>
+<p>sure</p>
+
+
+
+<a name="591813341"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591813341" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591813341">(Apr 29 2026 at 14:27)</a>:</h4>
+<p>The primary use case is to demo features before they are merged. Maybe the instance stays up for two weeks or a month.</p>
+
+
+
+<a name="591813417"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591813417" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591813417">(Apr 29 2026 at 14:27)</a>:</h4>
+<p>Also, seeing how the industry and tech stack changes, for a system that needs long term stability, I wouldn't recommend Docker. It has too many security problems. In addition, Docker itself is a company that needs to make money. It may be a good idea to use something with less dependencies on them. On the other hand, you will have to make some buy-in into a container runtime anyway... <img alt=":shrugdog:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/86c833ef.png" title="shrugdog"></p>
+
+
+
+<a name="591813576"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591813576" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591813576">(Apr 29 2026 at 14:28)</a>:</h4>
+<p>Sure, for something like that, very close to dev, Docker or Podman can be a great fit, as it is well known by many devs already.</p>
+
+
+
+<a name="591813752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591813752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591813752">(Apr 29 2026 at 14:28)</a>:</h4>
+<p>right</p>
+
+
+
+<a name="591814180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591814180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591814180">(Apr 29 2026 at 14:30)</a>:</h4>
+<p>At some point it makes sense to try to rope in things like K8s (or similar orchestrators) into development as well. This makes development and production more aligned, making the ops side a lot easier for everyone. But that's another tale to tell <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span></p>
+
+
+
+<a name="591815682"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591815682" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591815682">(Apr 29 2026 at 14:35)</a>:</h4>
+<p>sure</p>
+
+
+
+<a name="591815826"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591815826" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591815826">(Apr 29 2026 at 14:36)</a>:</h4>
+<p>I should stop babbling now and take the hint <span aria-label="face with peeking eye" class="emoji emoji-1fae3" role="img" title="face with peeking eye">:face_with_peeking_eye:</span></p>
+
+
+
+<a name="591817014"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591817014" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591817014">(Apr 29 2026 at 14:40)</a>:</h4>
+<p>If it helps, I these are the steps we want to automate with a <code>-c</code> flag:</p>
+<ul>
+<li>Spin up an empty EC2 instance</li>
+<li>Install Docker</li>
+<li>Download the compose file from <a href="https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></li>
+<li>Run <code>docker compose up</code></li>
+<li>Install Traefik? Or nginx? <a href="https://github.com/IQSS/dataverse/issues/10359">https://github.com/IQSS/dataverse/issues/10359</a> . And configure it.</li>
+<li>Wait, what about the frontend? We need that too. I think it was added in <a href="https://github.com/gdcc/dataverse-ansible/pull/278">https://github.com/gdcc/dataverse-ansible/pull/278</a></li>
+<li>And now we need Keycloak. Add it to the compose file above? Or create a new compose file? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> </li>
+<li>etc., etc.</li>
+</ul>
+<p>I think we should start with the first four steps and see where this goes! <span aria-label="crazy" class="emoji emoji-1f61c" role="img" title="crazy">:crazy:</span></p>
+
+
+
+<a name="591819186"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591819186" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591819186">(Apr 29 2026 at 14:49)</a>:</h4>
+<p>This sounds like a perfect usecase for Terraform</p>
+
+
+
+<a name="591819236"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591819236" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591819236">(Apr 29 2026 at 14:49)</a>:</h4>
+<p>Or as <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> rightly mentioned, OpenTofu</p>
+
+
+
+<a name="591819517"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591819517" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591819517">(Apr 29 2026 at 14:50)</a>:</h4>
+<p>Are they both open source? Our existing bash script is. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="591819650"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591819650" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591819650">(Apr 29 2026 at 14:50)</a>:</h4>
+<p>OpenTofu is a fork of Terraform as HashiCorp is not very open for contributions to Terraform.</p>
+
+
+
+<a name="591819717"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591819717" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591819717">(Apr 29 2026 at 14:51)</a>:</h4>
+<p>I love the idea <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> and <span class="user-mention" data-user-id="626369">@Don Sizemore</span> loves it too!</p>
+<p>I am however of the mentality that Jenkins is a legacy project, and if you ask me we should shy away from adding more features to it and figure out more modern ways to do prototyping. Please do correct me if I'm wrong.</p>
+
+
+
+<a name="591820089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820089">(Apr 29 2026 at 14:53)</a>:</h4>
+<p>With OpenTofu, you clone the repo, you type in tofu init, and tofu apply and the EC2 instance will be up however long y'all want it to. tofu destroy and its gone.</p>
+
+
+
+<a name="591820196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820196">(Apr 29 2026 at 14:53)</a>:</h4>
+<p>Hmm, would you be able to put together a proof of concept I can try?</p>
+
+
+
+<a name="591820248"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820248" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820248">(Apr 29 2026 at 14:53)</a>:</h4>
+<p>Absolutely</p>
+
+
+
+<a name="591820360"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820360" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820360">(Apr 29 2026 at 14:54)</a>:</h4>
+<p>podman instead of Docker?</p>
+
+
+
+<a name="591820408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820408">(Apr 29 2026 at 14:54)</a>:</h4>
+<p>Just to make sure we're on the same page here.</p>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591817014">said</a>:</p>
+<blockquote>
+<ul>
+<li>Spin up an empty EC2 instance</li>
+<li>Install Docker</li>
+</ul>
+</blockquote>
+<p>That's the Tofu job.</p>
+<blockquote>
+<ul>
+<li>Download the compose file from <a href="https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></li>
+</ul>
+</blockquote>
+<p>This is part Tofu, part cloud-init</p>
+<blockquote>
+<ul>
+<li>Run <code>docker compose up</code></li>
+<li>Install Traefik? Or nginx? <a href="https://github.com/IQSS/dataverse/issues/10359">https://github.com/IQSS/dataverse/issues/10359</a> . And configure it.</li>
+<li>Wait, what about the frontend? We need that too. I think it was added in <a href="https://github.com/gdcc/dataverse-ansible/pull/278">https://github.com/gdcc/dataverse-ansible/pull/278</a></li>
+<li>And now we need Keycloak. Add it to the compose file above? Or create a new compose file? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span> </li>
+<li>etc., etc.</li>
+</ul>
+</blockquote>
+<p>That's the part for a cloud-init script.</p>
+
+
+
+<a name="591820545"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820545" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820545">(Apr 29 2026 at 14:54)</a>:</h4>
+<p>yep, that's what i was thinking too</p>
+
+
+
+<a name="591820732"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820732" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820732">(Apr 29 2026 at 14:55)</a>:</h4>
+<p>I do something very similar in our Dataverse installations to renew certs without having to manually place them.</p>
+
+
+
+<a name="591820802"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820802" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820802">(Apr 29 2026 at 14:56)</a>:</h4>
+<p>I'll come back with a PoC, and y'all can help me iterate on it</p>
+
+
+
+<a name="591820974"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820974" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820974">(Apr 29 2026 at 14:56)</a>:</h4>
+<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>
+
+
+
+<a name="591820994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591820994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591820994">(Apr 29 2026 at 14:56)</a>:</h4>
+<p>The interesting part is always: how do I ship config etc into the spun up instance. This is where cloud-init and GitOps can shine.</p>
+
+
+
+<a name="591821752"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591821752" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591821752">(Apr 29 2026 at 14:58)</a>:</h4>
+<p>If I would try to write this as a Tofu job, I'd try to ship the compose file as part of the cloud-init payload via Tofu. Then a service unit for systemd to spin up compose with it, enabled by cloud-init.</p>
+
+
+
+<a name="591821908"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591821908" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591821908">(Apr 29 2026 at 14:59)</a>:</h4>
+<p>This keeps all the pieces like configuring the application etc as a job for compose, making it very flexible what to include etc.</p>
+
+
+
+<a name="591822249"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822249" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822249">(Apr 29 2026 at 15:00)</a>:</h4>
+<p>One thing to keep note of: cloud-init may need a list of /etc/hosts entries, depending on how the composed services are exposed via AWS.</p>
+
+
+
+<a name="591822456"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822456" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822456">(Apr 29 2026 at 15:01)</a>:</h4>
+<p>well only one way to find out!</p>
+
+
+
+<a name="591822510"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822510" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822510">(Apr 29 2026 at 15:01)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974">said</a>:</p>
+<blockquote>
+<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>
+</blockquote>
+<p>?</p>
+
+
+
+<a name="591822758"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822758" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822758">(Apr 29 2026 at 15:02)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591822510">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974">said</a>:</p>
+<blockquote>
+<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>
+</blockquote>
+<p>?</p>
+</blockquote>
+<p>I suppose only <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> can answer that. I don't have procura to spend money for IQSS <span aria-label="see no evil" class="emoji emoji-1f648" role="img" title="see no evil">:see_no_evil:</span>  They have standup now</p>
+
+
+
+<a name="591822805"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822805" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822805">(Apr 29 2026 at 15:02)</a>:</h4>
+<p>okee thank you</p>
+
+
+
+<a name="591822934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591822934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591822934">(Apr 29 2026 at 15:02)</a>:</h4>
+<p>Should we do a zoom call? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="591823093"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591823093" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591823093">(Apr 29 2026 at 15:03)</a>:</h4>
+<p>Love to, but I need to run errands with my kids and will be off in ~10</p>
+
+
+
+<a name="591823530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591823530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591823530">(Apr 29 2026 at 15:05)</a>:</h4>
+<p>we can set up a call later at a time that works for everyone. I'll get back to you with a PoC and my findings in the meanwhile</p>
+
+
+
+<a name="591824793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591824793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591824793">(Apr 29 2026 at 15:09)</a>:</h4>
+<p>19:00 my time could work for me</p>
+
+
+
+<a name="591825070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591825070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591825070">(Apr 29 2026 at 15:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> wanna try the clock button? <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> <br>
+<img alt="Screenshot 2026-04-29 at 11.10.39 AM.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="140x53" data-original-src="/user_uploads/53090/KZm27fKTjXne5iAG7spX6oF_/Screenshot-2026-04-29-at-11.10.39AM.png" src="/user_uploads/thumbnail/53090/KZm27fKTjXne5iAG7spX6oF_/Screenshot-2026-04-29-at-11.10.39AM.png/840x560.webp"></p>
+
+
+
+<a name="591825255"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591825255" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591825255">(Apr 29 2026 at 15:11)</a>:</h4>
+<p>Hell yeah</p>
+
+
+
+<a name="591825319"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591825319" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591825319">(Apr 29 2026 at 15:11)</a>:</h4>
+<p><time datetime="2026-04-29T17:00:00Z">2026-04-29T19:00:00+02:00</time> would work for me!</p>
+
+
+
+<a name="591825347"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591825347" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591825347">(Apr 29 2026 at 15:11)</a>:</h4>
+<p>so much easier, thanks!</p>
+
+
+
+<a name="591825496"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591825496" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591825496">(Apr 29 2026 at 15:12)</a>:</h4>
+<p>Could work for me. What do you think, <span class="user-mention" data-user-id="1034135">@Ash Manda</span>?</p>
+
+
+
+<a name="591828834"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591828834" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591828834">(Apr 29 2026 at 15:25)</a>:</h4>
+<p>Sure, as long as it is a quick call! I'll be off the clock this week and come back on Monday. Since I'm a GRA I can only work 20hrs :(</p>
+
+
+
+<a name="591829282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591829282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591829282">(Apr 29 2026 at 15:27)</a>:</h4>
+<p>Great, we'll make it quick. We can use my Zoom at <a href="https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a> (in ~90 minutes)</p>
+
+
+
+<a name="591832090"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591832090" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591832090">(Apr 29 2026 at 15:39)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591829282">said</a>:</p>
+<blockquote>
+<p><a href="https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>
+</blockquote>
+<p>Whatever works!</p>
+
+
+
+<a name="591832224"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591832224" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591832224">(Apr 29 2026 at 15:40)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974">said</a>:</p>
+<blockquote>
+<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>
+</blockquote>
+<p>yes</p>
+
+
+
+<a name="591832338"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591832338" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591832338">(Apr 29 2026 at 15:40)</a>:</h4>
+<p>talk soon!</p>
+
+
+
+<a name="591850479"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591850479" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591850479">(Apr 29 2026 at 16:58)</a>:</h4>
+<p>I created an issue we can discuss and edit:</p>
+<p>Dataverse in Docker in the cloud (with Keycloak) <a href="https://github.com/IQSS/dataverse/issues/12369">#12369</a></p>
+
+
+
+<a name="591850956"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591850956" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591850956">(Apr 29 2026 at 17:00)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> <span class="user-mention" data-user-id="1034135">@Ash Manda</span> ready? <a href="https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>
+
+
+
+<a name="591851272"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591851272" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591851272">(Apr 29 2026 at 17:01)</a>:</h4>
+<p>Almost there</p>
+
+
+
+<a name="591862595"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591862595" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591862595">(Apr 29 2026 at 17:57)</a>:</h4>
+<p>do we even want global state for a use case like this?</p>
+
+
+
+<a name="591862727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591862727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591862727">(Apr 29 2026 at 17:58)</a>:</h4>
+<p>Not necessarily. I was asking mostly because we will need ways to keep track of individual state to enable tearing down things again.</p>
+
+
+
+<a name="591862852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591862852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591862852">(Apr 29 2026 at 17:58)</a>:</h4>
+<p>Otherwise keeping all these EC2s around is gonna cost IQSS <span aria-label="money" class="emoji emoji-1f4b0" role="img" title="money">:money:</span></p>
+
+
+
+<a name="591862898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591862898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591862898">(Apr 29 2026 at 17:58)</a>:</h4>
+<p>probably a lifecycle block with local state?</p>
+
+
+
+<a name="591863190"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591863190" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591863190">(Apr 29 2026 at 18:00)</a>:</h4>
+<p>I dunno, we'll figure smth out</p>
+
+
+
+<a name="591865508"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591865508" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591865508">(Apr 29 2026 at 18:10)</a>:</h4>
+<p>It would probably be good to have a spinup environments by command or trigger (using a CI job to execute) that always gets an expiry date. Expiry can be extended by updates (CI trigger) or commands (triggering a CI job).</p>
+<p>On creation, the resources created become part of a persistent state, keeping track of the inventory. </p>
+<p>A scheduled janitor job removes any expired environments, leaves comments/warning/notes, etc.</p>
+
+
+
+<a name="591879907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/591879907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#591879907">(Apr 29 2026 at 19:28)</a>:</h4>
+<p>If it helps, in the bash script there's a <code>-d</code> flag for delete that we use when spinning up EC2 instances from Jenkins. Plus <code>-t</code> that we use to tag images with "jenkins_delete_me". I think <span class="user-mention" data-user-id="626369">@Don Sizemore</span> has something set up on the AWS side to delete them automatically.</p>
+
+
+
+<a name="592775785"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592775785" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592775785">(May 04 2026 at 15:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> Hello Oliver! Good evening! If you had the time I wanted to pick your brain about some concerns I have regarding using any state driven system like Tofu or Pulumi or CloudFormation for this specific usecase. Would you prefer I dump them here or write a clean proposal sorta document that outlines my main concerns?</p>
+
+
+
+<a name="592775947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592775947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592775947">(May 04 2026 at 15:43)</a>:</h4>
+<p>Whatever works for you. If you feel like this needs a more formal discussion with comments and all, a document may be better.</p>
+
+
+
+<a name="592783812"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592783812" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592783812">(May 04 2026 at 16:18)</a>:</h4>
+<p><a href="https://docs.google.com/document/d/1kQkYeW3FMCrpnDkWmBGq1ePeFR8aIrPC9OtHfcmj5fY/edit?usp=sharing">https://docs.google.com/document/d/1kQkYeW3FMCrpnDkWmBGq1ePeFR8aIrPC9OtHfcmj5fY/edit?usp=sharing</a></p>
+
+
+
+<a name="592783934"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592783934" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592783934">(May 04 2026 at 16:18)</a>:</h4>
+<p>These are some thoughts I had when thinking about this workflow. Please correct me wherever I'm wrong!</p>
+
+
+
+<a name="592784180"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592784180" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592784180">(May 04 2026 at 16:20)</a>:</h4>
+<p>I completely agree with your analysis: using / involving too much IaC for a developer is a nightmare waiting to happen.</p>
+
+
+
+<a name="592784749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592784749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592784749">(May 04 2026 at 16:23)</a>:</h4>
+<p>Where should I put more thoughts?</p>
+
+
+
+<a name="592784801"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592784801" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592784801">(May 04 2026 at 16:23)</a>:</h4>
+<p>Comments should be enabled. Or I can enable edits too</p>
+
+
+
+<a name="592784847"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592784847" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592784847">(May 04 2026 at 16:23)</a>:</h4>
+<p>Done</p>
+
+
+
+<a name="592784869"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592784869" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592784869">(May 04 2026 at 16:23)</a>:</h4>
+<p>OK will do - need to continue hacking for now.</p>
+
+
+
+<a name="592785021"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592785021" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592785021">(May 04 2026 at 16:24)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/592784869">said</a>:</p>
+<blockquote>
+<p>OK will do - need to continue hacking for now.</p>
+</blockquote>
+<p>Thank you! I appreciate your time and thoughts on this a lot. It's really good to have someone around to guide me who knows these systems well</p>
+
+
+
+<a name="592785188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592785188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592785188">(May 04 2026 at 16:25)</a>:</h4>
+<p>When it comes to IaC, I'm also still learning. The ecosystem is so vast and you can do things on so many different levels, sometimes it's hard to see the forest for the trees.</p>
+
+
+
+<a name="592862323"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Docker%20mode%20when%20spinning%20up%20EC2%20instances/near/592862323" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances.html#592862323">(May 04 2026 at 23:56)</a>:</h4>
+<p>Wow, this is getting a bit complicated! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> Thanks for all the work so far!</p>
+
+
+
+<hr><p>Last updated: May 20 2026 at 19:17 UTC</p>
+</html>

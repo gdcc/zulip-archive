@@ -1,0 +1,494 @@
+[
+    {
+        "content": "<p>I'm trying to jump ahead several releases and getting this error.</p>\n<div class=\"codehilite\"><pre><span></span><code>    print(api.status)\n          ^^^^^^^^^^\nAttributeError: &#39;Api&#39; object has no attribute &#39;status&#39;\n</code></pre></div>\n<p>Any ideas?</p>\n<p>For context, here my draft pull request: <a href=\"https://github.com/IQSS/dataverse-sample-data/pull/44\">https://github.com/IQSS/dataverse-sample-data/pull/44</a></p>",
+        "id": 438011972,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715359057
+    },
+    {
+        "content": "<p>Here's the line it's failing on: <a href=\"https://github.com/IQSS/dataverse-sample-data/blob/cc6eb12f3a51e93546c5164ddc4ae851e56c3dac/create_sample_data.py#L17\">https://github.com/IQSS/dataverse-sample-data/blob/cc6eb12f3a51e93546c5164ddc4ae851e56c3dac/create_sample_data.py#L17</a></p>",
+        "id": 438012207,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715359135
+    },
+    {
+        "content": "<p>Hm it seems like the <code>status</code> attribute has been remove a couple releases ago. At least I cant locate it in 0.3.1 so far.</p>\n<p><a href=\"https://github.com/gdcc/pyDataverse/blob/574739984d42d633a584c492d43b8b72c1e8425d/src/pyDataverse/api.py#L36\">https://github.com/gdcc/pyDataverse/blob/574739984d42d633a584c492d43b8b72c1e8425d/src/pyDataverse/api.py#L36</a></p>",
+        "id": 438013287,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715359556
+    },
+    {
+        "content": "<p>Do you know what the purpose of this one was?</p>",
+        "id": 438013356,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715359576
+    },
+    {
+        "content": "<p>No. I'm way behind. Sounds like it happened way before 0.3.2. Thanks!</p>",
+        "id": 438022822,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715363307
+    },
+    {
+        "content": "<p>This was on 0.2.1</p>\n<div class=\"codehilite\"><pre><span></span><code>try:\n                resp = get(url)\n                if resp:\n                    self.status = resp.json()[&#39;status&#39;]\n</code></pre></div>",
+        "id": 438036591,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715369966
+    },
+    {
+        "content": "<p>I got \"create dataverse\" working: <a href=\"https://github.com/IQSS/dataverse-sample-data/pull/44/commits/ad23316e20de1dd6d8d585c7a1b9dae12ee466d3\">https://github.com/IQSS/dataverse-sample-data/pull/44/commits/ad23316e20de1dd6d8d585c7a1b9dae12ee466d3</a></p>",
+        "id": 438036992,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715370174
+    },
+    {
+        "content": "<p>To get this status</p>",
+        "id": 438037050,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715370209
+    },
+    {
+        "content": "<p>pydv 2.1 wold call <a href=\"https://demo.dataverse.org/api/info/server\">https://demo.dataverse.org/api/info/server</a></p>",
+        "id": 438037065,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715370223
+    },
+    {
+        "content": "<p>{\"status\":\"OK\",\"data\":{\"message\":\"demo.dataverse.org\"}}</p>",
+        "id": 438037127,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715370246
+    },
+    {
+        "content": "<p>and return the status</p>",
+        "id": 438037129,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715370251
+    },
+    {
+        "content": "<p>Gotcha. I replaced it with <code>print(api.get_info_version())</code></p>",
+        "id": 438037434,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715370432
+    },
+    {
+        "content": "<p>Should we add <code>status</code> back to the <code>Api</code> class? I feel its a good gateway to check the connection.</p>",
+        "id": 438039640,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715371623
+    },
+    {
+        "content": "<p>If set upon initialisation it would be an indicator for connection problems</p>",
+        "id": 438039692,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715371657
+    },
+    {
+        "content": "<p>Meh, not sure.</p>",
+        "id": 438040459,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715372068
+    },
+    {
+        "content": "<p>Ok, I just marked <a href=\"https://github.com/IQSS/dataverse-sample-data/pull/44\">https://github.com/IQSS/dataverse-sample-data/pull/44</a> as ready for review. Both my create and destroy scripts work and that's all I really use.</p>",
+        "id": 438040535,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715372111
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> maybe you can take a look. I don't know if you use any other scripts.</p>",
+        "id": 438040562,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715372126
+    },
+    {
+        "content": "<p>I switched to pyDataverse's <code>get_dataset_lock</code>, which is nice. Previously I was using <code>requests</code> for that.</p>",
+        "id": 438040702,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715372186
+    },
+    {
+        "content": "<p>The script I added works fine, it doesn't use pyDV directly. I tested making a dataset with 20 images and worked fine <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 438041298,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715372526
+    },
+    {
+        "content": "<p>oh</p>",
+        "id": 438041309,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715372535
+    },
+    {
+        "content": "<p>Wait</p>",
+        "id": 438041313,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715372537
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>Traceback (most recent call last):\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 69, in map_httpcore_exceptions\n    yield\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 233, in handle_request\n    resp = self._pool.handle_request(req)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py&quot;, line 216, in handle_request\n    raise exc from None\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py&quot;, line 196, in handle_request\n    response = connection.handle_request(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py&quot;, line 101, in handle_request\n    return self._connection.handle_request(request)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 143, in handle_request\n    raise exc\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 113, in handle_request\n    ) = self._receive_response_headers(**kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 186, in _receive_response_headers\n    event = self._receive_event(timeout=timeout)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 224, in _receive_event\n    data = self._network_stream.read(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py&quot;, line 124, in read\n    with map_exceptions(exc_map):\n  File &quot;/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py&quot;, line 158, in __exit__\n    self.gen.throw(value)\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_exceptions.py&quot;, line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.ReadTimeout: timed out\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/create_sample_data.py&quot;, line 77, in &lt;module&gt;\n    resp = api.upload_datafile(dataset_pid, df_filename, df.json())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 1816, in upload_datafile\n    return self.post_request(\n           ^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 174, in post_request\n    return self._sync_request(\n           ^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 295, in _sync_request\n    resp = method(**kwargs, follow_redirects=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_api.py&quot;, line 319, in post\n    return request(\n           ^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_api.py&quot;, line 106, in request\n    return client.request(\n           ^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 827, in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 914, in send\n    response = self._send_handling_auth(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 942, in _send_handling_auth\n    response = self._send_handling_redirects(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 979, in _send_handling_redirects\n    response = self._send_single_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 1015, in _send_single_request\n    response = transport.handle_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 232, in handle_request\n    with map_httpcore_exceptions():\n  File &quot;/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py&quot;, line 158, in __exit__\n    self.gen.throw(value)\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 86, in map_httpcore_exceptions\n    raise mapped_exc(message) from exc\nhttpx.ReadTimeout: timed out\n</code></pre></div>",
+        "id": 438041448,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715372630
+    },
+    {
+        "content": "<p>So I was able to generate my custom dataset as I said but when I ran <code>python create_sample_data.py</code> the script crashed before it could finish</p>",
+        "id": 438041739,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715372783
+    },
+    {
+        "content": "<p>Does it work with this?</p>\n<div class=\"codehilite\"><pre><span></span><code>sample_data = [\n&#39;data/dataverses/open-source-at-harvard/open-source-at-harvard.json&#39;,\n&#39;data/dataverses/open-source-at-harvard/datasets/open-source-at-harvard/open-source-at-harvard.json&#39;,\n]\n</code></pre></div>\n<p>And what data lines are you using?</p>",
+        "id": 438042023,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715372973
+    },
+    {
+        "content": "<p><span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 438042161,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373036
+    },
+    {
+        "content": "<p>I normally just run <code>python create_sample_data.py</code> with no parameters or anything, is this something I have to add somewhere?</p>",
+        "id": 438042218,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373078
+    },
+    {
+        "content": "<p>I am going to run a quick test without the generated files</p>",
+        "id": 438042353,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373139
+    },
+    {
+        "content": "<p>Sorry, I'm talking about the lines in <code>dvconfig.py</code>, the config file.</p>",
+        "id": 438042390,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373157
+    },
+    {
+        "content": "<p>I only tested those two lines.</p>",
+        "id": 438042399,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373165
+    },
+    {
+        "content": "<p>Oh, I am testing the full thing <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span></p>",
+        "id": 438042455,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373193
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>sample_data = [\n&#39;data/dataverses/pums/pums.json&#39;,\n&#39;data/dataverses/pums/datasets/2000pums5/2000pums5.json&#39;,\n&#39;data/dataverses/dataverseno/dataverseno.json&#39;,\n&#39;data/dataverses/open-source-at-harvard/open-source-at-harvard.json&#39;,\n&#39;data/dataverses/open-source-at-harvard/dataverses/dataverse-project/dataverse-project.json&#39;,\n&#39;data/dataverses/open-source-at-harvard/dataverses/dataverse-project/datasets/dataverse-irc-metrics/dataverse-irc-metrics.json&#39;,\n&#39;data/dataverses/ecastro/ecastro.json&#39;,\n&#39;data/dataverses/ecastro/datasets/this-is-my-test-dataset/this-is-my-test-dataset.json&#39;,\n&#39;data/dataverses/manchester/manchester.json&#39;,\n&#39;data/dataverses/manchester/datasets/test-dataset/test-dataset.json&#39;,\n&#39;data/dataverses/dataverse-performance-demo/dataverse-performance-demo.json&#39;,\n&#39;data/dataverses/dataverse-performance-demo/datasets/performance-test/performance-test.json&#39;,\n&#39;data/dataverses/HCPDS/HCPDS.json&#39;,\n&#39;data/dataverses/HCPDS/datasets/reproductive-health-laws-around-the-world/reproductive-health-laws-around-the-world.json&#39;,\n&#39;data/dataverses/cms/cms.json&#39;,\n&#39;data/dataverses/cms/datasets/cmssampledata/cmssampledata.json&#39;,\n&#39;data/dataverses/scholcommlab/scholcommlab.json&#39;,\n&#39;data/dataverses/scholcommlab/datasets/diabeticconnect/diabeticconnect.json&#39;,\n&#39;data/dataverses/ubiquity-press/ubiquity-press.json&#39;,\n&#39;data/dataverses/ubiquity-press/dataverses/jopd/jopd.json&#39;,\n&#39;data/dataverses/ubiquity-press/dataverses/jopd/datasets/flynn-effect-in-estonia/flynn-effect-in-estonia.json&#39;,\n&#39;data/dataverses/ubiquity-press/dataverses/jopd/datasets/bafacalo/bafacalo.json&#39;,\n&#39;data/dataverses/open-source-at-harvard/datasets/open-source-at-harvard/open-source-at-harvard.json&#39;,\n&#39;data/dataverses/king/king.json&#39;,\n&#39;data/dataverses/king/datasets/cause-of-death/cause-of-death.json&#39;,\n]\n</code></pre></div>",
+        "id": 438042467,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373204
+    },
+    {
+        "content": "<p>Gotcha. Which one is it failing on?</p>",
+        "id": 438042498,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373231
+    },
+    {
+        "content": "<p>I just tested again without my custom files and got the same exception</p>",
+        "id": 438042691,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373334
+    },
+    {
+        "content": "<p>I don't think we put on the output where is failing</p>",
+        "id": 438042724,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373359
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>Lock found for dataset id doi:10.5072/FK2/ZTEH0N... sleeping...\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\n&lt;Response [200 OK]&gt;\n&lt;Response [200]&gt;\nTraceback (most recent call last):\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 69, in map_httpcore_exceptions\n    yield\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 233, in handle_request\n    resp = self._pool.handle_request(req)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py&quot;, line 216, in handle_request\n    raise exc from None\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py&quot;, line 196, in handle_request\n    response = connection.handle_request(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py&quot;, line 101, in handle_request\n    return self._connection.handle_request(request)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 143, in handle_request\n    raise exc\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 113, in handle_request\n    ) = self._receive_response_headers(**kwargs)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 186, in _receive_response_headers\n    event = self._receive_event(timeout=timeout)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py&quot;, line 224, in _receive_event\n    data = self._network_stream.read(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py&quot;, line 124, in read\n    with map_exceptions(exc_map):\n  File &quot;/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py&quot;, line 158, in __exit__\n    self.gen.throw(value)\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpcore/_exceptions.py&quot;, line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.ReadTimeout: timed out\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/create_sample_data.py&quot;, line 77, in &lt;module&gt;\n    resp = api.upload_datafile(dataset_pid, df_filename, df.json())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 1816, in upload_datafile\n    return self.post_request(\n           ^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 174, in post_request\n    return self._sync_request(\n           ^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/pyDataverse/api.py&quot;, line 295, in _sync_request\n    resp = method(**kwargs, follow_redirects=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_api.py&quot;, line 319, in post\n    return request(\n           ^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_api.py&quot;, line 106, in request\n    return client.request(\n           ^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 827, in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 914, in send\n    response = self._send_handling_auth(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 942, in _send_handling_auth\n    response = self._send_handling_redirects(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 979, in _send_handling_redirects\n    response = self._send_single_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_client.py&quot;, line 1015, in _send_single_request\n    response = transport.handle_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 232, in handle_request\n    with map_httpcore_exceptions():\n  File &quot;/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py&quot;, line 158, in __exit__\n    self.gen.throw(value)\n  File &quot;/Users/jptosca/REP/IQSS/dataverse-sample-data/venv/lib/python3.12/site-packages/httpx/_transports/default.py&quot;, line 86, in map_httpcore_exceptions\n    raise mapped_exc(message) from exc\nhttpx.ReadTimeout: timed out\n</code></pre></div>",
+        "id": 438042800,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373385
+    },
+    {
+        "content": "<p>It looks like \"manchester\" is failing consistently.</p>",
+        "id": 438042835,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373410
+    },
+    {
+        "content": "<p>I think everything that has files is failing randomly because the time out</p>",
+        "id": 438042890,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373447
+    },
+    {
+        "content": "<p><span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 438042896,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373450
+    },
+    {
+        "content": "<p>Last time failed earlier for me</p>",
+        "id": 438042914,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373463
+    },
+    {
+        "content": "<p>Oh. Hmm.</p>",
+        "id": 438043000,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373496
+    },
+    {
+        "content": "<p>Well, it could be unrelated to the pyDataverse upgrade. I rarely add all the data.</p>",
+        "id": 438043024,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373522
+    },
+    {
+        "content": "<p><code>httpcore.ReadTimeout: timed out</code></p>",
+        "id": 438043090,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373573
+    },
+    {
+        "content": "<p>When it's not late on a Friday night we can ask Jan what he thinks of that error. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 438043109,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373591
+    },
+    {
+        "content": "<p><span aria-label=\"thumbs up\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"thumbs up\">:thumbs_up:</span></p>",
+        "id": 438043179,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373617
+    },
+    {
+        "content": "<p>\"The default behavior is to raise a <code>TimeoutException</code> after 5 seconds of network inactivity.\" -- <a href=\"https://www.python-httpx.org/advanced/timeouts/\">https://www.python-httpx.org/advanced/timeouts/</a></p>",
+        "id": 438043252,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373673
+    },
+    {
+        "content": "<p>Probably caused by the sleep waiting for the dataset lockout? <span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span></p>",
+        "id": 438043340,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373729
+    },
+    {
+        "content": "<p>Maybe. I was thinking more that Dataverse is busy with processing data files and slow to respond.</p>",
+        "id": 438043392,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373773
+    },
+    {
+        "content": "<p>This happened to me locally on a fresh installation</p>",
+        "id": 438043472,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373828
+    },
+    {
+        "content": "<p>I think after one of the recent updates I started to see more sleeps and waiting for lock messages on the console</p>",
+        "id": 438043568,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715373870
+    },
+    {
+        "content": "<p>This is the line that is slow to respond:</p>\n<p><code>resp = api.upload_datafile(dataset_pid, df_filename, df.json())</code></p>",
+        "id": 438043605,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715373890
+    },
+    {
+        "content": "<p>Maybe not related pyDataverse, but when uploading bulk data I have encountered similar issues. Have you tried uploading the file that fails individually?</p>",
+        "id": 438046971,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715375606
+    },
+    {
+        "content": "<p>In the python-dvuploader I compile all the data into a zip and upload that one, which has solved this issue for me.</p>",
+        "id": 438047444,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715375851
+    },
+    {
+        "content": "<p>Alternatively we may have to set the timeout in the request to <code>None</code> to never time out. Let me create a branch, so you can test it.</p>",
+        "id": 438047630,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715375956
+    },
+    {
+        "content": "<p>Just pushed it. Can you re-install using the following?</p>\n<p><code>python -m pip install git+https://github.com/gdcc/pyDataverse.git@unlimited-timeout</code></p>",
+        "id": 438048065,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715376191
+    },
+    {
+        "content": "<p>I can test later tonight <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span> my<br>\nWife picked me up so we are at the gym now</p>",
+        "id": 438049050,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715376713
+    },
+    {
+        "content": "<p>I am testing, seems to be fixed. Will post back as soon as it is done</p>",
+        "id": 438057633,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715381596
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>raise mapped_exc(message) from exc\nhttpx.ReadTimeout: timed out\n</code></pre></div>",
+        "id": 438057812,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715381698
+    },
+    {
+        "content": "<p>I'm confused. <a href=\"https://github.com/gdcc/pyDataverse/tree/unlimited-timeout\">https://github.com/gdcc/pyDataverse/tree/unlimited-timeout</a> is 7 commits behind master and no commits ahead.</p>",
+        "id": 438817417,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715783561
+    },
+    {
+        "content": "<p>Damn, I have committed it, but not pushed yet <span aria-label=\"cold sweat\" class=\"emoji emoji-1f630\" role=\"img\" title=\"cold sweat\">:cold_sweat:</span></p>",
+        "id": 438859845,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715796456
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> told ya</p>",
+        "id": 438859943,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715796487
+    },
+    {
+        "content": "<p>I do that all the time <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 438859966,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715796499
+    },
+    {
+        "content": "<p><span aria-label=\"upside down\" class=\"emoji emoji-1f643\" role=\"img\" title=\"upside down\">:upside_down:</span></p>",
+        "id": 438860212,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1715796611
+    },
+    {
+        "content": "<p>Sorry <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 438860561,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715796767
+    },
+    {
+        "content": "<p>Luckily you've spotted it!</p>",
+        "id": 438860597,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715796783
+    },
+    {
+        "content": "<p>Ok, now we have the commit: <a href=\"https://github.com/gdcc/pyDataverse/commit/a524c1c91732a159f580750a7af30dab5eed04a0\">https://github.com/gdcc/pyDataverse/commit/a524c1c91732a159f580750a7af30dab5eed04a0</a></p>",
+        "id": 438861817,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715797256
+    },
+    {
+        "content": "<p>Did <code>python -m pip install git+https://github.com/gdcc/pyDataverse.git@unlimited-timeout</code> work?</p>\n<p>When I do <code>pip freeze | grep pyDataverse</code> I still see <code>pyDataverse==0.3.2</code>. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 438862102,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715797368
+    },
+    {
+        "content": "<p>The commit looks right, same as above: <code>Resolved https://github.com/gdcc/pyDataverse.git to commit a524c1c91732a159f580750a7af30dab5eed04a0</code></p>",
+        "id": 438862186,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715797411
+    },
+    {
+        "content": "<p>The version has not yet been bumped to 0.3.3</p>",
+        "id": 438863301,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715797902
+    },
+    {
+        "content": "<p>Right, but I don't see the change in venv/lib/python3.12/site-packages/pyDataverse/api.py</p>",
+        "id": 438863739,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715798092
+    },
+    {
+        "content": "<p>I can delete my old venv if that helps.</p>",
+        "id": 438863869,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715798150
+    },
+    {
+        "content": "<p>What I typically do is to pull the branch and install the repository using </p>\n<p><code>python -m pip install -e .</code></p>\n<p>In this way, your installation will always be synced to what you have pulled from GitHub. I am not sure though if it works with <code>venv</code>.</p>",
+        "id": 438864273,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715798307
+    },
+    {
+        "content": "<p>Would switching to <code>conda</code> be an option? This allows you to use your envs globally</p>",
+        "id": 438864344,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715798340
+    },
+    {
+        "content": "<p>Buh. Let me try blowing away my venv. That's easier for me. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 438865318,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715798686
+    },
+    {
+        "content": "<p>Ok, <code>pip freeze</code> now shows me this: <code>pyDataverse @ git+https://github.com/gdcc/pyDataverse.git@a524c1c91732a159f580750a7af30dab5eed04a0</code>. Good.</p>",
+        "id": 438865649,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715798804
+    },
+    {
+        "content": "<p>It is chugging along!</p>",
+        "id": 438867259,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715799408
+    },
+    {
+        "content": "<p>Yeah, I didn't create the full load of datasets, but I'd say it's fixed.</p>",
+        "id": 438868729,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715799969
+    },
+    {
+        "content": "<p>Should I create an issue?</p>",
+        "id": 438868812,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715800017
+    },
+    {
+        "content": "<p>Great to hear! Yea, feel free to create one. I will link a PR to it <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 438882664,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715806032
+    },
+    {
+        "content": "<p>Done! <a href=\"https://github.com/gdcc/pyDataverse/issues/187\">https://github.com/gdcc/pyDataverse/issues/187</a></p>",
+        "id": 438888726,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715808475
+    },
+    {
+        "content": "<p>Created a draft PR - <a href=\"https://github.com/gdcc/pyDataverse/pull/188\">https://github.com/gdcc/pyDataverse/pull/188</a></p>",
+        "id": 439009661,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715862788
+    },
+    {
+        "content": "<p>Added test to upload 50 files and it works with the fix. Just merged it <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 439193417,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715940925
+    },
+    {
+        "content": "<p>Did it fail without the fix? On 50 files?</p>",
+        "id": 439200909,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715944217
+    }
+]

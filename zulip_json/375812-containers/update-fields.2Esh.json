@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Do we already run <a href=\"http://update-fields.sh\">update-fields.sh</a> in the dev persona? As far as I can tell, we don't. We rely on the fact that schema.xml already has all the fields for the 6 metadata blocks we ship.</p>\n<p>I'm asking because I'm thinking about loading the CodeMeta block in the \"dev\" persona. But it looks like I'll need to call <a href=\"http://update-fields.sh\">update-fields.sh</a> afterwards.</p>",
+        "id": 481121641,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730986480
+    },
+    {
+        "content": "<p>We already had a draft issue for this so I just converted it into a real one:</p>\n<p>document updating metadata block (tsv) and Solr in Dockerized dev env <a href=\"https://github.com/IQSS/dataverse/issues/11004\">#11004</a></p>",
+        "id": 481122928,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730986903
+    },
+    {
+        "content": "<p>It looks like <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> talked about this back in April: <a href=\"https://docs.google.com/document/d/1toiFxJKGvrYMy9KrW9GZ4U6FLGhMaCipJ9ggtvZFwgc/edit?usp=sharing\">https://docs.google.com/document/d/1toiFxJKGvrYMy9KrW9GZ4U6FLGhMaCipJ9ggtvZFwgc/edit?usp=sharing</a></p>\n<p><a href=\"/user_uploads/53090/8hh_ashaM4Rp8oi8SRoZqQv4/Screenshot-2024-11-07-at-8.47.33AM.png\">Screenshot 2024-11-07 at 8.47.33 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/8hh_ashaM4Rp8oi8SRoZqQv4/Screenshot-2024-11-07-at-8.47.33AM.png\" title=\"Screenshot 2024-11-07 at 8.47.33 AM.png\"><img data-original-dimensions=\"2560x1440\" src=\"/user_uploads/thumbnail/53090/8hh_ashaM4Rp8oi8SRoZqQv4/Screenshot-2024-11-07-at-8.47.33AM.png/840x560.webp\"></a></div>",
+        "id": 481124606,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730987421
+    },
+    {
+        "content": "<p>My use case it to enable the CodeMeta metadata block for testing in <a href=\"https://github.com/IQSS/dataverse/issues/11001\">#11001</a>.</p>",
+        "id": 481124713,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730987464
+    },
+    {
+        "content": "<p>Ah, the script is over at <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/channel/379673-dev/topic/Run.20dataverse-external-vocab-support.20demo.20under.20docker\">#dev &gt; Run dataverse-external-vocab-support demo under docker</a> (loading <code>cvocdemo.tsv</code>)</p>",
+        "id": 481125924,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730987817
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span>, as we have our own customized .tsv (like citation, I know bad practice) we regularly have the need to run the <a href=\"http://update-fields.sh\">update-fields.sh</a> script while testing/developing. For CVOC as an example.</p>",
+        "id": 481132303,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1730989657
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🐉</span> <a href=\"#narrow/channel/375812-containers/topic/update-fields.2Esh/near/481125924\">said</a>:</p>\n<blockquote>\n<p>Ah, the script is over at <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/channel/379673-dev/topic/Run.20dataverse-external-vocab-support.20demo.20under.20docker\">#dev &gt; Run dataverse-external-vocab-support demo under docker</a> (loading <code>cvocdemo.tsv</code>)</p>\n</blockquote>\n<p>I still run parts of that procedure.</p>",
+        "id": 481132584,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1730989723
+    },
+    {
+        "content": "<p>Right. I remember. And I even went back and watched part of the recording from April. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 481134936,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730990340
+    },
+    {
+        "content": "<p>I have configbaker saving schema.xml into /shared</p>\n<p>But now I need to run <a href=\"http://update-fields.sh\">update-fields.sh</a> somehow.</p>",
+        "id": 481136277,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730990796
+    },
+    {
+        "content": "<p>Maybe I'm thinking about this wrong but I was hoping I could run a container after configbaker/bootstrap runs like this:</p>",
+        "id": 481136496,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730990871
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>  dev_solr_finisher:\n    container_name: &quot;dev_solr_finisher&quot;\n    image: gdcc/configbaker:unstable\n    depends_on:\n      - dev_bootstrap\n    restart: &quot;no&quot;\n    command:\n      - sh\n      - -c\n      - &quot;cat /shared/schema.xml&quot;\n    volumes:\n      - ./docker-dev-volumes/solr/data:/var/solr\n      - ./docker-dev-volumes/solr/conf:/solr-template\n      - ./docker-dev-volumes/shared:/shared\n</code></pre></div>",
+        "id": 481136507,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730990876
+    },
+    {
+        "content": "<p>But this new \"dev_solr_finisher\" container doesn't wait for \"dev_bootstrap\". It runs right away and can't find /shared/schema.xml <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 481136678,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730990921
+    },
+    {
+        "content": "<p>I think <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> will have the correct idea.<br>\nIn my mind I'm thinking about a \"toolbox ready to be use\", you give one .tsv and it updates everything. As you did for <a href=\"https://dataverse-guide--10940.org.readthedocs.build/en/10940/container/running/demo.html#multiple-languages\">https://dataverse-guide--10940.org.readthedocs.build/en/10940/container/running/demo.html#multiple-languages</a><br>\n<span class=\"user-mention\" data-user-id=\"651106\">@Jérôme Roucou</span> I don't reminber, but you might have a .sh for this.</p>",
+        "id": 481139303,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1730991640
+    },
+    {
+        "content": "<p>I was hoping this would work but it doesn't:</p>\n<div class=\"codehilite\"><pre><span></span><code>    depends_on:\n      dev_bootstrap:\n        condition: service_completed_successfully\n</code></pre></div>",
+        "id": 481139772,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730991756
+    },
+    {
+        "content": "<p>I end up with <code>[**ERROR**] DOCKER&gt; [gdcc/configbaker:unstable] \"dev_bootstrap\": Timeout after 10267 ms while waiting on exit code 0</code></p>",
+        "id": 481139879,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730991791
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🐉</span> <a href=\"#narrow/channel/375812-containers/topic/update-fields.2Esh/near/481139772\">said</a>:</p>\n<blockquote>\n<p>I was hoping this would work but it doesn't:</p>\n<p><div class=\"codehilite\"><pre><span></span><code>    depends_on:\n      dev_bootstrap:\n        condition: service_completed_successfully\n</code></pre></div><br>\n</p>\n</blockquote>\n<p>There is a something that wait for <a href=\"http://localhost:8080\">http://localhost:8080</a> to be started maybe you use the same idea.</p>",
+        "id": 481139998,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1730991832
+    },
+    {
+        "content": "<p><code>condition: service_completed_successfully</code> works fine here: <a href=\"https://github.com/IQSS/dataverse-frontend/pull/180/files\">https://github.com/IQSS/dataverse-frontend/pull/180/files</a></p>",
+        "id": 481141778,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730992368
+    },
+    {
+        "content": "<p>Waiting 3 minutes like this is dumb but it works and unblocks me <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> </p>\n<p><code>sleep 180 &amp;&amp; cat /shared/schema.xml</code></p>",
+        "id": 481144925,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730993285
+    },
+    {
+        "content": "<p>Nice, I got something hacky working:</p>\n<p><code>dev_solr_finisher&gt;     &lt;copyField source=\"codeVersion\" dest=\"_text_\" maxChars=\"3000\"/&gt;</code></p>",
+        "id": 481201039,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731013979
+    },
+    {
+        "content": "<p>Ok, I got a proper solution working. I'm happy for feedback though: <a href=\"https://github.com/IQSS/dataverse/pull/11001/commits/5afad8e6ac390461d42603f56efa583e70d87421\">https://github.com/IQSS/dataverse/pull/11001/commits/5afad8e6ac390461d42603f56efa583e70d87421</a></p>",
+        "id": 481381416,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731097496
+    }
+]

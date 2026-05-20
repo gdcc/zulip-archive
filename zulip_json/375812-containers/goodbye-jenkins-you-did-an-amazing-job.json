@@ -1,0 +1,1118 @@
+[
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  .Just wanted to get your thoughts on something.</p>\n<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span>  has tasked me now with figuring out a way to permanently move away from Jenkins and use GA.</p>\n<p>So this is how the workflow might look</p>\n<ol>\n<li>On commit to develop and on any PRs that target develop, a GitHub Actions run starts up. GitHub Actions is free and unlimited for GitHub public repos so no matter how many, it shouldn't be an issue no matter how many spin up.</li>\n<li>A GitHub Actions runner boots up, and it builds Dataverse as a container and runs the maven tests on the container Dataverse</li>\n<li>The jacoco test reports are extracted by the runner after the tests finish running</li>\n</ol>\n<p>Currently afaik, there is no good way in which we can display BOTH develop branch commit reports and PR commit reports directly on GitHub. So, we will have to feed the JaCoCo reports somewhere, maybe that could be a different website with a backend that is hosted on GitHub Pages. If that is the route we decide to go in, I will build the website myself too. I have a prototype workflow too, and it works mostly as intended with some additional tweaking I'll be doing in the coming weeks.</p>\n<p>What do you think? Any thoughts/improvements/suggestions about this workflow?</p>",
+        "id": 584520232,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775760952
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> I love it! But, yes, you're right that the reporting might be difficult. Any idea what other projects do? Jacoco is fairly popular, I believe. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 584520676,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761132
+    },
+    {
+        "content": "<p>Most corporate and open source projects that I am aware of use a separate reporting dashboard. In our case that is Jenkins, others use Codecov or Coveralls or SonarCloud.</p>\n<p>Codecov for example is a paid option BUT it is free forever for public repositories with unlimited users. We would have to set it up org-side. But just like with GitHub Actions we dunno if Microsoft or Codecov will ever change their minds and remove the unlimited runs part.</p>\n<p>With our own dashboard that we could build for Dataverse, the initial time cost of building it and maintaining it will be high, but in return IQSS retains permanent control over the reporting.</p>",
+        "id": 584521772,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761490
+    },
+    {
+        "content": "<p>We do use Coveralls already, if that helps: <a href=\"https://coveralls.io/github/IQSS/dataverse\">https://coveralls.io/github/IQSS/dataverse</a></p>",
+        "id": 584521893,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761542
+    },
+    {
+        "content": "<p>Coveralls fully supports JaCoCo reports! We could place them there.</p>",
+        "id": 584522032,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761601
+    },
+    {
+        "content": "<p>Great! And I believe we already do. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 584522089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761623
+    },
+    {
+        "content": "<p>Please check this out: <a href=\"https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/maven_unit_test.yml#L153-L163\">https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/maven_unit_test.yml#L153-L163</a></p>",
+        "id": 584522233,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761682
+    },
+    {
+        "content": "<p>Oh. We don't need Jenkins at all then?</p>",
+        "id": 584522293,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761708
+    },
+    {
+        "content": "<p>Well, the goal is to retire Jenkins, it sounds like. We still use it today, obviously, for our CI and for building the guides.</p>",
+        "id": 584522528,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761786
+    },
+    {
+        "content": "<p>When I first setup Coveralls it was in Travis. But <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> moved it to GitHub Actions in <a href=\"https://github.com/IQSS/dataverse/issues/7944\">#7944</a>.</p>",
+        "id": 584522628,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761823
+    },
+    {
+        "content": "<p>Seems like the existing GitHub Actions cover everything Jenkins does, that's why I was confused.</p>",
+        "id": 584522699,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761849
+    },
+    {
+        "content": "<p>If there's anything that Jenkins specifically does that GA isn't doing already, then I could work on filling that gap. But seems like y'all have already thought of this!</p>",
+        "id": 584522866,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761909
+    },
+    {
+        "content": "<p>The small thing that Jenkins is doing for us now is building the guides: <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>\n<p>The big thing that Jenkins does for us is running the API test suite.</p>",
+        "id": 584522897,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761922
+    },
+    {
+        "content": "<p>... and it sounds like you'd like to run the API test suite in containers, right? Sounds great!</p>",
+        "id": 584523044,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775761975
+    },
+    {
+        "content": "<p>Oh so we need 1. Integration Tests running in GA and 2. Guides built in GA for Jenkins to be redundant. Is that accurate?</p>",
+        "id": 584523056,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775761978
+    },
+    {
+        "content": "<p>Yes. I tend to call them API tests. <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> gets grumpy about me calling tests the wrong things. Maybe we can name them his way this time! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 584523221,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775762028
+    },
+    {
+        "content": "<p>Thank you so much! That clarifies a lot.</p>",
+        "id": 584523525,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775762135
+    },
+    {
+        "content": "<p>One last stupid question, is there already a workflow to build the guides or would you need one for that too?</p>",
+        "id": 584523756,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775762220
+    },
+    {
+        "content": "<p>Sure! I don't know if this helps or complicates things but <a href=\"https://github.com/gdcc/api-test-runner\">https://github.com/gdcc/api-test-runner</a> used to work. By that I mean that I could run API tests against the develop branch (for example) against Dataverse running in containers.</p>",
+        "id": 584523800,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775762235
+    },
+    {
+        "content": "<p>I will take a look and see if we can reuse that</p>",
+        "id": 584524005,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775762288
+    },
+    {
+        "content": "<p>Currently, we build the production version of the guides with Jenkins. Here's how: <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>\n<p>So yes, if we're going to retire Jenkins, we'll need something else.</p>\n<p>We do already have two checks in GitHub for guides....</p>\n<p><img alt=\"Screenshot 2026-04-09 at 3.21.18 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"816x112\" data-original-src=\"/user_uploads/53090/_nfCbIu7grJn6FRomPjQLNgJ/Screenshot-2026-04-09-at-3.21.18PM.png\" src=\"/user_uploads/thumbnail/53090/_nfCbIu7grJn6FRomPjQLNgJ/Screenshot-2026-04-09-at-3.21.18PM.png/840x560.webp\"></p>\n<p>... but they don't deploy to <a href=\"https://guides.dataverse.org\">https://guides.dataverse.org</a> . Only Jenkins does that.</p>",
+        "id": 584524629,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775762512
+    },
+    {
+        "content": "<p>Afaik GAs should be able to cover this, I'll let you know how it goes Phil. Thank you once again, you've been a great help. Otherwise I would've been chasing my own tail.</p>",
+        "id": 584524927,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775762616
+    },
+    {
+        "content": "<p>Oh, sure, I set up all this stuff (with <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span>) that you're keen to retire. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> </p>\n<p>I know where the bodies are buried! <span aria-label=\"scream\" class=\"emoji emoji-1f631\" role=\"img\" title=\"scream\">:scream:</span></p>",
+        "id": 584525085,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775762669
+    },
+    {
+        "content": "<p>Want me to explain the two checks for the guides? Of course you do! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 584526744,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775763331
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> created the \"Guides Build Status\" one in <a href=\"https://github.com/IQSS/dataverse/issues/7838\">#7838</a>. If there's a syntax problem in a PR, it will catch it. Here's how it looks as of this writing: <a href=\"https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/guides_build_sphinx.yml\">https://github.com/IQSS/dataverse/blob/v6.10.1/.github/workflows/guides_build_sphinx.yml</a></p>",
+        "id": 584527180,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775763486
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> created the \"docs/readthedocs.org\" one. As explained in <a href=\"https://github.com/IQSS/dataverse/issues/8650\">#8650</a>, it's for previewing doc changes in HTML format for pull requests. We talk about it here: <a href=\"https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#quick-fix\">https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#quick-fix</a></p>\n<p>Instead of a GitHub Action, it uses a webhook, which looks like this:</p>\n<p><img alt=\"Screenshot 2026-04-09 at 3.40.13 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1183x572\" data-original-src=\"/user_uploads/53090/BH1xzX65reAqPkC-qBTb6jtb/Screenshot-2026-04-09-at-3.40.13PM.png\" src=\"/user_uploads/thumbnail/53090/BH1xzX65reAqPkC-qBTb6jtb/Screenshot-2026-04-09-at-3.40.13PM.png/840x560.webp\"></p>",
+        "id": 584527540,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775763642
+    },
+    {
+        "content": "<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"m\">2026</span>-04-21T14:30:41.0336131Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>Tests<span class=\"w\"> </span>run:<span class=\"w\"> </span><span class=\"m\">20</span>,<span class=\"w\"> </span>Failures:<span class=\"w\"> </span><span class=\"m\">1</span>,<span class=\"w\"> </span>Errors:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Skipped:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">288</span>.2<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!<span class=\"w\"> </span>--<span class=\"w\"> </span><span class=\"k\">in</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.SearchIT\n<span class=\"m\">2026</span>-04-21T14:30:41.0344827Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.SearchIT.testSearchFilesAndUrlImages<span class=\"w\"> </span>--<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">8</span>.977<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!\n<span class=\"m\">2026</span>-04-21T14:30:41.0346353Z<span class=\"w\"> </span>java.lang.AssertionError:\n<span class=\"m\">2026</span>-04-21T14:30:41.0346993Z<span class=\"w\"> </span><span class=\"m\">1</span><span class=\"w\"> </span>expectation<span class=\"w\"> </span>failed.\n<span class=\"m\">2026</span>-04-21T14:30:41.0347594Z<span class=\"w\"> </span>JSON<span class=\"w\"> </span>path<span class=\"w\"> </span>data.items<span class=\"o\">[</span><span class=\"m\">0</span><span class=\"o\">]</span>.image_url<span class=\"w\"> </span>doesn<span class=\"err\">'</span>t<span class=\"w\"> </span>match.\n<span class=\"m\">2026</span>-04-21T14:30:41.0348219Z<span class=\"w\"> </span>Expected:<span class=\"w\"> </span>a<span class=\"w\"> </span>string<span class=\"w\"> </span>containing<span class=\"w\"> </span><span class=\"s2\">\"/logo\"</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0348763Z<span class=\"w\">   </span>Actual:<span class=\"w\"> </span>null\n<span class=\"m\">2026</span>-04-21T14:30:41.0349029Z\n<span class=\"m\">2026</span>-04-21T14:30:41.0349856Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class=\"o\">(</span>DirectConstructorHandleAccessor.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0351353Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class=\"o\">(</span>Constructor.java:502<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0355704Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class=\"o\">(</span>Constructor.java:486<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0357117Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class=\"o\">(</span>CachedConstructor.java:73<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0358655Z<span class=\"w\"> </span>Apr<span class=\"w\"> </span><span class=\"m\">21</span>,<span class=\"w\"> </span><span class=\"m\">2026</span><span class=\"w\"> </span><span class=\"m\">2</span>:30:41<span class=\"w\"> </span>PM<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.UtilIT<span class=\"w\"> </span>getRestAssuredBaseUri\n<span class=\"m\">2026</span>-04-21T14:30:41.0359995Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class=\"nv\">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class=\"o\">(</span>ConstructorSite.java:108<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0361688Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class=\"o\">(</span>AbstractCallSite.java:277<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0363367Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure</span>.validate<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:512<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0365065Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure$validate$1</span>.call<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0367098Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:696<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0368918Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class=\"nv\">$2$validateResponseIfRequired</span><span class=\"o\">(</span>ResponseSpecificationImpl.groovy<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0370555Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class=\"o\">(</span>DirectMethodHandleAccessor.java:103<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0371725Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0372954Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class=\"o\">(</span>PlainObjectMetaMethodSite.java:43<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0374747Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class=\"nv\">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class=\"o\">(</span>PogoMetaMethodSite.java:198<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0376766Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class=\"o\">(</span>PogoMetaMethodSite.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0378198Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class=\"o\">(</span>AbstractCallSite.java:185<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0379579Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.body<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:270<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0380891Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.specification.ResponseSpecification<span class=\"nv\">$body$1</span>.callCurrent<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0382200Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallCurrent<span class=\"o\">(</span>CallSiteArray.java:49<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0383491Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.specification.ResponseSpecification<span class=\"nv\">$body$1</span>.callCurrent<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0384814Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.body<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:117<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0386456Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.body<span class=\"o\">(</span>ValidatableResponseOptionsImpl.java:244<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0387859Z<span class=\"w\">  </span>at<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.SearchIT.testSearchFilesAndUrlImages<span class=\"o\">(</span>SearchIT.java:2032<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0389033Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0389846Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:30:41.0390654Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n</code></pre></div>",
+        "id": 588675670,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790375
+    },
+    {
+        "content": "<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"m\">2026</span>-04-21T14:17:53.1497050Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>Tests<span class=\"w\"> </span>run:<span class=\"w\"> </span><span class=\"m\">5</span>,<span class=\"w\"> </span>Failures:<span class=\"w\"> </span><span class=\"m\">1</span>,<span class=\"w\"> </span>Errors:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Skipped:<span class=\"w\"> </span><span class=\"m\">1</span>,<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">0</span>.549<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!<span class=\"w\"> </span>--<span class=\"w\"> </span><span class=\"k\">in</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT\n<span class=\"m\">2026</span>-04-21T14:17:53.1498527Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT.testMakeDataCountGetMetric<span class=\"w\"> </span>--<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">0</span>.416<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!\n<span class=\"m\">2026</span>-04-21T14:17:53.1499477Z<span class=\"w\"> </span>java.lang.AssertionError:\n<span class=\"m\">2026</span>-04-21T14:17:53.1499851Z<span class=\"w\"> </span><span class=\"m\">1</span><span class=\"w\"> </span>expectation<span class=\"w\"> </span>failed.\n<span class=\"m\">2026</span>-04-21T14:17:53.1500200Z<span class=\"w\"> </span>Expected<span class=\"w\"> </span>status<span class=\"w\"> </span>code<span class=\"w\"> </span>&lt;<span class=\"m\">200</span>&gt;<span class=\"w\"> </span>but<span class=\"w\"> </span>was<span class=\"w\"> </span>&lt;<span class=\"m\">400</span>&gt;.\n<span class=\"m\">2026</span>-04-21T14:17:53.1500478Z\n<span class=\"m\">2026</span>-04-21T14:17:53.1501183Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class=\"o\">(</span>DirectConstructorHandleAccessor.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1502406Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class=\"o\">(</span>Constructor.java:502<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1503292Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class=\"o\">(</span>Constructor.java:486<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1503930Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class=\"o\">(</span>CachedConstructor.java:73<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1504712Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class=\"nv\">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class=\"o\">(</span>ConstructorSite.java:108<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1505998Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class=\"o\">(</span>AbstractCallSite.java:277<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1506869Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure</span>.validate<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:512<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1507702Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure$validate$1</span>.call<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1508531Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:696<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1509411Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class=\"nv\">$2$validateResponseIfRequired</span><span class=\"o\">(</span>ResponseSpecificationImpl.groovy<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1510408Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class=\"o\">(</span>DirectMethodHandleAccessor.java:103<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1511244Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1511851Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class=\"o\">(</span>PlainObjectMetaMethodSite.java:43<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1512742Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class=\"nv\">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class=\"o\">(</span>PogoMetaMethodSite.java:198<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1513612Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class=\"o\">(</span>PogoMetaMethodSite.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1514323Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class=\"o\">(</span>AbstractCallSite.java:185<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1515045Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:135<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1516000Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.specification.ResponseSpecification<span class=\"nv\">$statusCode$0</span>.callCurrent<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1516876Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:143<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1517730Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.statusCode<span class=\"o\">(</span>ValidatableResponseOptionsImpl.java:89<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1518528Z<span class=\"w\">  </span>at<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.MakeDataCountApiIT.testMakeDataCountGetMetric<span class=\"o\">(</span>MakeDataCountApiIT.java:68<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1519124Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:17:53.1519506Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n</code></pre></div>",
+        "id": 588675730,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790395
+    },
+    {
+        "content": "<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"m\">2026</span>-04-21T14:11:46.7179540Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>Tests<span class=\"w\"> </span>run:<span class=\"w\"> </span><span class=\"m\">62</span>,<span class=\"w\"> </span>Failures:<span class=\"w\"> </span><span class=\"m\">1</span>,<span class=\"w\"> </span>Errors:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Skipped:<span class=\"w\"> </span><span class=\"m\">4</span>,<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">377</span>.5<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!<span class=\"w\"> </span>--<span class=\"w\"> </span><span class=\"k\">in</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DatasetsIT\n<span class=\"m\">2026</span>-04-21T14:11:46.7206380Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DatasetsIT.testUpdateMultipleFileMetadata<span class=\"w\"> </span>--<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">4</span>.884<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!\n<span class=\"m\">2026</span>-04-21T14:11:46.7207686Z<span class=\"w\"> </span>java.lang.AssertionError:\n<span class=\"m\">2026</span>-04-21T14:11:46.7208133Z<span class=\"w\"> </span><span class=\"m\">1</span><span class=\"w\"> </span>expectation<span class=\"w\"> </span>failed.\n<span class=\"m\">2026</span>-04-21T14:11:46.7208502Z<span class=\"w\"> </span>Expected<span class=\"w\"> </span>status<span class=\"w\"> </span>code<span class=\"w\"> </span>&lt;<span class=\"m\">200</span>&gt;<span class=\"w\"> </span>but<span class=\"w\"> </span>was<span class=\"w\"> </span>&lt;<span class=\"m\">403</span>&gt;.\n<span class=\"m\">2026</span>-04-21T14:11:46.7208807Z\n<span class=\"m\">2026</span>-04-21T14:11:46.7209497Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance<span class=\"o\">(</span>DirectConstructorHandleAccessor.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7210765Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstanceWithCaller<span class=\"o\">(</span>Constructor.java:502<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7211950Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Constructor.newInstance<span class=\"o\">(</span>Constructor.java:486<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7212874Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.reflection.CachedConstructor.invoke<span class=\"o\">(</span>CachedConstructor.java:73<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7214250Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.ConstructorSite<span class=\"nv\">$ConstructorSiteNoUnwrapNoCoerce</span>.callConstructor<span class=\"o\">(</span>ConstructorSite.java:108<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7216042Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCallConstructor<span class=\"o\">(</span>CallSiteArray.java:57<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7217338Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class=\"o\">(</span>AbstractCallSite.java:263<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7218635Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callConstructor<span class=\"o\">(</span>AbstractCallSite.java:277<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7220130Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure</span>.validate<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:512<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7221653Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl<span class=\"nv\">$HamcrestAssertionClosure$validate$1</span>.call<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7223517Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.validateResponseIfRequired<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:696<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7225112Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.this<span class=\"nv\">$2$validateResponseIfRequired</span><span class=\"o\">(</span>ResponseSpecificationImpl.groovy<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7226842Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke<span class=\"o\">(</span>DirectMethodHandleAccessor.java:103<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7227881Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7228974Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PlainObjectMetaMethodSite.doInvoke<span class=\"o\">(</span>PlainObjectMetaMethodSite.java:43<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7230638Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite<span class=\"nv\">$PogoCachedMethodSiteNoUnwrapNoCoerce</span>.invoke<span class=\"o\">(</span>PogoMetaMethodSite.java:198<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7232200Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.PogoMetaMethodSite.callCurrent<span class=\"o\">(</span>PogoMetaMethodSite.java:62<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7233474Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.codehaus.groovy.runtime.callsite.AbstractCallSite.callCurrent<span class=\"o\">(</span>AbstractCallSite.java:185<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7234784Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:135<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7236305Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.specification.ResponseSpecification<span class=\"nv\">$statusCode$0</span>.callCurrent<span class=\"o\">(</span>Unknown<span class=\"w\"> </span>Source<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7237581Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ResponseSpecificationImpl.statusCode<span class=\"o\">(</span>ResponseSpecificationImpl.groovy:143<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7239003Z<span class=\"w\">  </span>at<span class=\"w\"> </span>io.restassured.internal.ValidatableResponseOptionsImpl.statusCode<span class=\"o\">(</span>ValidatableResponseOptionsImpl.java:89<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7240544Z<span class=\"w\">  </span>at<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DatasetsIT.testUpdateMultipleFileMetadata<span class=\"o\">(</span>DatasetsIT.java:7105<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7241519Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7242200Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:11:46.7242856Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n</code></pre></div>",
+        "id": 588675757,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790406
+    },
+    {
+        "content": "<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"m\">2026</span>-04-21T14:14:40.2467362Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>Tests<span class=\"w\"> </span>run:<span class=\"w\"> </span><span class=\"m\">5</span>,<span class=\"w\"> </span>Failures:<span class=\"w\"> </span><span class=\"m\">1</span>,<span class=\"w\"> </span>Errors:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Skipped:<span class=\"w\"> </span><span class=\"m\">0</span>,<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">65</span>.16<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!<span class=\"w\"> </span>--<span class=\"w\"> </span><span class=\"k\">in</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT\n<span class=\"m\">2026</span>-04-21T14:14:40.2469046Z<span class=\"w\"> </span>Apr<span class=\"w\"> </span><span class=\"m\">21</span>,<span class=\"w\"> </span><span class=\"m\">2026</span><span class=\"w\"> </span><span class=\"m\">2</span>:14:40<span class=\"w\"> </span>PM<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.UtilIT<span class=\"w\"> </span>getRestAssuredBaseUri\n<span class=\"m\">2026</span>-04-21T14:14:40.2469845Z<span class=\"w\"> </span>INFO:<span class=\"w\"> </span>Base<span class=\"w\"> </span>URL<span class=\"w\"> </span><span class=\"k\">for</span><span class=\"w\"> </span>tests:<span class=\"w\"> </span>http://localhost:8080\n<span class=\"m\">2026</span>-04-21T14:14:40.2471146Z<span class=\"w\"> </span><span class=\"o\">[</span>ERROR<span class=\"o\">]</span><span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT.testRetrieveMyDataCollections<span class=\"w\"> </span>--<span class=\"w\"> </span>Time<span class=\"w\"> </span>elapsed:<span class=\"w\"> </span><span class=\"m\">11</span>.05<span class=\"w\"> </span>s<span class=\"w\"> </span><span class=\"o\">&lt;&lt;&lt;</span><span class=\"w\"> </span>FAILURE!\n<span class=\"m\">2026</span>-04-21T14:14:40.2472441Z<span class=\"w\"> </span>org.opentest4j.AssertionFailedError:<span class=\"w\"> </span>expected:<span class=\"w\"> </span>&lt;<span class=\"m\">16</span>&gt;<span class=\"w\"> </span>but<span class=\"w\"> </span>was:<span class=\"w\"> </span>&lt;<span class=\"m\">17</span>&gt;\n<span class=\"m\">2026</span>-04-21T14:14:40.2473482Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.AssertionFailureBuilder.build<span class=\"o\">(</span>AssertionFailureBuilder.java:151<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2475008Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow<span class=\"o\">(</span>AssertionFailureBuilder.java:132<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2476363Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.AssertEquals.failNotEqual<span class=\"o\">(</span>AssertEquals.java:197<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2477309Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.AssertEquals.assertEquals<span class=\"o\">(</span>AssertEquals.java:150<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2478284Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.AssertEquals.assertEquals<span class=\"o\">(</span>AssertEquals.java:145<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2479393Z<span class=\"w\">  </span>at<span class=\"w\"> </span>org.junit.jupiter.api.Assertions.assertEquals<span class=\"o\">(</span>Assertions.java:531<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2480455Z<span class=\"w\">  </span>at<span class=\"w\"> </span>edu.harvard.iq.dataverse.api.DataRetrieverApiIT.testRetrieveMyDataCollections<span class=\"o\">(</span>DataRetrieverApiIT.java:164<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2481466Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.lang.reflect.Method.invoke<span class=\"o\">(</span>Method.java:580<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2482062Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n<span class=\"m\">2026</span>-04-21T14:14:40.2482645Z<span class=\"w\">  </span>at<span class=\"w\"> </span>java.base/java.util.ArrayList.forEach<span class=\"o\">(</span>ArrayList.java:1596<span class=\"o\">)</span>\n</code></pre></div>",
+        "id": 588675924,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790454
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/blob/container-testing-workflow/.github/workflows/container_integration_tests_workflow.yml\">https://github.com/IQSS-Dataverse-Development/dataverse/blob/container-testing-workflow/.github/workflows/container_integration_tests_workflow.yml</a></p>",
+        "id": 588676121,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790509
+    },
+    {
+        "content": "<p>These are the four integration tests that fail on every attempt</p>",
+        "id": 588676404,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776790597
+    },
+    {
+        "content": "<p>we think we need to cobble in some more DB settings and jvm-options from Dataverse-Ansible and we should be good!</p>",
+        "id": 588683708,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1776792843
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25013696261\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25013696261</a></p>",
+        "id": 591221575,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777320061
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Hi Phil! Hope you're doing good!</p>\n<p>These three tests seem to fail no matter what, and I am not entirely sure if its just configuration or requires test code changes, think anyone can lend me a hand for a few minutes to quickly see what's up with these?</p>",
+        "id": 591222256,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777320308
+    },
+    {
+        "content": "<p>Just 3 tests flaking on us out of 2511, so we're almost there</p>",
+        "id": 591222447,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777320379
+    },
+    {
+        "content": "<p>I'm back, I'm back! Only 3?!? We're almost there! Good job! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 591224403,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777321105
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> how do I see the details for the SearchIT failure, for example? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591224674,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777321193
+    },
+    {
+        "content": "<p>Oops my bad. <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73261506538\">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73261506538</a></p>",
+        "id": 591224763,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777321227
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>Expected: a string containing &quot;/logo&quot;\n  Actual: null\n</code></pre></div>\n<p>Thanks!</p>",
+        "id": 591224853,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777321257
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> can we see if this helps? <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/pull/4\">https://github.com/IQSS-Dataverse-Development/dataverse/pull/4</a></p>",
+        "id": 591229311,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777322688
+    },
+    {
+        "content": "<p>will start the workflow soon</p>",
+        "id": 591230911,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777323282
+    },
+    {
+        "content": "<p>Hi Phil, could you please resubmit PR directly to the develop branch?</p>",
+        "id": 591232522,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777323845
+    },
+    {
+        "content": "<p>then the workflow can run</p>",
+        "id": 591232540,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777323851
+    },
+    {
+        "content": "<p>Sure, here you go: <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/pull/5\">https://github.com/IQSS-Dataverse-Development/dataverse/pull/5</a></p>",
+        "id": 591232994,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777324013
+    },
+    {
+        "content": "<p>Running: <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25019823115\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25019823115</a></p>",
+        "id": 591234080,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777324389
+    },
+    {
+        "content": "<p>Hi Phil, it still seems to fail. But please no pressure, and no rush on this, Jenkins still works, we can figure this out slowly <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 591238128,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777326317
+    },
+    {
+        "content": "<p>I think my PR fixed SearchIT. We're now down to two failures: <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436\">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436</a></p>",
+        "id": 591240373,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777327442
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591240373\">said</a>:</p>\n<blockquote>\n<p>I think my PR fixed SearchIT. We're now down to two failures: <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436\">https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436</a></p>\n</blockquote>\n<p>oops looked at the wrong run, you're absolutely right, tysm!</p>",
+        "id": 591241812,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777328223
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> any idea why <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/util/MailSessionProducerIT.java#L258\">https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/util/MailSessionProducerIT.java#L258</a> is failing?</p>",
+        "id": 591248254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777331893
+    },
+    {
+        "content": "<p>I'm not sure why the actual was 17 instead of 16 at <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164\">https://github.com/IQSS-Dataverse-Development/dataverse/blob/ddb6da543df74b9d6583de81ed450772784b9995/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164</a></p>",
+        "id": 591248374,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777331967
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Ash noted that there was a root element, but I'm curious why these tests pass in a VM but fail in containers. One difference is the underlying OS (Rocky-&gt;Ubuntu) which has posed charset problems here and there over the years.</p>",
+        "id": 591361780,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1777378184
+    },
+    {
+        "content": "<p>Hey folks, just catching up on this.</p>",
+        "id": 591365542,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777379077
+    },
+    {
+        "content": "<p>Should I still look into this or are y'all good?</p>",
+        "id": 591365614,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777379097
+    },
+    {
+        "content": "<p>I am pretty sure that I (who wrote the MailSessionProducerIT) did test with a container at the time.</p>",
+        "id": 591365841,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777379151
+    },
+    {
+        "content": "<p>Also happy do some pair programming over VC if that helps.</p>",
+        "id": 591366231,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777379243
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> yeah, if you could look at MailSessionProducerIT, I'd appreciate it</p>",
+        "id": 591369210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777379927
+    },
+    {
+        "content": "<p>Hmm the MaSePrIT is no API test, but a real integration test. So it should already run as part of the regular jobs on IQSS. Is it failing over there, too?</p>",
+        "id": 591370438,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380231
+    },
+    {
+        "content": "<p>Nope, all good over there. (See <a href=\"https://github.com/IQSS/dataverse/actions/runs/25045635432/job/73360393320\">https://github.com/IQSS/dataverse/actions/runs/25045635432/job/73360393320</a> for an example)</p>",
+        "id": 591370833,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380325
+    },
+    {
+        "content": "<p>I'm wondering why the test is even executed. While the original Jenkins job used <code>mvn test</code> (surefire), you've opted to use failsafe now (mvn verify). It looks like failsafe picks up the actual integration tests and not just the API tests as intended. (This doesn't answer the why it fails, but still)</p>",
+        "id": 591371921,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380558
+    },
+    {
+        "content": "<p>To me it looks like the \"-Dtest=...\" is a noop for failsafe, looking at their documentation. <a href=\"https://maven.apache.org/surefire/maven-failsafe-plugin/verify-mojo.html\">https://maven.apache.org/surefire/maven-failsafe-plugin/verify-mojo.html</a></p>",
+        "id": 591372269,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380634
+    },
+    {
+        "content": "<p>Yeah, for failsafe it has to be \"-Dit.test\", not \"-Dtest\".</p>",
+        "id": 591373151,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380854
+    },
+    {
+        "content": "<p>We really should use &lt;group&gt; instead and put a @Tag on the test classes.</p>",
+        "id": 591373252,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777380879
+    },
+    {
+        "content": "<p>Omg amazing catch <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I did not realize surefire, and failsafe accepted different flags</p>",
+        "id": 591376924,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777381680
+    },
+    {
+        "content": "<p>pushed the fix</p>",
+        "id": 591376977,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777381690
+    },
+    {
+        "content": "<p>you might've just saved me a whole day of banging my head on the wall</p>",
+        "id": 591377946,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777381903
+    },
+    {
+        "content": "<p>I did? Why? <span aria-label=\"blushing\" class=\"emoji emoji-1f633\" role=\"img\" title=\"blushing\">:blushing:</span></p>",
+        "id": 591378324,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777381972
+    },
+    {
+        "content": "<p>OK moving on... I can't find a reasonable explanation why this wouldn't work so far. Educated guess: the setup somehow has some more system properties being set.</p>",
+        "id": 591378659,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382049
+    },
+    {
+        "content": "<p>These real integration tests do not even touch a single Dataverse container, they just run within the local JVM</p>",
+        "id": 591378811,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382085
+    },
+    {
+        "content": "<p>Should we pursue this further or do we stop investigating to concentrate on the API tests?</p>",
+        "id": 591378998,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382124
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> do you mind switching of the unit tests? -DskipUnitTests</p>",
+        "id": 591379801,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382329
+    },
+    {
+        "content": "<p>on it</p>",
+        "id": 591380831,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382535
+    },
+    {
+        "content": "<p>done</p>",
+        "id": 591381048,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382585
+    },
+    {
+        "content": "<p>BTW this makes no sense. - name: Build Dataverse containers via Maven</p>\n<p>run: |</p>\n<p>set -euo pipefail</p>\n<h1>Force unit tests to run, generate coverage, and ignore failures so the build continues</h1>\n<p>mvn clean package -Pct -P all-unit-tests \\<br>\n-DskipUnitTests=true \\<br>\n-Djacoco.skip=false \\<br>\n-Dmaven.test.failure.ignore=true</p>",
+        "id": 591381576,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382690
+    },
+    {
+        "content": "<p>On the one hand you are including via profile all the unit tests</p>",
+        "id": 591381643,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382705
+    },
+    {
+        "content": "<p>But then you skip them all in package</p>",
+        "id": 591381694,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382717
+    },
+    {
+        "content": "<p>What will happen anyway, because that's default for profile ct</p>",
+        "id": 591381774,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382732
+    },
+    {
+        "content": "<p>But the comment says \"force unit tests to run\"</p>",
+        "id": 591381860,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382749
+    },
+    {
+        "content": "<p><span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591381908,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382759
+    },
+    {
+        "content": "<p>I switched them off rn, the tests skip by default</p>",
+        "id": 591381966,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382775
+    },
+    {
+        "content": "<p>cause you asked me to switch them off?</p>",
+        "id": 591382027,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382789
+    },
+    {
+        "content": "<p>hehehe in mvn verify <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 591382071,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382802
+    },
+    {
+        "content": "<p>No point in running the unit tests there</p>",
+        "id": 591382107,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382811
+    },
+    {
+        "content": "<p>At least for now they are only creating loads of clutter</p>",
+        "id": 591382140,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382822
+    },
+    {
+        "content": "<p>mvn verify doesn't run the unit tests</p>",
+        "id": 591382207,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382835
+    },
+    {
+        "content": "<p>only the integration tests</p>",
+        "id": 591382230,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382842
+    },
+    {
+        "content": "<p>Nope</p>",
+        "id": 591382246,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382846
+    },
+    {
+        "content": "<p>mvn verify means mvn test phase runs, too</p>",
+        "id": 591382292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382858
+    },
+    {
+        "content": "<p><a href=\"https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html\">https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html</a></p>",
+        "id": 591382408,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382888
+    },
+    {
+        "content": "<p>give the workflow a few minutes</p>",
+        "id": 591382459,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382898
+    },
+    {
+        "content": "<p>you'll see the two thousand tests or so disappear</p>",
+        "id": 591382492,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777382908
+    },
+    {
+        "content": "<p>Are we looking at the same thing? I'm looking at <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow</a></p>",
+        "id": 591382740,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382963
+    },
+    {
+        "content": "<p>Job is currently running</p>",
+        "id": 591382772,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777382972
+    },
+    {
+        "content": "<p>THere is no skipUnitTests on <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow#L209-L217\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25055406452/workflow#L209-L217</a>, so Maven will happily go through the test phase of the life cycle and execute the unit tests.</p>",
+        "id": 591383025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383022
+    },
+    {
+        "content": "<p>my bad, I was looking at a different workflow</p>",
+        "id": 591383204,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777383059
+    },
+    {
+        "content": "<p>test phase -&gt; surefire, picks up *Test.java<br>\nverify phase -&gt; failsafe, picks up *IT.java</p>",
+        "id": 591383230,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383063
+    },
+    {
+        "content": "<p>Oh oh... No more tests detected...</p>",
+        "id": 591386319,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383705
+    },
+    {
+        "content": "<p>I genuinely have no idea what just happened</p>",
+        "id": 591386739,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777383792
+    },
+    {
+        "content": "<p>I may have an idea.</p>",
+        "id": 591386842,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383813
+    },
+    {
+        "content": "<p>Yeah I suspect the default group create a problem here</p>",
+        "id": 591387262,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383894
+    },
+    {
+        "content": "<p>The it.test is an additional filter, not overriding the group</p>",
+        "id": 591387373,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383914
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>&lt;plugin&gt;\n                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;\n                &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;\n                &lt;configuration&gt;\n                    &lt;groups&gt;${it.groups}&lt;/groups&gt;\n                    &lt;!--\n                        Note: The @{} syntax here is used for late variable binding.\n                              Otherwise we would not be able to override the defaults in &lt;properties&gt; with prepare-agent above.\n                              See also https://www.jacoco.org/jacoco/trunk/doc/prepare-agent-mojo.html\n                              It&#39;s ignored by IntelliJ argLine parsing.\n                    --&gt;\n                    &lt;argLine&gt;@{failsafe.jacoco.args} ${argLine}&lt;/argLine&gt;\n                    &lt;skip&gt;${skipIntegrationTests}&lt;/skip&gt;\n                    &lt;systemPropertyVariables&gt;\n                        &lt;postgresql.server.version&gt;${postgresql.server.version}&lt;/postgresql.server.version&gt;\n                    &lt;/systemPropertyVariables&gt;\n                &lt;/configuration&gt;\n                &lt;executions&gt;\n                    &lt;execution&gt;\n                        &lt;goals&gt;\n                            &lt;goal&gt;integration-test&lt;/goal&gt;\n                            &lt;goal&gt;verify&lt;/goal&gt;\n                        &lt;/goals&gt;\n                    &lt;/execution&gt;\n                &lt;/executions&gt;\n            &lt;/plugin&gt;\n</code></pre></div>",
+        "id": 591387498,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383937
+    },
+    {
+        "content": "<p>So far we only had the \"real integration tests\" in scope for this, as so far, the API tests were always executed by surefire as part of <code>mvn test -Dtest=...</code></p>",
+        "id": 591387688,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777383979
+    },
+    {
+        "content": "<p>we need all the ~2500 Jenkins tests running in this workflow right?</p>",
+        "id": 591388204,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777384078
+    },
+    {
+        "content": "<p>That depends.</p>",
+        "id": 591388294,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384096
+    },
+    {
+        "content": "<p>let me poke around a little with the workflow</p>",
+        "id": 591390390,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777384498
+    },
+    {
+        "content": "<p>Should we carve out some time to talk about testing during tech hours this afternoon? Thanks for all the hard work!</p>",
+        "id": 591390411,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777384501
+    },
+    {
+        "content": "<p>I did a lot of things already to split up the Jacoco bits</p>",
+        "id": 591390461,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384510
+    },
+    {
+        "content": "<p>So we can just run the API tests</p>",
+        "id": 591390531,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384525
+    },
+    {
+        "content": "<p>And then merge the Jacoco reports for unit, integration and API tests</p>",
+        "id": 591390585,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384537
+    },
+    {
+        "content": "<p>This might make things easier and faster, as we don't have to keep repeating all of them</p>",
+        "id": 591390708,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384572
+    },
+    {
+        "content": "<p>We already have the unit and integration testing job in maven_unit_test.yml</p>",
+        "id": 591390806,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384589
+    },
+    {
+        "content": "<p>Which BTW then hands over the container workflow to build the containers</p>",
+        "id": 591390970,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384619
+    },
+    {
+        "content": "<p>We should probably integrate these pipelines more</p>",
+        "id": 591391073,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384634
+    },
+    {
+        "content": "<p>But that is a good next step</p>",
+        "id": 591391109,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384640
+    },
+    {
+        "content": "<p>For now, we'd only need to decide how we wanna go about executing which tests</p>",
+        "id": 591391240,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777384664
+    },
+    {
+        "content": "<p>If I can figure out a way to get those 2 tests to pass in this workflow, then honestly we wouldn't need to do much else in the way of combined reports or touching other workflows, it would make life easier for everyone. As I understand, there's no hurry to replace Jenkins immediately so I'm sure eventually we can get all of them to pass in a single workflow <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>\n<p>I'll look at Jenkins, and the already existing workflows to see if there's a config mismatch or something.</p>",
+        "id": 591401336,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777386731
+    },
+    {
+        "content": "<p>down to one failing test</p>",
+        "id": 591442524,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777397014
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729</a></p>",
+        "id": 591442533,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777397016
+    },
+    {
+        "content": "<p>That pesky <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/blob/b9f5589f4edf7c674c094b875875093bc995cf02/src/test/java/edu/harvard/iq/dataverse/api/DataRetrieverApiIT.java#L164\">DataRetrieverApiIT</a>. Hmm. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591444434,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777397587
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>// User1 gets the list of Dataverses/Collections it has access to\nretrieveMyCollectionListResponse = UtilIT.retrieveMyCollectionList(User1ApiToken, null);\nretrieveMyCollectionListResponse.prettyPrint();\n// The count should show the list size to be User1&#39;s + Root Dataverse count\nitems = retrieveMyCollectionListResponse.getBody().jsonPath().getList(&quot;data.items&quot;);\nassertEquals(rootCount + user1DataverseCount, items.size());//BOOM!💣\n</code></pre></div>",
+        "id": 591444865,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777397692
+    },
+    {
+        "content": "<p>Can we just put a greater than or equal to there</p>",
+        "id": 591445420,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777397840
+    },
+    {
+        "content": "<p>Like y'all do for the superuser</p>",
+        "id": 591445454,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777397852
+    },
+    {
+        "content": "<p>I mean if there's more data collections than expected, that still means the test is valid right?</p>",
+        "id": 591445598,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777397902
+    },
+    {
+        "content": "<p><code>mvn test -Dtest=DataRetrieverApiIT#testRetrieveMyDataCollections</code> works on my machine <span aria-label=\"trademark\" class=\"emoji emoji-2122\" role=\"img\" title=\"trademark\">:trademark:</span></p>",
+        "id": 591449257,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398888
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> you wrote these tests. Any ideas?</p>",
+        "id": 591449940,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399102
+    },
+    {
+        "content": "<p>The test is failing because user1 has access to an extra collection. It created 15 and has access to the root collection. So it should have access to 16 collections but it has access to 17 collections for some reason. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 591451299,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399402
+    },
+    {
+        "content": "<p>This seems to be the extra collection: \"id\": 449</p>",
+        "id": 591451652,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399504
+    },
+    {
+        "content": "<p>I'm trying to comb through the logs for: dv89758e93 which is id 449</p>",
+        "id": 591451752,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399535
+    },
+    {
+        "content": "<p>I say this because the 15 that were created for the test have higher numbers and were all in sequence, from 727 to 741.</p>",
+        "id": 591451762,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399538
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> this container is no longer up, right? I assume it gets destroyed at the end.</p>",
+        "id": 591451862,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399565
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>2026-04-28T17:07:12.390204076Z [#|2026-04-28T17:07:12.390+0000\u001b[1;93m|WARNING|\u001b[0mPayara 7.2026.2|\u001b[1;94medu.harvard.iq.dataverse.DataverseServiceBean|\u001b[0m_ThreadID=267;_ThreadName=http-thread-pool::http-listener-1(37);_TimeMillis=1777396032390;_LevelValue=900;|\n2026-04-28T17:07:12.390228021Z   Unable to find a single dataverse using alias &quot;dv89758e93&quot;: jakarta.persistence.NoResultException: getSingleResult() did not retrieve any entities.|#]\n</code></pre></div>",
+        "id": 591451877,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399569
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591451862\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> this container is no longer up, right? I assume it gets destroyed at the end.</p>\n</blockquote>\n<p>yep, it gets destroyed every single time, but I make sure every single execution log is saved</p>",
+        "id": 591451969,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399594
+    },
+    {
+        "content": "<p>Can I see that log, please?</p>",
+        "id": 591452047,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399620
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/hAVg9h6qGIIesQg57PEQKENZ/docker-logs-2.zip\">docker-logs (2).zip</a></p>",
+        "id": 591452243,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399677
+    },
+    {
+        "content": "<p>Thanks. This is available online as well?</p>",
+        "id": 591452424,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777399742
+    },
+    {
+        "content": "<p>yep</p>",
+        "id": 591452579,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399800
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729</a></p>",
+        "id": 591452596,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777399805
+    },
+    {
+        "content": "<p>Well, it's reproducible. For the <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436\">earlier run</a> it was also id 449, like the <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73438279431\">current run</a>. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> But why? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> What's different about running this in GitHub Actions vs Jenkins and local? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591453330,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777400060
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> pointed out that it might be that Solr is not getting enough time to index because thread.sleep is flaky on GitHub Actions, so I increased the timeout from 4000 to 40000 just to test if that's the issue</p>",
+        "id": 591453567,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777400128
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> when I click \"raw output\" I see the output for just that one failing test, which is great. Is it possible to also get all the output in one file?</p>",
+        "id": 591453647,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777400160
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453567\">said</a>:</p>\n<blockquote>\n<p>Solr</p>\n</blockquote>\n<p>Yeah, it's calling into <code>/api/mydata/retrieve/collectionList</code> which is powered by Solr, I'm pretty sure.</p>",
+        "id": 591453906,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777400248
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> by the way, I think you're solving this issue for us, which is huge:</p>\n<p>Let contributors know why tests are failing <a href=\"https://github.com/IQSS/dataverse/issues/9916\">#9916</a></p>\n<p>I just tried an incognito window and I can see all the juicy details. <span aria-label=\"lemon\" class=\"emoji emoji-1f34b\" role=\"img\" title=\"lemon\">:lemon:</span></p>",
+        "id": 591454305,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777400364
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453647\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> when I click \"raw output\" I see the output for just that one failing test, which is great. Is it possible to also get all the output in one file?</p>\n</blockquote>\n<p>It probably is, let me look into it.</p>",
+        "id": 591454565,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777400455
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729/job/73432388515\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25065778729/job/73432388515</a></p>\n<p>If you go to the failed job, click the gear icon next to the workflow name, you will see an option named download log archive</p>",
+        "id": 591455292,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777400699
+    },
+    {
+        "content": "<p>That contains the full execution log</p>",
+        "id": 591455324,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777400712
+    },
+    {
+        "content": "<p>12.6 MB. Thanks!</p>",
+        "id": 591455819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777400880
+    },
+    {
+        "content": "<p>This is a little sus to me...</p>\n<div class=\"codehilite\"><pre><span></span><code>2026-04-28T17:07:12.7763138Z         {\n2026-04-28T17:07:12.7763303Z             &quot;id&quot;: 334,\n2026-04-28T17:07:12.7763536Z             &quot;assignee&quot;: &quot;:authenticated-users&quot;,\n2026-04-28T17:07:12.7763863Z             &quot;assigneeName&quot;: &quot;Anyone with a Dataverse account&quot;,\n2026-04-28T17:07:12.7764158Z             &quot;roleId&quot;: 5,\n2026-04-28T17:07:12.7764383Z             &quot;roleName&quot;: &quot;Dataset Creator&quot;,\n2026-04-28T17:07:12.7764751Z             &quot;roleDescription&quot;: &quot;A person who can add datasets within a dataverse.&quot;,\n2026-04-28T17:07:12.7765134Z             &quot;_roleAlias&quot;: &quot;dsContributor&quot;,\n2026-04-28T17:07:12.7765388Z             &quot;definitionPointId&quot;: 449,\n2026-04-28T17:07:12.7765658Z             &quot;definitionPointName&quot;: &quot;dv89758e93&quot;,\n2026-04-28T17:07:12.7765941Z             &quot;definitionPointType&quot;: &quot;Dataverse&quot;\n2026-04-28T17:07:12.7766189Z         }\n</code></pre></div>\n<p>... I wonder why all authenticated users have access to id 449. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591456715,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401161
+    },
+    {
+        "content": "<p>I had the exact same thought, but if that were not the intended behavior then all tests should've thrown one extra. Only user1's does.</p>",
+        "id": 591457301,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777401323
+    },
+    {
+        "content": "<p>Yeah, it's still a puzzle... what's different about this env? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591457432,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401365
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> we've seen <code>DataRetrieverApiIT</code> fail twice for sure. Has it failed other times? Does it always fail? Do you want to run it again just for fun? Can we run just that test class in isolation? I'm just grasping at straws here. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 591457715,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401447
+    },
+    {
+        "content": "<p>it has been failing since the first time I wrote the workflow</p>",
+        "id": 591457788,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777401468
+    },
+    {
+        "content": "<p>boo</p>",
+        "id": 591457814,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401476
+    },
+    {
+        "content": "<p>I even thought it might be a multi-threaded race condition, and forced the entire suite to run single-core single-thread, but that did not fix it either</p>",
+        "id": 591457920,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777401513
+    },
+    {
+        "content": "<p>bleh</p>",
+        "id": 591458018,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401539
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> can we just delete that test? <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 591458080,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777401561
+    },
+    {
+        "content": "<p>You can comment it out and see if the other tests pass</p>",
+        "id": 591459447,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402012
+    },
+    {
+        "content": "<p>yep, everything except that does pass</p>",
+        "id": 591459519,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777402036
+    },
+    {
+        "content": "<p>or add <code>@Disabled</code></p>",
+        "id": 591459551,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777402045
+    },
+    {
+        "content": "<p>@Disabled</p>",
+        "id": 591459582,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402058
+    },
+    {
+        "content": "<p>that way we can punt on this until another day <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 591459610,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777402075
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> do you want a PR to add <code>@Disabled</code> or have you got it?</p>",
+        "id": 591459631,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777402084
+    },
+    {
+        "content": "<p>Is it always the same alias/id? or is it a newly created dataverse each time?</p>",
+        "id": 591459728,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402121
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591453330\">said</a>:</p>\n<blockquote>\n<p>Well, it's reproducible. For the <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73282463436\">earlier run</a> it was also id 449, like the <a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/runs/73438279431\">current run</a>. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> But why? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> What's different about running this in GitHub Actions vs Jenkins and local? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> for two runs, at least, the id was 449. ^^</p>",
+        "id": 591459844,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777402161
+    },
+    {
+        "content": "<p>Then that tells me we don't blow away the DB for each run. As we should</p>",
+        "id": 591460081,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402203
+    },
+    {
+        "content": "<p>Most tests do not clean up</p>",
+        "id": 591460125,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402220
+    },
+    {
+        "content": "<p>for every failed run, it is the same id 449 although the alias changes</p>",
+        "id": 591460138,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777402225
+    },
+    {
+        "content": "<p>Makes sense since the dataverses are created in the same order</p>",
+        "id": 591460260,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402268
+    },
+    {
+        "content": "<p>They would have the same id but not alias</p>",
+        "id": 591460319,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402285
+    },
+    {
+        "content": "<p>changing assertsequal to greater than or equal also fixes it. I think the same is done for superuser</p>",
+        "id": 591460375,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777402302
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/591459631\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> do you want a PR to add <code>@Disabled</code> or have you got it?</p>\n</blockquote>\n<p>I got it, but the workflow ain't in prod rn, so no hurry yet?</p>",
+        "id": 591460775,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777402424
+    },
+    {
+        "content": "<p>Since we probably can't get it to fail locally changing it to &gt;= is fine with me</p>",
+        "id": 591460785,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402426
+    },
+    {
+        "content": "<p>It's better than skipping it</p>",
+        "id": 591460886,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1777402453
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> right, no hurry but please go ahead with any of the suggestions above! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> I want to see it go green! <span aria-label=\"green heart\" class=\"emoji emoji-1f49a\" role=\"img\" title=\"green heart\">:green_heart:</span></p>",
+        "id": 591461813,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777402763
+    },
+    {
+        "content": "<p>Tests: Green</p>\n<p><a href=\"https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25075466484\">https://github.com/IQSS-Dataverse-Development/dataverse/actions/runs/25075466484</a></p>",
+        "id": 591514799,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777409994
+    },
+    {
+        "content": "<p>Had to disable the whole test, unfortunately</p>",
+        "id": 591515435,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410013
+    },
+    {
+        "content": "<p>but the rest 2497 of them run like butter</p>",
+        "id": 591516791,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410051
+    },
+    {
+        "content": "<p>Green? Yay! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> </p>\n<p>Don't worry, <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> will fix it later. <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 591516938,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777410056
+    },
+    {
+        "content": "<p>now its upto IQSS team to decide if this workflow is a good substitute for what Jenkins does, or if something is missing</p>",
+        "id": 591517706,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410079
+    },
+    {
+        "content": "<p>I mean, we might as well merge it, right? Belt and suspenders, for now! Are you planning to make a pull request?</p>",
+        "id": 591519358,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777410122
+    },
+    {
+        "content": "<p>yep opening one right now</p>",
+        "id": 591520263,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410153
+    },
+    {
+        "content": "<p>after I clean up the commit history</p>",
+        "id": 591520734,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410166
+    },
+    {
+        "content": "<p>or is it okay even like this?</p>",
+        "id": 591521114,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410177
+    },
+    {
+        "content": "<p>actually the PR has to come from <a href=\"https://github.com/uncch-rdmc/dataverse\">https://github.com/uncch-rdmc/dataverse</a> and I don't have perms there to create a new branch and make a PR, I'll do it tomorrow, and clean up the commit history at the same time</p>",
+        "id": 591526409,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410338
+    },
+    {
+        "content": "<p>Massive thank you to all of you for helping me work through this even though you're busy and have other responsibilities</p>",
+        "id": 591527150,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777410363
+    },
+    {
+        "content": "<p>Happy to help! Great work! So exciting! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 591527683,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777410396
+    }
+]

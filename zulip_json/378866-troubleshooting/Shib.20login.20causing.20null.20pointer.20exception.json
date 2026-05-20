@@ -1,0 +1,44 @@
+[
+    {
+        "content": "<p>Hello, <br>\nWe recently upgraded to v5.14 and have had points on our test server where we get a null pointer exception while trying to login via shibboleth.   After I authenticate with my credentials, the app sits there and then times out, not logging me in. Though sometimes it does log me in if I wait long enough.  </p>\n<p>It's only on our test server, so it could be a misconfiguration on our part. </p>\n<p>Has anyone seen this before? Does anything stand out to you about what we might have misconfigured?  </p>\n<p>[#|2025-05-30T17:49:11.202+0000|WARNING|Payara 5.2022.5|javax.enterprise.resource.webcontainer.jsf.lifecycle|_ThreadID=94;_ThreadName=http-thread-pool::jk-connector(1);_TimeMillis=1748627351202;_LevelValue=900;|<br>\n  #{Shib.init}: java.lang.NullPointerException<br>\njavax.faces.FacesException: #{Shib.init}: java.lang.NullPointerException<br>\n        at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:96)<br>\n        at com.sun.faces.application.ActionListenerImpl.processAction(ActionListenerImpl.java:71)<br>\n        at javax.faces.component.UIViewAction.broadcast(UIViewAction.java:548)<br>\n        at javax.faces.component.UIViewRoot.broadcastEvents(UIViewRoot.java:847)<br>\n        at javax.faces.component.UIViewRoot.processApplication(UIViewRoot.java:1396)<br>\n        at com.sun.faces.lifecycle.InvokeApplicationPhase.execute(InvokeApplicationPhase.java:58)<br>\n.<br>\n.<br>\n.<br>\n        at java.base/java.lang.Thread.run(Thread.java:829)<br>\nCaused by: javax.faces.el.EvaluationException: java.lang.NullPointerException<br>\n        at com.sun.faces.application.MethodBindingMethodExpressionAdapter.invoke(MethodBindingMethodExpressionAdapter.java:76)<br>\n        at com.sun.faces.application.ActionListenerImpl.getNavigationOutcome(ActionListenerImpl.java:82)<br>\n        ... 45 more<br>\nCaused by: java.lang.NullPointerException<br>\n        at edu.harvard.iq.dataverse.util.SessionUtil.changeSessionId(SessionUtil.java:22)<br>\n        at edu.harvard.iq.dataverse.DataverseSession.setUser(DataverseSession.java:150)<br>\n        at edu.harvard.iq.dataverse.DataverseSession$Proxy$_$$_WeldClientProxy.setUser(Unknown Source)<br>\n        at edu.harvard.iq.dataverse.Shib.logInUserAndSetShibAttributes(Shib.java:386)<br>\n        at edu.harvard.iq.dataverse.Shib.init(Shib.java:262)<br>\n        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)<br>\n        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>\n        at java.base/java.lang.reflect.Method.invoke(Method.java:566)<br>\n        at com.sun.el.util.ReflectionUtil.invokeMethod(ReflectionUtil.java:160)<br>\n        at com.sun.el.parser.AstValue.invoke(AstValue.java:261)<br>\n        at com.sun.el.MethodExpressionImpl.invoke(MethodExpressionImpl.java:237)<br>\n        at org.jboss.weld.module.web.util.el.ForwardingMethodExpression.invoke(ForwardingMethodExpression.java:40)<br>\n        at org.jboss.weld.module.web.el.WeldMethodExpression.invoke(WeldMethodExpression.java:50)<br>\n        at com.sun.faces.facelets.el.TagMethodExpression.invoke(TagMethodExpression.java:65)<br>\n        at com.sun.faces.application.MethodBindingMethodExpressionAdapter.invoke(MethodBindingMethodExpressionAdapter.java:66)<br>\n        ... 46 more</p>\n<p>Thanks in advance for any help troubleshooting this.</p>",
+        "id": 521350893,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1748629802
+    },
+    {
+        "content": "<p>So a null pointer at <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/util/SessionUtil.java#L22\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/util/SessionUtil.java#L22</a></p>",
+        "id": 521352057,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748630224
+    },
+    {
+        "content": "<p>hmm</p>",
+        "id": 521352061,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748630225
+    },
+    {
+        "content": "<p>What if you go to the equivalent of <a href=\"https://demo.dataverse.org/Shibboleth.sso/Session\">https://demo.dataverse.org/Shibboleth.sso/Session</a></p>\n<p>Anything there?</p>",
+        "id": 521352143,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748630265
+    },
+    {
+        "content": "<p>There's lots of good info there including <br>\nMiscellaneous :  session expiration, client address, sso protocol, identity provider, Authentication time, autehtnication context class and authentication context decl. <br>\nAttributes:  affiliation, eppn, givenName, mail , persistent-id and sn</p>\n<p>The fields seem to be filled in okay. </p>\n<p>What's interesting is that DV doesn't think I'm logged in.</p>",
+        "id": 521355942,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1748631977
+    },
+    {
+        "content": "<p>It looks like SessionUtil was added in <a href=\"https://github.com/IQSS/dataverse/issues/7111\">#7111</a> by Jim. He isn't here in Zulip. Do you mind starting a thread at <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> ?</p>",
+        "id": 521357150,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748632511
+    },
+    {
+        "content": "<p>Thanks, Philip.  We're going to try one more thing and then I'll email the list.  There's a chance that it's something in our setup.</p>",
+        "id": 521359678,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1748633535
+    }
+]
