@@ -1,0 +1,92 @@
+<html>
+<head><meta charset="utf-8"><title>generateIdentifierFromStoredProcedure as a VOLATILE function · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/generateIdentifierFromStoredProcedure.20as.20a.20VOLATILE.20function.html">generateIdentifierFromStoredProcedure as a VOLATILE function</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="594228896"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/generateIdentifierFromStoredProcedure%20as%20a%20VOLATILE%20function/near/594228896" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/generateIdentifierFromStoredProcedure.20as.20a.20VOLATILE.20function.html#594228896">(May 11 2026 at 08:53)</a>:</h4>
+<p>Hi everyone,</p>
+<p>last week I discovered an interesting "bug" in Dataverse related to <code>generateIdentifierFromStoredProcedure</code>.</p>
+<p>I updated a Dataverse instance from v6.8 to v6.9, and noticed that the "create dataset" API was occasionally getting stuck and not returning a response. See this terminal log of some datasets being created in quick succession:</p>
+<div class="codehilite"><pre><span></span><code>clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:92,&quot;persistentId&quot;:&quot;perma:nfdi4health-64&quot;}}
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:96,&quot;persistentId&quot;:&quot;perma:nfdi4health-64&quot;}}
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+^C
+
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+^C
+
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:97,&quot;persistentId&quot;:&quot;perma:nfdi4health-65&quot;}}
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+^C
+
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+^C
+
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:98,&quot;persistentId&quot;:&quot;perma:nfdi4health-66&quot;}}
+clemens@clemens-virtual-machine:~$ curl -X POST localhost:8080/api/dataverses/nfdi4health/datasets -H &quot;X-Dataverse-key: xxx&quot; -H &quot;Content-Type: application/json&quot; --data @/home/clemens/testdata.json
+{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:99,&quot;persistentId&quot;:&quot;perma:nfdi4health-67&quot;}}
+</code></pre></div>
+<p>(The ^C lines are where it got stuck and I had to kill the command with CTRL+C)</p>
+<p>(Also, notice the one identifier "perma:nfdi4health-64" being returned twice for two datasets...?)</p>
+<p>Now, first I had no clue what could be the reason. I ran <code>asadmin generate-jvm-report --type=thread</code> while I had a curl request stuck in another terminal to see what the Dataverse threads were doing. Here's a shortened bit of the output:</p>
+<div class="codehilite"><pre><span></span><code>payara@backend-testing-dv-v6-10-1-dataverse-0:~$ asadmin generate-jvm-report --type=thread
+...
+Thread Execution Information:
+-----------------------
+Thread &quot;http-thread-pool::http-listener-1(8)&quot; thread-id: 507 thread-state: RUNNABLE
+     at: org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2339)
+     at: org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372)
+...
+     at: edu.harvard.iq.dataverse.pidproviders.PidProviderFactoryBean.isGlobalIdLocallyUnique(PidProviderFactoryBean.java:224)
+     at: edu.harvard.iq.dataverse.pidproviders.AbstractPidProvider.isGlobalIdUnique(AbstractPidProvider.java:259)
+     at: edu.harvard.iq.dataverse.pidproviders.AbstractPidProvider.generateIdentifierFromStoredProcedureIndependent(AbstractPidProvider.java:455)
+     at: edu.harvard.iq.dataverse.pidproviders.AbstractPidProvider.generateDatasetIdentifier(AbstractPidProvider.java:242)
+     at: edu.harvard.iq.dataverse.pidproviders.AbstractPidProvider.generatePid(AbstractPidProvider.java:228)
+     at: edu.harvard.iq.dataverse.engine.command.impl.AbstractCreateDatasetCommand.execute(AbstractCreateDatasetCommand.java:90)
+...
+</code></pre></div>
+<p>So I thought, OK, could be another bug introduced in v6.9 related to PID providers that use "storedProcGenerated", like the one I reported here: <a href="https://github.com/IQSS/dataverse/issues/12126">https://github.com/IQSS/dataverse/issues/12126</a></p>
+<p>My SQL is based on <a href="https://github.com/IQSS/dataverse/blob/a36db2d7df0d9976c00179b82f11cfb338a6cfc8/doc/sphinx-guides/source/_static/util/createsequence.sql">the example for getting a numerical sequence</a> and the function itself looks like this:</p>
+<div class="codehilite"><pre><span></span><code>CREATE OR REPLACE FUNCTION generateIdentifierFromStoredProcedure()
+RETURNS varchar AS $$
+DECLARE
+identifier varchar;
+BEGIN
+    identifier := nextval(&#39;datasetidentifier_seq&#39;)::varchar;
+RETURN identifier;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+</code></pre></div>
+<p>In the end, I was able to fix the issue by marking this function <code>VOLATILE</code> instead of <code>IMMUTABLE</code>.</p>
+<p>It seems that when the function was marked as <code>IMMUTABLE</code> (meaning it "is guaranteed to return the same results given the same arguments forever" [1]), the db was caching the function result and occasionally just returning the same cached identifier over and over, which caused the <a href="https://github.com/IQSS/dataverse/blob/430037ccaf55d53d38e491c2b1270f7fa2eacf3b/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L445-L459">loop in <code>generateIdentifierFromStoredProcedureIndependent</code></a> to get stuck.</p>
+<p>The function should be marked <code>VOLATILE</code>, since it contains a call to <code>nextval</code>, which means it modifies the db state and its result constantly change.</p>
+<p>I'm thinking about opening a PR for the <code>IMMUTABLE</code> -&gt; <code>VOLATILE</code> change, but first, I thought this bug was so interesting I'd open a Zulip thread about it :)</p>
+<p>[1] <a href="https://www.postgresql.org/docs/current/xfunc-volatility.html">https://www.postgresql.org/docs/current/xfunc-volatility.html</a></p>
+
+
+
+<a name="594230064"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/generateIdentifierFromStoredProcedure%20as%20a%20VOLATILE%20function/near/594230064" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/generateIdentifierFromStoredProcedure.20as.20a.20VOLATILE.20function.html#594230064">(May 11 2026 at 08:58)</a>:</h4>
+<p>Yes, very interesting! Thanks!</p>
+
+
+
+<a name="594267178"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/generateIdentifierFromStoredProcedure%20as%20a%20VOLATILE%20function/near/594267178" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Vera Clemens <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/generateIdentifierFromStoredProcedure.20as.20a.20VOLATILE.20function.html#594267178">(May 11 2026 at 11:37)</a>:</h4>
+<p>Opened a PR here: <a href="https://github.com/IQSS/dataverse/pull/12391">https://github.com/IQSS/dataverse/pull/12391</a></p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

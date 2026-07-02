@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>Any advice on timeouts I am getting with DVUploader - uploading 350GB file. I am getting timeout errors, I know why, just need to figure out how to keep the S3 \"URLs\" - parts open and not time out.</p>\n<div class=\"codehilite\"><pre><span></span><code>Error response: HTTP/1.1 403 Forbidden : &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;Error&gt;&lt;Code&gt;AccessDenied&lt;/Code&gt;&lt;Message&gt;Request has expired&lt;/Message&gt;&lt;X-Amz-Expires&gt;3599&lt;/X-Amz-Expires&gt;&lt;Expires&gt;2024-03-21T16:18:09Z&lt;/Expires&gt;&lt;ServerTime&gt;2024-03-21T16:18:14Z&lt;/ServerTime&gt;&lt;RequestId&gt;4FH0FYK8QHER1BZP&lt;/RequestId&gt;&lt;HostId&gt;Cnn6zpUyPNgTnWd7lgMUa3WTnO62P7Y3v0uORF+NszVmh2FsbD0ceztzUDYQhgelZ5J7Tp60gDg=&lt;/HostId&gt;&lt;/Error&gt;\nRetrying upload of part: 118\nUpload of part: 118 failed with status: 403 (retrying)\n</code></pre></div>\n<p>Might be a Jim question, which I asked in Slack.</p>\n<p><span class=\"user-mention\" data-user-id=\"598843\">@Deirdre Kirmis</span> How did you get over the \"time out\", or are you using S3?<br>\nThanks.</p>",
+        "id": 428177174,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1711040506
+    },
+    {
+        "content": "<p>Update from Jim in Slack:</p>\n<blockquote>\n<p>Yes - there's a dataverse.files.&lt;id&gt;.url-expiration-minutes setting described in <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage\">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a>. The default is 60 minutes.</p>\n</blockquote>",
+        "id": 428178477,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1711040927
+    },
+    {
+        "content": "<p>looking into this to remember .. i do know that we had to set Timeout and ProxyTimeout in our apache config as well as the database timeout option</p>",
+        "id": 428180737,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711041649
+    },
+    {
+        "content": "<p>Timeout 6000<br>\n ProxyTimeout 6000</p>",
+        "id": 428180919,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711041707
+    },
+    {
+        "content": "<p>and we are using S3</p>",
+        "id": 428181193,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711041789
+    },
+    {
+        "content": "<p>here is the command that worked for us at the time, but I think there have been changes (ie: not requiring the -directupload flag)</p>\n<p>java -jar DVUploader-v1.2.0beta3.jar -recurse -directupload -key=&lt;your api token&gt; -did=doi:10.48349/ASU/&lt;your dataset code&gt; -server=https://dataverse.asu.edu &lt;directory path&gt;</p>",
+        "id": 428182392,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711042164
+    },
+    {
+        "content": "<p>do you have CORS rules set on your s3 bucket?</p>",
+        "id": 428225973,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711058765
+    },
+    {
+        "content": "<p>Here are our CORS rules:</p>\n<div class=\"codehilite\"><pre><span></span><code>[\n    {\n        &quot;AllowedHeaders&quot;: [\n            &quot;*&quot;\n        ],\n        &quot;AllowedMethods&quot;: [\n            &quot;GET&quot;,\n            &quot;PUT&quot;\n        ],\n        &quot;AllowedOrigins&quot;: [\n            &quot;*&quot;\n        ],\n        &quot;ExposeHeaders&quot;: [\n            &quot;ETag&quot;\n        ],\n        &quot;MaxAgeSeconds&quot;: 0\n    }\n]\n</code></pre></div>",
+        "id": 429421471,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1711376913
+    },
+    {
+        "content": "<p>that looks okay .. i think .. i finally found the email thread that I had with Jim M when we were trying to make this all work, and I was getting the exact same error .. </p>\n<p>.. i need to compile this whole thing into some kind of guide or something because there is so much valuable info that we got from jim's brilliant mind in it about how direct upload works .. i will send it to you</p>\n<p>.. one thing that I can see is that we set the dataverse.files.&lt;id&gt;.url-expiration-minutes to 480 .. what is yours set to?  and we definitely used the 1.1.2 beta version of dvuploader .. an yea the proxy timeouts didn't really matter</p>",
+        "id": 429439779,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711380710
+    },
+    {
+        "content": "<p>Adding more docs, especially for troubleshooting, to the guide would be much appreciated!</p>",
+        "id": 429442291,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1711381196
+    },
+    {
+        "content": "<p>okay, I will see if I can organize it a little and then send it on <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 429447153,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1711382015
+    },
+    {
+        "content": "<p>setting this parameter worked</p>\n<blockquote>\n<p>:there's a dataverse.files.&lt;id&gt;.url-expiration-minutes setting described in <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage\">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a>. The default is 60 minutes.</p>\n</blockquote>",
+        "id": 430151153,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1711655096
+    },
+    {
+        "content": "<p>I tried to mark this as resolved, but could not resolve - \"issues\" older than 7 days. So if someone with more power than me can resolve, Thanks.</p>",
+        "id": 430151783,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1711655391
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 430152027,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1711655488
+    },
+    {
+        "content": "<p>Done! I resolved this topic.</p>",
+        "id": 430152250,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1711655580
+    }
+]

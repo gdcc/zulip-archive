@@ -1,0 +1,26 @@
+[
+    {
+        "content": "<p>We're still on 5.14.  I'm trying to replace the old dataverse-5.14.war file with the updated one.  The deploy has been failing because the postgres database (dvndb) exists:<br>\n**PRIMARY KEY (SEQ_NAME))\": org.postgresql.util.PSQLException: ERROR: relation \"sequence\" already exists PER01000: Got SQLException executing statement \"INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0)\": org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint \"sequence_pkey\"  Detail: Key (seq_name)=(SEQ_GEN) already exists.<br>\nCommand deploy failed.<strong>  renamed the dvndb database as a backup.   But the deploy now fails because dvndb doesn't exist: </strong>  remote failure: Error occurred during deployment: Exception [EclipseLink-4002] (Eclipse Persistence Services - 2.7.9.payara-p2): org.eclipse.persistence.exceptions.DatabaseException Internal Exception: java.sql.SQLException: Error in allocating a connection. Cause: Connection could not be allocated because: FATAL: database \"dvndb\" does not exist<br>\nError Code: 0. Please see server.log for more details.<br>\nCommand deploy failed.<br>\n**</p>\n<p>Should there be an empty dvndb for the deploy?   (I'll also copy this to the google group).</p>",
+        "id": 607271295,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1782786940
+    },
+    {
+        "content": "<p>Deploy then fails because there isn't a dvndb database. Created an empty dvndb database (the renamed backup also still exists). The deploy works but payara5 isn't coming up.</p>\n<p>Caused by: javax.persistence.NoResultException: getSingleResult() did not retrieve any entities... findRootDataver</p>",
+        "id": 607484230,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1782858535
+    },
+    {
+        "content": "<p>Sorry, sorry, been busy. You definitely should keep your database!</p>",
+        "id": 607502743,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782867750
+    },
+    {
+        "content": "<p>I put the original dvndb database back. Then undeployed and redeployed the patched dataverse-5.14.war file.</p>\n<p>sudo ./asadmin deploy /tmp/dataverse-5.14.war<br>\nEnter admin user name&gt; admin<br>\nEnter admin password for user \"admin\"&gt;<br>\nNo response from Domain Admin Server after 600 seconds.<br>\nThe command is either taking too long to complete or the server has failed.<br>\nPlease see the server log files for command status.<br>\nCommand deploy failed.</p>\n<hr>\n<p><a href=\"/user_uploads/53090/qw7UmumJ8Joh3tAj1W_I4JyH/payara5-server.log\">payara5-server.log</a></p>",
+        "id": 607715799,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1782945704
+    }
+]

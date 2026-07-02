@@ -1,0 +1,46 @@
+<html>
+<head><meta charset="utf-8"><title>rdm-integration globus setup · large-data · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/index.html">large-data</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/rdm-integration.20globus.20setup.html">rdm-integration globus setup</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="593061860"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/rdm-integration%20globus%20setup/near/593061860" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> William Hahn <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/rdm-integration.20globus.20setup.html#593061860">(May 05 2026 at 17:13)</a>:</h4>
+<p>Hi all, I'm testing out <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span>'s rdm-integration tool and having some difficulty setting up globus. Please see <a href="https://github.com/libis/rdm-integration/blob/main/GLOBUS_INTEGRATION.md">https://github.com/libis/rdm-integration/blob/main/GLOBUS_INTEGRATION.md</a></p>
+<p>Which client ID should <code>oauth_client_id</code> point to? Is this a portal/science gateway, or something else? Also, this document states that the <code>plugins</code> section should be inserted into <code>backend_config.json</code>, but I see <code>plugins</code> as an attribute of <code>frontend_config.json</code> in the readme. Any help is appreciated, thank you!</p>
+
+
+
+<a name="593102458"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/rdm-integration%20globus%20setup/near/593102458" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eryk Kulikowski <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/rdm-integration.20globus.20setup.html#593102458">(May 05 2026 at 20:49)</a>:</h4>
+<p>Hi William, I checked this more carefully. oauth_client_id should be the ID of a Globus Confidential Client.<br>
+In the Globus web app, the path is: <a href="http://app.globus.org">app.globus.org</a> → Settings → Developers → Add/select Project → Apps → Add App → Add Confidential Client</p>
+<p>Use the ID of that Confidential Client as oauth_client_id. The matching client secret is also needed, but it should go in the OAuth secrets file used by the backend, not in frontend_config.json.<br>
+So yes, this is closer to a portal/science-gateway style setup than a native/PKCE app. rdm-integration does the OAuth token exchange server-side, so it needs both a client ID and a client secret.<br>
+You are also right about the documentation. The plugins section belongs in frontend_config.json; the statement in GLOBUS_INTEGRATION.md saying to put it in backend_config.json is wrong (I will correct this). The backend config should instead point to the OAuth secrets file and contain backend settings such as the Dataverse URL, Globus endpoint, storage settings, and pathToOauthSecrets.</p>
+<p>There are example config files in the repo under conf/: frontend_config.json, backend_config.json, and example_oauth_secrets.json. These are the files used by the local make up setup; make init copies them into docker-volumes/integration/.... However, I checked and the current examples do not include a complete Globus plugin example yet. They show the general structure, but I still need to add a proper Globus example.</p>
+<p>There is also some Dataverse-side configuration that has to line up, including :UploadMethods, :DownloadMethods, :GlobusAppUrl, and the storage JVM/MicroProfile settings for S3/Globus. In particular, Dataverse needs the Globus transfer endpoint and its own Globus token for the storage backend, while rdm-integration separately needs the Globus Confidential Client ID/secret for user OAuth.</p>
+<p>I’ll be at the Dataverse Community Meeting 2026 in Barcelona next week. If you’ll be there too, I’m happy to help set it up in person.</p>
+
+
+
+<a name="593105251"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/rdm-integration%20globus%20setup/near/593105251" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Eryk Kulikowski <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/rdm-integration.20globus.20setup.html#593105251">(May 05 2026 at 21:06)</a>:</h4>
+<p>I also updated GLOBUS_INTEGRATION.md to clarify this setup.</p>
+
+
+
+<a name="593108753"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/432390-large-data/topic/rdm-integration%20globus%20setup/near/593108753" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> William Hahn <a href="https://gdcc.github.io/zulip-archive/stream/432390-large-data/topic/rdm-integration.20globus.20setup.html#593108753">(May 05 2026 at 21:30)</a>:</h4>
+<p>Much appreciated, Eryk. I should have time tomorrow morning to give this a go, but this already seems to clarify my questions. I'll keep this thread updated...<br>
+And yes, I'll be in Barcelona! That'd be great if I continue to hit a wall.</p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

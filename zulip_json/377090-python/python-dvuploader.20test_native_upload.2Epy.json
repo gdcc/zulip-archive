@@ -1,0 +1,446 @@
+[
+    {
+        "content": "<p>test_native_upload.py is <a href=\"https://github.com/gdcc/python-dvuploader/actions/runs/17045098506/job/48318703025?pr=37\">failing</a> with a no-op PR: <a href=\"https://github.com/gdcc/python-dvuploader/pull/37\">https://github.com/gdcc/python-dvuploader/pull/37</a></p>\n<p>Why? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 534981799,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755532979
+    },
+    {
+        "content": "<p>I wonder if it's related to this:</p>\n<p>allow for tag replacement <a href=\"https://github.com/IQSS/dataverse/issues/11359\">#11359</a></p>",
+        "id": 534982953,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755533371
+    },
+    {
+        "content": "<p>I am also puzzled, it is working fine locally with the latest 6.7 release, but it fails in the CI.</p>",
+        "id": 535003123,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755542490
+    },
+    {
+        "content": "<p>I'm trying to run it locally. Need poetry set up first: <a class=\"stream-topic\" data-stream-id=\"377090\" href=\"/#narrow/channel/377090-python/topic/poetry.20not.20working.20for.20python-dvuploader/with/535003136\">#python &gt; poetry not working for python-dvuploader</a></p>",
+        "id": 535003213,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755542540
+    },
+    {
+        "content": "<p>It seems like either the <code>directoryLabel</code> is not passed correctly or something is failing on the DV-side</p>",
+        "id": 535003216,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755542541
+    },
+    {
+        "content": "<p>You can use <code>pip install -e .</code> as well</p>",
+        "id": 535003286,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755542569
+    },
+    {
+        "content": "<p>From within a venv, right? That is, I'll run <code>python -m venv venv</code> first, right?</p>",
+        "id": 535004103,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755542966
+    },
+    {
+        "content": "<p>Yes, you can use the venv in that case</p>",
+        "id": 535005023,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755543421
+    },
+    {
+        "content": "<p>Hmm, I ran<code>pip install -e .</code> but I'm getting this:</p>\n<div class=\"codehilite\"><pre><span></span><code>% python -m pytest -v\n/Users/PDurbin/github/gdcc/python-dvuploader/venv/bin/python: No module named pytest\n</code></pre></div>\n<p>So I ran <code>pip install pytest</code>. But now I'm getting this:</p>\n<div class=\"codehilite\"><pre><span></span><code>% python -m pytest -v\nERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --cov=dvuploader\n  inifile: /Users/PDurbin/github/gdcc/python-dvuploader/pyproject.toml\n  rootdir: /Users/PDurbin/github/gdcc/python-dvuploader\n</code></pre></div>",
+        "id": 535020957,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755550610
+    },
+    {
+        "content": "<p>Sorry, since you are not using poetry you need to install the test-dependencies first:</p>\n<p><code>pip install pytest-cov pytest-asyncio pytest-httpx</code></p>\n<p>Will add this to the Readme to prevent confusion <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span></p>",
+        "id": 535026743,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755554375
+    },
+    {
+        "content": "<p>Thanks, I can run <code>python -m pytest -v</code> now.</p>",
+        "id": 535311076,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695512
+    },
+    {
+        "content": "<p>I can replicate the error:</p>\n<div class=\"codehilite\"><pre><span></span><code>===================================== short test summary info =====================================\nFAILED tests/integration/test_native_upload.py::TestNativeUpload::test_native_upload_by_handler - AssertionError: Directory label does not match for file {&quot;description&quot;: &quot;&quot;, &quot;label&quot;: &quot;file.txt&quot;, &quot;restricted&quot;: false, &quot;version&quot;: 1, &quot;datasetVersionId&quot;: 4, &quot;categories&quot;: [&quot;DATA&quot;], &quot;dataFile&quot;: {&quot;id&quot;: 16, &quot;persistentId&quot;: &quot;&quot;, &quot;filename&quot;: &quot;file.txt&quot;, &quot;contentType&quot;: &quot;text/plain&quot;, &quot;friendlyType&quot;: &quot;Plain Text&quot;, &quot;filesize&quot;: 13, &quot;description&quot;: &quot;&quot;, &quot;categories&quot;: [&quot;DATA&quot;], &quot;storageIdentifier&quot;: &quot;local://198c79fc9ca-f998aa3fe2fa&quot;, &quot;rootDataFileId&quot;: -1, &quot;md5&quot;: &quot;65a8e27d8879283831b664bd8b7f0ad4&quot;, &quot;checksum&quot;: {&quot;type&quot;: &quot;MD5&quot;, &quot;value&quot;: &quot;65a8e27d8879283831b664bd8b7f0ad4&quot;}, &quot;tabularData&quot;: false, &quot;creationDate&quot;: &quot;2025-08-20&quot;, &quot;lastUpdateTime&quot;: &quot;2025-08-20T13:16:35Z&quot;, &quot;fileAccessRequest&quot;: false}}\nassert &#39;&#39; == &#39;subdir&#39;\n\n  - subdir\n====================== 1 failed, 33 passed, 13 warnings in 107.59s (0:01:47) ======================\n</code></pre></div>",
+        "id": 535312820,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696072
+    },
+    {
+        "content": "<p>I created an issue: <a href=\"https://github.com/gdcc/python-dvuploader/issues/39\">https://github.com/gdcc/python-dvuploader/issues/39</a></p>",
+        "id": 535314379,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696529
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> what if you delete your local \"unstable\" image and re-download it? Can you reproduce the problem then?</p>",
+        "id": 535315109,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696752
+    },
+    {
+        "content": "<p>Good idea! Will try it after our meeting <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span></p>",
+        "id": 535319895,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755698218
+    },
+    {
+        "content": "<p>I was able to reproduce the error <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span> Will give it a deeper dive asap</p>",
+        "id": 535491285,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1755778344
+    },
+    {
+        "content": "<p>Nice! It's only a matter of time now!</p>",
+        "id": 535500093,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755781359
+    },
+    {
+        "content": "<p>My money is on something that changed on the backend. <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span> </p>\n<p>But we'll see, I guess!</p>",
+        "id": 535500151,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755781382
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/377090-python/topic/python-dvuploader.20test_native_upload.2Epy/near/535003213\">said</a>:</p>\n<blockquote>\n<p>I'm trying to run it locally. Need poetry set up first: <a class=\"stream-topic\" data-stream-id=\"377090\" href=\"/#narrow/channel/377090-python/topic/poetry.20not.20working.20for.20python-dvuploader/with/540311436\">#python &gt; poetry not working for python-dvuploader</a></p>\n</blockquote>\n<p>This part is resolved.</p>",
+        "id": 540311590,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225871
+    },
+    {
+        "content": "<p><code>export $(grep \"API_TOKEN\" \"dv/bootstrap.exposed.env\")</code> doesn't work for me. From <a href=\"https://github.com/gdcc/python-dvuploader#running-tests-locally\">https://github.com/gdcc/python-dvuploader#running-tests-locally</a></p>",
+        "id": 540311630,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225896
+    },
+    {
+        "content": "<p>Nothing there:</p>\n<div class=\"codehilite\"><pre><span></span><code>pdurbin@beamish python-dvuploader % file dv/bootstrap.exposed.env\ndv/bootstrap.exposed.env: directory\npdurbin@beamish python-dvuploader % ls -al dv/bootstrap.exposed.env\ntotal 0\ndrwxr-xr-x  2 pdurbin  staff   64 Sep 18 16:01 .\ndrwxr-xr-x  4 pdurbin  staff  128 Sep 18 16:01 ..\npdurbin@beamish python-dvuploader %\n</code></pre></div>",
+        "id": 540311766,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225959
+    },
+    {
+        "content": "<p>Am I missing something? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 540311791,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225971
+    },
+    {
+        "content": "<p>The Docker compose should actually expose the <code>.env</code> from which you can grab the token. Did this change?</p>",
+        "id": 540312028,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758226084
+    },
+    {
+        "content": "<p>buh, not sure</p>",
+        "id": 540312088,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226109
+    },
+    {
+        "content": "<p>Is there supposed to be a .env file in that directory?</p>",
+        "id": 540312131,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226129
+    },
+    {
+        "content": "<p>I think this is the way the GitHub Action makes it possible to grab the token. In the compose within dvuploader the corresponding directory is exposed:</p>\n<div class=\"codehilite\" data-code-language=\"YAML\"><pre><span></span><code><span class=\"nt\">volumes</span><span class=\"p\">:</span>\n<span class=\"w\">      </span><span class=\"p p-Indicator\">-</span><span class=\"w\"> </span><span class=\"l l-Scalar l-Scalar-Plain\">${PWD}/dv/data:/dv</span>\n<span class=\"w\">      </span><span class=\"p p-Indicator\">-</span><span class=\"w\"> </span><span class=\"l l-Scalar l-Scalar-Plain\">${PWD}:/secrets</span>\n</code></pre></div>\n<p>Maybe it has changed and is not exposed anymore. If so, the Readme should be changed to manually add the token to the env.</p>",
+        "id": 540312374,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758226259
+    },
+    {
+        "content": "<p>That's what I did last time. I manually grabbed the API token.</p>",
+        "id": 540312447,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226300
+    },
+    {
+        "content": "<p>I think this is more stable and straight forward</p>",
+        "id": 540312473,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758226316
+    },
+    {
+        "content": "<p>I created an issue: <a href=\"https://github.com/gdcc/python-dvuploader/issues/41\">https://github.com/gdcc/python-dvuploader/issues/41</a></p>",
+        "id": 540312594,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226385
+    },
+    {
+        "content": "<p>Here's where <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> added saving the targetEnvFile: <a href=\"https://github.com/IQSS/dataverse/pull/9935\">https://github.com/IQSS/dataverse/pull/9935</a></p>",
+        "id": 540312941,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226574
+    },
+    {
+        "content": "<p>Right, here's more of the config:</p>\n<div class=\"codehilite\"><pre><span></span><code>    volumes:\n      - ${PWD}/dv/bootstrap.exposed.env:/.env\n    command:\n      - sh\n      - -c\n      - &quot;bootstrap.sh -e /.env dev&quot;\n</code></pre></div>",
+        "id": 540313199,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226722
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>File /.env not found, is a directory or not writeable\n</code></pre></div>",
+        "id": 540313306,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226777
+    },
+    {
+        "content": "<p>I think that explains it <span aria-label=\"point of information\" class=\"emoji emoji-261d\" role=\"img\" title=\"point of information\">:point_of_information:</span></p>",
+        "id": 540313370,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226803
+    },
+    {
+        "content": "<p>Not sure what the fix is though <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 540313407,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226816
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>% python3 -m pytest -v\n/opt/homebrew/opt/python@3.13/bin/python3.13: No module named pytest\n</code></pre></div>",
+        "id": 540313759,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758226988
+    },
+    {
+        "content": "<p>Should poetry have installed pytest for me? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 540313783,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227000
+    },
+    {
+        "content": "<p>Did you run the installation with <code>poetry install --with test</code>?</p>",
+        "id": 540313952,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227063
+    },
+    {
+        "content": "<p>yep!</p>",
+        "id": 540313966,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227070
+    },
+    {
+        "content": "<p>Okay, I guess the terminal python is not using the poetry env. In the CI I am using <code>poetry run pytest</code>, which should use the correct environment.</p>",
+        "id": 540314226,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227186
+    },
+    {
+        "content": "<p>yes! working! do you want a PR?</p>",
+        "id": 540314355,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227239
+    },
+    {
+        "content": "<p>That would be awesome! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 540314382,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227253
+    },
+    {
+        "content": "<p>here you go: <a href=\"https://github.com/gdcc/python-dvuploader/pull/42\">https://github.com/gdcc/python-dvuploader/pull/42</a></p>",
+        "id": 540314533,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227329
+    },
+    {
+        "content": "<p>Thanks <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span></p>",
+        "id": 540314582,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227353
+    },
+    {
+        "content": "<p>I can reproduce the failure: <a href=\"/user_uploads/53090/Xg9ppltXtB-3UCY10vKIVT1b/fail.txt\">fail.txt</a></p>",
+        "id": 540314664,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227402
+    },
+    {
+        "content": "<p>I think this is old news, though. You were able to reproduce it too, if memory serves.</p>",
+        "id": 540314717,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227421
+    },
+    {
+        "content": "<p>That is good news</p>",
+        "id": 540314756,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227442
+    },
+    {
+        "content": "<p>And so was I, a while ago: <a href=\"https://github.com/gdcc/python-dvuploader/issues/39\">https://github.com/gdcc/python-dvuploader/issues/39</a></p>\n<p>I just wasn't using poetry back then.</p>",
+        "id": 540314934,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227512
+    },
+    {
+        "content": "<p>I was looking into this too today, but I am still puzzled what the source problem is. FYI: in the non-direct upload, files are zipped and uploaded for efficiency. When inspecting the Zip that is sent, it correctly contains the directory structure. Even so, when I upload the archive using python-dvuploader, the directory labels are fine.</p>\n<p>I think that the last step, which updates the metadata of each file could cause the problem. Will comment that part out and see if it overwrites the directory labels in some way.</p>",
+        "id": 540315270,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227648
+    },
+    {
+        "content": "<p>I have also cross-checked with DVCLI, which also supports uploading entire directories as zip, but there everything is fine.</p>",
+        "id": 540315749,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227811
+    },
+    {
+        "content": "<p>Ok, cool. We suspect something changed upstream, right? In Dataverse itself, I mean.</p>",
+        "id": 540315801,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227831
+    },
+    {
+        "content": "<p>It could be, havent changed that part of the code. Maybe sending <code>None</code> as directory label removes it, which may not happened in previous versions.</p>",
+        "id": 540315992,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758227901
+    },
+    {
+        "content": "<p>Let's see, you're using DATAVERSE_IMAGE=docker.io/gdcc/dataverse:unstable</p>",
+        "id": 540316162,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227962
+    },
+    {
+        "content": "<p>Let's take a look at 6.8 (unreleased) at <a href=\"https://preview.guides.gdcc.io/en/develop/api/changelog.html\">https://preview.guides.gdcc.io/en/develop/api/changelog.html</a></p>",
+        "id": 540316243,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758227998
+    },
+    {
+        "content": "<ul>\n<li>For POST /api/files/{id}/metadata passing an empty string (“description”:””)  or array (“categories”:[]) will no longer be ignored. Empty fields will now clear out the values in the file’s metadata. To ignore the fields simply do not include them in the JSON string.</li>\n</ul>",
+        "id": 540316314,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228019
+    },
+    {
+        "content": "<p>Okay nice, that explains it!</p>",
+        "id": 540316392,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228055
+    },
+    {
+        "content": "<p>Will try it now</p>",
+        "id": 540316436,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228075
+    },
+    {
+        "content": "<p>I noticed that while writing the release notes the other day (<a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/Release.206.2E8.20Timeline/with/539608772\">#community &gt; Release 6.8 Timeline</a>)</p>",
+        "id": 540316449,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228084
+    },
+    {
+        "content": "<p>This is the 6.8 PR by the way: File Metadata Update - Empty values clear fields <a href=\"https://github.com/IQSS/dataverse/issues/11439\">#11439</a></p>",
+        "id": 540316710,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228173
+    },
+    {
+        "content": "<p>Fixed it!</p>",
+        "id": 540316776,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228197
+    },
+    {
+        "content": "<p>Nice! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 540317019,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228285
+    },
+    {
+        "content": "<p>The <code>File</code> class directory label defaults to empty literals, causing the metadata update to clear out the directory label all the time. I have now added an explicit check to only include the directory label when it is non-empty.</p>",
+        "id": 540317063,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228303
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/ZxDpVTnGa6Wd3AAkqL-LL5O1/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ZxDpVTnGa6Wd3AAkqL-LL5O1/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1644x560\" src=\"/user_uploads/thumbnail/53090/ZxDpVTnGa6Wd3AAkqL-LL5O1/image.png/840x560.webp\"></a></div>",
+        "id": 540317108,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228316
+    },
+    {
+        "content": "<p>Perfect. I suppose the PR should close this issue: <a href=\"https://github.com/gdcc/python-dvuploader/issues/39\">https://github.com/gdcc/python-dvuploader/issues/39</a></p>",
+        "id": 540317126,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228322
+    },
+    {
+        "content": "<p>So awesome, thanks for the help!</p>",
+        "id": 540317138,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228325
+    },
+    {
+        "content": "<p>I will open a PR</p>",
+        "id": 540317157,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228330
+    },
+    {
+        "content": "<p>Oh sure <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 540317181,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228338
+    },
+    {
+        "content": "<p>Once we fix this we can get back to the contributors, who first let us know about it. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 540317244,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228362
+    },
+    {
+        "content": "<p>Poor things. Failing tests weren't their fault! <span aria-label=\"upside down\" class=\"emoji emoji-1f643\" role=\"img\" title=\"upside down\">:upside_down:</span></p>",
+        "id": 540317308,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228383
+    },
+    {
+        "content": "<p>True that, all those red x's are nerve wracking <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 540317360,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228403
+    },
+    {
+        "content": "<p>I guess this is the main one to follow up on, from bnavigator: <a href=\"https://github.com/gdcc/python-dvuploader/pull/34\">https://github.com/gdcc/python-dvuploader/pull/34</a></p>",
+        "id": 540317474,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228456
+    },
+    {
+        "content": "<p>But I'm getting ahead of myself <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 540317518,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758228470
+    },
+    {
+        "content": "<p>I will mention his PR in mine and notify him to merge the main branch into his PR, once the fix has been merged</p>",
+        "id": 540317631,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758228519
+    },
+    {
+        "content": "<p>Done <a href=\"https://github.com/gdcc/python-dvuploader/pull/43\">https://github.com/gdcc/python-dvuploader/pull/43</a></p>",
+        "id": 540319922,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758229448
+    },
+    {
+        "content": "<p>Great work. You've even merged his PR already. We can probably resolve this topic. <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 544237887,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760125935
+    }
+]

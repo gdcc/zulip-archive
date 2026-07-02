@@ -1,0 +1,104 @@
+[
+    {
+        "content": "<p>Has anyone successfully run the Vagrant Dataverse on a M1/2/4 mac? The initial issue we ran into was the providers needed to be swapped so we tried to use vmware instead of vbox. Installed fusion 13 pro personal edition, made some changes, got farther... then ran into issues with the shared filesystem (HGFS).  We tried to use vagrant-sshfs to get around this and ran into some more issues. </p>\n<p>Wanted to check if I was missing something obvious before I dig in deeper.</p>",
+        "id": 470759984,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726525506
+    },
+    {
+        "content": "<p>Do you mean the Vagrantfile at <a href=\"https://github.com/gdcc/dataverse-ansible\">https://github.com/gdcc/dataverse-ansible</a> ?</p>",
+        "id": 470761455,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726525996
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> yes, that is the repo I am starting with</p>",
+        "id": 470765480,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726526981
+    },
+    {
+        "content": "<p>Hmm, I'm pretty sure that Vagrantfile is intended for development purposes, for working on the Ansible code.</p>\n<p>Is that what you're trying to do? Gear up to contribute to that repo?</p>",
+        "id": 470771874,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726529027
+    },
+    {
+        "content": "<p>yes, I was planning on using to test some changes to ansible. We have<br>\n been using an aws instance with the roles, but the feedback loop is a lot faster with a local instance</p>",
+        "id": 470780475,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726532356
+    },
+    {
+        "content": "<p>Let's check with Don tomorrow to see if he's tested with M1 etc.</p>",
+        "id": 470795536,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726536726
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> just curious if you've tried Vagrant on M1.</p>",
+        "id": 471013412,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726586391
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> I have not as I have an M2 these days. Want me to test that?</p>",
+        "id": 471029548,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1726589674
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> , anything with arm64 architecture will help to get another data point. We've tested with 2 machines here and ran into same issue<br>\nSteps:</p>\n<ul>\n<li>Install Fusion Pro 13 personal edition + various vagrant plugins</li>\n<li>Update Vagrantfile to reflect new provider ie</li>\n</ul>\n<div class=\"codehilite\"><pre><span></span><code>  config.vm.provider &quot;vmware_desktop&quot; do |vmware|\n    vmware.vmx[&quot;tools.upgrade.policy&quot;] = &quot;manual&quot;\n    vmware.gui = false\n    vmware.ssh_info_public = true\n    vmware.allowlist_verified = true\n    vmware.linked_clone = false\n    vmware.vmx[&quot;ethernet0.virtualdev&quot;] = &quot;vmxnet3&quot;\n    vmware.vmx[&quot;memsize&quot;] = &quot;8192&quot;\n    vmware.vmx[&quot;numvcpus&quot;] = &quot;4&quot;\n  end\n</code></pre></div>\n<ul>\n<li>It almost makes it but fails on HGFS file sharing, i've tried a few other fs types as fallbacks with no luck (sshfs, nfs)</li>\n</ul>\n<p>The error you would encounter is</p>\n<div class=\"codehilite\"><pre><span></span><code>HGFS was never found on the running virtual machine. This must be\ninstalled either through VMware tools or Open VM Tools. HGFS is\nrequired for shared folders to work properly. Please install either\nthe VMware tools or Open VM Tools and try again.\n</code></pre></div>\n<p>I've dug through the Vagrant issue queue and this issues seems to pop up and hung around, I tried some of the solutions suggested but with no luck -<br>\n<a href=\"https://github.com/hashicorp/vagrant/issues/6775\">https://github.com/hashicorp/vagrant/issues/6775</a></p>",
+        "id": 471030644,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726589997
+    },
+    {
+        "content": "<p>Does this mean I would need Fusion Pro 13 to test?</p>",
+        "id": 471037128,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1726591734
+    },
+    {
+        "content": "<p>Probably, or parallels or some other provider, I don't think vbox is supported in arm64. VMware Fusion Pro 13 Personal edition is free, so we went with that to test</p>",
+        "id": 471037635,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726591889
+    },
+    {
+        "content": "<p>It's funny, <a href=\"https://www.virtualbox.org/wiki/Downloads\">https://www.virtualbox.org/wiki/Downloads</a> says \"macOS / Apple Silicon hosts\" so I'd think M1 would be supported.</p>",
+        "id": 471047882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726594855
+    },
+    {
+        "content": "<p>If I clone the ansible repo and run <code>vagrant up</code> the error I immediately get (on is:</p>\n<div class=\"codehilite\"><pre><span></span><code>dataverse-ansible % vagrant up\nThe provider &#39;vmware_desktop&#39; could not be found, but was requested to\nback the machine &#39;default&#39;. Please use a provider that exists.\n\nVagrant knows about the following providers: docker, hyperv, virtualbox\n</code></pre></div>\n<p><a href=\"https://app.vagrantup.com/bento/boxes/rockylinux-9\">https://app.vagrantup.com/bento/boxes/rockylinux-9</a>, it could be the box doesn't support vbox, i'll dig in a little more</p>",
+        "id": 471056052,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726596789
+    },
+    {
+        "content": "<p>A follow up on this, a switch to a different base box resolved the build issue for vmware<br>\n<code>config.vm.box = \"bento/rockylinux-9-arm64\"</code><br>\n<code>postgres_redhat.yml</code> also needed to be updated to use an aarch64 friendly version</p>",
+        "id": 471323826,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726684553
+    },
+    {
+        "content": "<p>Interesting! Do you want to update the README for us?</p>",
+        "id": 471325615,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726685196
+    },
+    {
+        "content": "<p>Thanks, yes -- i'll submit a PR for the README shortly. I'll submit a longer PR with some logic switching based on if using osx or not for the postgres role a bit later, that one has an issue i'm still working out, something is not quite right with the GPG checks and I turned off for now just to get building. It is a postgres/yum/repo issue not related to dataverse</p>",
+        "id": 471326104,
+        "sender_full_name": "Kristian Allen - UCLA",
+        "timestamp": 1726685388
+    },
+    {
+        "content": "<p>Great! Yes! Please send all the PRs!</p>",
+        "id": 471329210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726686471
+    }
+]

@@ -1,0 +1,590 @@
+[
+    {
+        "content": "<p>Hi! I am very happy to see the support for multiple PID providers in 6.2. Right now I am looking for a way to set the PID provider for a dataverse via API. Maybe I have looked in the wrong places, but I didn't find anything. Only for datasets/datafiles: <a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#configure-the-pid-generator-a-dataset-uses-if-enabled\">https://guides.dataverse.org/en/latest/api/native-api.html#configure-the-pid-generator-a-dataset-uses-if-enabled</a></p>\n<p>Is it possible for dataverses as well? Thank you!</p>",
+        "id": 432850491,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1712908145
+    },
+    {
+        "content": "<p>It looks like setting the PID provider for a collection is only possible via UI for now. It seems to have been overlooked by us to add an Admin API endpoint like we have for the storage driver of a collection.</p>",
+        "id": 432855742,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712910188
+    },
+    {
+        "content": "<p>I'll ping folks on Slack, but I fear this will be released with 6.3. Usually a patch release is only done when we find very critical bugs.</p>",
+        "id": 432856091,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712910284
+    },
+    {
+        "content": "<p>Aw, I see. Thanks for checking.</p>",
+        "id": 432869366,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1712915438
+    },
+    {
+        "content": "<p>Another question regarding multiple PID providers, is it possible at all to change the PID provider of a dataset after it has been created? Example: I moved a dataset from a Permalink dataverse to a DOI dataverse, but the dataset still has a Permalink.  Is it possible for that dataset to lose the Permalink and receive a DOI, without re-creating it?</p>",
+        "id": 432869690,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1712915563
+    },
+    {
+        "content": "<p>I don't think that's possible.</p>",
+        "id": 432869943,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915652
+    },
+    {
+        "content": "<p>It kinda violates the principle that a PID is permanent...</p>",
+        "id": 432870003,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915685
+    },
+    {
+        "content": "<p>There might be an exception with the FAKE and PermaLink providers, but that has not been put into code</p>",
+        "id": 432870076,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915720
+    },
+    {
+        "content": "<p>As far as I know, that is</p>",
+        "id": 432870103,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915731
+    },
+    {
+        "content": "<p>Hmm. Yes. In our use case, we would like to optionally mint DOIs for datasets, otherwise only a Permalink. So the default would be to receive a Permalink, with the option to  receive a DOI instead or \"upgrade\" to a DOI later. (The Permalink would actually also continue to exist, but afaik Dataverse doesn't support multiple PIDs per dataset.)</p>",
+        "id": 432870688,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1712915966
+    },
+    {
+        "content": "<p>If it were possible to change the PID provider of a dataset from FAKE or Permalink to DOI, that would be very nice. Is this something that might be put into code, you think?</p>",
+        "id": 432871133,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1712916115
+    },
+    {
+        "content": "<p>No API for this? <img alt=\":doh:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/48103.png\" title=\"doh\"></p>",
+        "id": 432871233,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712916132
+    },
+    {
+        "content": "<blockquote>\n<p>In our use case, we would like to optionally mint DOIs for datasets, otherwise only a Permalink.</p>\n</blockquote>\n<p>That is possible: everything that needs a real DOI goes into a DOI-PID-provider enabled collection and permalink stays the default provider for the instance.</p>",
+        "id": 432871234,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712916132
+    },
+    {
+        "content": "<blockquote>\n<p>with the option to receive a DOI instead or \"upgrade\" to a DOI later</p>\n</blockquote>\n<p>Feel free to open an issue for this feature request</p>",
+        "id": 432871367,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712916182
+    },
+    {
+        "content": "<blockquote>\n<p>afaik Dataverse doesn't support multiple PIDs per dataset</p>\n</blockquote>\n<p>We kind of do. We allow \"alternative identifiers\", but obviously these are unmanaged. On the other hand: a permalink thing is not necessary to manage, as the metadata is not going anywhere outside the instance.</p>",
+        "id": 432871632,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712916256
+    },
+    {
+        "content": "<blockquote>\n<p>something that might be put into code, you think?</p>\n</blockquote>\n<p>I don't see why not. It will require extending the DOI provider interface with sth like \"allowMigration\" so no one moves real stuff to other real stuff and trips over. Migrating datasets from FAKE to a real provider after some initial demo phase etc sounds very reasonable to me, so I don't see why it shouldn't happen.</p>",
+        "id": 432872037,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712916390
+    },
+    {
+        "content": "<p>Obviously: if you want such a feature and you can contribute a PR it speeds up things. Please let us know in the issue description.</p>",
+        "id": 432872292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712916476
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> Jims says this about migrating PIDs on the internal Slack:</p>\n<blockquote>\n<p>As for migrating PIDs, there is no support for changing the PID of a dataset, aside from editing in the db, but that's probably not the only model (presumably people are referencing the existing PID). What is supported now is migrating a dataset into Dataverse with a PID that doesn't match the local protocol/authority/shoulder, and either 1) adding a new provider that matches the protocol/authority/shoulder to allow that dataset to be managed, or 2) asking DataCite to move that specific PID(s) to the existing account and adding those additional PIDs to the managed list for the existing provider (which would then work for the original protocol/authority/shoulder plus only the specific PIDs listed that don't match the pattern.</p>\n</blockquote>",
+        "id": 432880829,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712920199
+    },
+    {
+        "content": "<p>Again, please feel free to create more feature requests and discuss possible code contributions! <span aria-label=\"smiley cat\" class=\"emoji emoji-1f63a\" role=\"img\" title=\"smiley cat\">:smiley_cat:</span></p>",
+        "id": 432880991,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712920259
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> I see Oliver already encouraged you to open an issue. I'll just echo that. We've been talking about it <a href=\"https://iqss.slack.com/archives/C010LA04BCG/p1712910371351689\">in Slack</a> and we all agree we need this.</p>",
+        "id": 432906556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712929335
+    },
+    {
+        "content": "<p>I have opened two issues for what we have discussed here: <a href=\"https://github.com/IQSS/dataverse/issues/10497\">https://github.com/IQSS/dataverse/issues/10497</a> and <a href=\"https://github.com/IQSS/dataverse/issues/10496\">https://github.com/IQSS/dataverse/issues/10496</a></p>",
+        "id": 433312076,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1713192690
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>  I believe the current implementation of multiple PID provider has an inconvenient bug.<br>\nThere is an API to move an unpublished dataset from one dataverse to another. Assuming both dataverses have different PID providers configured. Which PID provider do we expect to mint the DOI? IMHO it shall be the <code>new</code> parent, i.e. the one it was moved to.  Hence, the PID properties must be altered during the move operation, right?</p>",
+        "id": 433466887,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713255449
+    },
+    {
+        "content": "<p>Nope, the PID will stay consistent.</p>",
+        "id": 433469595,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256404
+    },
+    {
+        "content": "<p>Anything already minted will not be changed</p>",
+        "id": 433469669,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256434
+    },
+    {
+        "content": "<p>An unpublished dataset does not have a minted DOI, does it?</p>",
+        "id": 433470157,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713256596
+    },
+    {
+        "content": "<p>Oh well yeah that is a corner case</p>",
+        "id": 433470207,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256612
+    },
+    {
+        "content": "<p>From the data model perspective it has though...</p>",
+        "id": 433470237,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256626
+    },
+    {
+        "content": "<p>I'm looking through the code to learn what would happen</p>",
+        "id": 433470279,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256643
+    },
+    {
+        "content": "<p>So we are talking about this case: the dataset has not published, the create time for the PID is null. <a href=\"https://github.com/poikilotherm/dataverse/blob/222b326aab6be19be9d7bc8907504801bc362343/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/FinalizeDatasetPublicationCommand.java#L101-L101\">https://github.com/poikilotherm/dataverse/blob/222b326aab6be19be9d7bc8907504801bc362343/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/FinalizeDatasetPublicationCommand.java#L101-L101</a></p>",
+        "id": 433470592,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256742
+    },
+    {
+        "content": "<p>So we're now looking at this: <a href=\"https://github.com/poikilotherm/dataverse/blob/222b326aab6be19be9d7bc8907504801bc362343/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/AbstractDatasetCommand.java#L156-L156\">https://github.com/poikilotherm/dataverse/blob/222b326aab6be19be9d7bc8907504801bc362343/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/AbstractDatasetCommand.java#L156-L156</a></p>",
+        "id": 433470654,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256768
+    },
+    {
+        "content": "<p>So the provider will be looked up from the PID that has been assigned when the dataset was created</p>",
+        "id": 433470824,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256807
+    },
+    {
+        "content": "<p>So it will still use the provider that was selected on creation</p>",
+        "id": 433470859,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256820
+    },
+    {
+        "content": "<p>So this definitely is a corner case. Let's see what's in MoveDatasetCommand about this</p>",
+        "id": 433471004,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256864
+    },
+    {
+        "content": "<p>I agree with you that things that once minted shall not be altered! However, tracing minting issues and configuration management of moved datasets will be a mess...but thats another story. This is possible a special case of a previous configured provider is no longer available...</p>\n<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> is currently hacking some unit/integration tests to see whats happening.</p>",
+        "id": 433471208,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713256928
+    },
+    {
+        "content": "<p>Jupp, nothing in that command dealing with migrating the PID provider.</p>",
+        "id": 433471243,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713256938
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> go go go! I would love to see some tests for this! It would be great to see some BDD testing here. Describing the scenario and forming it into a test...</p>",
+        "id": 433471494,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257011
+    },
+    {
+        "content": "<p>It would be really great to see some <a href=\"https://cucumber.io/docs/installation/java/\">Cucumber</a> around!</p>",
+        "id": 433472119,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257235
+    },
+    {
+        "content": "<p>We have so many tests, but they would benefit a lot from story driven testing</p>",
+        "id": 433472213,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257271
+    },
+    {
+        "content": "<p>Is it a bug or a feature? IMHO we need to thing about some edge scenarios and at least document the expected behaviour.  I have those cases in mind:  a) removed PID provider, thats was used to mint resources - what happens during publication of an update? b) moved minted PIDs  to other dataverse - what happen if I publish an updated version 1) provider still present and 2) provider no longer present (analog to a)  and 3) moved non-minted datasets to other dataverse - which PID provider is used?</p>",
+        "id": 433473005,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713257534
+    },
+    {
+        "content": "<p>You're right, this should be documented somewhere.</p>",
+        "id": 433473490,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257732
+    },
+    {
+        "content": "<p>I'm not sure if there is a design document somewhere, I might have lost the link</p>",
+        "id": 433473526,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257746
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> another reason to make those open, at least after the implementation is done...</p>",
+        "id": 433473633,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257774
+    },
+    {
+        "content": "<p>(Maybe even shape them into Architecture Decision Records?)</p>",
+        "id": 433473701,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257795
+    },
+    {
+        "content": "<p>The US is not awake yet, lets pester them once they are around</p>",
+        "id": 433473753,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257818
+    },
+    {
+        "content": "<p>Maybe we can create a PID FAQ somewhere in the docs? Assuming lay/ non-technical users have the same questions and are  overwhelmed with technical details in the design documents.</p>",
+        "id": 433473971,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713257891
+    },
+    {
+        "content": "<p>Sounds like a great addition to the Admin Guide. Usually moving datasets is admin only</p>",
+        "id": 433474048,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713257925
+    },
+    {
+        "content": "<p>With DataCite anyway, the DOI is \"registered\" (reserved) on the DataCite side when a draft dataset is created in Dataverse.</p>\n<p>Researchers might put this DOI in their publication. So I think it would be potentially surprising to them if the DOI/PID changes.</p>\n<p>Once the DOI is published, it changes state from \"registered\" to \"findable\". Please see also <a href=\"https://support.datacite.org/docs/doi-states\">https://support.datacite.org/docs/doi-states</a></p>",
+        "id": 433526709,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713275287
+    },
+    {
+        "content": "<p>Further up in this discussion I said this might be a feature depending on the provider</p>",
+        "id": 433532553,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713276873
+    },
+    {
+        "content": "<p>So DRAFTS in dataverse are <code>registered</code> with datacite and thus are already present via the handle system and subsequently cannot be deleted anymore?  I assumed they are just draft records  with in datacite, and are deleted if the dataset is deleted in dataverse. What happens with the DOI when a draft is deleted?</p>",
+        "id": 433696814,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341139
+    },
+    {
+        "content": "<p>Registered != published. A DataCite DOI in registered mode is not discoverable and still deletable</p>",
+        "id": 433698582,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341673
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L89\">https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L89</a></p>",
+        "id": 433698636,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341686
+    },
+    {
+        "content": "<p>Honestly I'm not sure what happens <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 433698664,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341694
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L140\">https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L140</a></p>",
+        "id": 433698678,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341701
+    },
+    {
+        "content": "<p>registered != publihsed but also registered != draft</p>",
+        "id": 433698761,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341730
+    },
+    {
+        "content": "<p>From this code snippet it assume its a DRAFT record and not a REGISTERED record. This means it can be deleted...</p>",
+        "id": 433698959,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341778
+    },
+    {
+        "content": "<p>And if its only a DRAFT, it shall not be used in any publication or published content. Thus, we can delete and create a new DOI according to another DOI-Provider configuration.</p>",
+        "id": 433699233,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341871
+    },
+    {
+        "content": "<p><a href=\"https://support.datacite.org/docs/doi-states\">https://support.datacite.org/docs/doi-states</a></p>",
+        "id": 433699268,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341880
+    },
+    {
+        "content": "<p>Reserving in Dataverse means draft state at DataCite</p>",
+        "id": 433699397,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341908
+    },
+    {
+        "content": "<p>IIRC</p>",
+        "id": 433699435,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341922
+    },
+    {
+        "content": "<p>Let me check</p>",
+        "id": 433699453,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341925
+    },
+    {
+        "content": "<p>Yes. <a href=\"https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L89\">https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L89</a></p>",
+        "id": 433699525,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713341953
+    },
+    {
+        "content": "<p>That is a good thing, yet a bit confusing.</p>",
+        "id": 433699628,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713341992
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/blob/d9a79228ef6776aff155f8d8a03349eb4f06751d/src/main/java/edu/harvard/iq/dataverse/pidproviders/doi/datacite/DataCiteDOIProvider.java#L195\"><code>publicizeIdentifier()</code></a> is used to switch from draft to findable.</p>",
+        "id": 433699710,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713342006
+    },
+    {
+        "content": "<p>This means, we could alter the moveDatasetCommand to delete the DRAFT DOI of one provider and create a new draft with another provider, such that configured PID provider of the target dataverse is used.</p>",
+        "id": 433700200,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713342180
+    },
+    {
+        "content": "<p>Please create a feature request if not yet existing <span aria-label=\"smile cat\" class=\"emoji emoji-1f638\" role=\"img\" title=\"smile cat\">:smile_cat:</span></p>",
+        "id": 433700892,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713342415
+    },
+    {
+        "content": "<p>Already created I assume, but as said Vera is on the issue and will create some tests for it. This is not the only edge case we need to think of.</p>",
+        "id": 433703380,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713343230
+    },
+    {
+        "content": "<p>It might be good to talk about this at a future tech hour discussion <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span></p>",
+        "id": 433703493,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713343280
+    },
+    {
+        "content": "<p>Sure, but again, please warn the user:</p>\n<p>\"Are you sure you want to change the PID of this dataset? If you put the dataset's original PID in your unpublished paper, please update it!\"</p>",
+        "id": 433722531,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713349678
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/379673-dev/topic/changing.20dataverse.20PID.20provider.20via.20API/near/433722531\">said</a>:</p>\n<blockquote>\n<p>Sure, but again, please warn the user:</p>\n<p>\"Are you sure you want to change the PID of this dataset? If you put the dataset's original PID in your unpublished paper, please update it!\"</p>\n</blockquote>\n<p>Is there an UI feature to move a dataset?</p>",
+        "id": 433750752,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713358892
+    },
+    {
+        "content": "<p>Yes. It's superuser-only right now. Screenshots:</p>\n<p><a href=\"/user_uploads/53090/R6VAAyAJKi3sqSit4Z8Kx69V/dashboard.png\">dashboard.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/R6VAAyAJKi3sqSit4Z8Kx69V/dashboard.png\" title=\"dashboard.png\"><img src=\"/user_uploads/53090/R6VAAyAJKi3sqSit4Z8Kx69V/dashboard.png\"></a></div><p><a href=\"/user_uploads/53090/ykXotOp65N0JFKK5hrFTUMTd/move-dataset.png\">move-dataset.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ykXotOp65N0JFKK5hrFTUMTd/move-dataset.png\" title=\"move-dataset.png\"><img src=\"/user_uploads/53090/ykXotOp65N0JFKK5hrFTUMTd/move-dataset.png\"></a></div><p>Docs: <a href=\"https://guides.dataverse.org/en/6.2/admin/dashboard.html#move-data\">https://guides.dataverse.org/en/6.2/admin/dashboard.html#move-data</a></p>",
+        "id": 433752911,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713359485
+    },
+    {
+        "content": "<p>Thanks, I've never noticed this button</p>",
+        "id": 433753183,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713359555
+    },
+    {
+        "content": "<p>Would this call-out/documentation be sufficient and describe the intended behaviour of the system?  \"This function can be used to transfer a dataset from one dataverse to another. The PID settings of the target dataverse become active when an unpublished (i.e. draft) dataset is moved to another dataverse. This invalidates the existing PID and creates a new one. If the PID has already been in use outside the system, it will have to be adjusted. The PID configuration is not adjusted for dataset that have already been published.\"</p>",
+        "id": 433755289,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713360096
+    },
+    {
+        "content": "<p>It certainly helps! My concern is... is the dataset author in the loop? Do they know what the superuser is up to?</p>",
+        "id": 433755991,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360276
+    },
+    {
+        "content": "<p>Fair enough, but I imagine this function is performed as part of a service request on behalf of a user.  We could add a notification to inform the user about the performed change.</p>",
+        "id": 433756675,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713360458
+    },
+    {
+        "content": "<p>Sure, that makes sense.</p>",
+        "id": 433756851,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360500
+    },
+    {
+        "content": "<p>At some point we should summarize in <a href=\"https://github.com/IQSS/dataverse/issues/10497\">#10497</a></p>",
+        "id": 433757013,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360539
+    },
+    {
+        "content": "<p>This could something like: <code>The dataset [] was moved from [] to []. Since it wasn't published the planned PID changed to [].  If the former PID has already been in use outside the system, it will have to be adjusted.</code></p>",
+        "id": 433757175,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713360587
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/379673-dev/topic/changing.20dataverse.20PID.20provider.20via.20API/near/433757013\">said</a>:</p>\n<blockquote>\n<p>At some point we should summarize in <a href=\"https://github.com/IQSS/dataverse/issues/10497\">#10497</a></p>\n</blockquote>\n<p>This is another feature request.</p>",
+        "id": 433757339,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713360623
+    },
+    {
+        "content": "<p>Sure, I would show the old PID as well.</p>",
+        "id": 433757344,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360624
+    },
+    {
+        "content": "<p>Oh, well, maybe we need a new issue?</p>",
+        "id": 433757422,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360655
+    },
+    {
+        "content": "<p>It different than this one: set dataverse PID provider via API <a href=\"https://github.com/IQSS/dataverse/issues/10496\">#10496</a></p>",
+        "id": 433757506,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713360679
+    },
+    {
+        "content": "<p>This thread talks about moved datasets, they should pick up the new PID configuration if not already published.  <a href=\"https://github.com/IQSS/dataverse/issues/10497\">#10497</a> is about upgrading published datasets from a suboptimal PID system to a \"better\" one. (e.g. started with internal PermaLinks and later upgrade to nice DOI PIDs.)   <a href=\"https://github.com/IQSS/dataverse/issues/10496\">#10496</a> is just about configure a dataverse PID provider via API.</p>",
+        "id": 433758333,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713360895
+    },
+    {
+        "content": "<p>Originally, this Zulip topic was about changing dataverse PID provider via API. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> </p>\n<p>Now it's about much more. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> </p>\n<p>We could start new topics and move messages around.</p>",
+        "id": 433758827,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713361038
+    },
+    {
+        "content": "<p>Or maybe re-title this thread? We're trying to say \"collection\" instead of \"dataverse\" these days. Maybe \"changing collection PID provider\"? Broad enough?</p>",
+        "id": 433759083,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713361103
+    },
+    {
+        "content": "<p>Thats nice, we also use collection in our project and renamed dataverse.</p>",
+        "id": 433759559,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713361216
+    },
+    {
+        "content": "<p>Great, I renamed this topic.</p>",
+        "id": 433760375,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713361455
+    },
+    {
+        "content": "<p>But do we have the right number of issues? We still need one more, right? \"moved datasets, they should pick up the new PID configuration if not already published\"</p>",
+        "id": 433760486,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713361495
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/379673-dev/topic/changing.20collection.20PID.20provider/near/433760486\">said</a>:</p>\n<blockquote>\n<p>But do we have the right number of issues? We still need one more, right? \"moved datasets, they should pick up the new PID configuration if not already published\"</p>\n</blockquote>\n<p>I going to create one and most likely implement it. Hopefully this feature can be part of the next release.</p>",
+        "id": 433760610,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713361525
+    },
+    {
+        "content": "<p>Here is the issue <a href=\"https://github.com/IQSS/dataverse/issues/10501\">https://github.com/IQSS/dataverse/issues/10501</a></p>",
+        "id": 433775346,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713363183
+    },
+    {
+        "content": "<p>Looks great. Could you please add a link back to this topic on Zulip?</p>",
+        "id": 433775727,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713363230
+    },
+    {
+        "content": "<p>I wanted to but I cannot find the option to create a link in zulip.</p>",
+        "id": 433775998,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713363260
+    },
+    {
+        "content": "<p>Nevermind, got it now!</p>",
+        "id": 433776247,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1713363289
+    },
+    {
+        "content": "<p>I usually use the sidebar</p>",
+        "id": 433787640,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713364601
+    },
+    {
+        "content": "<p>Ah, you linked to where you brought this up. Perfect.</p>",
+        "id": 433788005,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713364643
+    },
+    {
+        "content": "<p>I have been working on the tests to illustrate this issue. I played around with Cucumber <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>  thank you for the pointer. It has been a while since I used Cucumber for testing.</p>\n<p>I think it makes the most sense to implement the tests as API tests, so that is what I started with. I have now run into the following issue: how can we best test the cases involving a DOI provider? I can configure the tested dataverse with a DOI provider, however we don't want the tests to cause actual requests to be sent to the DataCite APIs. We also don't want the tests to fail because we have configured a fake DataCite API URL that doesn't respond in the expected way. Is mocking the DataCite API endpoints the right way to go? How would I go about this?</p>\n<p>Or do you envision some other way for the tests to be implemented?</p>\n<p>I've pushed my current state here <a href=\"https://github.com/vera/dataverse/tree/moving-datasets-between-pid-providers\">https://github.com/vera/dataverse/tree/moving-datasets-between-pid-providers</a> it's very WIP, happy to receive feedback on it (run tests with <code>mvn test -Dtest=RunCucumberTest</code>)</p>",
+        "id": 433791912,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1713365070
+    },
+    {
+        "content": "<p>Hmm, mocking sounds fine to me.</p>",
+        "id": 433795001,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713365415
+    },
+    {
+        "content": "<p>We discussed this issue with DataCite sometime ago on Slack as well</p>",
+        "id": 434032306,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713442362
+    },
+    {
+        "content": "<p>One idea to avoid real calls to the DataCite (Test) Fabrica was to use sth like WireMock</p>",
+        "id": 434032387,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713442397
+    }
+]

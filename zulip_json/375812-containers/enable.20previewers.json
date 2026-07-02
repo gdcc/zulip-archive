@@ -1,0 +1,422 @@
+[
+    {
+        "content": "<p>As promised in today's meeting, I tried using the previewers hosted on GitHub Pages. Didn't work. CORS error. I opened an issue: enable previewers in containers <a href=\"https://github.com/IQSS/dataverse/issues/10506\">#10506</a></p>",
+        "id": 434165029,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713456641
+    },
+    {
+        "content": "<p>The container serving the files needs to set the CORS header. For local development, <code>*</code> should be fine for <code>Access-Control-Allow-Origin</code></p>",
+        "id": 434320861,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713518110
+    },
+    {
+        "content": "<p>Which container should we use? Caddy? nginx? Traefik?</p>",
+        "id": 434715098,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713782681
+    },
+    {
+        "content": "<p>Maybe busybox?</p>",
+        "id": 434715641,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713782861
+    },
+    {
+        "content": "<p><a href=\"https://lipanski.com/posts/smallest-docker-image-static-website\">https://lipanski.com/posts/smallest-docker-image-static-website</a></p>",
+        "id": 434715668,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713782873
+    },
+    {
+        "content": "<p>Sure. We could always switch later.</p>",
+        "id": 434715819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713782912
+    },
+    {
+        "content": "<p>Image size matters <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 434715860,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713782925
+    },
+    {
+        "content": "<p>If we want more configurability and support to manipulate headers, we might look at Caddy or Nginx.</p>",
+        "id": 434716255,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713783069
+    },
+    {
+        "content": "<p>Well, we already use Caddy for the dev compose.</p>\n<p>And for the demo compose we talked about using Traefik. I just started a topic at <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/add.20Traefik\">#containers &gt; add Traefik</a></p>",
+        "id": 434716555,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713783163
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> , as mentioned in the Github issue I have implemented a solution for providing the previewers as a docker container. I wasn't aware of this thread and started implementing it inside the dataverse-previewers project. You can find it in my fork here: <a href=\"https://github.com/gschmutz/dataverse-previewers\">https://github.com/gschmutz/dataverse-previewers</a> in the docker folder. </p>\n<p>Docker image is using Nginx and I'm invoking the <a href=\"http://localinstall.sh\">localinstall.sh</a> script using env vars for the parameters.</p>",
+        "id": 482652369,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731688952
+    },
+    {
+        "content": "<p>Awesome! I'm looking at the \"compare\" at <a href=\"https://github.com/gdcc/dataverse-previewers/compare/develop...gschmutz:dataverse-previewers:develop\">https://github.com/gdcc/dataverse-previewers/compare/develop...gschmutz:dataverse-previewers:develop</a></p>",
+        "id": 482652715,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689062
+    },
+    {
+        "content": "<p>but I'm open to move it somewhere else, could copy the previewers from the release</p>",
+        "id": 482652773,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689086
+    },
+    {
+        "content": "<p>What's cool is that you seem to also be addressing this issue:</p>\n<p>Consider Traefik or similar for HTTPS etc. (milestone E) <a href=\"https://github.com/IQSS/dataverse/issues/10359\">#10359</a></p>",
+        "id": 482653097,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689193
+    },
+    {
+        "content": "<p>I also have a solution to register the previewers on a running Dataverse instance using docker.  It's currently in it's own project (<a href=\"https://github.com/TrivadisPF/docker-dataverse-previewer\">https://github.com/TrivadisPF/docker-dataverse-previewer</a>), but I was planning to bring it together</p>",
+        "id": 482653213,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689230
+    },
+    {
+        "content": "<p>I also had configbaker in mind, but first wanted to just do a PoC, in docker compose it looks like that:</p>\n<div class=\"codehilite\"><pre><span></span><code>  dataverse-setup-previewers:\n    container_name: dataverse-setup-previewers\n    hostname: dataverse-setup-previewers\n    image: trivadis/dataverse-deploy-previewers:latest\n    init: true\n    environment:\n      - API_TOKEN=${API_TOKEN}\n      - DATAVERSE_URL=http://${PUBLIC_IP}:28394\n      - TIMEOUT=10m\n      - PREVIEWER_PROVIDER_URL=http://${PUBLIC_IP}:28395\n      - INCLUDE_PREVIEWERS=text,html,pdf,csv,comma-separated-values,tsv,tab-separated-values,jpeg,png,gif,markdown,x-markdown\n      - EXCLUDE_PREVIEWERS=\n      - REMOVE_EXISTING=True\n    command:\n      - deploy\n    restart: no\n</code></pre></div>",
+        "id": 482653655,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689389
+    },
+    {
+        "content": "<p>I don't know if this helps, but Dataverse developers like me use this docker-compose file everyday: <a href=\"https://github.com/IQSS/dataverse/blob/develop/docker-compose-dev.yml\">https://github.com/IQSS/dataverse/blob/develop/docker-compose-dev.yml</a></p>\n<p>We also have a demo/eval compose file here: <a href=\"https://github.com/IQSS/dataverse/blob/develop/docker/compose/demo/compose.yml\">https://github.com/IQSS/dataverse/blob/develop/docker/compose/demo/compose.yml</a></p>\n<p>I'm interested in adding previewers to both of these somehow. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 482653668,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689398
+    },
+    {
+        "content": "<p>That is, I'd love a pull request against these files. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 482654145,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689538
+    },
+    {
+        "content": "<p>Developers use <code>mvn -Pct clean package docker:run</code> as explained at <a href=\"https://guides.dataverse.org/en/6.4/developers/dev-environment.html#quickstart\">https://guides.dataverse.org/en/6.4/developers/dev-environment.html#quickstart</a></p>\n<p>For the demo/eval use case, we have a separate quickstart at <a href=\"https://guides.dataverse.org/en/6.4/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.4/container/running/demo.html#quickstart</a></p>",
+        "id": 482654518,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689663
+    },
+    {
+        "content": "<p>Do you have any interest in trying either of these? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 482654569,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689686
+    },
+    {
+        "content": "<p>just want to ask :-) do you want me to do a PR using the solution I have now and we then discuss how to move it forward?</p>",
+        "id": 482654602,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689700
+    },
+    {
+        "content": "<p>I'm not sure, to be honest. It's another Docker thing to maintain. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 482654698,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689737
+    },
+    {
+        "content": "<p>But if we can get some of your ideas into a PR against one for both files above, it would be a big win.</p>",
+        "id": 482654848,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689777
+    },
+    {
+        "content": "<p>I'm happy to do a zoom call, by the way, if that's easier.</p>",
+        "id": 482655053,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689837
+    },
+    {
+        "content": "<p>sorry, I meant changing the two files but using the two docker images currently hosted on the trivadis docker hub? Just the docker solution I have now and then we can discuss if we want to consolidate it somewhere else</p>",
+        "id": 482655121,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689858
+    },
+    {
+        "content": "<p>Yes let's do a Zoom call, easier to discuss things than here ... but I'm just having dinner now, would you also be available in about 1 hour?</p>",
+        "id": 482655368,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731689924
+    },
+    {
+        "content": "<p>I think I understand... use the trivadis images... maybe!</p>\n<p>Yes, lunch time here. Let's check back in 1 or 1.5 hours, please. Thanks!</p>",
+        "id": 482655461,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731689963
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> ready for a zoom link? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 482669346,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731694509
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> <a href=\"https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09\">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>",
+        "id": 482671002,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731695120
+    },
+    {
+        "content": "<p>Sorry, I didn't notice the <span aria-label=\"thumbs up\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"thumbs up\">:thumbs_up:</span></p>",
+        "id": 482671031,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731695132
+    },
+    {
+        "content": "<p>Thanks for chatting and thanks for the future pull request!</p>",
+        "id": 482687652,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731701402
+    },
+    {
+        "content": "<p>I'm going to throw some links in here so I don't lose them:</p>\n<p><a href=\"https://github.com/TrivadisPF/docker-dataverse-previewer\">https://github.com/TrivadisPF/docker-dataverse-previewer</a><br>\n<a href=\"https://hub.docker.com/r/trivadis/dataverse-previewers-provider\">https://hub.docker.com/r/trivadis/dataverse-previewers-provider</a></p>\n<p><a href=\"https://github.com/TrivadisPF/docker-dataverse-previewer\">https://github.com/TrivadisPF/docker-dataverse-previewer</a><br>\n<a href=\"https://hub.docker.com/r/trivadis/dataverse-deploy-previewers\">https://hub.docker.com/r/trivadis/dataverse-deploy-previewers</a></p>",
+        "id": 482688060,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731701567
+    },
+    {
+        "content": "<p>thanks as well, I have just submitted the PR on the compose.yml. Took me a bit longer to make it work.  Had to change the <code>DATAVERSE_SITEURL</code> and set it to <code>http://${MACHINE_IP:-localhost}:8080\"</code> on the dataverse service</p>",
+        "id": 482701835,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731708243
+    },
+    {
+        "content": "<p>/me looks at Add two additional containers to provide Previewers locally <a href=\"https://github.com/IQSS/dataverse/issues/11025\">#11025</a></p>",
+        "id": 482703161,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731708896
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> thanks! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 482703186,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731708904
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> merged! Thanks! I noticed your branch was \"develop\" so I fast-tracked it. (See <a href=\"https://github.com/IQSS/dataverse/issues/10261\">#10261</a> for problems we have with both branches being called \"develop\".) We can add docs in another pull request.</p>",
+        "id": 482704351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709495
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/dYTqCep_Dz_VxeqGTPcW1CUG/Screenshot-2024-11-15-at-5.19.12PM.png\">Screenshot 2024-11-15 at 5.19.12 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/dYTqCep_Dz_VxeqGTPcW1CUG/Screenshot-2024-11-15-at-5.19.12PM.png\" title=\"Screenshot 2024-11-15 at 5.19.12 PM.png\"><img data-original-dimensions=\"1401x1143\" src=\"/user_uploads/thumbnail/53090/dYTqCep_Dz_VxeqGTPcW1CUG/Screenshot-2024-11-15-at-5.19.12PM.png/840x560.webp\"></a></div>",
+        "id": 482704381,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709512
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/aJtHbXmccKPBp4NrRiQo1eKB/Screenshot-2024-11-15-at-5.19.32PM.png\">Screenshot 2024-11-15 at 5.19.32 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/aJtHbXmccKPBp4NrRiQo1eKB/Screenshot-2024-11-15-at-5.19.32PM.png\" title=\"Screenshot 2024-11-15 at 5.19.32 PM.png\"><img data-original-dimensions=\"1401x719\" src=\"/user_uploads/thumbnail/53090/aJtHbXmccKPBp4NrRiQo1eKB/Screenshot-2024-11-15-at-5.19.32PM.png/840x560.webp\"></a></div>",
+        "id": 482704393,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709520
+    },
+    {
+        "content": "<p>Works great!</p>",
+        "id": 482704404,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709526
+    },
+    {
+        "content": "<p>Also, I added it to the <a href=\"https://docs.google.com/document/d/1JALRaIcsjB7oLmN0rAtNyu1kZo28xXgG7sDR1RkRG4I/edit?usp=sharing\">agenda</a> for our next meeting. (See also <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a> .)</p>",
+        "id": 482704533,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709594
+    },
+    {
+        "content": "<p>Thanks again! Have a good weekend!</p>",
+        "id": 482704554,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731709606
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span>  great hat it worked on your machine and sorry for not using a branch, I realized it but then forgot to change it before I pushed it. Yes I'm aware that docs are needed as well, can do that in the coming wee.</p>",
+        "id": 482860000,
+        "sender_full_name": "Guido Schmutz",
+        "timestamp": 1731848011
+    },
+    {
+        "content": "<p>Cool, cool, I'm happy to help with docs as well. Thanks again!</p>",
+        "id": 482868303,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731855130
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> <span class=\"user-mention\" data-user-id=\"602159\">@Kris Dekeyser (KU Leuven)</span> et al. I just got this approved and moved into \"sprint ready\": enable previewers in containers <a href=\"https://github.com/IQSS/dataverse/issues/10506\">#10506</a></p>\n<p>(As discussed during today's container meeting.)</p>",
+        "id": 494199840,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737048690
+    },
+    {
+        "content": "<p>Pretty high up too. Number 4 right now: <a href=\"https://github.com/orgs/IQSS/projects/34/views/28\">https://github.com/orgs/IQSS/projects/34/views/28</a> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 494200030,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737048757
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> hi! We just talked all about your previewers. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span> </p>\n<p>We recorded it, if you're interested: <a href=\"https://harvard.zoom.us/rec/share/mB8vTbBo_KAENu0QNyov7YXlEYe8-tDxRKSIJzFKZtOdsyKTw_dI73WTjmIX4y7l.9xgvoFYY4tGqWETB\">https://harvard.zoom.us/rec/share/mB8vTbBo_KAENu0QNyov7YXlEYe8-tDxRKSIJzFKZtOdsyKTw_dI73WTjmIX4y7l.9xgvoFYY4tGqWETB</a></p>\n<p>Notes at <a href=\"https://docs.google.com/document/d/1ma1G2QiN8OPqVEb5dB5cdG7x4qRXgA8DS9bQlmgx0sA/edit?usp=sharing\">https://docs.google.com/document/d/1ma1G2QiN8OPqVEb5dB5cdG7x4qRXgA8DS9bQlmgx0sA/edit?usp=sharing</a></p>\n<p>We plan to pick up the conversation next week if you'd like to join! Please see <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a></p>",
+        "id": 495529317,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737647001
+    },
+    {
+        "content": "<p>The new PR is away! add file previewers to dev env, more docs <a href=\"https://github.com/IQSS/dataverse/issues/11181\">#11181</a></p>",
+        "id": 495538094,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737649307
+    },
+    {
+        "content": "<p>It's in \"ready for review\". Please feel free to leave a review, all.</p>",
+        "id": 495538719,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737649485
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602159\">@Kris Dekeyser (KU Leuven)</span> and others who attended today's meeting (<a href=\"https://docs.google.com/document/d/1iNbb6SVCBKOQGmDaRmTyX2hwInKQGWJxHpDpV9MP2rI/edit?usp=sharing\">notes</a>, <a href=\"https://harvard.zoom.us/rec/share/eG-j-ptXsmTsY3LKucSNBXIMu_zK9zFY5U14z_C-chl9fDEdudElIV1Id50D11Hg.CJRt8PV7mFgZwv_L\">recording</a>), thanks for the feedback! I just added more docs about which previewers are available: <a href=\"https://github.com/IQSS/dataverse/pull/11181/commits/9fa64ed863ca706a4110b9df4d3a464d275d9b1a\">https://github.com/IQSS/dataverse/pull/11181/commits/9fa64ed863ca706a4110b9df4d3a464d275d9b1a</a></p>",
+        "id": 496852255,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738265249
+    },
+    {
+        "content": "<p>Please take a look and let me know what you think.</p>",
+        "id": 496852293,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738265259
+    },
+    {
+        "content": "<p>Also, I'm realizing I didn't bring this up during the meeting:</p>\n<p>\"Should we consider removing this MACHINE_IP stuff from this compose file? We already removed it from the dev version.\"</p>\n<p>From the same PR. Any thoughts on this?</p>",
+        "id": 496852461,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738265313
+    },
+    {
+        "content": "<p>I added some comments to the Github issue. But overall I like the change you made. Thank you.</p>",
+        "id": 496856453,
+        "sender_full_name": "Kris Dekeyser (KU Leuven)",
+        "timestamp": 1738266519
+    },
+    {
+        "content": "<p>Thanks! I replied!</p>",
+        "id": 496857660,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738266934
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656972\">@Guido Schmutz</span> Hi! Today <span class=\"user-mention\" data-user-id=\"602159\">@Kris Dekeyser (KU Leuven)</span> and I noticed 404s for files like <a href=\"http://localhost:9000/previewers/v1.4/fonts/glyphicons-halflings-regular.ttf\">http://localhost:9000/previewers/v1.4/fonts/glyphicons-halflings-regular.ttf</a></p>\n<p><a href=\"/user_uploads/53090/EBcwSjV37OiuUFQZtvsLKcFT/Screenshot-2025-02-06-at-10.46.14AM.png\">Screenshot 2025-02-06 at 10.46.14 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/EBcwSjV37OiuUFQZtvsLKcFT/Screenshot-2025-02-06-at-10.46.14AM.png\" title=\"Screenshot 2025-02-06 at 10.46.14 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"3384x2234\" src=\"/user_uploads/thumbnail/53090/EBcwSjV37OiuUFQZtvsLKcFT/Screenshot-2025-02-06-at-10.46.14AM.png/840x560.webp\"></a></div>",
+        "id": 498152679,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738856889
+    },
+    {
+        "content": "<p>Any thoughts on this? Could it be an issue with <a href=\"https://hub.docker.com/r/trivadis/dataverse-previewers-provider\">https://hub.docker.com/r/trivadis/dataverse-previewers-provider</a> ? Thanks! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 498153180,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738857007
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin ☃️</span> <a href=\"#narrow/channel/375812-containers/topic/enable.20previewers/near/498153180\">said</a>:</p>\n<blockquote>\n<p>Any thoughts on this? Could it be an issue with <a href=\"https://hub.docker.com/r/trivadis/dataverse-previewers-provider\">https://hub.docker.com/r/trivadis/dataverse-previewers-provider</a> ? Thanks! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>\n</blockquote>\n<p>Problemet eksisterer allerede...<br>\n<a href=\"https://github.com/gdcc/dataverse-previewers/issues/86\">https://github.com/gdcc/dataverse-previewers/issues/86</a></p>\n<p>That comes from the <code>localinstall.sh</code> and he uses it in the Docker images:<br>\n<a href=\"https://github.com/gschmutz/dataverse-previewers/tree/develop\">https://github.com/gschmutz/dataverse-previewers/tree/develop</a></p>",
+        "id": 498164124,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738859861
+    },
+    {
+        "content": "<p>Interesting! Thanks.</p>",
+        "id": 498165003,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738860100
+    },
+    {
+        "content": "<p>Hmm. The <code>localinstall.sh</code> in the docker image is the latest and includes the latest fix. I don't think the github issue is the problem.</p>\n<p>Your screenshot indicates that the problem is that it tries to download the glyph font from the local host. Why would it do that?</p>\n<p>Looking at the <code>localinstall.sh</code> closer, I think the problem is with the concept of the <code>localinstall.sh</code> itself. It downloads all the remote js and css files. And I believe that is what is killing it.</p>\n<p>One of the downloaded CSS files is the minified version of <a href=\"https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.css\">the bootstrap style sheet</a>. That file contains:</p>\n<div class=\"codehilite\" data-code-language=\"CSS\"><pre><span></span><code><span class=\"p\">@</span><span class=\"k\">font-face</span><span class=\"w\"> </span><span class=\"p\">{</span>\n<span class=\"w\">  </span><span class=\"nt\">font-family</span><span class=\"o\">:</span><span class=\"w\"> </span><span class=\"s2\">\"Glyphicons Halflings\"</span><span class=\"o\">;</span>\n<span class=\"w\">  </span><span class=\"nt\">src</span><span class=\"o\">:</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.eot\"</span><span class=\"o\">);</span>\n<span class=\"w\">  </span><span class=\"nt\">src</span><span class=\"o\">:</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.eot?#iefix\"</span><span class=\"o\">)</span><span class=\"w\"> </span><span class=\"nt\">format</span><span class=\"o\">(</span><span class=\"s2\">\"embedded-opentype\"</span><span class=\"o\">),</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.woff2\"</span><span class=\"o\">)</span><span class=\"w\"> </span><span class=\"nt\">format</span><span class=\"o\">(</span><span class=\"s2\">\"woff2\"</span><span class=\"o\">),</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.woff\"</span><span class=\"o\">)</span><span class=\"w\"> </span><span class=\"nt\">format</span><span class=\"o\">(</span><span class=\"s2\">\"woff\"</span><span class=\"o\">),</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.ttf\"</span><span class=\"o\">)</span><span class=\"w\"> </span><span class=\"nt\">format</span><span class=\"o\">(</span><span class=\"s2\">\"truetype\"</span><span class=\"o\">),</span><span class=\"w\"> </span><span class=\"nt\">url</span><span class=\"o\">(</span><span class=\"s2\">\"../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular\"</span><span class=\"o\">)</span><span class=\"w\"> </span><span class=\"nt\">format</span><span class=\"o\">(</span><span class=\"s2\">\"svg\"</span><span class=\"o\">);</span>\n<span class=\"p\">}</span>\n</code></pre></div>\n<p>Therefore copying that file locally will cause the referenced fonts to also be searched locally.</p>\n<p>An easy fix would be to nuke the whole idea of copying the files locally.</p>\n<p>The proper way to make a local install work is by installing the NPM package, but that is another story.</p>",
+        "id": 498203588,
+        "sender_full_name": "Kris Dekeyser (KU Leuven)",
+        "timestamp": 1738873175
+    },
+    {
+        "content": "<p>Right, for example, it's trying to download <a href=\"http://localhost:9000/previewers/v1.4/fonts/glyphicons-halflings-regular.ttf\">http://localhost:9000/previewers/v1.4/fonts/glyphicons-halflings-regular.ttf</a></p>",
+        "id": 498204437,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738873521
+    },
+    {
+        "content": "<p>Ah, interesting, Jim <a href=\"https://github.com/gdcc/dataverse-previewers/commit/7e32887fab7481868ffd68ecf7be5d32b84d089d\">created</a> the localinstall script but it was based on script by <span class=\"user-mention\" data-user-id=\"699150\">@Benedikt</span> according to the commit message. And <a href=\"https://github.com/gdcc/dataverse-previewers/pull/63\">the PR</a>.</p>",
+        "id": 498204975,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738873730
+    },
+    {
+        "content": "<p>Anyway, we should probably pull Jim in at some point.</p>",
+        "id": 498205008,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738873746
+    },
+    {
+        "content": "<p>That's true, NPM as you mean, <span class=\"user-mention\" data-user-id=\"602159\">@Kris Dekeyser (KU Leuven)</span> , would be best. However, it would somewhat overturn the whole concept of the previewer. It was just an idea of mine to run everything completely locally without an internet connection. <br>\nI didn't pay attention to the internally linked data.</p>\n<p>I will make an adjustment there now.</p>\n<p>Thanks...</p>",
+        "id": 498278824,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738915156
+    },
+    {
+        "content": "<p><a href=\"https://github.com/gdcc/dataverse-previewers/pull/98\">https://github.com/gdcc/dataverse-previewers/pull/98</a></p>",
+        "id": 498322583,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738929137
+    },
+    {
+        "content": "<p>If you want to build the Docker image yourself with the new <code>localinstall.sh</code>.</p>\n<p><a href=\"https://github.com/DataverseNO/dataverse-previewers/tree/docker-images\">https://github.com/DataverseNO/dataverse-previewers/tree/docker-images</a></p>",
+        "id": 498323065,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738929310
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>docker build -f docker/Dockerfile .\n</code></pre></div>",
+        "id": 498323431,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738929436
+    },
+    {
+        "content": "<p>Could we make the local copy optional? I would even prefer this to be an opt-in. Please see this <a href=\"https://github.com/gdcc/dataverse-previewers/issues/99\">github issue</a> for my reasoning.</p>",
+        "id": 498332242,
+        "sender_full_name": "Kris Dekeyser (KU Leuven)",
+        "timestamp": 1738932257
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"699150\">@Benedikt</span> do you want PR 98 to close issue 86? If so, you can add the word \"closes\".</p>",
+        "id": 498333130,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738932542
+    },
+    {
+        "content": "<p>I just wanted to say that you don't need to change anything in the images. If you write it in the environment, for example:</p>\n<div class=\"codehilite\"><pre><span></span><code>VERSIONS=&quot;CDN&quot;\n</code></pre></div>\n<p>Then nothing is changed locally and you use CDN/remote js/css files.</p>",
+        "id": 498348450,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738937156
+    },
+    {
+        "content": "<p>orly</p>",
+        "id": 498349763,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738937539
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/y5YJ2jbijKrufMLMmsjlu7r8/Screenshot-from-2025-02-07-15-20-22.png\">Screenshot from 2025-02-07 15-20-22.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/y5YJ2jbijKrufMLMmsjlu7r8/Screenshot-from-2025-02-07-15-20-22.png\" title=\"Screenshot from 2025-02-07 15-20-22.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1049x846\" src=\"/user_uploads/thumbnail/53090/y5YJ2jbijKrufMLMmsjlu7r8/Screenshot-from-2025-02-07-15-20-22.png/840x560.webp\"></a></div>",
+        "id": 498351542,
+        "sender_full_name": "Benedikt",
+        "timestamp": 1738938045
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"699150\">@Benedikt</span> That is nice, thank you.</p>",
+        "id": 498372665,
+        "sender_full_name": "Kris Dekeyser (KU Leuven)",
+        "timestamp": 1738943972
+    }
+]

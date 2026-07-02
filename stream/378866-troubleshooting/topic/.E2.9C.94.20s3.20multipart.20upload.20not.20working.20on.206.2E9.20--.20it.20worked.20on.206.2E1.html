@@ -1,0 +1,51 @@
+<html>
+<head><meta charset="utf-8"><title>✔ s3 multipart upload not working on 6.9 -- it worked on 6.1 · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html">✔ s3 multipart upload not working on 6.9 -- it worked on 6.1</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="606662892"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/606662892" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#606662892">(Jun 26 2026 at 08:16)</a>:</h4>
+<p>We recently (few months ago) upgraded to 6.9, and just noticed that dataverse does not use the multipart method for uploading to the ceph-based s3 storage we have, thus failing to upload any file larger than 4GiB. I tried setting  dataverse.files.&lt;id&gt;.chunked-encoding to both true and false, but neither works. I managed to find an old test server that contained a 6.1 instance, and it correctly sends the upload in many parts with <code>uploadId</code> and  <code>partNumber</code> parameters.<br>
+Is there an option to get the old behaviour back? Or are there s3 profile options that I can set in the <code>.aws/config</code> file?<br>
+I am currently trying to find when the error occurred, but is is quite slow, so any help is appreciated!</p>
+
+
+
+<a name="606663222"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/606663222" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#606663222">(Jun 26 2026 at 08:18)</a>:</h4>
+<p>Before you ask: direct upload is not an option, at least in the short-term.</p>
+
+
+
+<a name="606664041"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/606664041" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#606664041">(Jun 26 2026 at 08:22)</a>:</h4>
+<p>Sorry, I did not find <a class="stream-topic" data-stream-id="378866" href="/#narrow/channel/378866-troubleshooting/topic/.E2.9C.94.20Multipart.20upload.20broken.20after.20v6.2E7.20for.20S3.20compatible.20st.2E.2E.2E/with/604641991">#troubleshooting &gt; ✔ Multipart upload broken after v6.7 for S3 compatible st...</a> , the search function does not seem to be very good... I will try to use the patch linked there.</p>
+
+
+
+<a name="606683907"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/606683907" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#606683907">(Jun 26 2026 at 09:55)</a>:</h4>
+<p>I cherry-picked the relevant commit (<a href="https://github.com/IQSS/dataverse/pull/12358/changes/e8128c3361c02a9bf127d45ca7b835eeaf8230cd">https://github.com/IQSS/dataverse/pull/12358/changes/e8128c3361c02a9bf127d45ca7b835eeaf8230cd</a>), it seems to work.</p>
+
+
+
+<a name="606683922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/606683922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Notification Bot <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#606683922">(Jun 26 2026 at 09:55)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="602779">Péter Pallinger</span> has marked this topic as resolved.</p>
+
+
+
+<a name="607623049"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/%E2%9C%94%20s3%20multipart%20upload%20not%20working%20on%206.9%20--%20it%20worked%20on%206.1/near/607623049" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/.E2.9C.94.20s3.20multipart.20upload.20not.20working.20on.206.2E9.20--.20it.20worked.20on.206.2E1.html#607623049">(Jul 01 2026 at 14:05)</a>:</h4>
+<p>No worries! This bug is listed first in the 6.11 release notes. I'm glad a fix will be going out to everyone soon.</p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

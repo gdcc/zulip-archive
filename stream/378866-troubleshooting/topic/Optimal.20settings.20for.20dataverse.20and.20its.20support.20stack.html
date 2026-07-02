@@ -1,0 +1,169 @@
+<html>
+<head><meta charset="utf-8"><title>Optimal settings for dataverse and its support stack · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html">Optimal settings for dataverse and its support stack</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="595879782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/595879782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Frank Smutniak <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#595879782">(May 18 2026 at 16:58)</a>:</h4>
+<p>Our production dataverse runs 6.10.1 on an 8 virtual CPU server with 32GB memory.<br>
+We want to make sure our settings make full use of the resources.</p>
+<p>We build the server using the Harvard ansible scripts but expect there are<br>
+some server specific adjustments we need to make beyond initial setup.</p>
+<p>Our current settings look like the following:<br>
+domain1/config/domain.xml<br>
+        &lt;jvm-options&gt;-Xmx16384m&lt;/jvm-options&gt;</p>
+<p>For domain1/config/domain.xml what are suggested min-thread-pool-size and max-thread-pool-size for the &lt;thread-pool&gt;<br>
+associated with http-listener-1 (http-thread-pool)</p>
+<p>We currently do not have these set but are considering:<br>
+        &lt;jvm-options&gt;-XX:MaxMetaspaceSize=4096m&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-XX:MetaspaceSize=2048m&lt;/jvm-options&gt;<br>
+        &lt;jvm-options&gt;-Xms12288m&lt;/jvm-options&gt;</p>
+<p>In solr/bin/solr.in.sh we currently have no MEM settings. Should we consider?<br>
+        SOLR_JAVA_MEM="-Xms4g -Xmx4g"</p>
+<p>For apache, is a connection pool set of 300 optimal?</p>
+<p>For postgres, are there settings you've found to be optimal for working with dataverse?</p>
+<p>Thank you for any guidance.</p>
+
+
+
+<a name="597038254"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/597038254" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#597038254">(May 22 2026 at 15:42)</a>:</h4>
+<p>Hello,</p>
+<p>I wouldn't try to run Dataverse in a JVM heap smaller than 16g as you've specified. Dataverse usage can be bursty; the greatest memory spike will happen during tabular ingest.</p>
+<p>I've never played with the min/max thread pool sizes for the http listeners, but I remember reading that MaxMetaspaceSize and MetaspaceSize should be set to the same value to avoid performance problems (this may now be historic).</p>
+<p>UNC Dataverse currently runs in a Solr JVM heap setting of 1g; 4g should be plenty.</p>
+<p>The connection pool size for Apache depends on your usage; I'd imagine 300 should be plenty as long as the LLM scrapers stay away.</p>
+<p>I've never had to tune Postgres; our production RDS instance has 2 CPU and 8GB of RAM; the biggest single effect I've seen on performance depends on administrators calling ANALYZE; (or not) following a database import.</p>
+<p>I'd love to hear what other community members have to say here.</p>
+<p>Don</p>
+
+
+
+<a name="597280204"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/597280204" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#597280204">(May 23 2026 at 07:29)</a>:</h4>
+<p>Most "tuning" I needed to do on Postgres was cleanup a rather large ACTIONLOGRECORD table (years of buildup) and a lot of notifications. Runs fine under default settings, Postgres being a saint and all.</p>
+<p>I run demo/test dataverses on smaller VM's, but despite best effort, I find Payara has serious difficulty getting out of bed for less than 2 GB heap minimal and the sweet spot is somewhere around 3-4 GB.</p>
+<p>Workloads are on the spiky side of ops as Don indicates, tabular ingest can be an evil sod occasionally as users will happily add large tabular data files. Treat any post-processing (workflows) you do as those Mario enemies with spikes on all sides - expect to see trouble from them at least once even if they look innocent.</p>
+
+
+
+<a name="597280393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/597280393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#597280393">(May 23 2026 at 07:32)</a>:</h4>
+<p>One thing I'd like to do at some point is mess with a pgvector database, for that matter. Having a db that can natively store embeddings in a relatively efficient way to act as a search index (rather than Payara) might be trading disk space for memory but that's a decent deal in this case. I had some good luck with FFF-driven vector space being a relatively cheap win with searching.</p>
+
+
+
+<a name="597875024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/597875024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Frank Smutniak <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#597875024">(May 26 2026 at 15:22)</a>:</h4>
+<p>Thanks Don and Thomas,<br>
+The bots are a big drain on resources in bursts but with our recent changes it is having less downtime or slow service.  Thank you for your suggestions and confirmation.<br>
+Frank</p>
+
+
+
+<a name="597875446"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/597875446" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Frank Smutniak <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#597875446">(May 26 2026 at 15:23)</a>:</h4>
+<p>Removing ACTIONLOGRECORD was done as we recently ported from the old amazon linux to AL 23.  It saved a lot of space!</p>
+
+
+
+<a name="599710427"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/599710427" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#599710427">(Jun 03 2026 at 07:15)</a>:</h4>
+<p>Having spoken about it with some folks at this point; did you consider Anubis to block off bots? It's a bit of a mixed blessing since researchers will also use AI to go through your Dataverse (so it's "legit" usage but simply at a scale we're not used to).</p>
+
+
+
+<a name="599711353"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/599711353" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#599711353">(Jun 03 2026 at 07:20)</a>:</h4>
+<p>I reckon we're going to be stuck with that for a while still, and I'm hearing people consider it legit usage by researchers (thus scaling upwards to meet demand) and some people going "nope" and deploying Anubis to save costs.</p>
+<p>Has anyone implemented some sort of clever MCP server discovery+redirect to point bots to the right entrance for these kind of tasks?</p>
+
+
+
+<a name="599762025"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/599762025" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#599762025">(Jun 03 2026 at 11:00)</a>:</h4>
+<p>You're thinking that an MCP-based solution would be easier on the servers? Rather that the servers being crawled, that is?</p>
+
+
+
+<a name="599787220"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/599787220" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#599787220">(Jun 03 2026 at 12:49)</a>:</h4>
+<p>Is MCP really the way to go here? Wouldn't an agents.md be a more fitting approach? <a href="https://agents.md/">https://agents.md/</a> (there's also SKILL.md)</p>
+
+
+
+<a name="600090084"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/600090084" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#600090084">(Jun 04 2026 at 13:37)</a>:</h4>
+<p>I think web UI requests are likely more expensive, sure. I also don't know if MCP is the way to go but I like to point bots to the bot entrance if it's cheaper and more fitting to use</p>
+
+
+
+<a name="600090501"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/600090501" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#600090501">(Jun 04 2026 at 13:38)</a>:</h4>
+<p>I'm just spit balling for now but the discussion I've had so far chiefly goes around 'at what cost can we facilitate AI users' so cost as a metric seems the way to look at that</p>
+
+
+
+<a name="600090838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/600090838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#600090838">(Jun 04 2026 at 13:40)</a>:</h4>
+<p>Pull request <a href="https://github.com/IQSS/dataverse/issues/12025">#12025</a> by <span class="user-mention" data-user-id="663397">@Juan</span> is about telling bots where to find APIs and standards used, using <code>.well-known/api-catalog</code> from <a href="https://datatracker.ietf.org/doc/rfc9727/">https://datatracker.ietf.org/doc/rfc9727/</a></p>
+
+
+
+<a name="601231078"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601231078" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601231078">(Jun 08 2026 at 19:42)</a>:</h4>
+<p><a href="https://contentsignals.org/">https://contentsignals.org/</a> seems very much related!</p>
+
+
+
+<a name="601231264"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601231264" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601231264">(Jun 08 2026 at 19:43)</a>:</h4>
+<p><a href="https://modelcontextprotocol.io/community/server-card/charter#deliverables-%26-success-metrics">https://modelcontextprotocol.io/community/server-card/charter#deliverables-%26-success-metrics</a> says they don't have a final spec yet. (Draft at <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127</a>, .well-known/mcp.json)</p>
+
+
+
+<a name="601231737"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601231737" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601231737">(Jun 08 2026 at 19:46)</a>:</h4>
+<p>See also <a href="https://blog.cloudflare.com/agent-readiness/">https://blog.cloudflare.com/agent-readiness/</a></p>
+
+
+
+<a name="601232659"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601232659" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601232659">(Jun 08 2026 at 19:50)</a>:</h4>
+<p>cool</p>
+
+
+
+<a name="601232905"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601232905" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601232905">(Jun 08 2026 at 19:52)</a>:</h4>
+<p>I'm not sure serving .well-known/api-catalog is a job for Dataverse directly. Very often you'll expose other .well-knowns, so maybe it should be an internal rewrite from the reverse proxy to an "normal" API endpoint /api/info/api-catalog or similar.</p>
+
+
+
+<a name="601233069"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601233069" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601233069">(Jun 08 2026 at 19:52)</a>:</h4>
+<p>The proposed way to integrate it into a dataset page is quite costly.</p>
+
+
+
+<a name="601712827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601712827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601712827">(Jun 10 2026 at 09:00)</a>:</h4>
+<p>Would it be reasonable to handle it like sitemap generation to avoid costly hits? (started by user with admin access on the API, generates files which can be served by webserver (not payara), and give a few examples on how the reverse proxy should behave)</p>
+<p>Secondary reason why that might be useful is because I don't see these types of requests decreasing in the future, so offloading to battle-tested webserver to serve files seems the right call.</p>
+
+
+
+<a name="601743977"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Optimal%20settings%20for%20dataverse%20and%20its%20support%20stack/near/601743977" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Optimal.20settings.20for.20dataverse.20and.20its.20support.20stack.html#601743977">(Jun 10 2026 at 10:49)</a>:</h4>
+<p>I don't see them deceasing either.</p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

@@ -1,0 +1,32 @@
+[
+    {
+        "content": "<p>Hi, I am using version 6.5 and I found a problem that if a user belongs to a group the SearchResultFragment fails to be generated and Dataverses/Datasets/Datafiles won't show for that user.<br>\nThe error in server.log is like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2025-10-20T14:54:52.146+0000] [Payara 6.2024.6] [INFO] [] [edu.harvard.iq.dataverse.search.SearchIncludeFragment] [tid: _ThreadID=113 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1760972092146] [levelValue: 800] [[\n  Search Syntax Error: Error from server at http://solr:8983/solr/collection1: org.apache.solr.search.SyntaxError: Cannot parse &#39;discoverableBy:(group_user57&#39;: Encountered &quot;&lt;EOF&gt;&quot; at line 1, column 28.\nWas expecting one of:\n    &lt;AND&gt; ...\n    &lt;OR&gt; ...\n    &lt;NOT&gt; ...\n    &quot;+&quot; ...\n    &quot;-&quot; ...\n    &lt;BAREOPER&gt; ...\n    &quot;(&quot; ...\n    &quot;)&quot; ...\n    &quot;*&quot; ...\n    &quot;^&quot; ...\n    &lt;QUOTED&gt; ...\n    &lt;TERM&gt; ...\n    &lt;FUZZY_SLOP&gt; ...\n    &lt;PREFIXTERM&gt; ...\n    &lt;WILDTERM&gt; ...\n    &lt;REGEXPTERM&gt; ...\n    &quot;[&quot; ...\n    &quot;{&quot; ...\n    &lt;LPARAMS&gt; ...\n    &quot;filter(&quot; ...\n    &lt;NUMBER&gt; ...\n    ]]\n</code></pre></div>\n<p>I also increased verbosity for <code>edu.harvard.iq.dataverse.search</code> and found that the query parameter causing the error is like this <code>Groups: (group_user57 OR group_217-c_-L)</code>.<br>\nAny ideas of what could be causing this error?</p>",
+        "id": 546004617,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760972603
+    },
+    {
+        "content": "<p>Interesting. Can you reproduce it on <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> ?</p>",
+        "id": 546022334,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760976281
+    },
+    {
+        "content": "<p>I created an account there, then I created a dataverse and added a group to my account. Everything worked fine.  I am in middle of merging 6.6 into my branch. When I am finished I could look into the HTML files, maybe I made some mistake on a previous merge. Any files I should be looking, besides <code>dataverse.xhtml</code> and <code>search-include-fragment.xhtml</code>?<br>\nWhile creating a new dataset on <a href=\"https://demo.dataverse.org/\">https://demo.dataverse.org/</a>  I found this behavior for the author fields:<br>\n<a href=\"/user_uploads/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1135x412\" src=\"/user_uploads/thumbnail/53090/St0_NA7n5GVP70NwtZwtoYtu/image.png/840x560.webp\"></a></div>",
+        "id": 546172982,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1761035631
+    },
+    {
+        "content": "<p>Yes, on the demo server (and Harvard Dataverse) we have deployed external vocabulary scripts so the author fields look a little different: <a href=\"https://github.com/IQSS/dataverse.harvard.edu/issues/326\">https://github.com/IQSS/dataverse.harvard.edu/issues/326</a></p>",
+        "id": 546192380,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1761041178
+    },
+    {
+        "content": "<p>I'm not sure what other files you should look at, sorry.</p>",
+        "id": 546192560,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1761041229
+    }
+]

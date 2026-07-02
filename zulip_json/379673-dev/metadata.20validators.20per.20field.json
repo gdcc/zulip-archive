@@ -1,0 +1,284 @@
+[
+    {
+        "content": "<p>I have a crazy idea. How about we enable configuring a metadata validator per field via MPCONFIG? We could allow loading these as plugins like exporters if an internal one does not suffice. (Even with the SPA we still need a server side validation.) These configurations could even be requested as a JSON Schema expression, allowing for client side validation. Comments?</p>",
+        "id": 449219863,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720156506
+    },
+    {
+        "content": "<p>I like it! How would I write such a field-validator?</p>",
+        "id": 449230222,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1720161504
+    },
+    {
+        "content": "<p>I'd say some stuff should be included like numeric min/max</p>",
+        "id": 449230991,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720161878
+    },
+    {
+        "content": "<p>Then you just use it by configuration</p>",
+        "id": 449231009,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720161887
+    },
+    {
+        "content": "<p>But to enable custom validators, these should use an SPI loaded Java plugin</p>",
+        "id": 449231056,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720161915
+    },
+    {
+        "content": "<p>Obviously you can use the same tricks again to go from there to Javascript/Python, but this comes with a performance penalty</p>",
+        "id": 449231116,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720161949
+    },
+    {
+        "content": "<p>They'd be loaded and connected to a field by configuration</p>",
+        "id": 449231185,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720161975
+    },
+    {
+        "content": "<p>It would certainly allow for much more complex validations</p>",
+        "id": 449231283,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162013
+    },
+    {
+        "content": "<p>Probably for a first step it would be instance wide configuration only, but one should consider a later extension to configuration per collection.</p>",
+        "id": 449231391,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162071
+    },
+    {
+        "content": "<p>Could the numeric and format validation logic be outsourced to the JSON Schema of a metadata block? This way, other instances could reuse the validation logic, and some existing features could be used already. Or is this not possible with the current implementation?</p>",
+        "id": 449232252,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1720162484
+    },
+    {
+        "content": "<p>This starts to sound like a chicken and egg problem</p>",
+        "id": 449232458,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162576
+    },
+    {
+        "content": "<p>We could of course write a custom validator that extracts information like this from a JSON Schema</p>",
+        "id": 449232503,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162601
+    },
+    {
+        "content": "<p>In fact, that would be one of the ideas for these validators, enabling a textbox to be filled with JSON controlled by a schema</p>",
+        "id": 449232534,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162617
+    },
+    {
+        "content": "<p>Using JSON Schemas as a format for metadata schema definitions in Java (so they become the source, not the target like we're talking about in the JSON schema topic) is a long lasting dream, but goes beyond what I envisioned</p>",
+        "id": 449232756,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162708
+    },
+    {
+        "content": "<p>Also, this  would still need configuration per collection I suppose</p>",
+        "id": 449232783,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162722
+    },
+    {
+        "content": "<p>The validators I envision would have a Java interface that would be asked to hand out a JSON schema thing, to be included in the JSON schema you can retrieve now via the Dataverse API</p>",
+        "id": 449233260,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720162919
+    },
+    {
+        "content": "<p>Custom validators sound fun. Out of curiosity, do you have a specific use case?</p>",
+        "id": 449871747,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720445814
+    },
+    {
+        "content": "<p>Yes!</p>",
+        "id": 449871791,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445825
+    },
+    {
+        "content": "<p>Do tell.</p>",
+        "id": 449871849,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720445841
+    },
+    {
+        "content": "<p>I'm grabbing the links as we speak</p>",
+        "id": 449871905,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445855
+    },
+    {
+        "content": "<p><a href=\"https://data.fz-juelich.de/guide/juelich/data-linking.html\">https://data.fz-juelich.de/guide/juelich/data-linking.html</a></p>",
+        "id": 449871941,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445864
+    },
+    {
+        "content": "<p>We have this custom metadata field</p>",
+        "id": 449871976,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445873
+    },
+    {
+        "content": "<p>In our fork, we added a custom metadata type \"uri\" for it</p>",
+        "id": 449872069,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445887
+    },
+    {
+        "content": "<p>As the URL type would not be sufficient</p>",
+        "id": 449872119,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445900
+    },
+    {
+        "content": "<p>With a text field and a custom validator, we could achieve the same but keep upstream compatibility, no fork necessary</p>",
+        "id": 449872250,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445934
+    },
+    {
+        "content": "<p>Ah, so you want to support both http:// and smb:// for example.</p>",
+        "id": 449872702,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720446048
+    },
+    {
+        "content": "<p>Exactly :-)</p>",
+        "id": 449872742,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446060
+    },
+    {
+        "content": "<p>Sounds fairly custom but maybe someone can reuse your validator some day. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 449872868,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720446098
+    },
+    {
+        "content": "<p>I can immediately envision more features for this</p>",
+        "id": 449872914,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446114
+    },
+    {
+        "content": "<p>Controlled vocabularies without adding them to the schema</p>",
+        "id": 449873034,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446137
+    },
+    {
+        "content": "<p>Lookup services</p>",
+        "id": 449873062,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446146
+    },
+    {
+        "content": "<p>Restriction of URLs</p>",
+        "id": 449873194,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446182
+    },
+    {
+        "content": "<p>Someone might want to disallow using certain author schemes that are in citation.tsv</p>",
+        "id": 449873300,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446213
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/9750\">#9750</a> from <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> made it into 6.3 but it would be nice to drop in jar and not wait for a release.</p>",
+        "id": 449873330,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720446223
+    },
+    {
+        "content": "<p>But instead of forking the schema, the validator would bark at sth that is forbidden</p>",
+        "id": 449873363,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720446233
+    },
+    {
+        "content": "<p>Could the custom validators work on guestbook fields? See <a href=\"https://github.com/IQSS/dataverse/issues/10661\">#10661</a> opened by <span class=\"user-mention\" data-user-id=\"658065\">@Dimitri Szabo</span></p>",
+        "id": 449952746,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720464100
+    },
+    {
+        "content": "<p>Also, what's the plan for keeping React in sync with these custom validators?</p>",
+        "id": 449952839,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720464131
+    },
+    {
+        "content": "<p>From a technical viewpoint, these validators would probably hook into Bean Validations.</p>",
+        "id": 449954191,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464651
+    },
+    {
+        "content": "<p>So it should be possible to use these on anything we want them to use on.</p>",
+        "id": 449954275,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464685
+    },
+    {
+        "content": "<p>Usually Bean Validators get attached using the decorator pattern, so I don't see why this shouldn't be possible for guest books.</p>",
+        "id": 449954343,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464717
+    },
+    {
+        "content": "<p>My idea to expose these validators would be to make any of these plugins express themselves as JSON Schema. That way they could be picked up by any client.</p>",
+        "id": 449954577,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464783
+    },
+    {
+        "content": "<p>As far as I know, the backend will still be the source of authority for any validation, right <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> ?</p>",
+        "id": 449954690,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464823
+    },
+    {
+        "content": "<p>If I understood it correctly, the frontend will now use the API to retrieve the fields and data types. So aside from including this into the JSON Schema API endpoints, it should be possible to embed these validators in some serialized form into any other API endpoint as well.</p>",
+        "id": 449954990,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464920
+    },
+    {
+        "content": "<p>It's not like we would remove everything else - we'd keep the data type around, but extend the definition to possible values/ranges/...</p>",
+        "id": 449955146,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720464967
+    },
+    {
+        "content": "<p>For email validation there was a mismatch that was corrected in <a href=\"https://github.com/IQSS/dataverse-frontend/pull/402\">https://github.com/IQSS/dataverse-frontend/pull/402</a></p>",
+        "id": 449955867,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720465215
+    },
+    {
+        "content": "<p>Yeah, but is a duplication of the constraint check. I'm suggesting we enable receiving these constraints as regex or whatever using the API, based on the custom validator implementation. In addition to being able to receive a JSON Schema thing the same interface could request responding with some Javascript validator, reusable in the SPA and other clients.</p>",
+        "id": 450523185,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720634373
+    },
+    {
+        "content": "<p>Reusable in the SPA would be great.</p>",
+        "id": 450534520,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720637343
+    }
+]

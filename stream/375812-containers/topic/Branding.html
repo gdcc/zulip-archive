@@ -1,0 +1,141 @@
+<html>
+<head><meta charset="utf-8"><title>Branding · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html">Branding</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="599525910"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599525910" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> daniel4nnah <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599525910">(Jun 02 2026 at 14:35)</a>:</h4>
+<p>Hello!<br>
+I'm using <code>gdcc/dataverse:6.10.1-noble-r4</code> image. I've created my own persona following the <a href="https://guides.dataverse.org/en/latest/container/running/demo.html">docs</a> , I was able to configure the language and custom metadata blocks, however I haven't been able to add the banner image (<code>:LogoCustomizationFile</code>). </p>
+<p>I first tried adding this in my own setup-all script:</p>
+<div class="codehilite"><pre><span></span><code>curl -v -X PUT -H &quot;X-Dataverse-key:$adminKey&quot; -d &quot;$SCRIPT_PATH/logos/logo.png&quot; &quot;${DATAVERSE_URL}/api/admin/settings/:LogoCustomizationFile&quot;
+</code></pre></div>
+<p>No errors show in logs and the postgres setting is created, however the image is never displayed in the UI. I assumed the issue was because the dataverse container wasn't able to find the image, so I manually checked adding a new logo from the 'Theme+widgets' menu and realized it got saved at <code>/dv/docroot/logos/1</code> inside the dataverse container, so I tried adding the logo directly to that folder from my bootstrap script:</p>
+<div class="codehilite"><pre><span></span><code>mkdir -p /dv/docroot/logos/1
+cp &quot;$SCRIPT_PATH/logos/logo.png&quot; /dv/docroot/logos/1/logo.png
+chown -R 1000:1000 /dv/docroot
+</code></pre></div>
+<p>However it still doesn't work even tho the image is in the correct folder inside the dataverse container.  If I go back to the Theme+Widgets menu and manually add another image, then it saves in the exact same place as the one I tried uploading from the bootstrap container and it is showed in the UI. I also realized when manually doing so, no :LogoCustomizationFile is added to the postgres <code>setting</code> table.</p>
+<p>Could you please help me out on this?</p>
+
+
+
+<a name="599556947"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599556947" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599556947">(Jun 02 2026 at 16:22)</a>:</h4>
+<p>Hmm, sounds related to this issue, which we haven't worked on yet: <a href="https://github.com/IQSS/dataverse/issues/10539">#10539</a></p>
+
+
+
+<a name="599593383"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599593383" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599593383">(Jun 02 2026 at 19:01)</a>:</h4>
+<p><span class="user-mention" data-user-id="1082194">@daniel4nnah</span> Have you followed <a href="https://guides.dataverse.org/en/latest/installation/config.html#custom-navbar-logo">https://guides.dataverse.org/en/latest/installation/config.html#custom-navbar-logo</a> ?</p>
+
+
+
+<a name="599593528"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599593528" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599593528">(Jun 02 2026 at 19:02)</a>:</h4>
+<p>The path you put in there is a URL, not a file path. One of the unfortunate past choices... <span aria-label="rolling eyes" class="emoji emoji-1f644" role="img" title="rolling eyes">:rolling_eyes:</span></p>
+
+
+
+<a name="599610151"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599610151" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599610151">(Jun 02 2026 at 20:16)</a>:</h4>
+<p>The path part of a URL. It's confusing! <span aria-label="scream" class="emoji emoji-1f631" role="img" title="scream">:scream:</span></p>
+
+
+
+<a name="599610731"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599610731" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599610731">(Jun 02 2026 at 20:19)</a>:</h4>
+<p>Although you can also use an absolute URL. <a href="https://example.org/my/logo.png">https://example.org/my/logo.png</a> will work as well.</p>
+<div class="message_inline_image"><a href="https://example.org/my/logo.png"><img src="https://uploads.zulipusercontent.net/f300a77dfb3926ff6e9bdfaba72ff4cbaeff69e8/68747470733a2f2f6578616d706c652e6f72672f6d792f6c6f676f2e706e67"></a></div>
+
+
+
+<a name="599611005"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599611005" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599611005">(Jun 02 2026 at 20:21)</a>:</h4>
+<p>Interesting. I've never tried using an absolute URL.</p>
+
+
+
+<a name="599611035"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599611035" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599611035">(Jun 02 2026 at 20:21)</a>:</h4>
+<p>I am using a "static content" container running alongside Dataverse. Exposing it via an Ingress object under <code>/static</code> makes the stuff inside of it available.</p>
+
+
+
+<a name="599611143"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599611143" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599611143">(Jun 02 2026 at 20:21)</a>:</h4>
+<p>See <a href="https://data-next.fz-juelich.de">https://data-next.fz-juelich.de</a> for an example.</p>
+
+
+
+<a name="599617193"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599617193" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> daniel4nnah <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599617193">(Jun 02 2026 at 20:49)</a>:</h4>
+<p>Thanks!! It worked when I added an URL instead, I was using the image path</p>
+<p>I have a second question regarding the 'Theme' image, is it possible to configure it from the bootstrap container? I'm not sure if that's what you were talking about when you mentioned the static content container. Or should I keep this customization directly from the UI?</p>
+
+
+
+<a name="599619837"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599619837" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599619837">(Jun 02 2026 at 21:00)</a>:</h4>
+<p>I think <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> fixed that in <a href="https://github.com/IQSS/dataverse/issues/9819">#9819</a>.</p>
+
+
+
+<a name="599619924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599619924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599619924">(Jun 02 2026 at 21:01)</a>:</h4>
+<p>Or at least I wrote this at <a href="https://ct.gdcc.io">https://ct.gdcc.io</a></p>
+<ul>
+<li>2023-10-13 The docroot is now configurable so logos can now be uploaded to collections: <a href="https://github.com/IQSS/dataverse/pull/9819">https://github.com/IQSS/dataverse/pull/9819</a></li>
+</ul>
+
+
+
+<a name="599620149"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599620149" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599620149">(Jun 02 2026 at 21:02)</a>:</h4>
+<p>I could be misunderstanding the question. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="599663032"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599663032" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> daniel4nnah <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599663032">(Jun 03 2026 at 01:14)</a>:</h4>
+<p>Thanks again, that helped me a lot, I was able to make it work! However, I had to add the reference of my banner and footer images to the dataversetheme table in postgres manually, I couldn't find an endpoint that did that for me. Does it exist?</p>
+
+
+
+<a name="599793745"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599793745" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599793745">(Jun 03 2026 at 13:14)</a>:</h4>
+<p>I don't believe there's such an API, yet.</p>
+<p>I say this because I see <code>POST   /api/dataverses/{id}/theme/images/{logo|thumbnail}</code> under "API needed" at <a href="https://docs.google.com/document/d/1OZOw0niLnl3Gc70YLc_YXhltWlf_9kqiWwdXOJ2M8bk/edit?usp=sharing">https://docs.google.com/document/d/1OZOw0niLnl3Gc70YLc_YXhltWlf_9kqiWwdXOJ2M8bk/edit?usp=sharing</a> via <a href="https://github.com/IQSS/dataverse-frontend/issues/983">https://github.com/IQSS/dataverse-frontend/issues/983</a></p>
+<p>But, as that doc indicates, the new UI will need that API endpoint, so it should be coming at some point. I believe this feature request captures it:</p>
+<p>Feature Request/Idea: Native API access to upload collection logos and Theme specifications  <a href="https://github.com/IQSS/dataverse/issues/10194">#10194</a></p>
+<p>Does that sound right?</p>
+
+
+
+<a name="599798763"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599798763" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> daniel4nnah <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599798763">(Jun 03 2026 at 13:32)</a>:</h4>
+<p>Yes, exactly, that would be a great feature to add. Thanks again for all your help!</p>
+
+
+
+<a name="599799345"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599799345" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599799345">(Jun 03 2026 at 13:34)</a>:</h4>
+<p><span class="user-mention" data-user-id="1082194">@daniel4nnah</span> sure, please feel free to give that issue a <span aria-label="thumbs up" class="emoji emoji-1f44d" role="img" title="thumbs up">:thumbs_up:</span> and/or a comment.</p>
+
+
+
+<a name="599812843"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Branding/near/599812843" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Branding.html#599812843">(Jun 03 2026 at 14:14)</a>:</h4>
+<p>I'm not sure about what we're talking with theme and banner/footer, but I usually use the DB options to set the custom text. Using HTML is allowed there and allows me to include (for example) the FZJ logo. I serve that using a static content container as mentioned above. See our instance for an example <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span></p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

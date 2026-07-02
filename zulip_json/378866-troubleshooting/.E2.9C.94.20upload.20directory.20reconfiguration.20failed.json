@@ -1,0 +1,152 @@
+[
+    {
+        "content": "<p>I try to change the default upload dataset directory to \"/sdcfs/data_collect_prod/publication\" by running the following command \"./asadmin create-jvm-options \"\\-Ddataverse.files..directory=/sdcfs/data_collect_prod/publication\", <br>\n<a href=\"/user_uploads/53090/CUrBCdAa61bYETONRGLYMfSm/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/CUrBCdAa61bYETONRGLYMfSm/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/CUrBCdAa61bYETONRGLYMfSm/image.png\"></a></div><p>but when I upload the dataset, the files still located under the default directory \"/usr/local/payara6/glassfish/domains/domain1/files/\"</p>\n<p>Anybody has ideas?<br>\nThanks</p>",
+        "id": 450324798,
+        "sender_full_name": "shan",
+        "timestamp": 1720576785
+    },
+    {
+        "content": "<p>That's not how this works. Your command is adding an arbitrary system property that will never be picked up.</p>",
+        "id": 450355057,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720592707
+    },
+    {
+        "content": "<p>You need to replace the &lt;id&gt; part with the actual ID of your file storage. Please look into your domain.xml to extract that information if you don't remember the ID.</p>",
+        "id": 450355544,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720592860
+    },
+    {
+        "content": "<p>If you're using the classic way of installing Dataverse, the ID will be <em>file</em> by default.</p>",
+        "id": 450355929,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720592991
+    },
+    {
+        "content": "<p>As you're talking about uploaded files, please also keep in mind that any upload will have temporary storage locations before being transferred to the actual storage. See the dataverse.files.* JVM options.</p>",
+        "id": 450356204,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720593079
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> once upon a time I made a diagram for that. Should we include this in the guides somewhere?</p>",
+        "id": 450356506,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720593186
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> sure, I've referenced that diagrams a couple times in the past few months. It's quite useful.</p>",
+        "id": 450456425,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720618942
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"734848\">@shan</span> are you able to put the right values in by editing domain.xml (classic installation) or by  editing your compose.yml file (Docker installation)?</p>",
+        "id": 450456620,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720619000
+    },
+    {
+        "content": "<p>I used the classic installation, and rerun the command \"./asadmin create-jvm-options \"\\-Ddataverse.files..directory=/sdcfs/data_collect_prod\"\"</p>\n<p>but it still didn't work, the upload files still located in the default directory \"/usr/local/payara6/glassfish/domains/domain1/files\"</p>\n<p>here is the screenshot of the domain.xml：<br>\n<a href=\"/user_uploads/53090/kdmvjM5LSuhjnW0y6m6jDmqA/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/kdmvjM5LSuhjnW0y6m6jDmqA/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/kdmvjM5LSuhjnW0y6m6jDmqA/image.png\"></a></div>",
+        "id": 450608193,
+        "sender_full_name": "shan",
+        "timestamp": 1720664259
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"734848\">@shan</span> ok, classic installation. In that case you can just edit the domain.xml file with vi or emacs or whatever, if that's easier.</p>\n<p>I'm a little confused my your screenshot. The word \"dataverse\" doesn't appear anywhere. Did you screenshot the correct part of the file?</p>",
+        "id": 451004822,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720797053
+    },
+    {
+        "content": "<p>We created a symlink for default location ‘files’ to a directory in separate disk.</p>",
+        "id": 451082776,
+        "sender_full_name": "Bikram",
+        "timestamp": 1720821312
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"719882\">@Bikram</span> that sounds a good idea ~</p>",
+        "id": 451427864,
+        "sender_full_name": "shan",
+        "timestamp": 1721028161
+    },
+    {
+        "content": "<p>Symlinks are a bad idea. Mount a file system instead <a href=\"https://linuxize.com/post/how-to-mount-and-unmount-file-systems-in-linux/\">https://linuxize.com/post/how-to-mount-and-unmount-file-systems-in-linux/</a> There's also the option to use bind mounts if really necessary.</p>\n<p>Using configuration, you can also change the destination folders. Just in case you can't change your mount points for some reason. See <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#dataverse-files-directory\">https://guides.dataverse.org/en/latest/installation/config.html#dataverse-files-directory</a> and following, as well as <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#temporary-upload-file-storage\">https://guides.dataverse.org/en/latest/installation/config.html#temporary-upload-file-storage</a></p>",
+        "id": 451433720,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721030148
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> Ok, I Checked the configuration in domain.xml, there are two dataverse related directory configurations, <br>\n<a href=\"/user_uploads/53090/MVzp1JfLl4pCTszVui0SgW9u/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/MVzp1JfLl4pCTszVui0SgW9u/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/MVzp1JfLl4pCTszVui0SgW9u/image.png\"></a></div><p>Do I need to change the configuration of both parts? what's the difference between the two configurations (<a href=\"http://Ddataverse.files.directory\">Ddataverse.files.directory</a> and Ddataverse.files.file.directory)in the image ？</p>",
+        "id": 451442759,
+        "sender_full_name": "shan",
+        "timestamp": 1721032601
+    },
+    {
+        "content": "<p>Please read about the details in the extensive configuration guide:<br>\n<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#storage-files-dir\">https://guides.dataverse.org/en/latest/installation/config.html#storage-files-dir</a><br>\n<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#dataverse-files-directory\">https://guides.dataverse.org/en/latest/installation/config.html#dataverse-files-directory</a></p>",
+        "id": 451443068,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721032695
+    },
+    {
+        "content": "<p>And don't ask ChatGPT about it - it has no actual clue what it's about... Tries to compensate by halucinating... <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span> <a href=\"https://chatgpt.com/share/5559fe4f-25ef-4e5d-ac4b-3afef4f938f4\">https://chatgpt.com/share/5559fe4f-25ef-4e5d-ac4b-3afef4f938f4</a></p>",
+        "id": 451444049,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721032991
+    },
+    {
+        "content": "<p>okay thank you, just wondering why symlinks are bad idea! We have had our Dataverse instances setup this way from last 8-9years, Never ran into any issues and it makes easier to use separate data disks with different sizes and repurpose those. <br>\nBut yes, one should use the available configuration options. Lot of these options were not available with the initial release of Dataverse4.</p>",
+        "id": 451572956,
+        "sender_full_name": "Bikram",
+        "timestamp": 1721066002
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> I edit the domain.xml file with vi, and change the &lt;jvm-options&gt;-Ddataverse.files.directory=/sdcfs/data_collect_prod/dataverse&lt;/jvm-options&gt;, then restart the domain by running \"./asadmin restart-domains /home/dataverse/dataverse-6.2/target/dataverse-6.2.war\"</p>\n<p>but after that,  I return to the home page of dataverse,  <a href=\"http://mydataverse.domain:8080\">http://mydataverse.domain:8080</a>, it shows that payara is running , instead of the dataverse page I have created before<br>\n<a href=\"/user_uploads/53090/06iuHN4Gg3syTuEZ3W4-l9TM/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/06iuHN4Gg3syTuEZ3W4-l9TM/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/06iuHN4Gg3syTuEZ3W4-l9TM/image.png\"></a></div>",
+        "id": 451706522,
+        "sender_full_name": "shan",
+        "timestamp": 1721118477
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"734848\">@shan</span> hmm, that's no good. Can you attach your server.log file?</p>",
+        "id": 451760533,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721136962
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> sadly no log files appeared in the /usr/local/payara6/glassfish/domains/domain1/logs/server.log, the latest log is <br>\n<a href=\"/user_uploads/53090/xlbUqHiaZ2hQGcwZNinJsw-b/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/xlbUqHiaZ2hQGcwZNinJsw-b/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/xlbUqHiaZ2hQGcwZNinJsw-b/image.png\"></a></div>",
+        "id": 451902907,
+        "sender_full_name": "shan",
+        "timestamp": 1721177740
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> it seems to because of the  wrong GID of the file \"server.log\",  I've corrected it to the right one, and get the following messages from the server.log:<br>\n<a href=\"/user_uploads/53090/V_wjjUAPbf77AjnTP4jHLD-g/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/V_wjjUAPbf77AjnTP4jHLD-g/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/V_wjjUAPbf77AjnTP4jHLD-g/image.png\"></a></div><p>I have tested from the command line that both \"root\" and  \"dataverse\" have the permissions to write and read the directory</p>",
+        "id": 451907586,
+        "sender_full_name": "shan",
+        "timestamp": 1721180225
+    },
+    {
+        "content": "<p>Whatever user Payara is running as (usually \"dataverse\") needs to be able to write there.</p>",
+        "id": 451913758,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721181985
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> Finally, the problem fixed, it is because of the difference between the uid in Linux system and uid in the filesystem. Anyway, thanks !</p>",
+        "id": 451985031,
+        "sender_full_name": "shan",
+        "timestamp": 1721204790
+    },
+    {
+        "content": "<p>Interesting. I'm glad you figured it out! Good job. <span aria-label=\"trophy\" class=\"emoji emoji-1f3c6\" role=\"img\" title=\"trophy\">:trophy:</span></p>",
+        "id": 452062272,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721221104
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 452062284,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1721221108
+    }
+]

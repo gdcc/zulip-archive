@@ -1,0 +1,146 @@
+[
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>  dataverse:\n    container_name: &quot;dataverse&quot;\n    hostname: dataverse\n    build:\n      dockerfile: ./dataverse/Dockerfile\n      args:\n        - BASE_VERSION=${BASE_VERSION:-6.6-noble}\n        - DATAVERSE_WAR_URL=${DATAVERSE_WAR_URL:-https://github.com/IQSS/dataverse/releases/download/v6.6/dataverse-6.6.war}\n        - USER_ID=${USER_ID:-1000}\n        - GROUP_ID=${GROUP_ID:-1000}\n</code></pre></div>\n<p>From <span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> at <a href=\"https://github.com/libis/rdm-integration/blob/bca3826674a426522fdd75437b0e4ff54234f6e6/docker-compose.yml#L66\">https://github.com/libis/rdm-integration/blob/bca3826674a426522fdd75437b0e4ff54234f6e6/docker-compose.yml#L66</a></p>",
+        "id": 553715282,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762289801
+    },
+    {
+        "content": "<p>What I like most in that repo: the modularized approach to setup. <span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> this would be good to have in upstream, too!</p>",
+        "id": 554280092,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762509441
+    },
+    {
+        "content": "<p>Absolutely. That compose file was something we only touched on during tech hours but I'd love to hear more.</p>",
+        "id": 554300472,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762515232
+    },
+    {
+        "content": "<p>I just opened a PR that might be interesting for the upstream repo: <a href=\"https://github.com/IQSS/dataverse/pull/11961\">https://github.com/IQSS/dataverse/pull/11961</a></p>\n<p>It adds fast-redeploy scripts for container-based development that reduce iteration time from ~54s to ~12s (4.5x faster). The workflow uses exploded WAR deployment with incremental compilation and Payara's asadmin deploy --force for hot redeployment without container restarts.</p>\n<p>Key features:</p>\n<ul>\n<li>Three scripts: <a href=\"http://dev-start-frd.sh\">dev-start-frd.sh</a> (setup), <a href=\"http://dev-frd.sh\">dev-frd.sh</a> (iterate), <a href=\"http://dev-down-frd.sh\">dev-down-frd.sh</a> (shutdown)</li>\n<li>Zero infrastructure changes, completely optional</li>\n<li>Works with any editor (not IDE-dependent)</li>\n</ul>\n<p>This could be a good topic for tech hours - we could discuss what developer workflow improvements would be valuable to include in the mainstream Dataverse repo.</p>",
+        "id": 554304782,
+        "sender_full_name": "Eryk Kulikowski",
+        "timestamp": 1762516621
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> THANK YOU!</p>",
+        "id": 554305044,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762516705
+    },
+    {
+        "content": "<p>And yes, I'd love to hear from other developers any tips and tricks to speed up development!</p>",
+        "id": 554305095,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762516726
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> I really like what you did in your PR! Thanks for testing out all of this stuff and looking into making it work!</p>",
+        "id": 554655241,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762767553
+    },
+    {
+        "content": "<p>I have a few suggestions and maybe we should discuss them here in chat or during the next containerization meeting.</p>",
+        "id": 554655363,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762767588
+    },
+    {
+        "content": "<p>Braindump / Notes to self:</p>\n<ul>\n<li>Once upon a time we wanted to start a docker-related directory /docker/... in the repo. Maybe this is the perfect opportunity to kickstart it?</li>\n<li>I don't see much in there that wouldn't be possible with the Maven plugins. We should try to align both ways.</li>\n<li>I hear you on the persistence.xml bit - it's been a long standing issue to get rid of that and have devs use Flyway properly.</li>\n<li>For the memory: thinking about using an environment variable instead of the override file. Usable from Maven and compose CLI and doesn't need a wrapper script just to activate the override file.</li>\n<li>Cargo Plugin Remote?, <code>cargo.glassfish.deploy.arg.force</code></li>\n<li>Watch Background Job?</li>\n<li>DMP Watch Mode - may need fixes for our situation</li>\n<li><a href=\"https://docs.docker.com/compose/how-tos/file-watch\">https://docs.docker.com/compose/how-tos/file-watch</a></li>\n<li>Move away from DMP to <em>run</em> things? <a href=\"https://github.com/chonton/compose-maven-plugin\">https://github.com/chonton/compose-maven-plugin</a></li>\n</ul>",
+        "id": 554659031,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762768685
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"614964\">Eryk Kulikowski</span> <a href=\"#narrow/channel/379673-dev/topic/fast.20redeploy.20with.20docker.20compose/near/554304782\">said</a>:</p>\n<blockquote>\n<p>I just opened a PR that might be interesting for the upstream repo: <a href=\"https://github.com/IQSS/dataverse/pull/11961\">https://github.com/IQSS/dataverse/pull/11961</a></p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> sorry, I'm only just trying this! I'm running into some problems, unfortunately. Can you please take a look at my comment at <a href=\"https://github.com/IQSS/dataverse/pull/11961/changes#r3304062417\">https://github.com/IQSS/dataverse/pull/11961/changes#r3304062417</a> ? Thanks!</p>",
+        "id": 597849600,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779803045
+    },
+    {
+        "content": "<p>Actually, you know what, I tried it again and it worked!</p>",
+        "id": 597850927,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779803331
+    },
+    {
+        "content": "<p>Merged! Thanks, <span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span>! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 597852306,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779803652
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> I'm already using your scripts! I love them! Thanks again!</p>",
+        "id": 597928924,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779824122
+    },
+    {
+        "content": "<p>I used it all day today. It's great!</p>",
+        "id": 598179829,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779914809
+    },
+    {
+        "content": "<p>The IDE methods are much more fiddly. You have to update each class individually.</p>",
+        "id": 598179939,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779914845
+    },
+    {
+        "content": "<p>With Eryk's method you can edit a bunch of files and not think hard about which one you edited. You can just run the script and BOOM, the new code is deployed.</p>",
+        "id": 598180081,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779914897
+    },
+    {
+        "content": "<p>Cool! Still wondering if we can make it a bit more aligned, more intuitive to use for folks new to this kind of stuff. It might seem strange to people to run these scripts.</p>",
+        "id": 598345463,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779977883
+    },
+    {
+        "content": "<p>As a command line junkie, I find them quite natural! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 598347270,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779978294
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> I switched to <a href=\"https://github.com/IQSS/dataverse/issues/11507\">#11507</a> where many more fields have been added to scripts/api/data/metadatablocks/geospatial.tsv but I don't see them:</p>\n<p><img alt=\"Screenshot 2026-06-08 at 9.55.09 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1291x487\" data-original-src=\"/user_uploads/53090/uHZzk1VJYaWzDV0e0spcjPg7/Screenshot-2026-06-08-at-9.55.09AM.png\" src=\"/user_uploads/thumbnail/53090/uHZzk1VJYaWzDV0e0spcjPg7/Screenshot-2026-06-08-at-9.55.09AM.png/840x560.webp\"></p>\n<p>Do I have to do something special apart from <code>rm -rf docker-dev-volumes</code> to pick up the new fields before running <code>scripts/dev/dev-start-frd.sh</code>?</p>",
+        "id": 601155827,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780927311
+    },
+    {
+        "content": "<p>I can see the new fields with the normal <code>mvn -Pct clean package docker:run</code> method. I assume it's because the configbaker image is re-created.</p>",
+        "id": 601157258,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780927673
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> ,</p>\n<p>Most likely the <code>mvn -Pct clean package docker:run</code> updated your db (by processing tsv and adding the metadata), so the frd scripts should work as usual after that step? And you are right to suspect the config bakers, etc. Fast redeploy scripts only touch on the java code/war file, not DB or other things.</p>",
+        "id": 601178003,
+        "sender_full_name": "Eryk Kulikowski",
+        "timestamp": 1780932527
+    },
+    {
+        "content": "<p>Yes, that's what I'm thinking. We just might want to leave a note at a future version of <a href=\"https://preview.guides.gdcc.io/en/develop/container/dev-usage.html#fast-redeploy-command-line\">https://preview.guides.gdcc.io/en/develop/container/dev-usage.html#fast-redeploy-command-line</a> to help set expectations.</p>",
+        "id": 601180350,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780933062
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> (and others), if you're interested, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> and I chatted a bit about your (awesome) fast redeploy scripts this morning during the container meeting. Here's the recording: <a href=\"https://drive.google.com/drive/folders/1-HjwWrvQggmILe0hSBKgPLREmt6uwgy-?usp=drive_link\">https://drive.google.com/drive/folders/1-HjwWrvQggmILe0hSBKgPLREmt6uwgy-?usp=drive_link</a></p>",
+        "id": 602197324,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781191708
+    },
+    {
+        "content": "<p>Great feedback, thanks! I tried to improve the scripts based on that: <a href=\"https://github.com/IQSS/dataverse/pull/12467\">https://github.com/IQSS/dataverse/pull/12467</a></p>\n<p>Simplified and runs now with <code>mvn -Pfrd package</code>, removed the shell scripts, etc.</p>",
+        "id": 603650838,
+        "sender_full_name": "Eryk Kulikowski",
+        "timestamp": 1781598920
+    }
+]

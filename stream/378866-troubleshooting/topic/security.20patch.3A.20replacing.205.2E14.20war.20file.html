@@ -1,0 +1,53 @@
+<html>
+<head><meta charset="utf-8"><title>security patch: replacing 5.14 war file · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/security.20patch.3A.20replacing.205.2E14.20war.20file.html">security patch: replacing 5.14 war file</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="607271295"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/security%20patch%3A%20replacing%205.14%20war%20file/near/607271295" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/security.20patch.3A.20replacing.205.2E14.20war.20file.html#607271295">(Jun 30 2026 at 02:35)</a>:</h4>
+<p>We're still on 5.14.  I'm trying to replace the old dataverse-5.14.war file with the updated one.  The deploy has been failing because the postgres database (dvndb) exists:<br>
+**PRIMARY KEY (SEQ_NAME))": org.postgresql.util.PSQLException: ERROR: relation "sequence" already exists PER01000: Got SQLException executing statement "INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0)": org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "sequence_pkey"  Detail: Key (seq_name)=(SEQ_GEN) already exists.<br>
+Command deploy failed.<strong>  renamed the dvndb database as a backup.   But the deploy now fails because dvndb doesn't exist: </strong>  remote failure: Error occurred during deployment: Exception [EclipseLink-4002] (Eclipse Persistence Services - 2.7.9.payara-p2): org.eclipse.persistence.exceptions.DatabaseException Internal Exception: java.sql.SQLException: Error in allocating a connection. Cause: Connection could not be allocated because: FATAL: database "dvndb" does not exist<br>
+Error Code: 0. Please see server.log for more details.<br>
+Command deploy failed.<br>
+**</p>
+<p>Should there be an empty dvndb for the deploy?   (I'll also copy this to the google group).</p>
+
+
+
+<a name="607484230"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/security%20patch%3A%20replacing%205.14%20war%20file/near/607484230" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/security.20patch.3A.20replacing.205.2E14.20war.20file.html#607484230">(Jun 30 2026 at 22:28)</a>:</h4>
+<p>Deploy then fails because there isn't a dvndb database. Created an empty dvndb database (the renamed backup also still exists). The deploy works but payara5 isn't coming up.</p>
+<p>Caused by: javax.persistence.NoResultException: getSingleResult() did not retrieve any entities... findRootDataver</p>
+
+
+
+<a name="607502743"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/security%20patch%3A%20replacing%205.14%20war%20file/near/607502743" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/security.20patch.3A.20replacing.205.2E14.20war.20file.html#607502743">(Jul 01 2026 at 01:02)</a>:</h4>
+<p>Sorry, sorry, been busy. You definitely should keep your database!</p>
+
+
+
+<a name="607715799"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/security%20patch%3A%20replacing%205.14%20war%20file/near/607715799" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> jamie jamison <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/security.20patch.3A.20replacing.205.2E14.20war.20file.html#607715799">(Jul 01 2026 at 22:41)</a>:</h4>
+<p>I put the original dvndb database back. Then undeployed and redeployed the patched dataverse-5.14.war file.</p>
+<p>sudo ./asadmin deploy /tmp/dataverse-5.14.war<br>
+Enter admin user name&gt; admin<br>
+Enter admin password for user "admin"&gt;<br>
+No response from Domain Admin Server after 600 seconds.<br>
+The command is either taking too long to complete or the server has failed.<br>
+Please see the server log files for command status.<br>
+Command deploy failed.</p>
+<hr>
+<p><a href="/user_uploads/53090/qw7UmumJ8Joh3tAj1W_I4JyH/payara5-server.log">payara5-server.log</a></p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

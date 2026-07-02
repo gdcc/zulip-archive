@@ -1,0 +1,74 @@
+[
+    {
+        "content": "<p>Hi all, I hope you're doing well, <br>\njust have one question regarding the metadata block number, is there a limit to how many metadata can we have ? cauz in our case we are testing with a large number (currently at 42 with many fields) and we are hitting a header too large issue from dataverse, I tried many of the workarounds: </p>\n<ul>\n<li>increasing the header from both solr and dataverse (tried with env variables, as well as a custom jetty.xml file for solr), env variable from dataverse side..</li>\n<li>switched to http1..<br>\nnothing seems to fix the issue :/<br>\nthank you and best regards.<br>\nOussama</li>\n</ul>",
+        "id": 566330652,
+        "sender_full_name": "oussama Zoubia (UKK)",
+        "timestamp": 1767612355
+    },
+    {
+        "content": "<p>You've changed <code>requestHeaderSize</code> already (<a href=\"https://guides.dataverse.org/en/6.9/installation/prerequisites.html#installing-solr\">docs</a>)? To what value?</p>\n<p>Do the logs indicated how big the header is?</p>",
+        "id": 566339050,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767615109
+    },
+    {
+        "content": "<p>I've set it to 1024000 in the solr container: </p>\n<ul>\n<li>SOLR_OPTS=-Dsolr.jetty.request.header.size=1024000 -Dsolr.jetty.response.header.size=1024000<br>\nit doesn't show how long the header is, but it's a long string, <br>\nthe exact error is : </li>\n</ul>\n<div class=\"codehilite\"><pre><span></span><code>Could not hpack encode GET{u=http://solr:8983/solr/collection1/select?q=*.....\n</code></pre></div>\n<p>ps : <br>\nI deployed dataverse with Docker, and im using version v6.6 for dataverse and 9.8.0 for solr.</p>",
+        "id": 566340528,
+        "sender_full_name": "oussama Zoubia (UKK)",
+        "timestamp": 1767615603
+    },
+    {
+        "content": "<p>Ok, so 100 times the number we recommend in the docs. That should be enough!</p>\n<p>Do you want to go ahead and open an issue at <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a> ?</p>",
+        "id": 566365420,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767623326
+    },
+    {
+        "content": "<p>thank you Philip for the replies.<br>\neven setting that to a larger value couldn't solve the issue, the only work around I could find was removing some of the older blocks, <br>\nI just create an <a href=\"https://github.com/IQSS/dataverse/issues/12069\">issue</a> for the error. <br>\nbest. <br>\noussama.</p>",
+        "id": 566390171,
+        "sender_full_name": "oussama Zoubia (UKK)",
+        "timestamp": 1767629552
+    },
+    {
+        "content": "<p>Thanks! I edited the issue to add a link to this topic in Zulip.</p>",
+        "id": 566392994,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767630297
+    },
+    {
+        "content": "<p>Thanks, Philip. I just have one additional general question:</p>\n<p>If the problem with this header is caused by the large number of searchable items, then logically, limiting or decreasing the number should make the header smaller or make it work. However, it didn’t work for me (unless I did it incorrectly).</p>",
+        "id": 566523555,
+        "sender_full_name": "oussama Zoubia (UKK)",
+        "timestamp": 1767697815
+    },
+    {
+        "content": "<p>Right, but how are you decreasing the number of searchable items? I'm pretty sure that number is determined by how many fields are available in the database (that were added by loading a metadata block tsv file, I mean).</p>",
+        "id": 566540289,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767704858
+    },
+    {
+        "content": "<p>... which is probably a bug</p>",
+        "id": 566548273,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767707865
+    },
+    {
+        "content": "<p>update: <br>\nbecause that error was coming mostly from the facets, <br>\nI reduced the number of facets and the facetable items. and it solved the issue. <br>\nHowever I still think it's still a limitation. <br>\nbest.</p>",
+        "id": 569458779,
+        "sender_full_name": "oussama Zoubia (UKK)",
+        "timestamp": 1769079246
+    },
+    {
+        "content": "<p>Thanks for the update. I copy/pasted it here: <a href=\"https://github.com/IQSS/dataverse/issues/12069#issuecomment-3784167204\">https://github.com/IQSS/dataverse/issues/12069#issuecomment-3784167204</a></p>",
+        "id": 569478314,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769085388
+    },
+    {
+        "content": "<p>Good to know that this may be a problem. One of our users was asking for usage of Dataverse in the context of electric grid research and they have some really huge metadata structures.</p>",
+        "id": 569548804,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1769102587
+    }
+]

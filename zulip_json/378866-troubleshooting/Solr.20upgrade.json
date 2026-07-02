@@ -1,0 +1,404 @@
+[
+    {
+        "content": "<p>Hi all .. recently I upgraded our QA site to v6.0 following the given instructions for java, payara, and solr. We have Dataverse running on an application server, and Solr and Rserve running on a separate server in AWS. All went well, it seemed, solr was running the new version and I could see all the datasets in Dataverse. Then, I restarted the Solr server, and now I'm getting a \"connection refused\" on the Dataverse landing page. I've seen this before, but I don't remember how to fix it. I verified that my solr.service isn't using the “-D jetty.host=127.0.0.1\" option and made sure to upgrade java on the services server to v17. I see the server listening on port 8983 but don't see any connections. Any ideas what I missed?</p>",
+        "id": 396927069,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697469783
+    },
+    {
+        "content": "<p>Do you see fields on the equivalent of <a href=\"http://localhost:8983/solr/collection1/schema/fields\">http://localhost:8983/solr/collection1/schema/fields</a> ?</p>",
+        "id": 396927432,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697469887
+    },
+    {
+        "content": "<p>yes, but \"curl <a href=\"http://localhost:8080/api/info/version\">http://localhost:8080/api/info/version</a>\" doesn't work</p>",
+        "id": 396927965,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470002
+    },
+    {
+        "content": "<p>Huh. /info/version doesn't work but you're seeing a Solr error on the collection/home page?</p>",
+        "id": 396928347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697470102
+    },
+    {
+        "content": "<p>oops sorry, ignore that .. i copied the wrong command .. this one works \"curl <a href=\"http://localhost:8983/solr/collection1/schema/fields\">http://localhost:8983/solr/collection1/schema/fields</a>\"</p>",
+        "id": 396929263,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470383
+    },
+    {
+        "content": "<p>but still getting \"Server refused connection at: http://&lt;IP address&gt;:8983/solr/collection1\"</p>",
+        "id": 396929405,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470435
+    },
+    {
+        "content": "<p>on the webserver</p>",
+        "id": 396929493,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470450
+    },
+    {
+        "content": "<p>You're doing that \"fields\" curl test from the Payara server, right? Across the wire to the Solr server?</p>",
+        "id": 396930003,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697470629
+    },
+    {
+        "content": "<p>nope .. doesn't work on the web server</p>",
+        "id": 396930156,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470683
+    },
+    {
+        "content": "<p>connection refused</p>",
+        "id": 396930212,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470698
+    },
+    {
+        "content": "<p>Is there a firewall blocking it?</p>",
+        "id": 396930621,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697470842
+    },
+    {
+        "content": "<p>there shouldn't be .. i just upgraded the currently running instance .. and the current security group allows that port .. i didn't change that .. and didn't install any other firewall or add any rules</p>",
+        "id": 396930912,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697470929
+    },
+    {
+        "content": "<p>SolrHostColonPort is set correctly still</p>",
+        "id": 396931302,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697471058
+    },
+    {
+        "content": "<p>I'd stick with curl. If you can't curl the fields from the Payara server to the Solr server, we should fix that first. This has nothing to do with Dataverse.</p>",
+        "id": 396931442,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697471114
+    },
+    {
+        "content": "<p>ah so maybe something actually went wrong with the payara install?</p>",
+        "id": 396931849,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697471251
+    },
+    {
+        "content": "<p>Sorry, no, I'm saying it's probably a firewall.</p>",
+        "id": 396932996,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697471679
+    },
+    {
+        "content": "<p>okay checking all that out again .. my security groups seem fine .. server IPs didn't change .. if i change it back to old solr it works</p>",
+        "id": 396933262,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697471765
+    },
+    {
+        "content": "<p>Huh, old Solr works...</p>",
+        "id": 396933679,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697471910
+    },
+    {
+        "content": "<p>no now it isn't .. it did last night .. or if I change back to the volume where the old solr was running it works</p>",
+        "id": 396934415,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697472135
+    },
+    {
+        "content": "<p>going to revert the instances back to the old versions and try this again in a dev environment .. i must have messed something up</p>",
+        "id": 396934560,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697472176
+    },
+    {
+        "content": "<p>yea, so i reverted back to the volume (for the solr server) that had solr 8 running but kept the payara server the same (upgraded) and it works .. i am just detaching/attaching volumes and not changing any security groups</p>",
+        "id": 396935254,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697472342
+    },
+    {
+        "content": "<p>but, my webserver instance now is upgraded, but the solr instance is still running v8 .. will try the upgrade again</p>",
+        "id": 396935369,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697472370
+    },
+    {
+        "content": "<p>or . if it's okay to leave solr 8 running with upgraded payara and java .. will try the solr upgrade in a temp dev env</p>",
+        "id": 396935538,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697472444
+    },
+    {
+        "content": "<p>what's weird is .. after doing the upgrade initially .. it was running fine on new solr and the webserver was connecting .. but i must not have restarted the solr server after that .. that was a couple of weeks ago .. i restarted it this weekend, and after that it wouldn't connect</p>",
+        "id": 396937125,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697473094
+    },
+    {
+        "content": "<p>i created a dev environment and am trying this upgrade again .. at the end of the payara upgrade, i get a message that the deploy of dataverse-6.0.war failed .. however the site loads and shows that it is at v6.0 .. and the only errors that i see in the sql statements that display when upgrading are related to things already existing .. is this normal? is there a way for me to see why it failed? i can't remember if i've gotten a \"failed\" message on deploy before .. i do always see the \"already exists\" messages though</p>",
+        "id": 397554425,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697739204
+    },
+    {
+        "content": "<p>Yeah, unfortunately some of that noise is normal. <span aria-label=\"disappointed\" class=\"emoji emoji-1f61e\" role=\"img\" title=\"disappointed\">:disappointed:</span></p>",
+        "id": 397554630,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697739288
+    },
+    {
+        "content": "<p>Since this is a dev env I assume it's safe for you to post the output here.</p>",
+        "id": 397554680,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697739309
+    },
+    {
+        "content": "<p>oh oops, i guess this time it really failed .. the first time i did this it said it failed but it actually deployed .. this time not <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 397554841,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697739379
+    },
+    {
+        "content": "<p>oh i did it again and it worked</p>",
+        "id": 397554877,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697739403
+    },
+    {
+        "content": "<p>well, it says \"Deploy completed with warnings\" which is what i usually see .. but the site isn't coming up .. wow this upgrade is a bear</p>",
+        "id": 397554973,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697739454
+    },
+    {
+        "content": "<p>yea going to the site just shows payara admin page .. something messed up</p>",
+        "id": 397555175,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697739567
+    },
+    {
+        "content": "<p>It's like hitting the TV with a stick until it works.</p>",
+        "id": 397555364,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697739656
+    },
+    {
+        "content": "<p><span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 397556203,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697740090
+    },
+    {
+        "content": "<p>haven't even tried the solr upgrade yet!</p>",
+        "id": 397556244,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697740110
+    },
+    {
+        "content": "<p>fun times ahead! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 397558237,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697741023
+    },
+    {
+        "content": "<p>interesting, the payara site was showing because the load balancer registered my instance as unhealthy .. i must have taken too long to upgrade! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> <br>\nAs for upgrading solr, one question that i have is .. the instructions say to su - as the solr user, but that user is unprivileged, so doesn't have permission to wget or unzip in /usr/local/solr, or to copy files as indicated in the instructions. Do you have your solr user in sudoers? Or special permissions?  The main installation instructions say to chown to solr for /usr/local/solr but that is not recursive.</p>",
+        "id": 397566839,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697744551
+    },
+    {
+        "content": "<p>Huh. Not recursive? I thought it was.</p>",
+        "id": 397570740,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697746292
+    },
+    {
+        "content": "<p>I'm looking at this:</p>\n<div class=\"codehilite\"><pre><span></span><code>useradd solr\nmkdir /usr/local/solr\nchown solr:solr /usr/local/solr\n</code></pre></div>",
+        "id": 397570969,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697746400
+    },
+    {
+        "content": "<p>From <a href=\"https://guides.dataverse.org/en/6.0/installation/prerequisites.html#installing-solr\">https://guides.dataverse.org/en/6.0/installation/prerequisites.html#installing-solr</a></p>",
+        "id": 397571004,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697746417
+    },
+    {
+        "content": "<p>So /usr/local/solr should be owned by the solr user. Right?</p>",
+        "id": 397571098,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697746451
+    },
+    {
+        "content": "<p>yes, but nothing under that directory is .. that would be chown -R solr:solr /usr/local/solr</p>",
+        "id": 397572667,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697747260
+    },
+    {
+        "content": "<p>i did the full upgrade again .. solr won't start .. eegads what am i doing wrong?</p>",
+        "id": 397572753,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697747291
+    },
+    {
+        "content": "<p>if i point the solr.service file back to the old solr (/usr/local/solr) it works fine using the old version</p>",
+        "id": 397572902,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697747367
+    },
+    {
+        "content": "<p>I would chown -R it to the solr user.</p>",
+        "id": 397573330,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697747550
+    },
+    {
+        "content": "<p>okay just wasn't sure if some things needed to stay as root .. going to do that and go through the steps again .. thanks!</p>",
+        "id": 397573680,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697747758
+    },
+    {
+        "content": "<p>Basically, Solr should be running as the solr user. So that user needs to own the files.</p>",
+        "id": 397573869,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697747856
+    },
+    {
+        "content": "<p>You know, a service user.</p>",
+        "id": 397573886,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697747864
+    },
+    {
+        "content": "<p>yea i thought so and actually tried changing the ownership of everything before but that still doesn't fix it .. solr still won't start .. back to banging the stick</p>",
+        "id": 397574331,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697748089
+    },
+    {
+        "content": "<p>heh</p>",
+        "id": 397574351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697748103
+    },
+    {
+        "content": "<p>fixed .. deleted the solr-9.3.0 directory and started all over, after chown -R /usr/local/solr and doing the entire install as solr user and now it works .. i must not have done that correctly before although i thought i did .. omg .. sorry to bother you .. thanks for your help!</p>",
+        "id": 397576211,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697748941
+    },
+    {
+        "content": "<p>No problem! Should we fix the release notes?</p>",
+        "id": 397576510,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749087
+    },
+    {
+        "content": "<p>agh .. and i restarted the server and now solr doesn't start! this is what happened originally .. i upgraded everything but didn't restart the server, and everything was running, but about 2 weeks later i restarted the server and solr wouldn't start .. well i know it CAN work</p>",
+        "id": 397576658,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697749175
+    },
+    {
+        "content": "<p>not sure about the release notes .. i'm really an ubuntu person .. just have rocky linux for this .. although i think it is the same, most folks probably know and don't follow each line so specifically <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 397577128,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697749383
+    },
+    {
+        "content": "<p>The release notes could certainly be off. I wrote most of it. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 397578021,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749833
+    },
+    {
+        "content": "<p>the are great! immensely helpful!</p>",
+        "id": 397578314,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697749974
+    },
+    {
+        "content": "<p>i can't figure out why solr would start fine after upgrading, but not start after a reboot</p>",
+        "id": 397578433,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697750040
+    },
+    {
+        "content": "<p>well, it is working .. not sure what fixed it .. i just wiped out and reinstalled about 4 more times .. i restart the instance and solr service starts .. i can see my datasets and add new from the console, etc .. but the last weird thing is that .. although solr starts, and the reindex command works from the web server .. the curl command to show the schema fields still gets a connection refused error .. i have a SG rule in place allowing port 8983 from the webserver and i just added a rule to allow everything from the webserver .. idk</p>",
+        "id": 397587751,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697755792
+    },
+    {
+        "content": "<p>Yeah, we've got to get that curl command working. You can do it! <img alt=\":dataverse_woman:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44206.png\" title=\"dataverse woman\"></p>",
+        "id": 397739766,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697817521
+    },
+    {
+        "content": "<p>if anyone else deals with this .. <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> found an alert in the solr docs indicating that \"Solr now binds to localhost network interface by default for better out of the box security.\" We have to add our server IP to the \"SOLR JETTY HOST\" to allow external solr servers. YAY THANK YOU!!!! I was pretty focused on my installation being wrong and didn't consider actually looking at the solr docs.</p>",
+        "id": 397768079,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697831582
+    },
+    {
+        "content": "<p>Yes, I noticed he just opened <a href=\"https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328\">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328</a> about removing <a href=\"http://jetty.host\">jetty.host</a> in the future.</p>",
+        "id": 397768258,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697831678
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/Solr.20upgrade/near/397768258\">said</a>:</p>\n<blockquote>\n<p>Yes, I noticed he just opened <a href=\"https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328\">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/328</a> about removing <a href=\"http://jetty.host\">jetty.host</a> in the future.</p>\n</blockquote>\n<p>I also opened number 10030! Will submit PR.</p>",
+        "id": 397769434,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1697832254
+    },
+    {
+        "content": "<p>/me looks at <a href=\"https://github.com/IQSS/dataverse/issues/10030\">#10030</a></p>",
+        "id": 397769708,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697832398
+    },
+    {
+        "content": "<p>nice</p>",
+        "id": 397769731,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697832412
+    },
+    {
+        "content": "<p>Don, thanks again. You two are so immensely helpful to me (and everyone else). As I've said often before, ASU wouldn't have a dataverse installation without you all!</p>",
+        "id": 397769748,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697832423
+    },
+    {
+        "content": "<p>Aw. Such a nice way to go into the weekend. Thanks, Deirdre.</p>",
+        "id": 397769820,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697832464
+    },
+    {
+        "content": "<p><span aria-label=\"glowing star\" class=\"emoji emoji-1f31f\" role=\"img\" title=\"glowing star\">:glowing_star:</span></p>",
+        "id": 397770305,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1697832724
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> just made a pull request for the issue above: document localhost-only behavior of Solr-9.3.0 and later <a href=\"https://github.com/IQSS/dataverse/issues/10037\">#10037</a> (thanks!)</p>",
+        "id": 398339054,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698171514
+    }
+]

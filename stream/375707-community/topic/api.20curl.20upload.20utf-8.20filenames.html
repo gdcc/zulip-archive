@@ -1,0 +1,100 @@
+<html>
+<head><meta charset="utf-8"><title>api curl upload utf-8 filenames · community · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/index.html">community</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html">api curl upload utf-8 filenames</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="602195207"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602195207" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602195207">(Jun 11 2026 at 15:21)</a>:</h4>
+<p>I am trying to upload files with accented filenames. <br>
+Example try:</p>
+<div class="codehilite"><pre><span></span><code>curl -f -H &quot;X-Dataverse-key:$API_KEY&quot; -X POST -F &quot;file=@\&quot;Boldogság\&quot;&quot; -F &#39;
+jsonData={&quot;filename&quot;: &quot;Boldogs%C3%A1g&quot;}&#39; &quot;$SERVER/api/datasets/:persistentId/add?persistentId=$PID&quot;
+</code></pre></div>
+<p>This results in "BoldogsÃ¡g" as filename. If I leave the jsonData without urlencoding, the result is the same. If I use utf-8 escape sequences (like \045F), the result is the same.<br>
+I can easily rename the file on the user interface, but I would not like to do that to hundreds of files...</p>
+
+
+
+<a name="602195910"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602195910" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602195910">(Jun 11 2026 at 15:24)</a>:</h4>
+<p>Interesting. You definitely want to use curl? I'm just wondering if pyDataverse handles this.</p>
+
+
+
+<a name="602382569"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602382569" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602382569">(Jun 12 2026 at 04:41)</a>:</h4>
+<p>I will try pydataverse. Unfortunately, uploading big files with pydataverse is really slow and memory hungry, or - after 2GB - even impossible.</p>
+
+
+
+<a name="602459701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602459701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602459701">(Jun 12 2026 at 09:50)</a>:</h4>
+<p>Maybe you could try DVUploader as well: <a href="https://guides.dataverse.org/en/6.10.1/user/dataset-management.html#command-line-dvuploader">https://guides.dataverse.org/en/6.10.1/user/dataset-management.html#command-line-dvuploader</a></p>
+
+
+
+<a name="602459898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602459898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602459898">(Jun 12 2026 at 09:50)</a>:</h4>
+<p>To be clear, I'm wondering if there's a bug in the backend (Dataverse) or if we need add a flag or something to curl.</p>
+
+
+
+<a name="602501053"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602501053" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602501053">(Jun 12 2026 at 12:22)</a>:</h4>
+<p>I triesd uploading with pydataverse, and the error is the same: all non-8bit UTF-8 characters are represented with two characters -- the two bytes for the actual UTF-8 characters interpreted in a different code page (iso-8859-1 maybe?). If this is not a bug in the backend, it seems at least an outdated default codepage for processing input. <br>
+How can the uploaded content's encoding be specified?</p>
+
+
+
+<a name="602505263"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602505263" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602505263">(Jun 12 2026 at 12:37)</a>:</h4>
+<p>I also tried dvuploader, but it failed to upload the file with a 400 error (it connected good, and detected if the file MD5 existed before, and nothing was logged in the server logs). So it failed before the two other methods.</p>
+
+
+
+<a name="602519427"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602519427" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602519427">(Jun 12 2026 at 13:21)</a>:</h4>
+<p>Boo. I'm calling for reinforcements. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="602519576"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602519576" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602519576">(Jun 12 2026 at 13:22)</a>:</h4>
+<p><span class="user-mention" data-user-id="602779">@Péter Pallinger</span> one more thing to try if you're willing! <a href="https://github.com/gdcc/python-dvuploader">https://github.com/gdcc/python-dvuploader</a></p>
+
+
+
+<a name="602551524"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602551524" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602551524">(Jun 12 2026 at 14:56)</a>:</h4>
+<p>python-dvuploader did upload the file, but the resulting file name was the same...</p>
+
+
+
+<a name="602560464"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/602560464" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#602560464">(Jun 12 2026 at 15:23)</a>:</h4>
+<p>bah</p>
+
+
+
+<a name="604129451"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/604129451" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#604129451">(Jun 17 2026 at 12:13)</a>:</h4>
+<p>I filed a bug report:<br>
+<a href="https://github.com/IQSS/dataverse/issues/12470">https://github.com/IQSS/dataverse/issues/12470</a></p>
+<p>There is also a working workaround: You can rename the file after upload. But this is quite slow in case of many small files.</p>
+
+
+
+<a name="604147197"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375707-community/topic/api%20curl%20upload%20utf-8%20filenames/near/604147197" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375707-community/topic/api.20curl.20upload.20utf-8.20filenames.html#604147197">(Jun 17 2026 at 13:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="602779">@Péter Pallinger</span> thanks!</p>
+
+
+
+<hr><p>Last updated: Jul 02 2026 at 09:55 UTC</p>
+</html>

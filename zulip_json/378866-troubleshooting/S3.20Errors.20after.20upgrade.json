@@ -1,0 +1,350 @@
+[
+    {
+        "content": "<p>I attempted to do normal patching today on our production dataverse, and now I'm seeing the following errors in the log:</p>\n<p>[2024-12-19T13:52:17.943+0000] [Payara 6.2024.7] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.S3AccessIO] [tid: _ThreadID=95 _ThreadName=http-thread-pool::jk-connector(5)] [timeMillis: 1734616337943] [levelValue: 900] [[<br>\n  Caught an AmazonClientException in S3AccessIO.savePathAsAux():    User: arn:aws:sts::141031099449:assumed-role/AmazonSSMRoleForInstancesQuickSetup/i-098a0e852528a90ec is not authorized to perform: s3:PutObject on resource: \"arn:aws:s3:::&lt;dataset ID&gt;/export_schema.org.cached\" because no identity-based policy allows the s3:PutObject action (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: 74AKGFFAECW74WVA; S3 Extended Request ID: cNxNGnkZz/jjXoBuQqL0osMOs5ybNqItPkScpz5k9ZAutveyqngvN7mjUHnTQzNhVD/dmk8UChw=; Proxy: null)]]</p>\n<p>[2024-12-19T13:52:16.860+0000] [Payara 6.2024.7] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.S3AccessIO] [tid: _ThreadID=93 _ThreadName=http-thread-pool::jk-connector(3)] [timeMillis: 1734616336860] [levelValue: 900] [[<br>\n  Caught an AmazonClientException in S3AccessIO.isAuxObjectCached:    Forbidden (Service: Amazon S3; Status Code: 403; Error Code: 403 Forbidden; Request ID: Q4J9MBT25S4NS90Z; S3 Extended Request ID: 5HsBIjXxuTsjOGZz7duteNynYJo9j5idbyHBLObZ5RVU2aPI8I+4BqyyVO7lUFFeqr4MN14faSc=; Proxy: null)]]</p>\n<p>I restored the volume to before patching, but the error persists. I did not change anything related to my  access keys or policies on the user having access. I still have my CORS policy in place, and the policy on the IAM user to allow basically everything on the s3 bucket. Access keys are the same and correct.</p>\n<p>Any ideas what I'm missing?</p>",
+        "id": 489971452,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734617038
+    },
+    {
+        "content": "<p>Huh, my first thought is CORS policy but it sounds like you checked that already. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 489973108,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734617564
+    },
+    {
+        "content": "<p>so strange .. this is happening on all of our installations .. the server can't see the bucket .. can't upload any files .. any idea why that would suddenly occur?</p>",
+        "id": 489973454,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734617675
+    },
+    {
+        "content": "<p>this is our CORS policy<br>\n[<br>\n    {<br>\n        \"AllowedHeaders\": [<br>\n            \"*\"<br>\n        ],<br>\n        \"AllowedMethods\": [<br>\n            \"GET\",<br>\n            \"HEAD\",<br>\n            \"PUT\"<br>\n        ],<br>\n        \"AllowedOrigins\": [<br>\n            \"*\"<br>\n        ],<br>\n        \"ExposeHeaders\": [<br>\n            \"Content-Range\",<br>\n            \"ETag\",<br>\n            \"Content-Encoding\",<br>\n            \"Accept-Ranges\"<br>\n        ],<br>\n        \"MaxAgeSeconds\": 0<br>\n    }<br>\n]</p>",
+        "id": 489973753,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734617772
+    },
+    {
+        "content": "<p>Can you go over what changed? It sounds like the version of Dataverse itself didn't change but you patched the underlying OS? Linux, I assume. Which distro?</p>",
+        "id": 489973856,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734617825
+    },
+    {
+        "content": "<p>i patched the OS, but then restored back to a snapshot of the volume, so now i'm running on that .. so the OS is not upgraded</p>",
+        "id": 489974595,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618062
+    },
+    {
+        "content": "<p>rocky linux 8</p>",
+        "id": 489974631,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618081
+    },
+    {
+        "content": "<p>Strange that it's causing S3 trouble.</p>",
+        "id": 489975395,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734618328
+    },
+    {
+        "content": "<p>i'm still using the aws credentials file for access .. could that be an issue?</p>",
+        "id": 489975549,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618374
+    },
+    {
+        "content": "<p>I mean, that should depend on the version of Dataverse, I think, which hasn't changed.</p>",
+        "id": 489975696,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734618430
+    },
+    {
+        "content": "<p>It is worth testing outside of Dataverse?</p>",
+        "id": 489975734,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734618445
+    },
+    {
+        "content": "<p>on prod we are running v6.4<br>\non qa i did upgrade to v6.5 recently</p>",
+        "id": 489975774,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618460
+    },
+    {
+        "content": "<p>Which one is having S3 trouble?</p>",
+        "id": 489975945,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734618504
+    },
+    {
+        "content": "<p>both</p>",
+        "id": 489975964,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618511
+    },
+    {
+        "content": "<p>D'oh! <img alt=\":doh:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/343009b9.png\" title=\"doh\"></p>",
+        "id": 489975978,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734618521
+    },
+    {
+        "content": "<p>yea fun week .. had some other unfun issues earlier</p>",
+        "id": 489976171,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734618600
+    },
+    {
+        "content": "<p>when i use the cli to list the bucket contents it works</p>",
+        "id": 489977661,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619129
+    },
+    {
+        "content": "<p>well it does on the prod server, but not on qa .. i get \"cannot import name 'PROTOCOL_TLS'\"</p>",
+        "id": 489978436,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619386
+    },
+    {
+        "content": "<p>I wouldn't trust myself to test via cli but I'm glad you're trying!</p>",
+        "id": 489978687,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734619461
+    },
+    {
+        "content": "<p>what version of Dataverse? with 5.14+ Dataverse will prefer RBAC even if you give it access keys.</p>",
+        "id": 489978730,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619474
+    },
+    {
+        "content": "<p>ah, v6.5. I have 6.5 running on two instances with S3 storage, one using RBAC, one still using keys.</p>",
+        "id": 489978846,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619514
+    },
+    {
+        "content": "<p>v6.4 and v6.5 .. but these have been working just fine for quite some time .. until today</p>",
+        "id": 489978860,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619518
+    },
+    {
+        "content": "<p>they are both still using keys</p>",
+        "id": 489978900,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619535
+    },
+    {
+        "content": "<p>is there any AWS role assigned to the EC2 instance?</p>",
+        "id": 489978972,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619563
+    },
+    {
+        "content": "<p>I have an open issue requesting the ability to disable the RBAC preference within Dataverse, but if there's a role assigned to the EC2 instance, <em>that</em> sets the S3 permission policy.</p>",
+        "id": 489979126,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619605
+    },
+    {
+        "content": "<p>we use aws backup so it has the \"AmazonSSMRoleForInstancesQuickSetup\" assigned to it</p>",
+        "id": 489979176,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619624
+    },
+    {
+        "content": "<p>it has been there for at least a year</p>",
+        "id": 489979234,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619643
+    },
+    {
+        "content": "<p>what I did was create a meta-role for the instance (in my case it had the AWS SSM role assigned previously). the parent role included the SSM policy and an \"inline\" custom policy into which I copy-pasted the S3 permissions.</p>",
+        "id": 489979405,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619686
+    },
+    {
+        "content": "<p>sorry i mean systems manager</p>",
+        "id": 489979416,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619690
+    },
+    {
+        "content": "<p>I'm not sure why things had been working after you upgraded to v5.14 - that's when mine broke.</p>",
+        "id": 489979479,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619716
+    },
+    {
+        "content": "<p>i'm not sure why we even have the systems manager role on this instance .. i'm not managing any of the rocky linux instances with SSM .. so i need to create a new role and add the SSM policy and the inline policy with the current s3 permissions that are on the IAM user?</p>",
+        "id": 489979783,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619809
+    },
+    {
+        "content": "<p>and attach that to the instance instead of the SSM one?</p>",
+        "id": 489979836,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734619828
+    },
+    {
+        "content": "<p>if you're not using SSM, you could create a role for the instance's S3 access and assign the bucket policy to that role</p>",
+        "id": 489980273,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734619974
+    },
+    {
+        "content": "<p>I'm still curious how/why you're just hitting this now. Does anyone else modify your AWS configuration?</p>",
+        "id": 489980387,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734620011
+    },
+    {
+        "content": "<p>i wonder if it has to do with the recent upgrade of SSM .. if somewhere along the lines it assigned the instance policy to all the instances for some reason .. i have a distribution, host management, and patching config but none of them include any of the rocky linux instances</p>",
+        "id": 489980721,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620108
+    },
+    {
+        "content": "<p>i'm the only one that messes with our linux configs .. so it was likely something I did =)</p>",
+        "id": 489981000,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620178
+    },
+    {
+        "content": "<p>I'm seeing now that I need to submit a pull request to flesh out the docs mentioned in <a href=\"https://github.com/IQSS/dataverse/issues/10707\">https://github.com/IQSS/dataverse/issues/10707</a> and open a second issue for that disableRBAC boolean</p>",
+        "id": 489981402,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734620286
+    },
+    {
+        "content": "<p>but Dataverse will definitely prefer S3 permissions specified in the EC2 instance's assigned role over any access keys you offer it.</p>",
+        "id": 489981536,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734620325
+    },
+    {
+        "content": "<p>That was it!!!! OMG i'm breathing again. DON .. thank you!!!!</p>",
+        "id": 489983454,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620874
+    },
+    {
+        "content": "<p>Now to figure out why it changed ...</p>",
+        "id": 489983525,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620886
+    },
+    {
+        "content": "<p>Thanks to you both for responding so quickly to this thread.</p>",
+        "id": 489983583,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620901
+    },
+    {
+        "content": "<p>Really I was just stalling you until Don showed up. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 489983669,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734620925
+    },
+    {
+        "content": "<p>haha .. well thanks for that .. it calmed me down!</p>\n<p>that change happened on both AWS accounts, so somehow the SSM role got assigned to the instance even though I'm not including it anywhere in the configs</p>",
+        "id": 489983851,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734620989
+    },
+    {
+        "content": "<p>I'm glad that fixed it! I'm submitting a PR for the docs now, that got buried in my to-do list.</p>",
+        "id": 489984025,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734621042
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598843\">@Deirdre Kirmis</span> maybe you can review the PR Don makes to improve the docs. Or you could make the PR yourself if you want!</p>",
+        "id": 489984073,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734621061
+    },
+    {
+        "content": "<p>Happy to help with anything! LMK and I'll for sure look at it.</p>",
+        "id": 489984255,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734621118
+    },
+    {
+        "content": "<p>Thank you, thank you, thank you! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 489985594,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734621487
+    },
+    {
+        "content": "<p>I just read through that PR and it seems pretty clear .. I just hadn't seen it. <span aria-label=\"expressionless\" class=\"emoji emoji-1f611\" role=\"img\" title=\"expressionless\">:expressionless:</span>  Sorry about that!</p>",
+        "id": 489986762,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734621840
+    },
+    {
+        "content": "<p>The issue, you mean? <a href=\"https://github.com/IQSS/dataverse/issues/10707\">https://github.com/IQSS/dataverse/issues/10707</a></p>",
+        "id": 489987033,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734621905
+    },
+    {
+        "content": "<p>Yes, but now i read again i see you meant a PR for the docs! Sorry, my brain is kind of fried.</p>",
+        "id": 489987551,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734622032
+    },
+    {
+        "content": "<p>No worries. You probably got up early today.</p>",
+        "id": 489987890,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734622104
+    },
+    {
+        "content": "<p>suuuuuper early .. patching thursday! <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 489988333,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734622206
+    },
+    {
+        "content": "<p>patching stuff, breaking stuff, fixing stuff</p>",
+        "id": 489988472,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734622256
+    },
+    {
+        "content": "<p>haha that's my cycle! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 489988981,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734622416
+    },
+    {
+        "content": "<p>NOW there's a PR: <a href=\"https://github.com/IQSS/dataverse/pull/11111/files\">https://github.com/IQSS/dataverse/pull/11111/files</a><br>\nand I opened <a href=\"https://github.com/IQSS/dataverse/issues/11112\">https://github.com/IQSS/dataverse/issues/11112</a></p>",
+        "id": 489990665,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1734622913
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598843\">@Deirdre Kirmis</span> do you see an invite at <a href=\"https://github.com/IQSS\">https://github.com/IQSS</a> ? I'm trying add you to <a href=\"https://github.com/orgs/IQSS/teams/dataverse-readonly\">https://github.com/orgs/IQSS/teams/dataverse-readonly</a> so I can request a review from you. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 489993342,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734623709
+    },
+    {
+        "content": "<p>yes .. i'm in!</p>",
+        "id": 489997858,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1734625072
+    },
+    {
+        "content": "<p>Review requested!</p>",
+        "id": 490001132,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1734626078
+    }
+]
