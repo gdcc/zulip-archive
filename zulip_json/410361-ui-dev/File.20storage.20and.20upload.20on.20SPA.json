@@ -1,0 +1,50 @@
+[
+    {
+        "content": "<p>The developer documentation suggest that you need S3 credentials to be able to upload a file. And indeed, when trying to upload it fails with : <code>FileJSDataverseRepository.ts:299 \n PUT https://beta-dataverse-direct.s3.us-east-1.amazonaws.com/10.5072/FK2/HWDGFW…Signature=286e552… 403 (Forbidden)</code>.<br>\nIt seems that the amazonaws is hardwired, which does not work wel for non-IQSS developers. <br>\nIt would be better if the develop enviromment used a minio docker container. </p>\n<p>But futhermore, it might be that the Dataverse backend also must use this same S3 as its file storage for the upload to work?</p>",
+        "id": 533059653,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1754471948
+    },
+    {
+        "content": "<p>I'm confused. In development we do use MinIO and LocalStack. In this test, for example: <a href=\"https://github.com/IQSS/dataverse/blob/v6.7.1/src/test/java/edu/harvard/iq/dataverse/api/S3AccessIT.java\">https://github.com/IQSS/dataverse/blob/v6.7.1/src/test/java/edu/harvard/iq/dataverse/api/S3AccessIT.java</a></p>\n<p>So there shouldn't be any dependence on AWS. Do we need to fix the developer docs? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 533098658,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754485612
+    },
+    {
+        "content": "<p>I am looking at the docs: <a href=\"https://github.com/IQSS/dataverse-frontend/blob/develop/DEVELOPER_GUIDE.md#running-the-project-locally\">https://github.com/IQSS/dataverse-frontend/blob/develop/DEVELOPER_GUIDE.md#running-the-project-locally</a><br>\nIf I run the SPA locally, I get that error. <br>\nSorry for the confusion, I added 'on SPA' to the topic.</p>",
+        "id": 533099296,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1754485790
+    },
+    {
+        "content": "<p>thanks</p>",
+        "id": 533100613,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754486190
+    },
+    {
+        "content": "<p>I see what you mean:</p>\n<div class=\"codehilite\"><pre><span></span><code># /dev-env/ directory\n\n# copy the .env.example file to .env\n# To test file upload, update the .env file with S3 credentials\n$ cp .env.example .env\n</code></pre></div>\n<p>Yes, my <code>.env.</code>file has these:</p>\n<div class=\"codehilite\"><pre><span></span><code>S3_ACCESS_KEY=REDACTED\nS3_SECRET_KEY=REDACTED\n</code></pre></div>\n<p>I agree this is suboptimal. I assumed it was using MinIO or LocalStack rather than actual AWS S3. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 533101180,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754486344
+    },
+    {
+        "content": "<p>Ha, I see from my Slack history that <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> shared those secrets with me about a year ago.</p>\n<p><span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> I forget the details on this. Is the frontend dev environment dependent on AWS S3? Can developers use MinIO or LocalStack instead?</p>",
+        "id": 533101635,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754486480
+    },
+    {
+        "content": "<p>The original idea was to use MinIO / LocalStack, but we ultimately discarded that approach due to difficulties getting it to work with direct uploads.<br>\nTo speed up development, we decided to switch to a real S3 bucket instead.<br>\nWe're happy to transition to a fully containerized solution using MinIO / LocalStack in the future, as long as we can get a working setup.</p>",
+        "id": 533125520,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1754493449
+    },
+    {
+        "content": "<p>Great, I added this to our \"Roadmap - Technical Brainstorming\" doc.</p>",
+        "id": 533126408,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754493763
+    }
+]

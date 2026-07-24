@@ -1,0 +1,58 @@
+<html>
+<head><meta charset="utf-8"><title>Controlled Vocabulary Field Missing from Published Dataset · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html">Controlled Vocabulary Field Missing from Published Dataset</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="609458404"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Controlled%20Vocabulary%20Field%20Missing%20from%20Published%20Dataset/near/609458404" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html#609458404">(Jul 10 2026 at 13:38)</a>:</h4>
+<p>We recently converted the <code>kindOfData</code> (Data Type) field from a free text field to a controlled vocabulary. Since that change, we’re seeing inconsistent behavior.</p>
+<ul>
+<li>The Data Type values are visible when editing a dataset.</li>
+<li>The values are available for faceting/filtering.</li>
+<li>The values appear to exist in the database (stored as controlled vocabulary values).</li>
+<li>However, the field does <strong>not</strong> appear on the published dataset page.</li>
+<li>It is also missing from metadata exports (for example, OAI-ORE where <code>kindOfData</code> should be present).</li>
+</ul>
+<p>Initially I suspected a metadata field configuration problem. I found some issues in our <code>citation.tsv</code> (missing <code>displayFormat</code> and formatting problems), corrected them, reloaded the dataset fields, and re-exported metadata, but the behavior did not change.</p>
+<p>At this point everything appears to be configured correctly, yet Dataverse still omits the field from both the published UI and exports while continuing to display it in edit mode.</p>
+<p>Has anyone seen this behavior with controlled vocabulary fields? Is there another cache, index, metadata configuration, or code path that determines whether controlled vocabulary fields are rendered on published dataset pages and included in metadata exports?</p>
+<p>Any ideas on where to look next would be appreciated.<br>
+Dataverse v6.7.1 thru 6.10.1 (both on our upgraded test site and our production)</p>
+
+
+
+<a name="609460268"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Controlled%20Vocabulary%20Field%20Missing%20from%20Published%20Dataset/near/609460268" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html#609460268">(Jul 10 2026 at 13:46)</a>:</h4>
+<p>Oh dear, there's a reason we say this in <a href="https://guides.dataverse.org/en/6.11/admin/metadatacustomization.html#introduction">the guides</a>:</p>
+<p>"Generally speaking it is safer to create your own custom metadata block rather than editing metadata blocks that ship with the Dataverse Software, because changes to these blocks may be made in future releases. If you’d like to make improvements to any of the metadata blocks shipped with the Dataverse Software, please open an issue at <a href="https://github.com/IQSS/dataverse/issues">https://github.com/IQSS/dataverse/issues</a> so it can be discussed before a pull request is made."</p>
+
+
+
+<a name="609485941"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Controlled%20Vocabulary%20Field%20Missing%20from%20Published%20Dataset/near/609485941" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html#609485941">(Jul 10 2026 at 15:35)</a>:</h4>
+<p>Would it be possible for you to revert your citation block to be vanilla?</p>
+<p>And create a new custom metadata block with the field you want?</p>
+<p>(I guess migrate the data to the new field first and then revert the citation field to vanilla.)</p>
+
+
+
+<a name="609536223"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Controlled%20Vocabulary%20Field%20Missing%20from%20Published%20Dataset/near/609536223" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Richards <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html#609536223">(Jul 10 2026 at 20:13)</a>:</h4>
+<p>OK, thanks. That sounds like the right plan to move forwards with.</p>
+
+
+
+<a name="609536313"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Controlled%20Vocabulary%20Field%20Missing%20from%20Published%20Dataset/near/609536313" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Controlled.20Vocabulary.20Field.20Missing.20from.20Published.20Dataset.html#609536313">(Jul 10 2026 at 20:14)</a>:</h4>
+<p>Sorry it isn't easier!</p>
+
+
+
+<hr><p>Last updated: Jul 24 2026 at 14:48 UTC</p>
+</html>

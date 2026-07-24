@@ -1,0 +1,166 @@
+<html>
+<head><meta charset="utf-8"><title>Question about infrastructure/server config · infra-ops · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/index.html">infra-ops</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html">Question about infrastructure/server config</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="608797206"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608797206" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608797206">(Jul 07 2026 at 17:31)</a>:</h4>
+<p>Since <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> was so kind as to create this channel .. I'll ask the first (of likely many) question(s)! </p>
+<ul>
+<li>Will start basic .. sysadmins, what does your infrastructure look like? </li>
+<li>Are you in the cloud, or on-prem? </li>
+<li>What OS do you run Dataverse on? </li>
+<li>Do you have a 1) single server for webapp+solr+ext tools or 2) a server for app, server for microservices, solr, external apps, 3) some other config? </li>
+<li>What are your server specs (ie: cpu, ram, etc)</li>
+<li>Do you run external tools locally on the app or services server, or point to the public repo?</li>
+</ul>
+<p>In the spirit of sharing, at ASU we are: </p>
+<ul>
+<li>all in AWS </li>
+<li>running Rocky Linux 8 still </li>
+<li>have a server for web app and a server for SOLR .. but are going to combine soon (w/b m6a.2xlarge - 8CPU/32GRAM) </li>
+<li>we point to repo for some external tools (ie: previewers, data exp) but have some installed locally .. after doing the above will create a "services" server to install/run all locally; we actually have a third instance for Globus transfer app but I will combine that with the other services and tools on the "services" server</li>
+</ul>
+<p>Any thoughts on running dataverse+solr on the same server? </p>
+<p>I guess that was multiple questions, but hopefully all related.</p>
+
+
+
+<a name="608800654"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608800654" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608800654">(Jul 07 2026 at 17:44)</a>:</h4>
+<p>Harvard Dataverse is in the cloud, on AWS.</p>
+<p>We run on some variant of Red Hat, either RHEL or Rocky.</p>
+<p>We're on multiple servers, described here: <a href="https://guides.dataverse.org/en/6.11/installation/prep.html#advanced-installation">https://guides.dataverse.org/en/6.11/installation/prep.html#advanced-installation</a></p>
+
+
+
+<a name="608800734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608800734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608800734">(Jul 07 2026 at 17:45)</a>:</h4>
+<p>Here's a pic:</p>
+<p><img alt="3webservers.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="611x686" data-original-src="/user_uploads/53090/5uO8CbQhSSD7EkO4Y_bWETs8/3webservers.png" src="/user_uploads/thumbnail/53090/5uO8CbQhSSD7EkO4Y_bWETs8/3webservers.png/840x560.webp"></p>
+
+
+
+<a name="608801043"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608801043" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608801043">(Jul 07 2026 at 17:46)</a>:</h4>
+<p>Our specs are described here: <a href="https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements">https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements</a></p>
+<p>Namely:</p>
+<ul>
+<li>two instances for web frontends running Payara fronted by Apache (“m4.4xlarge” with 64 GB RAM and 16 vCPUs)<ul>
+<li>these are sitting behind an AWS ELB load balancer</li>
+</ul>
+</li>
+<li>one instance for the Solr search engine (“m4.2xlarge” with 32 GB RAM and 8 vCPUs)</li>
+<li>one instance for R (“m4.xlarge” instances with 16 GB RAM and 4 vCPUs)</li>
+<li>The PostgreSQL database is served by Amazon RDS.</li>
+</ul>
+
+
+
+<a name="608801331"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608801331" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608801331">(Jul 07 2026 at 17:47)</a>:</h4>
+<p>We point to the public gdcc repo for external tools, like this: <a href="https://gdcc.github.io/dataverse-previewers/previewers/v1.5/SpreadsheetPreview.html">https://gdcc.github.io/dataverse-previewers/previewers/v1.5/SpreadsheetPreview.html</a></p>
+
+
+
+<a name="608803168"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608803168" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608803168">(Jul 07 2026 at 17:55)</a>:</h4>
+<p>Ah yea, I've seen this .. something for us to strive to! <br>
+Interesting, so you are running the database on the instance and not in RDS? </p>
+<p>And, are those 2 (3?) webserver instances permanent or does the LB utilize autoscaling? And on-demand instances, or reserved? We may need to increase our specs.</p>
+<p>And you have SOLR separate .. well maybe we should leave ours as is. Good to know you are using the repo for external tools too.</p>
+<p>Thanks for the response! Would love to know what other orgs are doing. I know a few have mentioned that they have webapp+solr on a single server.</p>
+
+
+
+<a name="608803475"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608803475" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608803475">(Jul 07 2026 at 17:56)</a>:</h4>
+<p>Thanks for moving the other issues into this channel .. some I had not seen and a lot of good answers.</p>
+
+
+
+<a name="608803627"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608803627" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608803627">(Jul 07 2026 at 17:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598843">Deirdre Kirmis</span> <a href="#narrow/channel/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config/near/608803168">said</a>:</p>
+<blockquote>
+<p>Interesting, so you are running the database on the instance and not in RDS?</p>
+</blockquote>
+<p>Oh! Excellent point! That diagram is out of date. We use RDS.</p>
+
+
+
+<a name="608803852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608803852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608803852">(Jul 07 2026 at 17:57)</a>:</h4>
+<p>I just edited the message above to include this line from the guides:</p>
+<p>"The PostgreSQL database is served by Amazon RDS."</p>
+
+
+
+<a name="608804733"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608804733" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608804733">(Jul 07 2026 at 18:00)</a>:</h4>
+<p>I would help myself a lot more if I just read through the entire section in the guides.</p>
+
+
+
+<a name="608806216"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608806216" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608806216">(Jul 07 2026 at 18:06)</a>:</h4>
+<p>I mean, it hasn't been updated it a while, but please be my guest! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="608809580"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608809580" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608809580">(Jul 07 2026 at 18:23)</a>:</h4>
+<p>That whole <a href="https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements">Preparation</a> page is really helpful. As is Jim's <a href="https://guides.dataverse.org/en/latest/admin/big-data-administration.html">scaling tips</a> page.</p>
+
+
+
+<a name="608810269"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608810269" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608810269">(Jul 07 2026 at 18:27)</a>:</h4>
+<p>Does Harvard run community-dev'd applications (ie: metrics, globus transfer, rdm dash, python scripts, etc) .. on a separate server from these, or on the existing web server(s)?</p>
+
+
+
+<a name="608810734"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/608810734" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#608810734">(Jul 07 2026 at 18:30)</a>:</h4>
+<p>Separate. The servers mentioned above are dedicated to production.</p>
+
+
+
+<a name="609157701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/609157701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#609157701">(Jul 09 2026 at 07:34)</a>:</h4>
+<p>New instance I'm setting up will run on Nomad with containers with configuration/microProfile as part of Nomad Vault.</p>
+
+
+
+<a name="609164793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/609164793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Thomas van Erven <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#609164793">(Jul 09 2026 at 08:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> did you lads ever run your containers on Fargate and if so, what was the experience?</p>
+
+
+
+<a name="609196727"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/609196727" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#609196727">(Jul 09 2026 at 10:53)</a>:</h4>
+<p>If we're using Fargate, I'm not aware of it. <span class="user-mention" data-user-id="637063">@Leo Andreev</span> and <span class="user-mention" data-user-id="980865">@Steven Winship</span> would know.</p>
+
+
+
+<a name="609469646"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/609469646" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#609469646">(Jul 10 2026 at 14:24)</a>:</h4>
+<p><span class="user-mention" data-user-id="720428">@Thomas van Erven</span> if you get things running on Fargate I would be very interested as we are moving many of our services for other apps there (ECS). Even if we could just run SOLR there that would be cool.</p>
+
+
+
+<a name="609525827"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/Question%20about%20infrastructure/server%20config/near/609525827" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config.html#609525827">(Jul 10 2026 at 19:04)</a>:</h4>
+<p>Actually, thinking more about it .. if we could run SOLR in ECS with the current installation that would be immense. We are running it on a separate instance now, so shouldn't that work? Going to see if I can make that happen. We eventually do want to go to the container installation, but for now that would be helpful.</p>
+
+
+
+<hr><p>Last updated: Jul 24 2026 at 14:48 UTC</p>
+</html>

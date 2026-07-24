@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Still on 5.14 and payara5.  I'm running into an issue publishing datasets.</p>\n<p>#|2025-07-08T19:05:28.937+0000|SEVERE|Payara 5.2022.4|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=96;_ThreadName=http-thread-pool::jk-connector(3);_TimeMillis=1752001528937;_LevelValue=1000;|<br>\n  CommandException, when attempting to update the dataset: This dataset may not be published due to an error when contacting the &lt;a href=https://ezid.cdlib.org target=\"_blank\"/&gt; EZID &lt;/a&gt; Service. Please try again.<br>\nedu.harvard.iq.dataverse.engine.command.exception.CommandException: This dataset may not be published due to an error when contacting the &lt;a href=https://ezid.cdlib.org target=\"_blank\"/&gt; EZID &lt;/a&gt; Service. Please try again.<br>\n        at edu.harvard.iq.dataverse.engine.command.impl.AbstractDatasetCommand.registerExternalIdentifier(AbstractDatasetCommand.java:193)</p>\n<p>I'm wondering if the doi settings in domain.xml have changed.<br>\nMine look like:<br>\n&lt;jvm-options&gt;-DProtocol=doi&lt;/jvm-options&gt;<br>\n&lt;jvm-options&gt;-Ddoi.provider=EZID&lt;/jvm-options&gt;<br>\n&lt;jvm-options&gt;-Ddoi.password=<strong>*</strong>*&lt;/jvm-options&gt;<br>\n&lt;jvm-options&gt;-Dcom.ctc.wstx.returnNullForDefaultNamespace=true&lt;/jvm-options&gt;<br>\n&lt;jvm-options&gt;-Ddoi.username=<strong>*</strong>&lt;/jvm-options&gt;</p>\n<p>Thank you,</p>\n<p>Jamie Jamison<br>\nUCLA Dataverse</p>",
+        "id": 527922126,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752077382
+    },
+    {
+        "content": "<p>Hoboy. EZID. Only supported in California. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 527923022,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752077713
+    },
+    {
+        "content": "<p>Is the EZID service up and working?</p>",
+        "id": 527923129,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752077753
+    },
+    {
+        "content": "<p>Also, when was the last time published worked for you? And has anything changed?</p>",
+        "id": 527923210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752077778
+    },
+    {
+        "content": "<p>Oh good, Jim is helping here as well: <a href=\"https://groups.google.com/g/dataverse-community/c/gdTnvT5TAgM/m/SiuYx_E4BgAJ\">https://groups.google.com/g/dataverse-community/c/gdTnvT5TAgM/m/SiuYx_E4BgAJ</a></p>",
+        "id": 527937304,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752083020
+    },
+    {
+        "content": "<p>Jim was very helpful.  I've gotten the userid, password and baseurl set.  I just need to figure out how  dataverse.pid.ezid.api-url is set.  What ever I have for that is still incorrect.</p>",
+        "id": 527954783,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752090437
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-ezid-api-url\">https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-ezid-api-url</a> says it defaults to <a href=\"https://ezid.cdlib.org\">https://ezid.cdlib.org</a></p>",
+        "id": 527955139,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752090585
+    },
+    {
+        "content": "<p>I have that.   The other one I'm confused about is Ddataverse.pid.permalink.base-url.   This isn't the same as the old base-url?</p>\n<p>Documentation (<a href=\"https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-permalink-base-url\">https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-permalink-base-url</a>)  has:</p>\n<h3><a href=\"https://guides.dataverse.org/en/5.14/installation/config.html#id247\">dataverse.pid.permalink.base-url</a><a href=\"https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-permalink-base-url\">https://guides.dataverse.org/en/5.14/installation/config.html#dataverse-pid-permalink-base-url</a></h3>\n<p>When using <a href=\"https://guides.dataverse.org/en/5.14/installation/config.html#permalinks\">PermaLinks</a>, this setting can be used to configure an external resolver. Dataverse will associate a PermaLink PID with the URL: <code>&lt;dataverse.pid.permalink.base-url&gt;/citation?persistentId=perma:&lt;permalink&gt;</code>. The default value is your Dataverse site URL, which will result in PermaLinks correctly resolving to the appropriate dataset page.</p>\n<p>To set this option, issue a command such as:</p>\n<p><code>./asadmin create-jvm-options '-Ddataverse.pid.permalink.base-url=https\\://localresolver.yourdataverse.org'</code></p>\n<p>So that would be url=https\\://localresolver.dataverse.ucla.edu   ?</p>",
+        "id": 527958048,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752091807
+    },
+    {
+        "content": "<p>I contacted UC Berkeley, the other campus using EZID.  They sent some examples and I've tried adding those but I'm still getting the error:<br>\n[#|2025-07-14T20:12:04.845+0000|SEVERE|Payara 5.2022.4|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=97;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1752523924845;_LevelValue=1000;|<br>\n  CommandException, when attempting to update the dataset: This dataset may not be published due to an error when contacting the &lt;a href=https://ezid.cdlib.org target=\"_blank\"/&gt; EZID &lt;/a&gt; Service. Please try again.<br>\nedu.harvard.iq.dataverse.engine.command.exception.CommandException: This dataset may not be published due to an error when contacting the &lt;a href=https://ezid.cdlib.org target=\"_blank\"/&gt; EZID &lt;/a&gt; Service. Please try again.</p>\n<p>It's probably something obviouse but I haven't found the problem yet.</p>\n<p>Can I share my domain.xml file with anyone just to get someother eyes on the problem.</p>\n<p>-jamie</p>",
+        "id": 528734112,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752524590
+    },
+    {
+        "content": "<p>Hmm, is there any more in server.log? That's pretty much the complete error?</p>",
+        "id": 528734971,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752524922
+    },
+    {
+        "content": "<p>The entire error is too long to fit here.  I've attached it as a text file.<br>\n<a href=\"/user_uploads/53090/Brc9ZPiq68eQTxmZlk1dRnK5/payara5-error.txt\">payara5-error.txt</a></p>",
+        "id": 528741392,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752527592
+    },
+    {
+        "content": "<p>What I think it comes down to is that I still don't have ezid setup correctly</p>",
+        "id": 528743503,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1752528506
+    },
+    {
+        "content": "<p>Hmm, I don't like the look of this:</p>\n<p><code>String edu.ucsb.nceas.ezid.EZIDException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target</code></p>",
+        "id": 528857063,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752584894
+    },
+    {
+        "content": "<p>For <span class=\"user-mention\" data-user-id=\"903222\">@Yuyun Wirawati</span> there was something wrong with a HTTP SSL cert: <a href=\"https://groups.google.com/g/dataverse-community/c/xD1gfiD5H-U/m/56aSTXkFEgAJ\">https://groups.google.com/g/dataverse-community/c/xD1gfiD5H-U/m/56aSTXkFEgAJ</a></p>",
+        "id": 528857329,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752584971
+    },
+    {
+        "content": "<p>And there was a similar cert error here when trying to add a harvesting client: <a href=\"https://groups.google.com/g/dataverse-community/c/lpYLX4RkxO4/m/5KTRZQ-3AQAJ\">https://groups.google.com/g/dataverse-community/c/lpYLX4RkxO4/m/5KTRZQ-3AQAJ</a></p>",
+        "id": 528857641,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1752585048
+    },
+    {
+        "content": "<p>hmm, same error message. <br>\nFor us, we replaced the cacerts.jks (  /usr/local/payara5/glassfish/domains/domain1/config/cacerts.jks) to new version. Connection to DataCite was restored, and we could publish again.</p>",
+        "id": 528965740,
+        "sender_full_name": "Yuyun Wirawati",
+        "timestamp": 1752628758
+    }
+]

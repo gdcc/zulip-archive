@@ -1,0 +1,312 @@
+<html>
+<head><meta charset="utf-8"><title>RDS looks like gzip file · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html">RDS looks like gzip file</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="612419409"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612419409" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612419409">(Jul 23 2026 at 18:02)</a>:</h4>
+<p>Hello , <br>
+(We are running 6.10.1, though this dataset was ingested when we were using 6.6)</p>
+<p>We have this dataset that has 4 RDS files in it.  3 were converted to tab files and the 4th was not because it looks like a gzip file.  In looking at the files, I see the all have the same bytes in the  header indicating they are RDS compressed files. <br>
+I can't tell what is different about the files that one would be identified as GZIP while the rest are identified as RDS.   I'm not familiar with R and only have done some basic troubleshooting. </p>
+<p>$ hexdump -n 2 Vote_Data.RDS<br>
+0000000 8b1f<br>
+0000002<br>
+$ hexdump -n 2 College_Debt_Data.RDS<br>
+0000000 8b1f<br>
+0000002</p>
+<p>The dataset: <a href="https://dataverse.yale.edu/dataset.xhtml?persistentId=doi:10.60600/YU/R7ILPI">https://dataverse.yale.edu/dataset.xhtml?persistentId=doi:10.60600/YU/R7ILPI</a></p>
+<p>The files are: </p>
+<ul>
+<li>Vote_Data.RDS  (converted to tab)</li>
+<li>Coronavirus_Data.RDS (converted to tab)</li>
+<li>Filibuster_Data.RDS (converted to tab)</li>
+<li>College_Debt_Data.RDS  (not converted.... says it's a gzip file)</li>
+</ul>
+<p>Any suggestions on how to troubleshoot this? </p>
+<p>Thanks!<br>
+Bethany</p>
+
+
+
+<a name="612419651"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612419651" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612419651">(Jul 23 2026 at 18:03)</a>:</h4>
+<p>Note: I did try taking these files from our production server and importing to our test.  I got the same results.</p>
+
+
+
+<a name="612420540"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612420540" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612420540">(Jul 23 2026 at 18:07)</a>:</h4>
+<p>I ran <code>file</code> on them:</p>
+<div class="codehilite"><pre><span></span><code>% file College_Debt_Data.RDS Vote_Data.RDS
+College_Debt_Data.RDS: gzip compressed data, from HPFS filesystem (OS/2, NT), original size modulo 2^32 117202
+Vote_Data.RDS:         gzip compressed data, from HPFS filesystem (OS/2, NT), original size modulo 2^32 251482
+</code></pre></div>
+
+
+
+<a name="612420714"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612420714" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612420714">(Jul 23 2026 at 18:08)</a>:</h4>
+<p><span class="user-mention" data-user-id="737390">@Bethany Seeger</span> the file that didn't ingest is so small I would suggest creating an issue and uploading it there. You might have to put it in a .zip file.</p>
+
+
+
+<a name="612420991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612420991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612420991">(Jul 23 2026 at 18:09)</a>:</h4>
+<p>Thanks, <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> . Are you suggesting the system might have an issue around really small RDS compressed files?  Perhaps that that is the issue?   interesting!</p>
+
+
+
+<a name="612421085"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612421085" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612421085">(Jul 23 2026 at 18:10)</a>:</h4>
+<p>Yeah, probably a bug in this file or nearby: <a href="https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/ingest/tabulardata/impl/plugins/rdata/RDATAFileReader.java">https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/ingest/tabulardata/impl/plugins/rdata/RDATAFileReader.java</a></p>
+
+
+
+<a name="612421537"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612421537" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612421537">(Jul 23 2026 at 18:12)</a>:</h4>
+<p>Oh, well, I don't know if size matters.</p>
+
+
+
+<a name="612421632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612421632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612421632">(Jul 23 2026 at 18:13)</a>:</h4>
+<p>I just meant I think there's a size limit to files you can attach to a GitHub issue. That file that won't ingest is tiny so it should upload fine.</p>
+
+
+
+<a name="612422324"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612422324" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612422324">(Jul 23 2026 at 18:16)</a>:</h4>
+<p>Actually, come to think of it, perhaps the bug has more to do with the code that detects file types. Somewhere in here, maybe: <a href="https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L380">https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L380</a></p>
+
+
+
+<a name="612422393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612422393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612422393">(Jul 23 2026 at 18:16)</a>:</h4>
+<p>Ohhhhh... okay. Gottcha.  Thanks for looking at the files.  I have limited working knowledge  with R and via file/hexdump I couldn't see any obvious difference in the files.  Perhaps there is a difference inside the object structure that failed.</p>
+
+
+
+<a name="612422497"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612422497" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612422497">(Jul 23 2026 at 18:17)</a>:</h4>
+<p>So, I just realized I didn't look at the logs.  I deleted and reuploaded the file and saw this: </p>
+<p>[2026-07-23T18:16:23.359+0000] [Payara 7.2026.2] [SEVERE] [] [] [tid: _ThreadID=103 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1784830583359] [levelValue: 1000] [[<br>
+  java.io.EOFException: Unexpected end of ZLIB input stream<br>
+        at java.base/java.util.zip.InflaterInputStream.fill(InflaterInputStream.java:266)<br>
+        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:175)<br>
+        at java.base/java.util.zip.GZIPInputStream.read(GZIPInputStream.java:149)</p>
+<p>That might imply the file is corrupt / truncated</p>
+
+
+
+<a name="612422578"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612422578" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612422578">(Jul 23 2026 at 18:17)</a>:</h4>
+<p>Interesting. You might want to try to open the file in R to check.</p>
+
+
+
+<a name="612426066"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612426066" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612426066">(Jul 23 2026 at 18:33)</a>:</h4>
+<p>I just downloaded RStudio and was able to load() the file successfully in there.</p>
+
+
+
+<a name="612426128"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612426128" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612426128">(Jul 23 2026 at 18:33)</a>:</h4>
+<p><img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="697x470" data-original-src="/user_uploads/53090/EsfySRk0RLA_Eg3sz3QjQ5zH/image.png" src="/user_uploads/thumbnail/53090/EsfySRk0RLA_Eg3sz3QjQ5zH/image.png/840x560.webp"></p>
+
+
+
+<a name="612426419"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612426419" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612426419">(Jul 23 2026 at 18:34)</a>:</h4>
+<p>would this code do that?   (or lead to it) <a href="https://github.com/IQSS/dataverse/blob/b485249231feb43c70459884089b9af7b4c3beea/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L768">https://github.com/IQSS/dataverse/blob/b485249231feb43c70459884089b9af7b4c3beea/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L768</a></p>
+
+
+
+<a name="612427830"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612427830" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612427830">(Jul 23 2026 at 18:42)</a>:</h4>
+<p>I'll create a ticket, but I half suspect there might be an issue in the file that's not immediately obvious.</p>
+
+
+
+<a name="612428119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428119">(Jul 23 2026 at 18:43)</a>:</h4>
+<p>That code certainly could be involved, sure. Anything else in the stack trace?</p>
+
+
+
+<a name="612428340"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428340" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428340">(Jul 23 2026 at 18:44)</a>:</h4>
+<p>Here's more of the stack, which probably contains the most relevant Dataverse info (let me know if you want the full stack)</p>
+<p>[2026-07-23T18:16:23.359+0000] [Payara 7.2026.2] [SEVERE] [] [] [tid: _ThreadID=103 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1784830583359] [levelValue: 1000] [[<br>
+  java.io.EOFException: Unexpected end of ZLIB input stream<br>
+        at java.base/java.util.zip.InflaterInputStream.fill(InflaterInputStream.java:266)<br>
+        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:175)<br>
+        at java.base/java.util.zip.GZIPInputStream.read(GZIPInputStream.java:149)<br>
+        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:123)<br>
+        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.testRDAformat(IngestableDataChecker.java:593)<br>
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)<br>
+        at java.base/java.lang.reflect.Method.invoke(Method.java:580)<br>
+        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.detectTabularDataFormat(IngestableDataChecker.java:669)<br>
+        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.detectTabularDataFormat(IngestableDataChecker.java:639)<br>
+        at edu.harvard.iq.dataverse.util.FileUtil.determineFileType(FileUtil.java:458)<br>
+        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDataFilesCommand.execute(CreateNewDataFilesCommand.java:218)<br>
+        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDataFilesCommand.execute(CreateNewDataFilesCommand.java:69)<br>
+        at edu.harvard.iq.dataverse.EjbDataverseEngineInner.submit(EjbDataverseEngineInner.java:36)<br>
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)<br>
+        at java.base/java.lang.reflect.Method.invoke(Method.java:580)<br>
+        at org.glassfish.exousia.AuthorizationService.lambda$invokeBeanMethod$2(AuthorizationService.java:498)<br>
+        at org.glassfish.exousia.AuthorizationService.runInScope(AuthorizationService.java:582)<br>
+        at org.glassfish.exousia.AuthorizationService.invokeBeanMethod(AuthorizationService.java:498)<br>
+        at org.glassfish.ejb.security.application.EJBSecurityManager.invoke(EJBSecurityManager.java:272)<br>
+        at com.sun.ejb.containers.BaseContainer.invokeBeanMethod(BaseContainer.java:4716)</p>
+
+
+
+<a name="612428689"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428689" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428689">(Jul 23 2026 at 18:46)</a>:</h4>
+<p>You're reuploading to 6.10.1?</p>
+
+
+
+<a name="612428782"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428782" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428782">(Jul 23 2026 at 18:47)</a>:</h4>
+<p>I'm asking because this line doesn't make much sense for that error: <a href="https://github.com/IQSS/dataverse/blob/v6.10.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L593">https://github.com/IQSS/dataverse/blob/v6.10.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L593</a></p>
+
+
+
+<a name="612428845"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428845" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428845">(Jul 23 2026 at 18:47)</a>:</h4>
+<p>Hmm, well, there's a <code>gzin.read()</code> in there.</p>
+
+
+
+<a name="612428857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612428857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612428857">(Jul 23 2026 at 18:47)</a>:</h4>
+<p>So I guess it makes sense.</p>
+
+
+
+<a name="612429155"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612429155" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612429155">(Jul 23 2026 at 18:49)</a>:</h4>
+<p>For 6.10.1 upload - yes.  And I don't have access to the actual (pre-Dataverse) original files, so I downloaded the originals from our prod. </p>
+<p>Yeah, seems like that spot makes sense. AI says that if the <code>GZIPOutputStream</code> or <code>ObjectOutputStream</code> wasn't closed on the write, it could cause this error reading it in.  So it's possible it's the file.</p>
+<p>And that systems like RStudio can recover better from errors like this.</p>
+
+
+
+<a name="612429355"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612429355" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612429355">(Jul 23 2026 at 18:50)</a>:</h4>
+<p>I have to step away for a while, but I might try writing that file again (now that I have it open) and see how that goes.</p>
+
+
+
+<a name="612429555"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612429555" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612429555">(Jul 23 2026 at 18:51)</a>:</h4>
+<p>Sure, maybe a workaround it to rewrite the file. Still smells like a bug to me though. <span aria-label="lady beetle" class="emoji emoji-1f41e" role="img" title="lady beetle">:lady_beetle:</span></p>
+
+
+
+<a name="612588651"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612588651" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612588651">(Jul 24 2026 at 14:20)</a>:</h4>
+<p>Hi Philip, I tried to resave the file, but it still shows up as a gzip archive.   If it is a format issue, I don't know enough R to fix it.  I'm seeing if we can ask the depositor to check. <br>
+I'll create  a ticket though, as it could be something else, or maybe Dataverse could handle it better if it is format.  </p>
+<p>Thanks for your help/thoughts on this!</p>
+
+
+
+<a name="612589228"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612589228" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612589228">(Jul 24 2026 at 14:23)</a>:</h4>
+<p>Sure, please link to the GitHub issue once you've created it.</p>
+
+
+
+<a name="612589338"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612589338" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612589338">(Jul 24 2026 at 14:23)</a>:</h4>
+<p>Not to be nosy, but why is RData/RDS (<code>application/x-rlang-transport</code>) the preferred format for this researcher? Richer metadata?</p>
+
+
+
+<a name="612590092"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612590092" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612590092">(Jul 24 2026 at 14:27)</a>:</h4>
+<p>Here's a search for that content type: <a href="https://dataverse.yale.edu/dataverse/yaleuniversitydataverse/?q=fileContentType%3Aapplication%2Fx-rlang-transport">https://dataverse.yale.edu/dataverse/yaleuniversitydataverse/?q=fileContentType%3Aapplication%2Fx-rlang-transport</a></p>
+
+
+
+<a name="612590205"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612590205" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612590205">(Jul 24 2026 at 14:28)</a>:</h4>
+<p>But those are the files that failed ingest.</p>
+
+
+
+<a name="612590450"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612590450" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612590450">(Jul 24 2026 at 14:29)</a>:</h4>
+<p>I don't think we have a way to search on original file type:</p>
+<div class="codehilite"><pre><span></span><code>          &quot;contentType&quot;: &quot;text/tab-separated-values&quot;,
+          &quot;friendlyType&quot;: &quot;Tab-Delimited&quot;,
+          &quot;filesize&quot;: 161484,
+          &quot;description&quot;: &quot;Vote_Data; ISPS number D228F05; Published 4/23/2026; Source: Authors; Created with: R &quot;,
+          &quot;categories&quot;: [
+            &quot;Data&quot;,
+            &quot;Survey/interview (e.g., ANES)&quot;
+          ],
+          &quot;storageIdentifier&quot;: &quot;s3://yul-dv-prd:19dc0231be9-8b8496ecf6a8&quot;,
+          &quot;originalFileFormat&quot;: &quot;application/x-rlang-transport&quot;,
+          &quot;originalFormatLabel&quot;: &quot;R Data&quot;,
+          &quot;originalFileSize&quot;: 23293,
+          &quot;originalFileName&quot;: &quot;Vote_Data.RDS&quot;,
+</code></pre></div>
+
+
+
+<a name="612590683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612590683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612590683">(Jul 24 2026 at 14:30)</a>:</h4>
+<p>Here's the link to the ticket: <a href="https://github.com/IQSS/dataverse/issues/12558">https://github.com/IQSS/dataverse/issues/12558</a> </p>
+<p>I haven't uploaded the file yet.</p>
+
+
+
+<a name="612590772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612590772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612590772">(Jul 24 2026 at 14:30)</a>:</h4>
+<p>Thanks! Please do. Again, you might need to zip it first.</p>
+
+
+
+<a name="612591056"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612591056" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612591056">(Jul 24 2026 at 14:32)</a>:</h4>
+<p>Hmmm..... I think we turned Rdata ingest off because of a security recommendation.</p>
+
+
+
+<a name="612591153"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612591153" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612591153">(Jul 24 2026 at 14:32)</a>:</h4>
+<p>Turned it off. Yes, sounds right.</p>
+
+
+
+<a name="612591357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612591357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612591357">(Jul 24 2026 at 14:33)</a>:</h4>
+<p>This might be a stupid question, but how is Rdata different from RDS?  I know RDS is an object (compressed or not), is RData as well?  nm, I'll google it! :)</p>
+
+
+
+<a name="612591699"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612591699" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612591699">(Jul 24 2026 at 14:34)</a>:</h4>
+<p>Sorry, I have no idea. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> This issue is related, though: <a href="https://github.com/IQSS/dataverse/issues/6678">https://github.com/IQSS/dataverse/issues/6678</a></p>
+
+
+
+<a name="612591873"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/RDS%20looks%20like%20gzip%20file/near/612591873" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/RDS.20looks.20like.20gzip.20file.html#612591873">(Jul 24 2026 at 14:35)</a>:</h4>
+<p>Also related: <a href="https://github.com/IQSS/dataverse/issues/7249">https://github.com/IQSS/dataverse/issues/7249</a></p>
+
+
+
+<hr><p>Last updated: Jul 24 2026 at 14:48 UTC</p>
+</html>

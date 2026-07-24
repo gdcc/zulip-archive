@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Hello .. I've noticed lately that when I initiate a reindex in all three of our Dataverse installations, the following is occurring:</p>\n<p>When I type \" curl <a href=\"http://localhost:8080/api/admin/index/clear\">http://localhost:8080/api/admin/index/clear</a>\" .. the log shows \"attempting to delete all Solr documents before a complete re-index\" and the console shows \"{\"status\":\"OK\",\"data\":{\"numRowsClearedByClearAllIndexTimes\":3,\"message\":\"Solr index and database index timestamps cleared.\"}}\"</p>\n<p>.. however, the log never comes back with an \"All cleared\" message .. </p>\n<p>.. then, if I type \"curl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a>\" .. the console shows \"{\"status\":\"OK\",\"data\":{\"availablePartitionIds\":[0],\"args\":{\"numPartitions\":1,\"partitionIdToProcess\":0},\"message\":\"indexAllOrSubset has begun of 1 dataverses and 1 datasets.\"}}\" .... and the log goes through the indexing of all the dataverses and datasets (in this case there is only one) .. and then shows this message \"1 dataverses and 1 datasets indexed. index all took 249 milliseconds. <em>Solr index was not cleared before indexing.</em>\" </p>\n<p>.. the console never comes back with a \"completed\" message</p>\n<p>.. the datasets all appear on the UI and seem to be indexed .. ?</p>\n<p>I did find a few issues related to this, but they were from 7 years ago. There were some similar ones more recently, but in those cases there was an exception error and failures of some of the datasets indexing. I did reinstall solr and this particular installation is brand new. And then created one dataset. =)  </p>\n<p>We are running v6.6 on our dev site (the one above with 1 dataset), which was a complete new install. QA and prod are running v6.5 and both experience the same thing, QA has 0 datasets currently and prod has almost 100. </p>\n<p>.. all of the \"checks\" messages in the logs seem normal when i check the status or timestamps  ..</p>\n<p>Appreciate any thoughts or ideas!</p>",
+        "id": 510750912,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054132
+    },
+    {
+        "content": "<p>Hmm, any errors in server logs?</p>",
+        "id": 510751395,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744054279
+    },
+    {
+        "content": "<p>no nothing .. the \"index was not cleared is the last message\" .. until i check the status and then i get all the normal status  messages</p>",
+        "id": 510751722,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054378
+    },
+    {
+        "content": "<p>maybe i need to set the log level higher .. i think it is just at the default</p>",
+        "id": 510752314,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054588
+    },
+    {
+        "content": "<p>This is what I see (I'm using Docker and only have the root collection and running the latest in the \"develop\" branch):</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_dataverse&gt;   indexing dataverse 1 of 1 (id=1, persistentId=root)|#]\ndev_dataverse&gt;\ndev_dataverse&gt; [#|2025-04-07T19:37:53.336+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673336;_LevelValue=800;|\ndev_dataverse&gt;   done iterating through all datasets|#]\ndev_dataverse&gt;\ndev_dataverse&gt; [#|2025-04-07T19:37:53.336+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673336;_LevelValue=800;|\ndev_dataverse&gt;   index all took 5 milliseconds|#]\ndev_dataverse&gt;\ndev_dataverse&gt; [#|2025-04-07T19:37:53.337+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=254;_ThreadName=__ejb-thread-pool2;_TimeMillis=1744054673337;_LevelValue=800;|\ndev_dataverse&gt;   1 dataverses and 0 datasets indexed. index all took 5 milliseconds. Solr index was not cleared before indexing.\ndev_dataverse&gt; |#]\n</code></pre></div>",
+        "id": 510752680,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744054738
+    },
+    {
+        "content": "<p>Can you find \"milliseconds\" in your log? Or \"index all\"?</p>",
+        "id": 510752747,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744054769
+    },
+    {
+        "content": "<p>mine looks like this: </p>\n<p>[#|2025-04-07T19:37:48.763+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668763;_LevelValue=800;|<br>\n  done iterating through all datasets|#]</p>\n<p>[#|2025-04-07T19:37:48.764+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668764;_LevelValue=800;|<br>\n  index all took 290 milliseconds|#]</p>\n<p>[#|2025-04-07T19:37:48.764+0000|INFO|Payara 6.2025.2|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=247;_ThreadName=__ejb-thread-pool4;_TimeMillis=1744054668764;_LevelValue=800;|<br>\n  1 dataverses and 1 datasets indexed. index all took 290 milliseconds. Solr index was not cleared before indexing.<br>\n|#]</p>\n<p>.. lol well increasing logging level gave a LOT of detail for each indexed dataset, but same result on the \"not cleared\" message .. that is the last message</p>",
+        "id": 510752792,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054791
+    },
+    {
+        "content": "<p>I guess we're saying the same thing, sorry. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 510752855,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744054805
+    },
+    {
+        "content": "<p>oh sorry .. i looked at yours and for some reason thought it said it was cleared</p>",
+        "id": 510752915,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054834
+    },
+    {
+        "content": "<p>so yea, maybe it's normal?</p>",
+        "id": 510752971,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054861
+    },
+    {
+        "content": "<p>When you say the console doesn't come back... you mean it hangs? It should spit out some JSON and give you your prompt back.</p>",
+        "id": 510753010,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744054876
+    },
+    {
+        "content": "<p>yes, on the console it gives the \"index has begun\" message, but never comes back and says it was complete</p>",
+        "id": 510753087,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054917
+    },
+    {
+        "content": "<p>curl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a><br>\n{\"status\":\"OK\",\"data\":{\"availablePartitionIds\":[0],\"args\":{\"numPartitions\":1,\"partitionIdToProcess\":0},\"message\":\"indexAllOrSubset has begun of 1 dataverses and 1 datasets.\"}}</p>",
+        "id": 510753190,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744054953
+    },
+    {
+        "content": "<p>maybe it doesn't</p>",
+        "id": 510753449,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744055065
+    },
+    {
+        "content": "<p>i just need constant verification <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 510753504,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1744055093
+    },
+    {
+        "content": "<p>ha</p>",
+        "id": 510753527,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744055103
+    }
+]

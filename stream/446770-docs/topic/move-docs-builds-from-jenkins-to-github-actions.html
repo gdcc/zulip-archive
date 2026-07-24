@@ -1,0 +1,933 @@
+<html>
+<head><meta charset="utf-8"><title>move-docs-builds-from-jenkins-to-github-actions · docs · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/index.html">docs</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html">move-docs-builds-from-jenkins-to-github-actions</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="598171448"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598171448" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598171448">(May 27 2026 at 19:56)</a>:</h4>
+<p>So if I am understanding the docs build process correctly, the worker node is cloning the git repo, doing a sphinx build on the Jenkins hardware, scp'ing the zipped archive from the Jenkins hardware into <a href="mailto:rocky@54.198.97.45">rocky@54.198.97.45</a>, and then unzipping that file on the server, and setting it up.</p>
+<p>What is stopping me from creating two GitHub Actions, one that builds the guides and uploads the built artifact for any branch and any PR, and another GitHub Action with AWS IAM role perms set for the action to be able to access the server only from the main branch of the dataverse repo, taking it and unzipping it on the server?</p>
+
+
+
+<a name="598172636"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598172636" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598172636">(May 27 2026 at 20:03)</a>:</h4>
+<p>Well, won't the guides server get a bit clogged up if we put docs on it from every PR?</p>
+
+
+
+<a name="598172762"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598172762" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598172762">(May 27 2026 at 20:04)</a>:</h4>
+<p>Currently we only use that Jenkins job at two times:</p>
+<ul>
+<li>To build a preview release of the guides - <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate</a></li>
+<li>To build the final release of the guides - <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></li>
+</ul>
+
+
+
+<a name="598172963"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598172963" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598172963">(May 27 2026 at 20:05)</a>:</h4>
+<p>If we build for every PR, I'm worried we'll fill the disk on the guides server.</p>
+
+
+
+<a name="598174358"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598174358" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598174358">(May 27 2026 at 20:14)</a>:</h4>
+<p>That's a really good point. Hmmm. Manual trigger then? But with a manual trigger, you would have to specify the exact git branch as an input every single time. It will default to main. Do you ever run build jobs for PRs or other branches? Or only on main/develop?</p>
+
+
+
+<a name="598177687"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598177687" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598177687">(May 27 2026 at 20:33)</a>:</h4>
+<p>We use "develop" for <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate</a></p>
+<p>We use "master" for <a href="https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>
+<p>I'm fine with a manual trigger (workflow dispatch).</p>
+
+
+
+<a name="598181601"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598181601" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598181601">(May 27 2026 at 20:57)</a>:</h4>
+<p>Makes sense to me, I will get a staging Amazon server up and test a mock workflow to see how a workflow dispatch with inputs would look like. Thank you so much!</p>
+
+
+
+<a name="598181669"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598181669" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598181669">(May 27 2026 at 20:58)</a>:</h4>
+<p>Sure! Thanks for working on this! <img alt=":dataverse_man:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/c7b94a03.png" title="dataverse man"></p>
+
+
+
+<a name="598181890"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598181890" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598181890">(May 27 2026 at 20:59)</a>:</h4>
+<p>UNC hosts <a href="https://guides.dataverse.org">https://guides.dataverse.org</a> . Is that still ok, going forward?</p>
+
+
+
+<a name="598182803"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598182803" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598182803">(May 27 2026 at 21:02)</a>:</h4>
+<p>I wish I could give you a concrete answer, but that's a question for <span class="user-mention" data-user-id="626369">@Don Sizemore</span></p>
+
+
+
+<a name="598339554"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598339554" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598339554">(May 28 2026 at 13:56)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> I can't answer for my superiors (who are out today), but it's a lot less work for us to use GitHub Actions to publish to say <a href="http://guides.gdcc.io">guides.gdcc.io</a>. How do we feel about GH pages-hosted guides?</p>
+
+
+
+<a name="598347922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598347922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598347922">(May 28 2026 at 14:27)</a>:</h4>
+<p>In theory, it sounds fine. Can you please do a <code>du</code> to see how much space is used for all the <a href="https://guides.dataverse.org/en/latest/versions.html">old versions</a> of the guides? However many GB it is, I don't think it'll be completely unreasonable for a git repo. At least I hope not.</p>
+
+
+
+<a name="598351260"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598351260" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598351260">(May 28 2026 at 14:39)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> 2.3GB though I see four old branch builds that could probably be cleaned up</p>
+
+
+
+<a name="598354547"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598354547" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598354547">(May 28 2026 at 14:53)</a>:</h4>
+<p>Hmm, "We recommend repositories remain small, ideally less than 1 GB, and less than 5 GB is strongly recommended." -- <a href="https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github">https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github</a></p>
+<p>I dunno, I'm a bit nervous that at 2.3 GB we're already halfway toward the 5 GB strongly recommended limit.</p>
+<p>I'm not saying UNC should host it forever (of course!) but maybe we shouldn't move so much content into a git repo.</p>
+
+
+
+<a name="598359913"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598359913" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598359913">(May 28 2026 at 15:14)</a>:</h4>
+<p>We have a lot of eternally free options. We have Cloudflare Pages/Workers. We can use S3 + GitHub pages. Or we have <a href="https://about.readthedocs.com/">https://about.readthedocs.com/</a> which is forever free for Open Source. No GitHub Actions, no large builds, just point them at the repo, and forget about them. </p>
+<p>The current setup works with Jenkins, but translating it into Actions, Role ARNs, staging servers for testing, and security reviews is going to be a long drawn out months long process which we would rather not get into unless there's no other way.</p>
+
+
+
+<a name="598360899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598360899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598360899">(May 28 2026 at 15:17)</a>:</h4>
+<p>Those setups are so easy that with org approval, I can have deployments up within minutes</p>
+
+
+
+<a name="598362235"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598362235" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598362235">(May 28 2026 at 15:23)</a>:</h4>
+<p>I'm not a fan of the ads on ReadTheDocs. If we can continue to serve up Dataverse documentation without ads, this would be my preference.</p>
+
+
+
+<a name="598362710"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598362710" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598362710">(May 28 2026 at 15:25)</a>:</h4>
+<p>I don't think there's a way we can opt out of their ethical ads feature. Cloudflare Pages then? Would that be alright?</p>
+
+
+
+<a name="598362935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598362935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598362935">(May 28 2026 at 15:26)</a>:</h4>
+<p>I've never used Cloudflare but I've certainly heard good things about it.</p>
+
+
+
+<a name="598363074"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363074" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363074">(May 28 2026 at 15:26)</a>:</h4>
+<p>I use it regularly for my production deployments. <a href="http://dash.srmanda.com">dash.srmanda.com</a> and <a href="http://srmanda.com">srmanda.com</a> are some examples from my side. Heavy builds.</p>
+
+
+
+<a name="598363202"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363202" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363202">(May 28 2026 at 15:27)</a>:</h4>
+<p>But you'll have to move the DNS over to Cloudflare, that's the catch. There's always a catch</p>
+
+
+
+<a name="598363421"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363421" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363421">(May 28 2026 at 15:28)</a>:</h4>
+<p>I don't see any ads at <a href="https://srmanda.com">https://srmanda.com</a> (great!) but at <a href="https://dash.srmanda.com">https://dash.srmanda.com</a> I'm seeing this:</p>
+<p><img alt="Screenshot 2026-05-28 at 11.27.55 AM.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="504x427" data-original-src="/user_uploads/53090/g0oH0xeAP118FeOwmadncdHt/Screenshot-2026-05-28-at-11.27.55AM.png" src="/user_uploads/thumbnail/53090/g0oH0xeAP118FeOwmadncdHt/Screenshot-2026-05-28-at-11.27.55AM.png/840x560.webp"></p>
+<p>Is that an ad? It looks like one! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="598363526"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363526" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363526">(May 28 2026 at 15:28)</a>:</h4>
+<p>No, that's my login page for the dash <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="598363554"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363554" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363554">(May 28 2026 at 15:28)</a>:</h4>
+<p>oh, phew!</p>
+
+
+
+<a name="598363701"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363701" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363701">(May 28 2026 at 15:29)</a>:</h4>
+<p>I never thought that it looks like an ad. Now I see it very clearly. Good advice, I'll work on that page. Thank you!</p>
+
+
+
+<a name="598363789"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363789" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363789">(May 28 2026 at 15:29)</a>:</h4>
+<p>ha, sure</p>
+
+
+
+<a name="598363812"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363812" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363812">(May 28 2026 at 15:29)</a>:</h4>
+<p>Are you blocked on a decision on which way to go? I'd like to discuss this with the team.</p>
+
+
+
+<a name="598363981"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598363981" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598363981">(May 28 2026 at 15:30)</a>:</h4>
+<p>Yes please, feel free to discuss! I'm just trying to find what's the best way I can make this transition smooth</p>
+
+
+
+<a name="598390519"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598390519" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598390519">(May 28 2026 at 17:44)</a>:</h4>
+<p>Well I was trying to build a Proof of Concept to showcase to the team in Cloudflare. I didn't realize this looking at the logs, but apparently pip install graphviz doesn't install the actual dot executable, that has to be installed separately. And serverless environments like GitHub Pages or Cloudflare don't support installation of the graphviz binary. </p>
+<p>As long as the docs use graphviz, the docs build will always require a full server to run</p>
+<p>The only real workaround is for the docs graphs to be rewritten into mermaid, which isn't a complete rewrite, but it is still a major change. And even after we do that, I'm not entirely sure what other hiccups I will run into. But, I can always experiment and try. So I will rewrite my fork's doc graphs into mermaid and let you know how it goes</p>
+
+
+
+<a name="598394063"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598394063" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598394063">(May 28 2026 at 18:02)</a>:</h4>
+<p>If it helps, on my Mac I install dot by installing graphviz: <a href="https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#sphinx-installed-locally">https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#sphinx-installed-locally</a></p>
+
+
+
+<a name="598396281"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598396281" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598396281">(May 28 2026 at 18:13)</a>:</h4>
+<p>mhmm I read your docs, they were very helpful, but cloudflare is serverless so brew/apt-get all are disabled and restricted</p>
+
+
+
+<a name="598398454"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598398454" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598398454">(May 28 2026 at 18:24)</a>:</h4>
+<p>Cloudflare proof of concept is live at: <a href="https://dataverse-smr.pages.dev/">https://dataverse-smr.pages.dev/</a></p>
+
+
+
+<a name="598398707"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598398707" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598398707">(May 28 2026 at 18:25)</a>:</h4>
+<p>Compare both the rendering softwares at:<br>
+Graphviz: <a href="https://guides.dataverse.org/en/latest/developers/dependencies.html">https://guides.dataverse.org/en/latest/developers/dependencies.html</a><br>
+Mermaid: <a href="https://dataverse-smr.pages.dev/developers/dependencies">https://dataverse-smr.pages.dev/developers/dependencies</a></p>
+
+
+
+<a name="598398800"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598398800" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598398800">(May 28 2026 at 18:26)</a>:</h4>
+<p>I was just looking at the one at <a href="https://dataverse-smr.pages.dev/api/intro#what-is-an-api">https://dataverse-smr.pages.dev/api/intro#what-is-an-api</a> ! Amazing!</p>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> check this out ^^</p>
+
+
+
+<a name="598398928"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598398928" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598398928">(May 28 2026 at 18:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> you converted all the dot/graphviz images to Mermaid?</p>
+
+
+
+<a name="598401070"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598401070" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598401070">(May 28 2026 at 18:38)</a>:</h4>
+<p>Yep. Wasn't that hard</p>
+
+
+
+<a name="598401093"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598401093" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598401093">(May 28 2026 at 18:39)</a>:</h4>
+<p>Just some syntax rewrite</p>
+
+
+
+<a name="598402596"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598402596" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598402596">(May 28 2026 at 18:47)</a>:</h4>
+<p>Do you have a branch on GitHub for this? Maybe we should just merge it!</p>
+
+
+
+<a name="598402631"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598402631" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598402631">(May 28 2026 at 18:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> would you miss dot/graphviz terribly?</p>
+
+
+
+<a name="598402774"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598402774" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598402774">(May 28 2026 at 18:48)</a>:</h4>
+<p>If we replace dot/graphviz with mermaid, that's fine by me.</p>
+
+
+
+<a name="598403209"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598403209" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598403209">(May 28 2026 at 18:50)</a>:</h4>
+<p><span class="topic-mention">@topic</span> we don't need to commit the built pages as sources to Git. So Github Pages may still be an option.</p>
+
+
+
+<a name="598403829"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598403829" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598403829">(May 28 2026 at 18:54)</a>:</h4>
+<p>But we have 2.3 GB of old versions we need to put somewhere.</p>
+
+
+
+<a name="598404641"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598404641" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598404641">(May 28 2026 at 18:59)</a>:</h4>
+<p>I thought I'd read that we can use the artifact deployment method to get around that, but apparently this is no longer true. <a href="https://github.com/marketplace/actions/upload-github-pages-artifact#artifact-validation">https://github.com/marketplace/actions/upload-github-pages-artifact#artifact-validation</a></p>
+
+
+
+<a name="598406171"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598406171" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598406171">(May 28 2026 at 19:08)</a>:</h4>
+<p>Personally, I'd vote against using Cloudflare. They are putting hefty price tags on their services wherever they can. I know that quite a bunch of things like the Turing Way Guide are using Netlify: <a href="https://github.com/the-turing-way/the-turing-way/blob/main/netlify.toml">https://github.com/the-turing-way/the-turing-way/blob/main/netlify.toml</a></p>
+
+
+
+<a name="598406759"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598406759" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598406759">(May 28 2026 at 19:12)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> do you have statistics about the guide usage like bandwidth/month and requests/month?</p>
+
+
+
+<a name="598406861"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598406861" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598406861">(May 28 2026 at 19:13)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598406759">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="626369">Don Sizemore</span> do you have statistics about the guide usage like bandwidth/month and requests/month?</p>
+</blockquote>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> see <a class="message-link" href="/#narrow/channel/446770-docs/topic/analytics/near/507857503">#docs &gt; analytics @ 💬</a></p>
+
+
+
+<a name="598408282"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408282" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408282">(May 28 2026 at 19:22)</a>:</h4>
+<p>I do have a branch here: <a href="https://github.com/srmanda-cs/dataverse/tree/12408-move-docs-jenkins-builds">https://github.com/srmanda-cs/dataverse/tree/12408-move-docs-jenkins-builds</a></p>
+<p>But the PR needs to come from unc-ch rdmc, for now it's just an experiment more than anything else.</p>
+<p>The mermaid change has to be made for ANY serverless deployment though. GitHub Pages, Cloudflare, Netlify, Railway</p>
+
+
+
+<a name="598408383"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408383" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408383">(May 28 2026 at 19:23)</a>:</h4>
+<p>I'm not against using Mermaid, but wouldn't it be sufficient to just install the necessary dependencies at build time in CI?</p>
+
+
+
+<a name="598408463"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408463" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408463">(May 28 2026 at 19:23)</a>:</h4>
+<p>(Or use a readily available Docker image for the job)</p>
+
+
+
+<a name="598408588"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408588" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408588">(May 28 2026 at 19:24)</a>:</h4>
+<p>Looking at <a href="https://github.com/IQSS/dataverse/blob/develop/.github/workflows/guides_build_sphinx.yml">https://github.com/IQSS/dataverse/blob/develop/.github/workflows/guides_build_sphinx.yml</a>  this is what we use so far...</p>
+
+
+
+<a name="598408620"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408620" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408620">(May 28 2026 at 19:24)</a>:</h4>
+<p>It takes care of setting up the requirements.</p>
+
+
+
+<a name="598408739"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408739" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408739">(May 28 2026 at 19:25)</a>:</h4>
+<p>Yeah Cloudflare doesn't give access to apt-get or brew, it's a locked down image</p>
+
+
+
+<a name="598408766"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408766" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408766">(May 28 2026 at 19:25)</a>:</h4>
+<p>Why would we need that image?</p>
+
+
+
+<a name="598408808"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408808" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408808">(May 28 2026 at 19:26)</a>:</h4>
+<p>Isn't uploading the stuff (resulting artifact) to cloudflare a separate step?</p>
+
+
+
+<a name="598408911"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598408911" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598408911">(May 28 2026 at 19:26)</a>:</h4>
+<p>Ohhhh so build in GitHub actions and upload to Cloudflare? That could work.</p>
+
+
+
+<a name="598409021"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598409021" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598409021">(May 28 2026 at 19:27)</a>:</h4>
+<p>Here's how I do it with Maven Site and upload the artifact after for the dataverse-spi: <a href="https://github.com/gdcc/dataverse-spi/blob/main/.github/workflows/site.yml">https://github.com/gdcc/dataverse-spi/blob/main/.github/workflows/site.yml</a></p>
+
+
+
+<a name="598409102"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598409102" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598409102">(May 28 2026 at 19:27)</a>:</h4>
+<p>The workflow above with building the guide in Github Actions should already give you something usable as a deployment.</p>
+
+
+
+<a name="598409179"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598409179" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598409179">(May 28 2026 at 19:28)</a>:</h4>
+<p>let me do an upload, I'll let you know</p>
+
+
+
+<a name="598409935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598409935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598409935">(May 28 2026 at 19:32)</a>:</h4>
+<p>So is the final decision to go with GitHub Pages? This is viable</p>
+
+
+
+<a name="598409988"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598409988" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598409988">(May 28 2026 at 19:33)</a>:</h4>
+<p>No no, this won't be possible I think</p>
+
+
+
+<a name="598410040"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410040" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410040">(May 28 2026 at 19:33)</a>:</h4>
+<p>If y'all want to go with Cloudflare though, I would strongly recommend Mermaid, then you can retire all the GitHub Actions and have a lot less to maintain. Just one build command that's it</p>
+
+
+
+<a name="598410072"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410072" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410072">(May 28 2026 at 19:33)</a>:</h4>
+<p>and Cloudflare Pages is very very generous</p>
+
+
+
+<a name="598410101"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410101" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410101">(May 28 2026 at 19:33)</a>:</h4>
+<p>Github Pages has a supported limit of 1 GB, independent of using a Git branch or Deployment artifact.</p>
+
+
+
+<a name="598410177"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410177" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410177">(May 28 2026 at 19:34)</a>:</h4>
+<p>Ok, so even smaller than the 5 GB limit I mentioned above.</p>
+
+
+
+<a name="598410321"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410321" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410321">(May 28 2026 at 19:35)</a>:</h4>
+<p>Should I create a separate topic in <a class="stream" data-stream-id="446770" href="/#narrow/channel/446770-docs">#docs</a> about moving from dot/graphviz to Mermaid? And maybe we can have a dedicated issue and PR?</p>
+
+
+
+<a name="598410399"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410399" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410399">(May 28 2026 at 19:35)</a>:</h4>
+<p>SGTM if the team is okay with it</p>
+
+
+
+<a name="598410453"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410453" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410453">(May 28 2026 at 19:36)</a>:</h4>
+<p>Cloudflare's free tier limit is 20k files, each not exceeding 25MB</p>
+
+
+
+<a name="598410494"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410494" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410494">(May 28 2026 at 19:36)</a>:</h4>
+<p>That might be cutting it close...</p>
+
+
+
+<a name="598410522"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410522" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410522">(May 28 2026 at 19:36)</a>:</h4>
+<p>We have a lot of versions...</p>
+
+
+
+<a name="598410627"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410627" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410627">(May 28 2026 at 19:37)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410399">said</a>:</p>
+<blockquote>
+<p>SGTM if the team is okay with it</p>
+</blockquote>
+<p>Great, please see <a class="stream-topic" data-stream-id="446770" href="/#narrow/channel/446770-docs/topic/switch.20from.20dot.2Fgraphviz.20to.20mermaid/with/598410582">#docs &gt; switch from dot/graphviz to mermaid</a></p>
+
+
+
+<a name="598410772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598410772">(May 28 2026 at 19:38)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410522">said</a>:</p>
+<blockquote>
+<p>We have a lot of versions...</p>
+</blockquote>
+<p>we might have to use R2 then. 1.5 cents a month per GB. It's all tradeoffs, no perfect solution <span aria-label="sob" class="emoji emoji-1f62d" role="img" title="sob">:sob:</span></p>
+
+
+
+<a name="598412051"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598412051" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598412051">(May 28 2026 at 19:47)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> as you hate the ads on RTD, by using the new deployment mechanism (whatever it may be in the end) we can drop using it if we build the deploy chain on our own. Will impact the amount of files and used bandwidth though.</p>
+
+
+
+<a name="598412654"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598412654" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598412654">(May 28 2026 at 19:50)</a>:</h4>
+<p>well do let me know what the team converges on! I'm happy to go any way. But that unc docs server is going away, that much is sure, and I want to prevent the site from going down completely.</p>
+
+
+
+<a name="598412991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598412991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598412991">(May 28 2026 at 19:52)</a>:</h4>
+<p>I've also been chatting with <span class="user-mention" data-user-id="637063">@Leo Andreev</span> <span class="user-mention" data-user-id="980865">@Steven Winship</span> and <span class="user-mention" data-user-id="600327">@Ceilyn Boyd</span> about this in Slack. Please stay tuned!</p>
+
+
+
+<a name="598415681"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598415681" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598415681">(May 28 2026 at 20:09)</a>:</h4>
+<p>AI Summary of everything so far so that I don't get confused and cause y'all headaches</p>
+<p>Context: The UNC docs server and Jenkins build server are both going away. We need a new home for the Dataverse documentation. Here's where things stand:</p>
+<p>The disk reality: du on the current docs is 2.3 GiB, which already exceeds GitHub Pages' 1 GiB hard limit and puts us uncomfortably close to the soft 5 GiB repo ceiling. GitHub Pages is effectively off the table.</p>
+<p>Options on the table:</p>
+<p>ReadTheDocs: Works today with zero migration effort, but has ads. Its an option but Phil has noted the ads are a pain.</p>
+<p>GitHub Pages: Hard 1 GiB limit for Pages, soft 5 GiB for the repo. GitHub actively enforces the 1 GB limit and has taken down sites for violations. GitHub Pages is fundamentally not built for this usecase. At 2.3 GiB we already exceed the Pages limit. Not viable without significant pruning of old versions.</p>
+<p>Cloudflare Pages: Unlimited bandwidth, generous free tier, but capped at 20,000 files per deployment and 25 MB per file. Graphviz (dot) cannot be installed in Cloudflare's locked-down build environment, so this option requires either switching to Mermaid or building the artifact elsewhere first.</p>
+<p>The two paths if we go Cloudflare:</p>
+<p>Path A: Build on GitHub Actions, upload artifact to Cloudflare: Keep Graphviz, use the existing guides_build_sphinx.yml (which already installs Graphviz and runs the build but does not publish), add a deploy step using cloudflare/pages-action. More moving parts, two systems to maintain.</p>
+<p>Path B: Mermaid + Cloudflare native build: Replace Graphviz with sphinxcontrib-mermaid, let Cloudflare handle the entire build with a single command (cd doc/sphinx-guides &amp;&amp; pip install -r requirements.txt &amp;&amp; make html &amp;&amp; make epub &amp;&amp; cp build/epub/Dataverse.epub build/html). Retires all the GitHub Actions pipeline entirely. Simpler long-term, one system to maintain.</p>
+<p>Active work: There is an experimental branch already at <a href="https://github.com/IQSS/dataverse/compare/develop...srmanda-cs:dataverse:12408-move-docs-jenkins-builds">https://github.com/IQSS/dataverse/compare/develop...srmanda-cs:dataverse:12408-move-docs-jenkins-builds</a> with the Mermaid migration (8 commits, 4 files changed). A live Cloudflare deployment of the docs is already running at <a href="https://dataverse-smr.pages.dev/">https://dataverse-smr.pages.dev/</a> on v6.10.1 as proof of concept.</p>
+<p>The 20k file ceiling concern: With multiple versioned doc releases this could become an issue on Cloudflare's free tier. Mitigation would be Cloudflare R2 at roughly $0.015/month per GB, and additional pricing for Class A/Class B operations which adds cost, but is bearable.</p>
+<p>Decision needed: Which hosting platform, and if Cloudflare, Path A or Path B?</p>
+<p>My priority: It is to make sure the site does not accidentally go down, the migration is smooth, and nobody gets left holding a broken build or left hanging. I am happy to own the entire transition end to end and build whatever path the team decides on. No matter which option we go with, even servers, I will make it work.</p>
+
+
+
+<a name="598416242"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598416242" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598416242">(May 28 2026 at 20:13)</a>:</h4>
+<p>Sounds right.</p>
+
+
+
+<a name="598418093"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598418093" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598418093">(May 28 2026 at 20:25)</a>:</h4>
+<p>The part that seems missing here: how does Cloudflare pages handle the versioning? If building in CI, we control where to put things. How does this work when building on Cloudflare pages?</p>
+
+
+
+<a name="598418466"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598418466" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598418466">(May 28 2026 at 20:27)</a>:</h4>
+<p>One other thing that comes to mind when building at Cloudflare and others (and not in CI): we loose some control over the process, potentially making it less portable. But this may just be me being overly cautious.</p>
+
+
+
+<a name="598418520"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598418520" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598418520">(May 28 2026 at 20:27)</a>:</h4>
+<p>By versioning, if you mean version control then cloudflare makes a new deployment url per commit<br>
+<img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="2540x1116" data-original-src="/user_uploads/53090/vRc0rBtd0Gwpps1zDIkcO9Jo/image.png" src="/user_uploads/thumbnail/53090/vRc0rBtd0Gwpps1zDIkcO9Jo/image.png/840x560.webp"><br>
+They exist indefinitely.</p>
+
+
+
+<a name="598418961"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598418961" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598418961">(May 28 2026 at 20:30)</a>:</h4>
+<p>versioning is very important</p>
+<p>right now we just have subdirectories for 6.9 or 6.2 or whatever</p>
+
+
+
+<a name="598419406"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598419406" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598419406">(May 28 2026 at 20:33)</a>:</h4>
+<p>Well technically, since Cloudflare is capable of generating a static url per commit, you wouldn't need any old docs, you would just point it to an old commit url say the commit url for 6.9 master and point them to view the docs there so number of files won't ever exceed like 700. But in practice I wouldn't know what that would look like. It's definitely possible though</p>
+
+
+
+<a name="598420094"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420094" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420094">(May 28 2026 at 20:39)</a>:</h4>
+<p>I'm not sure I follow but that's ok. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> We want people to have the same experience as today when they visit docs for their old version of Dataverse.</p>
+
+
+
+<a name="598420152"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420152" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420152">(May 28 2026 at 20:39)</a>:</h4>
+<p>Not to forget we must make sure not to break any existing links. Installations rely on the versioned links to be kept intact, as they link to the guides.</p>
+
+
+
+<a name="598420478"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420478" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420478">(May 28 2026 at 20:41)</a>:</h4>
+<p>yes, exactly</p>
+
+
+
+<a name="598420548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420548">(May 28 2026 at 20:42)</a>:</h4>
+<p>so the URLs need to stay the same, <a href="https://guides.dataverse.org/en/6.2/">https://guides.dataverse.org/en/6.2/</a> or whatever old version</p>
+
+
+
+<a name="598420743"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420743" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420743">(May 28 2026 at 20:43)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420094">said</a>:</p>
+<blockquote>
+<p>I'm not sure I follow but that's ok. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> We want people to have the same experience as today when they visit docs for their old version of Dataverse.</p>
+</blockquote>
+<p>Well this is my very first time moving a Sphinx deployment from a server to serverless so this is all very very new to me ;(</p>
+<p>From what I understand, this is something Cloudflare does. So every time you push a commit to a branch it is monitoring, it creates a separate static url for THAT specific commit and that specific docs build.</p>
+<p>Right now, for example /6.9/ is an entire separate directory with its own files. The way Cloudflare handles it, it would just redirect to a build made using an older commit which has its own url instead of storing all the files in one place. I hope this makes sense?</p>
+
+
+
+<a name="598420888"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420888" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420888">(May 28 2026 at 20:44)</a>:</h4>
+<p>sort of?</p>
+
+
+
+<a name="598420935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598420935">(May 28 2026 at 20:45)</a>:</h4>
+<p>I think I'd need to see it in action to know if it's what we need.</p>
+
+
+
+<a name="598421115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421115">(May 28 2026 at 20:46)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> do we have any deep links into a specific page of a version from the application that are user facing? (notifications, ...)</p>
+
+
+
+<a name="598421161"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421161" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421161">(May 28 2026 at 20:46)</a>:</h4>
+<p>yep, I'm pretty sure we do</p>
+
+
+
+<a name="598421166"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421166" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421166">(May 28 2026 at 20:46)</a>:</h4>
+<p>This might break depending on the possibilities for a redirect. I don't know enough about their setup, but should be verified.</p>
+
+
+
+<a name="598421189"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421189" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421189">(May 28 2026 at 20:46)</a>:</h4>
+<p><img alt=":doh:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/343009b9.png" title="doh"></p>
+
+
+
+<a name="598421305"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421305" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421305">(May 28 2026 at 20:47)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420935">said</a>:</p>
+<blockquote>
+<p>I think I'd need to see it in action to know if it's what we need.</p>
+</blockquote>
+<p>Yeah, I agree. As I said, it might not work as we need in practice.</p>
+
+
+
+<a name="598421735"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421735" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421735">(May 28 2026 at 20:51)</a>:</h4>
+<p>What we have today is a static site served up by Apache. Very 90s. Works fine! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="598421766"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421766" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421766">(May 28 2026 at 20:51)</a>:</h4>
+<p>(or maybe it's nginx, I dunno)</p>
+
+
+
+<a name="598421932"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598421932" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598421932">(May 28 2026 at 20:52)</a>:</h4>
+<p>it's probably going to be fine for the next few decades even, very robust, but it needs a server  ; )</p>
+
+
+
+<a name="598422129"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422129" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598422129">(May 28 2026 at 20:53)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> would IQSS be fine in putting some money into this? Or does it have to be for free?</p>
+
+
+
+<a name="598422253"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422253" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598422253">(May 28 2026 at 20:54)</a>:</h4>
+<p>well not just money, the server needs constant upkeep and maintenance too from personnel</p>
+
+
+
+<a name="598422432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598422432">(May 28 2026 at 20:56)</a>:</h4>
+<p>I'm saying there's a ton of option when it comes to static website hosting that do not involve any maintenance. We can just mimic what we do now with Jenkins and keep all the old versions the same way we always did. This may involve spending a small fee though.</p>
+
+
+
+<a name="598422588"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422588" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598422588">(May 28 2026 at 20:57)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422129">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> would IQSS be fine in putting some money into this? Or does it have to be for free?</p>
+</blockquote>
+<p>It's a fair question. We can ask <span class="user-mention silent" data-user-id="600327">Ceilyn Boyd</span> about it.</p>
+
+
+
+<a name="598423034"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598423034" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598423034">(May 28 2026 at 21:00)</a>:</h4>
+<p>I mean, maybe we could give ReadTheDocs some money to get rid of the ads. They seem like a nice company.</p>
+
+
+
+<a name="598424130"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598424130" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598424130">(May 28 2026 at 21:07)</a>:</h4>
+<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>
+
+
+
+<a name="598425309"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425309" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598425309">(May 28 2026 at 21:16)</a>:</h4>
+<p>Look at what I just found... <a href="https://pico.sh">https://pico.sh</a> It's 2$/month and seems to enable just dropping off stuff as we used to via SSH. (Would need building in CI though)</p>
+
+
+
+<a name="598425530"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425530" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598425530">(May 28 2026 at 21:18)</a>:</h4>
+<p>BTW a build of our guides takes ~40MB of space.</p>
+
+
+
+<a name="598538319"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538319" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598538319">(May 29 2026 at 11:32)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598424130">said</a>:</p>
+<blockquote>
+<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>
+</blockquote>
+<p>Decommissioning what? Everything UNC hosts? Originally we were talking about Jenkins.</p>
+
+
+
+<a name="598538463"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538463" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598538463">(May 29 2026 at 11:33)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425530">said</a>:</p>
+<blockquote>
+<p>BTW a build of our guides takes ~40MB of space.</p>
+</blockquote>
+<p>Does that include HTML, epub, and PDF?</p>
+
+
+
+<a name="598542330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598542330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598542330">(May 29 2026 at 11:56)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538319">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598424130">said</a>:</p>
+<blockquote>
+<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>
+</blockquote>
+<p>Decommissioning what? Everything UNC hosts? Originally we were talking about Jenkins.</p>
+</blockquote>
+<p>Jenkins, yes!</p>
+
+
+
+<a name="598548002"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598548002" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598548002">(May 29 2026 at 12:27)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538463">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="598183">Oliver Bertuch</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425530">said</a>:</p>
+<blockquote>
+<p>BTW a build of our guides takes ~40MB of space.</p>
+</blockquote>
+<p>Does that include HTML, epub, and PDF?</p>
+</blockquote>
+<p>Only HTML.</p>
+
+
+
+<a name="598558403"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598558403" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598558403">(May 29 2026 at 13:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> for Jenkins, can we pick up the conversation from here: <a class="message-link" href="/#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/597880132">#containers &gt; goodbye-jenkins-you-did-an-amazing-job @ 💬</a>  ?</p>
+
+
+
+<a name="598611858"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598611858" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598611858">(May 29 2026 at 17:35)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  what do you think about an S3-compatible static host instead of a full-blown server? Cloudflare R2? </p>
+<p>GitHub Actions can build, and upload the entire build artifact to R2 using aws s3 sync, the same thing that Jenkins is doing right now. Cloudflare will provide an SSL certificate for <a href="http://guides.dataverse.org">guides.dataverse.org</a>.</p>
+<p>R2 is going to be free practically forever since the first 10GiB is completely free, egress is zero. Class A operations are writes, Class B operations are reads. That's A LOT.<br>
+<img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="1212x646" data-original-src="/user_uploads/53090/m-mcQIKd3svZr35WqWFTIY94/image.png" src="/user_uploads/thumbnail/53090/m-mcQIKd3svZr35WqWFTIY94/image.png/840x560.webp"></p>
+<p>This setup can also be emulated with AWS S3 directly, but S3 doesn't provide SSL certificates, so unless we put Cloudfront in front of it, the guides link will only serve HTTP.</p>
+
+
+
+<a name="598612316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598612316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598612316">(May 29 2026 at 17:37)</a>:</h4>
+<p>Looks nice but let's wait to hear from <span class="user-mention" data-user-id="637063">@Leo Andreev</span> and <span class="user-mention" data-user-id="980865">@Steven Winship</span> on their preferences.</p>
+
+
+
+<a name="598627776"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598627776" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598627776">(May 29 2026 at 19:08)</a>:</h4>
+<p>Some hard statistics. The current guides deployment has 42k files and weighs about 2.1GB<br>
+<img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="994x140" data-original-src="/user_uploads/53090/MR54VHY51mvVTLbdIF826HaN/image.png" src="/user_uploads/thumbnail/53090/MR54VHY51mvVTLbdIF826HaN/image.png/840x560.webp"></p>
+
+
+
+<a name="598631508"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598631508" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598631508">(May 29 2026 at 19:32)</a>:</h4>
+<p>beefy <span aria-label="cow" class="emoji emoji-1f404" role="img" title="cow">:cow:</span></p>
+
+
+
+<a name="598632491"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598632491" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598632491">(May 29 2026 at 19:38)</a>:</h4>
+<p>Cloudflare R2 PoC live at: <a href="https://guides.srmanda.com/">https://guides.srmanda.com/</a></p>
+<p>GitHub Actions for regular updates, for example 6.11, will look like this:</p>
+<ol>
+<li>Sphinx Build</li>
+<li>rclone sync /en/6.11/</li>
+<li>rclone sync /en/latest/</li>
+</ol>
+<p>and that's about it. Cost? $0</p>
+<p>This is a direct dump of the current docs server</p>
+
+
+
+<a name="598632692"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598632692" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598632692">(May 29 2026 at 19:40)</a>:</h4>
+<p>Nice! You have all the versions all the way back to <a href="https://guides.srmanda.com/en/3.6.2/">https://guides.srmanda.com/en/3.6.2/</a> ! If nothing else, this is a good backup! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="598632845"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598632845" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#598632845">(May 29 2026 at 19:41)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598611858">said</a>:</p>
+<blockquote>
+<p>R2 is going to be free practically forever since the first 10GiB is completely free</p>
+</blockquote>
+<p>And the first 10 GB is free, you said ^^</p>
+
+
+
+<a name="605793316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605793316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605793316">(Jun 22 2026 at 17:00)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> was is your latest thinking on the guides?</p>
+<p>Do you want to focus on the smaller step of moving the build process from Jenkins to a GitHub Action? And continue hosting the guides on the existing guides server?</p>
+<p>Or do you want the larger step of both moving the build process and replacing the guides server itself?</p>
+
+
+
+<a name="605796305"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605796305" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605796305">(Jun 22 2026 at 17:10)</a>:</h4>
+<p>We would strongly prefer to replace the guides server. Servers require continuous maintenance and labor regardless of an automated GitHub actions. Patches, DDoS protection, DHCP assignments. I would like to solve this problem permanently for IQSS so that y'all don't get pushed into a SPOF situation</p>
+
+
+
+<a name="605796524"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605796524" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605796524">(Jun 22 2026 at 17:11)</a>:</h4>
+<p>Ok. And you want to go with Cloudflare R2?</p>
+
+
+
+<a name="605796683"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605796683" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605796683">(Jun 22 2026 at 17:12)</a>:</h4>
+<p>As far as my personal research and experience with Cloudflare goes, R2 is the simplest and most cost-effective replacement.</p>
+
+
+
+<a name="605796898"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605796898" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605796898">(Jun 22 2026 at 17:12)</a>:</h4>
+<p>Ok. I think I'll add this to the agenda for tech hours tomorrow. Sound good?</p>
+
+
+
+<a name="605796946"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605796946" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605796946">(Jun 22 2026 at 17:12)</a>:</h4>
+<p>Sounds good to me!</p>
+
+
+
+<a name="605797175"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605797175" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605797175">(Jun 22 2026 at 17:13)</a>:</h4>
+<p>Great, done: <a href="https://docs.google.com/document/d/1xVD_Xi5OYlJnU1scEDQv5jjEIovu1GZDuilxwpgorpo/edit?usp=sharing">https://docs.google.com/document/d/1xVD_Xi5OYlJnU1scEDQv5jjEIovu1GZDuilxwpgorpo/edit?usp=sharing</a></p>
+
+
+
+<a name="605798976"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605798976" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605798976">(Jun 22 2026 at 17:20)</a>:</h4>
+<p>Thank you so much! Some additional context.</p>
+<p>Prototype available at: <a href="https://guides.srmanda.com/">https://guides.srmanda.com/</a></p>
+<p>Guides Size: 2.44GiB, Cloudflare Egress fees is 0, and free until 10GiB, 1M Class B, and 10M Class A<br>
+<a href="https://developers.cloudflare.com/r2/pricing/">https://developers.cloudflare.com/r2/pricing/</a></p>
+<p>Estimated migration effort: &lt;24hrs we can keep both guides up as long as IQSS is comfortable, possibly few months.</p>
+<p>Proposed Architecture: R2 with Redirect Rules/R2 behind Cloudflare Workers</p>
+
+
+
+<a name="605799449"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/605799449" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#605799449">(Jun 22 2026 at 17:21)</a>:</h4>
+<p>Added! Thanks!</p>
+
+
+
+<a name="608823587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/608823587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#608823587">(Jul 07 2026 at 19:43)</a>:</h4>
+<p>I believe the final decision that was made here was to move the guides from UNC's server into Demo Dataverse's server iirc. We will need pems and secrets from upstream's side, I will be starting work on this very soon. Thank you!</p>
+
+
+
+<a name="608833639"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/608833639" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#608833639">(Jul 07 2026 at 20:47)</a>:</h4>
+<p>Yes! When you're ready, let's work with <span class="user-mention" data-user-id="980865">@Steven Winship</span> or <span class="user-mention" data-user-id="637063">@Leo Andreev</span> (who's on vacation this week and next) to get you an ssh key for the demo server.</p>
+
+
+
+<a name="611934003"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611934003" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611934003">(Jul 21 2026 at 16:27)</a>:</h4>
+<p>Hello. Good afternoon. I want to request an SSH key for the demo server.</p>
+<p>Here is my draft plan. I will restrict all my work to a separate folder say "docs" maybe. Please create a usergroup named "docs" and assign the ssh key user to this usergroup. Give this user access to only the docs folder r/w permissions. I will port the entire current docs build from the UNC docs server over to this demo server. Then I will establish a process to automatically push new builds into this server. Then I will reuse Oliver's docs building action to use an SSH key and have GitHub Actions push a docs build into this server. I will most likely restrict the GitHub Action to workflow_dispatch only. Then DNS can be updated to point to the demo server. I would love to know if the Dataverse team has any advice or ideas.</p>
+
+
+
+<a name="611947169"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611947169" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611947169">(Jul 21 2026 at 17:32)</a>:</h4>
+<p><span class="user-mention" data-user-id="1034135">@Ash Manda</span> sounds like I good plan. I just pinged <span class="user-mention" data-user-id="637063">@Leo Andreev</span> and <span class="user-mention" data-user-id="980865">@Steven Winship</span> about the ssh key.</p>
+
+
+
+<a name="611954978"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611954978" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611954978">(Jul 21 2026 at 18:07)</a>:</h4>
+<p>In the case that Harvard IT does not give access to the GitHub Network Space to call into Harvard's infrastructure, I will most likely pivot to using a Message Queue, maybe like Amazon SQS or something, and the demo server will poll the queue to see if a workflow dispatch was initiated. Little bit of setup, but would be completely free and no maintenance overhead.</p>
+
+
+
+<a name="611959891"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611959891" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611959891">(Jul 21 2026 at 18:31)</a>:</h4>
+<p>We have GitHub Actions that already call into Harvard infra. We deploy the frontend to the beta server, for example.</p>
+
+
+
+<a name="611960655"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611960655" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611960655">(Jul 21 2026 at 18:35)</a>:</h4>
+<p>Thank you, that makes me feel a lot better!</p>
+
+
+
+<a name="611961284"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611961284" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611961284">(Jul 21 2026 at 18:39)</a>:</h4>
+<p>Sure. Don't worry. We've been down this road already.</p>
+
+
+
+<a name="611985592"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611985592" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Steven Winship <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611985592">(Jul 21 2026 at 20:53)</a>:</h4>
+<p><a href="mailto:steven_winship@iq.harvard.edu">steven_winship@iq.harvard.edu</a> would like to recall the message, "Re: #docs &gt; move-docs-builds-from-jenkins-to-github-actions".</p>
+
+
+
+<a name="611985716"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/611985716" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions.html#611985716">(Jul 21 2026 at 20:54)</a>:</h4>
+<p>Don't worry, I deleted it already. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<hr><p>Last updated: Jul 24 2026 at 14:48 UTC</p>
+</html>

@@ -1,0 +1,154 @@
+<html>
+<head><meta charset="utf-8"><title>Separate Solr docker image? · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html">Separate Solr docker image?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="593799503"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593799503" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Max Kadel <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593799503">(May 08 2026 at 14:13)</a>:</h4>
+<p>I'm playing with helm files my colleague April made for our demo deployment, trying to make them more generalizable.</p>
+<p>One thing I noticed was that spinning up the Solr with the right config was a separate step, so I thought it would be nice to build a docker image that's <em>just</em> the Solr image with the config that matches the release you're working with.</p>
+<p>Here's a link to the <a href="https://github.com/notch8/dataverse-helm/blob/main/docker/solr/Dockerfile">Dockerfile</a> and the <a href="https://github.com/notch8/dataverse-helm/blob/main/.github/workflows/solr-image.yml">github action to publish it</a> - is this something that would be valuable to contribute back? If so, where would be the most appropriate place for it?</p>
+<p>I don't think the rest of the helm chart stuff is ready to be folded in, but I could see the Solr image being handy.</p>
+
+
+
+<a name="593807467"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593807467" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593807467">(May 08 2026 at 14:48)</a>:</h4>
+<p>I have had that same thought before and created such an image back when I started <a href="https://github.com/gdcc/dataverse-kubernetes">https://github.com/gdcc/dataverse-kubernetes</a></p>
+
+
+
+<a name="593807677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593807677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593807677">(May 08 2026 at 14:48)</a>:</h4>
+<p>I stopped doing that and favored the more vanilla approach due to the at time available options with bitname/solr and apache/solr images.</p>
+
+
+
+<a name="593807927"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593807927" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593807927">(May 08 2026 at 14:49)</a>:</h4>
+<p>But now that this is history and we probably won't look into using SolrCloud anytime soon, maybe it's worth using our custom derivate of the upstream Solr image again.</p>
+
+
+
+<a name="593808218"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593808218" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593808218">(May 08 2026 at 14:51)</a>:</h4>
+<p>At some point we will probably also have to create a Keycloak image which gives us the special Dataverse module as a builtin.</p>
+
+
+
+<a name="593808475"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593808475" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593808475">(May 08 2026 at 14:52)</a>:</h4>
+<p>When I was able to finally move on from gdcc/dataverse-kubernetes, I was really glad to finally be able to quickly build and use the images for development</p>
+
+
+
+<a name="593808534"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593808534" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593808534">(May 08 2026 at 14:52)</a>:</h4>
+<p>Which is why the whole build pipeline is now centered in the upstream repo</p>
+
+
+
+<a name="593808684"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593808684" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593808684">(May 08 2026 at 14:53)</a>:</h4>
+<p>If we can figure out a way to move the whole container business away from it without loosing this flexibility, I'm all ears.</p>
+
+
+
+<a name="593808875"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593808875" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593808875">(May 08 2026 at 14:54)</a>:</h4>
+<p>I did play around with a few things lately to create custom pipelines with Maven. Maybe some of that would help. Or finally releasing the dataverse-parent module to Maven Central.</p>
+
+
+
+<a name="593809395"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593809395" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Max Kadel <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593809395">(May 08 2026 at 14:56)</a>:</h4>
+<p>Hm, I think I need to learn more about the current build steps / dev steps - sounds like it's not helpful to contribute upstream at this point.</p>
+
+
+
+<a name="593810963"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593810963" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593810963">(May 08 2026 at 15:03)</a>:</h4>
+<p>Not to shoot you down - I'm just saying maybe you asking about this is the right moment to talk about moving these things, so we make upstream a bit more lightweight again.</p>
+
+
+
+<a name="593811436"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593811436" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Max Kadel <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593811436">(May 08 2026 at 15:05)</a>:</h4>
+<p>Thanks - I think I'm not clear on where the upstream things you're talking about vs. the downstream things are.</p>
+
+
+
+<a name="593812924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593812924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593812924">(May 08 2026 at 15:11)</a>:</h4>
+<p>In IQSS/dataverse we have a Docker Maven Plugin centered build pipeline for the images. This allows anyone with Docker and the usual Java setup and almost no knowledge about Docker / Compose / ... to use containers for backend development with a single Maven command (and most of our devs are accustomed to using Maven CLI)</p>
+
+
+
+<a name="593813089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813089">(May 08 2026 at 15:12)</a>:</h4>
+<p>In addition, we're using Github Actions. These not only do the heavy lifting around Maven tests, but also run the build pipelines for containers</p>
+
+
+
+<a name="593813368"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813368" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813368">(May 08 2026 at 15:13)</a>:</h4>
+<p>Container images are build and created for feature branches and PRs and pushed to <a href="http://ghcr.io">ghcr.io</a>. This way, backend and frontend devs can work together fast even without any knowledge about containers on the backend "end" (which is still somewhat true, as most devs at IQSS are still favoring a classic setup)</p>
+
+
+
+<a name="593813502"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813502" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813502">(May 08 2026 at 15:14)</a>:</h4>
+<p>Images are also built and pushed from these pipelines at release time or as snapshots of the develop branch when a PR is merged</p>
+
+
+
+<a name="593813618"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813618" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813618">(May 08 2026 at 15:14)</a>:</h4>
+<p>These go to Docker Hub, ready to be used by the community, sysadmins, devs, integrators, etc</p>
+
+
+
+<a name="593813736"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813736" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813736">(May 08 2026 at 15:15)</a>:</h4>
+<p>And finally, we have a pipeline that automates maintenance of the said images.</p>
+
+
+
+<a name="593813849"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593813849" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593813849">(May 08 2026 at 15:15)</a>:</h4>
+<p>For the past 3 releases we maintain the images to receive security updates and push these to Docker Hub, following the Bitnami naming pattern.</p>
+
+
+
+<a name="593814106"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593814106" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593814106">(May 08 2026 at 15:16)</a>:</h4>
+<p>We can't take away the containerized build of images in the development pipelines, as they are getting more and more important to run integration and API tests for code changes in the main codebase.</p>
+
+
+
+<a name="593814352"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593814352" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593814352">(May 08 2026 at 15:17)</a>:</h4>
+<p>Does that give a better comprehension about the ecosystem?</p>
+
+
+
+<a name="593815198"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/593815198" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#593815198">(May 08 2026 at 15:20)</a>:</h4>
+<p>I'm not entirely sure if we'd be able to move on from using Maven to fire up containers to a more "pure" compose style setup. Before we think in that direction, let's make sure to talk to devs that now are using containers how they'd feel about that. Again - not for <em>building</em> images, but for <em>running</em> them. It's far to important to have proper access to Maven properties and tie in with the overall webapp build process, which is <del>really hard</del> impossible in pure Compose.</p>
+
+
+
+<a name="599823572"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Separate%20Solr%20docker%20image%3F/near/599823572" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Separate.20Solr.20docker.20image.3F.html#599823572">(Jun 03 2026 at 14:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="1065357">@Max Kadel</span> I may become more interested in revisiting this sooner as expected. I want to include backup scripts in the Solr image to use Velero pre/post-hooks. Not sure yet - maybe making this a part of configbaker and run the scripts from the solr-driver sidecar.</p>
+
+
+
+<hr><p>Last updated: Jul 24 2026 at 14:48 UTC</p>
+</html>

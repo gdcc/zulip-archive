@@ -1,0 +1,230 @@
+[
+    {
+        "content": "<p>Hello , <br>\n(We are running 6.10.1, though this dataset was ingested when we were using 6.6)</p>\n<p>We have this dataset that has 4 RDS files in it.  3 were converted to tab files and the 4th was not because it looks like a gzip file.  In looking at the files, I see the all have the same bytes in the  header indicating they are RDS compressed files. <br>\nI can't tell what is different about the files that one would be identified as GZIP while the rest are identified as RDS.   I'm not familiar with R and only have done some basic troubleshooting. </p>\n<p>$ hexdump -n 2 Vote_Data.RDS<br>\n0000000 8b1f<br>\n0000002<br>\n$ hexdump -n 2 College_Debt_Data.RDS<br>\n0000000 8b1f<br>\n0000002</p>\n<p>The dataset: <a href=\"https://dataverse.yale.edu/dataset.xhtml?persistentId=doi:10.60600/YU/R7ILPI\">https://dataverse.yale.edu/dataset.xhtml?persistentId=doi:10.60600/YU/R7ILPI</a></p>\n<p>The files are: </p>\n<ul>\n<li>Vote_Data.RDS  (converted to tab)</li>\n<li>Coronavirus_Data.RDS (converted to tab)</li>\n<li>Filibuster_Data.RDS (converted to tab)</li>\n<li>College_Debt_Data.RDS  (not converted.... says it's a gzip file)</li>\n</ul>\n<p>Any suggestions on how to troubleshoot this? </p>\n<p>Thanks!<br>\nBethany</p>",
+        "id": 612419409,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784829724
+    },
+    {
+        "content": "<p>Note: I did try taking these files from our production server and importing to our test.  I got the same results.</p>",
+        "id": 612419651,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784829785
+    },
+    {
+        "content": "<p>I ran <code>file</code> on them:</p>\n<div class=\"codehilite\"><pre><span></span><code>% file College_Debt_Data.RDS Vote_Data.RDS\nCollege_Debt_Data.RDS: gzip compressed data, from HPFS filesystem (OS/2, NT), original size modulo 2^32 117202\nVote_Data.RDS:         gzip compressed data, from HPFS filesystem (OS/2, NT), original size modulo 2^32 251482\n</code></pre></div>",
+        "id": 612420540,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830073
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"737390\">@Bethany Seeger</span> the file that didn't ingest is so small I would suggest creating an issue and uploading it there. You might have to put it in a .zip file.</p>",
+        "id": 612420714,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830122
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> . Are you suggesting the system might have an issue around really small RDS compressed files?  Perhaps that that is the issue?   interesting!</p>",
+        "id": 612420991,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784830199
+    },
+    {
+        "content": "<p>Yeah, probably a bug in this file or nearby: <a href=\"https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/ingest/tabulardata/impl/plugins/rdata/RDATAFileReader.java\">https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/ingest/tabulardata/impl/plugins/rdata/RDATAFileReader.java</a></p>",
+        "id": 612421085,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830220
+    },
+    {
+        "content": "<p>Oh, well, I don't know if size matters.</p>",
+        "id": 612421537,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830343
+    },
+    {
+        "content": "<p>I just meant I think there's a size limit to files you can attach to a GitHub issue. That file that won't ingest is tiny so it should upload fine.</p>",
+        "id": 612421632,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830380
+    },
+    {
+        "content": "<p>Actually, come to think of it, perhaps the bug has more to do with the code that detects file types. Somewhere in here, maybe: <a href=\"https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L380\">https://github.com/IQSS/dataverse/blob/v6.11/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L380</a></p>",
+        "id": 612422324,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830588
+    },
+    {
+        "content": "<p>Ohhhhh... okay. Gottcha.  Thanks for looking at the files.  I have limited working knowledge  with R and via file/hexdump I couldn't see any obvious difference in the files.  Perhaps there is a difference inside the object structure that failed.</p>",
+        "id": 612422393,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784830608
+    },
+    {
+        "content": "<p>So, I just realized I didn't look at the logs.  I deleted and reuploaded the file and saw this: </p>\n<p>[2026-07-23T18:16:23.359+0000] [Payara 7.2026.2] [SEVERE] [] [] [tid: _ThreadID=103 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1784830583359] [levelValue: 1000] [[<br>\n  java.io.EOFException: Unexpected end of ZLIB input stream<br>\n        at java.base/java.util.zip.InflaterInputStream.fill(InflaterInputStream.java:266)<br>\n        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:175)<br>\n        at java.base/java.util.zip.GZIPInputStream.read(GZIPInputStream.java:149)</p>\n<p>That might imply the file is corrupt / truncated</p>",
+        "id": 612422497,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784830640
+    },
+    {
+        "content": "<p>Interesting. You might want to try to open the file in R to check.</p>",
+        "id": 612422578,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784830661
+    },
+    {
+        "content": "<p>I just downloaded RStudio and was able to load() the file successfully in there.</p>",
+        "id": 612426066,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784831604
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"697x470\" data-original-src=\"/user_uploads/53090/EsfySRk0RLA_Eg3sz3QjQ5zH/image.png\" src=\"/user_uploads/thumbnail/53090/EsfySRk0RLA_Eg3sz3QjQ5zH/image.png/840x560.webp\"></p>",
+        "id": 612426128,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784831617
+    },
+    {
+        "content": "<p>would this code do that?   (or lead to it) <a href=\"https://github.com/IQSS/dataverse/blob/b485249231feb43c70459884089b9af7b4c3beea/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L768\">https://github.com/IQSS/dataverse/blob/b485249231feb43c70459884089b9af7b4c3beea/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L768</a></p>",
+        "id": 612426419,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784831695
+    },
+    {
+        "content": "<p>I'll create a ticket, but I half suspect there might be an issue in the file that's not immediately obvious.</p>",
+        "id": 612427830,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784832129
+    },
+    {
+        "content": "<p>That code certainly could be involved, sure. Anything else in the stack trace?</p>",
+        "id": 612428119,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832229
+    },
+    {
+        "content": "<p>Here's more of the stack, which probably contains the most relevant Dataverse info (let me know if you want the full stack)</p>\n<p>[2026-07-23T18:16:23.359+0000] [Payara 7.2026.2] [SEVERE] [] [] [tid: _ThreadID=103 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1784830583359] [levelValue: 1000] [[<br>\n  java.io.EOFException: Unexpected end of ZLIB input stream<br>\n        at java.base/java.util.zip.InflaterInputStream.fill(InflaterInputStream.java:266)<br>\n        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:175)<br>\n        at java.base/java.util.zip.GZIPInputStream.read(GZIPInputStream.java:149)<br>\n        at java.base/java.util.zip.InflaterInputStream.read(InflaterInputStream.java:123)<br>\n        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.testRDAformat(IngestableDataChecker.java:593)<br>\n        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)<br>\n        at java.base/java.lang.reflect.Method.invoke(Method.java:580)<br>\n        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.detectTabularDataFormat(IngestableDataChecker.java:669)<br>\n        at edu.harvard.iq.dataverse.ingest.IngestableDataChecker.detectTabularDataFormat(IngestableDataChecker.java:639)<br>\n        at edu.harvard.iq.dataverse.util.FileUtil.determineFileType(FileUtil.java:458)<br>\n        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDataFilesCommand.execute(CreateNewDataFilesCommand.java:218)<br>\n        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDataFilesCommand.execute(CreateNewDataFilesCommand.java:69)<br>\n        at edu.harvard.iq.dataverse.EjbDataverseEngineInner.submit(EjbDataverseEngineInner.java:36)<br>\n        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)<br>\n        at java.base/java.lang.reflect.Method.invoke(Method.java:580)<br>\n        at org.glassfish.exousia.AuthorizationService.lambda$invokeBeanMethod$2(AuthorizationService.java:498)<br>\n        at org.glassfish.exousia.AuthorizationService.runInScope(AuthorizationService.java:582)<br>\n        at org.glassfish.exousia.AuthorizationService.invokeBeanMethod(AuthorizationService.java:498)<br>\n        at org.glassfish.ejb.security.application.EJBSecurityManager.invoke(EJBSecurityManager.java:272)<br>\n        at com.sun.ejb.containers.BaseContainer.invokeBeanMethod(BaseContainer.java:4716)</p>",
+        "id": 612428340,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784832294
+    },
+    {
+        "content": "<p>You're reuploading to 6.10.1?</p>",
+        "id": 612428689,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832403
+    },
+    {
+        "content": "<p>I'm asking because this line doesn't make much sense for that error: <a href=\"https://github.com/IQSS/dataverse/blob/v6.10.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L593\">https://github.com/IQSS/dataverse/blob/v6.10.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestableDataChecker.java#L593</a></p>",
+        "id": 612428782,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832433
+    },
+    {
+        "content": "<p>Hmm, well, there's a <code>gzin.read()</code> in there.</p>",
+        "id": 612428845,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832455
+    },
+    {
+        "content": "<p>So I guess it makes sense.</p>",
+        "id": 612428857,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832460
+    },
+    {
+        "content": "<p>For 6.10.1 upload - yes.  And I don't have access to the actual (pre-Dataverse) original files, so I downloaded the originals from our prod. </p>\n<p>Yeah, seems like that spot makes sense. AI says that if the <code>GZIPOutputStream</code> or <code>ObjectOutputStream</code> wasn't closed on the write, it could cause this error reading it in.  So it's possible it's the file.</p>\n<p>And that systems like RStudio can recover better from errors like this.</p>",
+        "id": 612429155,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784832570
+    },
+    {
+        "content": "<p>I have to step away for a while, but I might try writing that file again (now that I have it open) and see how that goes.</p>",
+        "id": 612429355,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784832648
+    },
+    {
+        "content": "<p>Sure, maybe a workaround it to rewrite the file. Still smells like a bug to me though. <span aria-label=\"lady beetle\" class=\"emoji emoji-1f41e\" role=\"img\" title=\"lady beetle\">:lady_beetle:</span></p>",
+        "id": 612429555,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784832719
+    },
+    {
+        "content": "<p>Hi Philip, I tried to resave the file, but it still shows up as a gzip archive.   If it is a format issue, I don't know enough R to fix it.  I'm seeing if we can ask the depositor to check. <br>\nI'll create  a ticket though, as it could be something else, or maybe Dataverse could handle it better if it is format.  </p>\n<p>Thanks for your help/thoughts on this!</p>",
+        "id": 612588651,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784902852
+    },
+    {
+        "content": "<p>Sure, please link to the GitHub issue once you've created it.</p>",
+        "id": 612589228,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903005
+    },
+    {
+        "content": "<p>Not to be nosy, but why is RData/RDS (<code>application/x-rlang-transport</code>) the preferred format for this researcher? Richer metadata?</p>",
+        "id": 612589338,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903028
+    },
+    {
+        "content": "<p>Here's a search for that content type: <a href=\"https://dataverse.yale.edu/dataverse/yaleuniversitydataverse/?q=fileContentType%3Aapplication%2Fx-rlang-transport\">https://dataverse.yale.edu/dataverse/yaleuniversitydataverse/?q=fileContentType%3Aapplication%2Fx-rlang-transport</a></p>",
+        "id": 612590092,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903262
+    },
+    {
+        "content": "<p>But those are the files that failed ingest.</p>",
+        "id": 612590205,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903300
+    },
+    {
+        "content": "<p>I don't think we have a way to search on original file type:</p>\n<div class=\"codehilite\"><pre><span></span><code>          &quot;contentType&quot;: &quot;text/tab-separated-values&quot;,\n          &quot;friendlyType&quot;: &quot;Tab-Delimited&quot;,\n          &quot;filesize&quot;: 161484,\n          &quot;description&quot;: &quot;Vote_Data; ISPS number D228F05; Published 4/23/2026; Source: Authors; Created with: R &quot;,\n          &quot;categories&quot;: [\n            &quot;Data&quot;,\n            &quot;Survey/interview (e.g., ANES)&quot;\n          ],\n          &quot;storageIdentifier&quot;: &quot;s3://yul-dv-prd:19dc0231be9-8b8496ecf6a8&quot;,\n          &quot;originalFileFormat&quot;: &quot;application/x-rlang-transport&quot;,\n          &quot;originalFormatLabel&quot;: &quot;R Data&quot;,\n          &quot;originalFileSize&quot;: 23293,\n          &quot;originalFileName&quot;: &quot;Vote_Data.RDS&quot;,\n</code></pre></div>",
+        "id": 612590450,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903357
+    },
+    {
+        "content": "<p>Here's the link to the ticket: <a href=\"https://github.com/IQSS/dataverse/issues/12558\">https://github.com/IQSS/dataverse/issues/12558</a> </p>\n<p>I haven't uploaded the file yet.</p>",
+        "id": 612590683,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784903411
+    },
+    {
+        "content": "<p>Thanks! Please do. Again, you might need to zip it first.</p>",
+        "id": 612590772,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903435
+    },
+    {
+        "content": "<p>Hmmm..... I think we turned Rdata ingest off because of a security recommendation.</p>",
+        "id": 612591056,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784903521
+    },
+    {
+        "content": "<p>Turned it off. Yes, sounds right.</p>",
+        "id": 612591153,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903546
+    },
+    {
+        "content": "<p>This might be a stupid question, but how is Rdata different from RDS?  I know RDS is an object (compressed or not), is RData as well?  nm, I'll google it! :)</p>",
+        "id": 612591357,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1784903602
+    },
+    {
+        "content": "<p>Sorry, I have no idea. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> This issue is related, though: <a href=\"https://github.com/IQSS/dataverse/issues/6678\">https://github.com/IQSS/dataverse/issues/6678</a></p>",
+        "id": 612591699,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903695
+    },
+    {
+        "content": "<p>Also related: <a href=\"https://github.com/IQSS/dataverse/issues/7249\">https://github.com/IQSS/dataverse/issues/7249</a></p>",
+        "id": 612591873,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784903745
+    }
+]

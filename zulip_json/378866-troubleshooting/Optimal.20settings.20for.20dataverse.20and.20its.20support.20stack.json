@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>Our production dataverse runs 6.10.1 on an 8 virtual CPU server with 32GB memory.<br>\nWe want to make sure our settings make full use of the resources.</p>\n<p>We build the server using the Harvard ansible scripts but expect there are<br>\nsome server specific adjustments we need to make beyond initial setup.</p>\n<p>Our current settings look like the following:<br>\ndomain1/config/domain.xml<br>\n        &lt;jvm-options&gt;-Xmx16384m&lt;/jvm-options&gt;</p>\n<p>For domain1/config/domain.xml what are suggested min-thread-pool-size and max-thread-pool-size for the &lt;thread-pool&gt;<br>\nassociated with http-listener-1 (http-thread-pool)</p>\n<p>We currently do not have these set but are considering:<br>\n        &lt;jvm-options&gt;-XX:MaxMetaspaceSize=4096m&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-XX:MetaspaceSize=2048m&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Xms12288m&lt;/jvm-options&gt;</p>\n<p>In solr/bin/solr.in.sh we currently have no MEM settings. Should we consider?<br>\n        SOLR_JAVA_MEM=\"-Xms4g -Xmx4g\"</p>\n<p>For apache, is a connection pool set of 300 optimal?</p>\n<p>For postgres, are there settings you've found to be optimal for working with dataverse?</p>\n<p>Thank you for any guidance.</p>",
+        "id": 595879782,
+        "sender_full_name": "Frank Smutniak",
+        "timestamp": 1779123519
+    },
+    {
+        "content": "<p>Hello,</p>\n<p>I wouldn't try to run Dataverse in a JVM heap smaller than 16g as you've specified. Dataverse usage can be bursty; the greatest memory spike will happen during tabular ingest.</p>\n<p>I've never played with the min/max thread pool sizes for the http listeners, but I remember reading that MaxMetaspaceSize and MetaspaceSize should be set to the same value to avoid performance problems (this may now be historic).</p>\n<p>UNC Dataverse currently runs in a Solr JVM heap setting of 1g; 4g should be plenty.</p>\n<p>The connection pool size for Apache depends on your usage; I'd imagine 300 should be plenty as long as the LLM scrapers stay away.</p>\n<p>I've never had to tune Postgres; our production RDS instance has 2 CPU and 8GB of RAM; the biggest single effect I've seen on performance depends on administrators calling ANALYZE; (or not) following a database import.</p>\n<p>I'd love to hear what other community members have to say here.</p>\n<p>Don</p>",
+        "id": 597038254,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1779464526
+    },
+    {
+        "content": "<p>Most \"tuning\" I needed to do on Postgres was cleanup a rather large ACTIONLOGRECORD table (years of buildup) and a lot of notifications. Runs fine under default settings, Postgres being a saint and all.</p>\n<p>I run demo/test dataverses on smaller VM's, but despite best effort, I find Payara has serious difficulty getting out of bed for less than 2 GB heap minimal and the sweet spot is somewhere around 3-4 GB.</p>\n<p>Workloads are on the spiky side of ops as Don indicates, tabular ingest can be an evil sod occasionally as users will happily add large tabular data files. Treat any post-processing (workflows) you do as those Mario enemies with spikes on all sides - expect to see trouble from them at least once even if they look innocent.</p>",
+        "id": 597280204,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1779521364
+    },
+    {
+        "content": "<p>One thing I'd like to do at some point is mess with a pgvector database, for that matter. Having a db that can natively store embeddings in a relatively efficient way to act as a search index (rather than Payara) might be trading disk space for memory but that's a decent deal in this case. I had some good luck with FFF-driven vector space being a relatively cheap win with searching.</p>",
+        "id": 597280393,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1779521553
+    },
+    {
+        "content": "<p>Thanks Don and Thomas,<br>\nThe bots are a big drain on resources in bursts but with our recent changes it is having less downtime or slow service.  Thank you for your suggestions and confirmation.<br>\nFrank</p>",
+        "id": 597875024,
+        "sender_full_name": "Frank Smutniak",
+        "timestamp": 1779808942
+    },
+    {
+        "content": "<p>Removing ACTIONLOGRECORD was done as we recently ported from the old amazon linux to AL 23.  It saved a lot of space!</p>",
+        "id": 597875446,
+        "sender_full_name": "Frank Smutniak",
+        "timestamp": 1779809034
+    },
+    {
+        "content": "<p>Having spoken about it with some folks at this point; did you consider Anubis to block off bots? It's a bit of a mixed blessing since researchers will also use AI to go through your Dataverse (so it's \"legit\" usage but simply at a scale we're not used to).</p>",
+        "id": 599710427,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1780470955
+    },
+    {
+        "content": "<p>I reckon we're going to be stuck with that for a while still, and I'm hearing people consider it legit usage by researchers (thus scaling upwards to meet demand) and some people going \"nope\" and deploying Anubis to save costs.</p>\n<p>Has anyone implemented some sort of clever MCP server discovery+redirect to point bots to the right entrance for these kind of tasks?</p>",
+        "id": 599711353,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1780471234
+    },
+    {
+        "content": "<p>You're thinking that an MCP-based solution would be easier on the servers? Rather that the servers being crawled, that is?</p>",
+        "id": 599762025,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780484401
+    },
+    {
+        "content": "<p>Is MCP really the way to go here? Wouldn't an agents.md be a more fitting approach? <a href=\"https://agents.md/\">https://agents.md/</a> (there's also SKILL.md)</p>",
+        "id": 599787220,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780490994
+    },
+    {
+        "content": "<p>I think web UI requests are likely more expensive, sure. I also don't know if MCP is the way to go but I like to point bots to the bot entrance if it's cheaper and more fitting to use</p>",
+        "id": 600090084,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1780580225
+    },
+    {
+        "content": "<p>I'm just spit balling for now but the discussion I've had so far chiefly goes around 'at what cost can we facilitate AI users' so cost as a metric seems the way to look at that</p>",
+        "id": 600090501,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1780580328
+    },
+    {
+        "content": "<p>Pull request <a href=\"https://github.com/IQSS/dataverse/issues/12025\">#12025</a> by <span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> is about telling bots where to find APIs and standards used, using <code>.well-known/api-catalog</code> from <a href=\"https://datatracker.ietf.org/doc/rfc9727/\">https://datatracker.ietf.org/doc/rfc9727/</a></p>",
+        "id": 600090838,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780580415
+    },
+    {
+        "content": "<p><a href=\"https://contentsignals.org/\">https://contentsignals.org/</a> seems very much related!</p>",
+        "id": 601231078,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780947753
+    },
+    {
+        "content": "<p><a href=\"https://modelcontextprotocol.io/community/server-card/charter#deliverables-%26-success-metrics\">https://modelcontextprotocol.io/community/server-card/charter#deliverables-%26-success-metrics</a> says they don't have a final spec yet. (Draft at <a href=\"https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127\">https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127</a>, .well-known/mcp.json)</p>",
+        "id": 601231264,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780947816
+    },
+    {
+        "content": "<p>See also <a href=\"https://blog.cloudflare.com/agent-readiness/\">https://blog.cloudflare.com/agent-readiness/</a></p>",
+        "id": 601231737,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780947974
+    },
+    {
+        "content": "<p>cool</p>",
+        "id": 601232659,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780948232
+    },
+    {
+        "content": "<p>I'm not sure serving .well-known/api-catalog is a job for Dataverse directly. Very often you'll expose other .well-knowns, so maybe it should be an internal rewrite from the reverse proxy to an \"normal\" API endpoint /api/info/api-catalog or similar.</p>",
+        "id": 601232905,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780948324
+    },
+    {
+        "content": "<p>The proposed way to integrate it into a dataset page is quite costly.</p>",
+        "id": 601233069,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780948364
+    },
+    {
+        "content": "<p>Would it be reasonable to handle it like sitemap generation to avoid costly hits? (started by user with admin access on the API, generates files which can be served by webserver (not payara), and give a few examples on how the reverse proxy should behave)</p>\n<p>Secondary reason why that might be useful is because I don't see these types of requests decreasing in the future, so offloading to battle-tested webserver to serve files seems the right call.</p>",
+        "id": 601712827,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1781082020
+    },
+    {
+        "content": "<p>I don't see them deceasing either.</p>",
+        "id": 601743977,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781088592
+    }
+]
