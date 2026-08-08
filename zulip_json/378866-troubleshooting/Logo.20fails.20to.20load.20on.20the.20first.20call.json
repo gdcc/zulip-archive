@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>Good afternoon:</p>\n<p>We have noticed for some time that the logo sometimes fails to load on the first call. <br>\nAs example:</p>\n<p><img alt=\"Screenshot from 2026-06-18 14-33-40.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1494x180\" data-original-src=\"/user_uploads/53090/dJGwzn6dzzdAZfM-nPJBJK5t/Screenshot-from-2026-06-18-14-33-40.png\" src=\"/user_uploads/thumbnail/53090/dJGwzn6dzzdAZfM-nPJBJK5t/Screenshot-from-2026-06-18-14-33-40.png/840x560.webp\"></p>\n<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"571x198\" data-original-src=\"/user_uploads/53090/lgEUFEnoq4JTYSH7OhwwA_F1/image.png\" src=\"/user_uploads/thumbnail/53090/lgEUFEnoq4JTYSH7OhwwA_F1/image.png/840x560.webp\"></p>\n<p>Has anyone else experienced this problem?</p>",
+        "id": 604513023,
+        "sender_full_name": "Daniel Vila",
+        "timestamp": 1781786399
+    },
+    {
+        "content": "<p>Hmm, yes, I'm seeing the same:</p>\n<p><img alt=\"Screenshot 2026-06-18 at 9.18.53 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1523x526\" data-original-src=\"/user_uploads/53090/b1htsDRE_4cCmehuPo2XJq2d/Screenshot-2026-06-18-at-9.18.53AM.png\" src=\"/user_uploads/thumbnail/53090/b1htsDRE_4cCmehuPo2XJq2d/Screenshot-2026-06-18-at-9.18.53AM.png/840x560.webp\"></p>",
+        "id": 604525850,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781788748
+    },
+    {
+        "content": "<p>It's failing on <a href=\"https://dataverse.harvard.edu/logos/navbar/logo.png;jsessionid=ae10addf4895c024c26deeaee3d6\">https://dataverse.harvard.edu/logos/navbar/logo.png;jsessionid=ae10addf4895c024c26deeaee3d6</a> for me</p>",
+        "id": 604525965,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781788768
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>% curl -i &#39;https://dataverse.harvard.edu/logos/navbar/logo.png;jsessionid=ae10addf4895c024c26deeaee3d6&#39;\nHTTP/2 202\nserver: awselb/2.0\ndate: Thu, 18 Jun 2026 13:19:52 GMT\ncontent-length: 0\nx-amzn-waf-action: challenge\ncache-control: no-store, max-age=0\ncontent-type: text/html; charset=UTF-8\naccess-control-allow-origin: *\naccess-control-max-age: 86400\naccess-control-allow-methods: OPTIONS,GET,POST\naccess-control-expose-headers: x-amzn-waf-action\n</code></pre></div>",
+        "id": 604526164,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781788806
+    },
+    {
+        "content": "<p><code>x-amzn-waf-action</code> is our AWS ELB (Elastic Load Balancer).</p>",
+        "id": 604526429,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781788855
+    },
+    {
+        "content": "<p>After refresh:<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"553x169\" data-original-src=\"/user_uploads/53090/VqSbtuScYOe5BhX8Jd8xxzRU/image.png\" src=\"/user_uploads/thumbnail/53090/VqSbtuScYOe5BhX8Jd8xxzRU/image.png/840x560.webp\"></p>",
+        "id": 604530263,
+        "sender_full_name": "Daniel Vila",
+        "timestamp": 1781789490
+    },
+    {
+        "content": "<p>Ok, so you're seeing this without the ELB. Hmm.</p>\n<p>It must have something to do with the jsessionid, right? It appears in the URL for the first load in an incognito window, for example.</p>",
+        "id": 604531509,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781789687
+    },
+    {
+        "content": "<p>Right</p>",
+        "id": 604532043,
+        "sender_full_name": "Daniel Vila",
+        "timestamp": 1781789778
+    },
+    {
+        "content": "<p>It seems to happen only in the latest versions.</p>",
+        "id": 604532872,
+        "sender_full_name": "Daniel Vila",
+        "timestamp": 1781789911
+    },
+    {
+        "content": "<p>It works fine from a fresh docker compose env: <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></p>\n<p>This environment only has Payara, though, so when I go to <a href=\"http://localhost:8080\">http://localhost:8080</a> I'm not hitting any sort of proxy like Apache.</p>\n<p><img alt=\"Screenshot 2026-06-18 at 9.44.27 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1250x828\" data-original-src=\"/user_uploads/53090/1CN90n0F6D6MnRDgo-lHbrAc/Screenshot-2026-06-18-at-9.44.27AM.png\" src=\"/user_uploads/thumbnail/53090/1CN90n0F6D6MnRDgo-lHbrAc/Screenshot-2026-06-18-at-9.44.27AM.png/840x560.webp\"></p>",
+        "id": 604534877,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781790278
+    },
+    {
+        "content": "<p>Does the problem only surface when a proxy is in the mix? How can I reproduce this on my laptop? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 604534977,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781790298
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1096494\">@Daniel Vila</span> please feel free to create an issue about this at <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a></p>",
+        "id": 604536129,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781790505
+    },
+    {
+        "content": "<p>I can definitely see the problem at <a href=\"https://edmond.mpg.de\">https://edmond.mpg.de</a></p>\n<p><img alt=\"Screenshot 2026-06-18 at 9.47.37 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1215x591\" data-original-src=\"/user_uploads/53090/dUy_GPLL9zrnd632Prrrycus/Screenshot-2026-06-18-at-9.47.37AM.png\" src=\"/user_uploads/thumbnail/53090/dUy_GPLL9zrnd632Prrrycus/Screenshot-2026-06-18-at-9.47.37AM.png/840x560.webp\"></p>",
+        "id": 604541642,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781791455
+    }
+]

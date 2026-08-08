@@ -1,0 +1,140 @@
+[
+    {
+        "content": "<p>There was some discussion of this back in February:<br>\n<a href=\"https://groups.google.com/g/dataverse-community/c/ZJRAuy-1PKE/m/bdIqRh5WAAAJ\">https://groups.google.com/g/dataverse-community/c/ZJRAuy-1PKE/m/bdIqRh5WAAAJ</a></p>\n<p>When we were at V 5.14, I could use DVUploader on any size file. Now that we are at 6.2, it looks like the MaxFileUploadSize is now checked?</p>\n<p>Can someone confirm?</p>\n<p>Then if I have 6GB set (mainly for the UI), I will have to increase the :MaxFileUploadSizeInBytes to use DVUploader on \"large\" files?</p>\n<p>Since DVUploader was touted as how to upload large files (and large amounts of files), I thought that there might be a different setting for DVUploader (or no checks).... but I know it is just using Native API commands.</p>\n<p>Any thoughts on having two \"Max\" upload sizes?</p>",
+        "id": 482233022,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1731521735
+    },
+    {
+        "content": "<p>Interesting. It looks like back then I pointed at <a href=\"https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestServiceBean.java#L361\">https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/ingest/IngestServiceBean.java#L361</a> ...</p>\n<p><code>if (fileSizeLimit == null || confirmedFileSize &lt; fileSizeLimit)</code></p>\n<p>... added in this PR: Collection Quotas <a href=\"https://github.com/IQSS/dataverse/issues/10144\">#10144</a></p>",
+        "id": 482234957,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731522391
+    },
+    {
+        "content": "<p>So I'm pretty confident that file size isn't being checked.</p>",
+        "id": 482235001,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731522406
+    },
+    {
+        "content": "<p>But you're saying you want some sort of mode where the file size is not checked? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 482235077,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731522430
+    },
+    {
+        "content": "<p>You want to have your cake and eat it too? <span aria-label=\"cake\" class=\"emoji emoji-1f370\" role=\"img\" title=\"cake\">:cake:</span> <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 482235131,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731522452
+    },
+    {
+        "content": "<p>So you say \"pretty confident that file size isn't being checked.\"<br>\nBut actually, I think the file size is being checked now on DVUploader</p>\n<p>With our Max File upload size set to 6GB, I got this error from DVUploader:</p>\n<blockquote>\n<p>PROCESSING(F): D:\\McCormickObs_MAIN_2024\\McCormickObs_MAIN_2024_E57.e57<br>\n               Does not yet exist on server.<br>\nRetrying request for file upload URL(s): return status was : 400<br>\nRetrying request for file upload URL(s): return status was : 400<br>\nRetrying request for file upload URL(s): return status was : 400<br>\nRetrying request for file upload URL(s): return status was : 400<br>\nRetrying request for file upload URL(s): return status was : 400<br>\nNot uploaded due to error during processing: D:\\McCormickObs_MAIN_2024\\McCormickObs_MAIN_2024_E57.e57</p>\n<p><strong><em>Execution Complete.</em></strong></p>\n</blockquote>\n<p>When I set max upload size to 10GB (file to upload was 8GB).<br>\nIt worked:</p>\n<blockquote>\n<p>PROCESSING(F): D:\\McCormickObs_MAIN_2024\\McCormickObs_MAIN_2024_E57.e57<br>\n               Does not yet exist on server.<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nCreating job for 1073741824 bytes<br>\nAll 8.0 parts for: s3://dataverse-storage-staging:19321b8dc03-41fddc523654 queued.</p>\n</blockquote>",
+        "id": 482237919,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1731523513
+    },
+    {
+        "content": "<p>Sorry, sorry, I wrote that backwards. I'm pretty sure the file size IS being checked, as you've observed.</p>",
+        "id": 482263499,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731532853
+    },
+    {
+        "content": "<p>Is being checked as of that pull request, as of Dataverse 6.1.</p>",
+        "id": 482263597,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731532901
+    },
+    {
+        "content": "<p>But you want a way to override this somehow?</p>",
+        "id": 482263661,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731532924
+    },
+    {
+        "content": "<p>As I  said since DVUploader is touted as how to upload \"large\" files, I would like there to be a different maxSIze, IF uploading via api, that larger than the GUI limit.</p>\n<p>Does this make sense <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> ? If so, shall I make an issue?</p>",
+        "id": 482374724,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1731585852
+    },
+    {
+        "content": "<p>I mean, it doesn't really make sense to be. I like how it's a system-wide setting.</p>\n<p>Why not just raise the limit? Does it result in a poor UI experience?</p>",
+        "id": 482376232,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731586293
+    },
+    {
+        "content": "<p>My experience it does results in poor UI experience. The \"software\" gets in the way; I think. But that too might have changed with later versions.</p>",
+        "id": 482384622,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1731588980
+    },
+    {
+        "content": "<p>I hope it's better with the <a href=\"https://github.com/IQSS/dataverse-frontend\">new</a> React frontend, the SPA. Have you tried <a href=\"https://beta.dataverse.org\">https://beta.dataverse.org</a> ?</p>",
+        "id": 482432347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731601458
+    },
+    {
+        "content": "<p>Although maybe I should ask <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> how much free disk space we have first. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 482432458,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731601491
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> I love the idea of separate upload size limits depending on method (dv-uploader in particular). <a href=\"http://beta.dataverse.org\">beta.dataverse.org</a> currently has 12G available, but don't tell anybody.</p>",
+        "id": 482441177,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1731603887
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> I will quietly <span aria-label=\"shush\" class=\"emoji emoji-1f92b\" role=\"img\" title=\"shush\">:shush:</span>  test the SPA w/ a \"large\" file (well, &lt; 12GB).</p>",
+        "id": 482624046,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1731680584
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> great. I can't wait to hear how it goes!</p>",
+        "id": 482624932,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731680836
+    },
+    {
+        "content": "<p>Just getting around to comparing speed w/ <a href=\"http://beta.dataverse.org\">beta.dataverse.org</a>..... but it is \"down\", getting the \"Hello from Payara\" page.<br>\n<span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> ?? <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> ??</p>",
+        "id": 483512497,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1732116752
+    },
+    {
+        "content": "<p><img alt=\":doh:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/343009b9.png\" title=\"doh\"></p>",
+        "id": 483512551,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1732116765
+    },
+    {
+        "content": "<p>Yeah, we know. We're working on it. Sorry!</p>",
+        "id": 483512635,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1732116789
+    },
+    {
+        "content": "<p>No prob. Just reporting, in case no one knew.</p>",
+        "id": 483512709,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1732116812
+    },
+    {
+        "content": "<p>Once upon a time we had this issue:</p>\n<p>Monitoring dashboard for shared resources use in dataverse <a href=\"https://github.com/IQSS/dataverse/issues/5760\">#5760</a></p>",
+        "id": 483513024,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1732116898
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> we haven't heard from mbamouni in a while. Please feel free to create a fresh issue if you want some monitoring of beta, etc. Maybe <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> can add it to the hub. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 483513619,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1732117055
+    }
+]

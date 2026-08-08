@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>I'm trying to figure out what could be wrong when I try to spin up an evaluation instance using instructions in Dataverse container setup. Somehow the <code>docker compose up</code> does not make progress past getting Payara up and running, so when I go to localhost:8080, I get the \"Hello from Payara - your server is now running\" page and nothing else. I increased the bootstrap timeout value to 20 minutes, but it did not help.</p>",
+        "id": 436018508,
+        "sender_full_name": "mjlassila",
+        "timestamp": 1714389986
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"713909\">@mjlassila</span> hmm, could you please post output from the \"dataverse\" container? It sounds like the war file wasn't properly deployed.</p>",
+        "id": 436024599,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714391864
+    },
+    {
+        "content": "<p>I believe the container is called \"dataverse\" (if not, you can check with <code>docker ps</code>). So <code>docker logs dataverse</code> should show the output.</p>",
+        "id": 436050937,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714398536
+    },
+    {
+        "content": "<p>Here's the output I got by redirecting <code>docker logs dataverse</code> to the file <a href=\"/user_uploads/53090/J711jQCtx-M1tYi0JfMrjgRw/docker-dataverse.log\">docker-dataverse.log</a>. Additionally there's some likely relevant output displayed in terminal when I run <code>docker compose up</code>:</p>\n<div class=\"codehilite\"><pre><span></span><code>dataverse         |\ndataverse exited with code 0\ndataverse         | /opt/payara/scripts/entrypoint.sh: line 15: /opt/payara/config/pre-boot-commands.asadmin: Permission denied\ndataverse         | /opt/payara/scripts/entrypoint.sh: line 17: /opt/payara/config/post-boot-commands.asadmin: Permission denied\ndataverse         | [Entrypoint] running /opt/payara/scripts/init_1_generate_deploy_commands.sh\ndataverse         | post boot commands already deploys /opt/payara/deployments/dataverse\ndataverse         |\ndataverse         | [Entrypoint] running /opt/payara/scripts/init_1_generate_devmode_commands.sh\n</code></pre></div>",
+        "id": 436253065,
+        "sender_full_name": "mjlassila",
+        "timestamp": 1714477697
+    },
+    {
+        "content": "<p>Permission denied. Hmm</p>",
+        "id": 436255698,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714478550
+    },
+    {
+        "content": "<p>Are you on Windows? If so, did you clone the repo from a Linux terminal?</p>",
+        "id": 436256032,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714478662
+    },
+    {
+        "content": "<p>I'm running MacOS 14.4</p>",
+        "id": 436281355,
+        "sender_full_name": "mjlassila",
+        "timestamp": 1714486423
+    },
+    {
+        "content": "<p>Huh, I'm on MacOS too</p>",
+        "id": 436282768,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714486811
+    },
+    {
+        "content": "<p>Do you happen to have Java and Maven installed? If so, you could try this developer-oriented version: <a href=\"https://guides.dataverse.org/en/6.2/developers/dev-environment.html#quickstart\">https://guides.dataverse.org/en/6.2/developers/dev-environment.html#quickstart</a></p>",
+        "id": 436283191,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714486938
+    },
+    {
+        "content": "<p>I'm not sure why you're getting that permission error.</p>",
+        "id": 436283241,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714486955
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"713909\">@mjlassila</span> we just talked about this during (<a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a> ) but no one had any ideas off hand. Any progress?</p>",
+        "id": 436707453,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714660105
+    },
+    {
+        "content": "<p>I finally managed to get this working using <code>docker compose</code> by tweaking my Docker setup. I'm using colima as my Docker runtime and the latest version was using vz for virtualization in M3 Macs, instead of better supported QEMU and 9p for filesystem mounts.</p>",
+        "id": 436866768,
+        "sender_full_name": "mjlassila",
+        "timestamp": 1714736498
+    },
+    {
+        "content": "<p>When I got Dataverse up, the final hurdle was to get Solr to initialize. From the log I saw error that schema.xml was not found in /var/solr/data/collection1 in the solr container.  When I copied schema.xml to the <code>[directory-with-docker-compose]/data/solr/data/data/collection1</code> I got Solr up and running.</p>",
+        "id": 436866783,
+        "sender_full_name": "mjlassila",
+        "timestamp": 1714736507
+    },
+    {
+        "content": "<p>Interesting. Should we add any of this to our documentation? Would you want to make a pull request?</p>\n<p>I'm glad you got it working! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 436867557,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714736853
+    }
+]

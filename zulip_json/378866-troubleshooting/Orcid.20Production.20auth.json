@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Good morning! I am playing with orcid as a auth system (on behalkf on the BSC) with a dataverse but I am getting the following error \"Remote system did not return an authorization code.\". In the server log I see </p>\n<div class=\"codehilite\"><pre><span></span><code>&quot;[#|2024-05-13T08:51:00.765+0000|INFO|Payara 6.2023.8|edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean|_ThreadID=104;_ThreadName=http-thread-pool::jk-connector(3);_TimeMillis=1715590260765;_LevelValue=800;|\n  OAuth2Exception getting code parameter. HTTP return code: -1. Message: Remote system did not return an authorization code. Message body: |#]\n&quot;\n</code></pre></div>\n<p>I wrote a script (below).  to check my credentials and it create an access token</p>\n<div class=\"codehilite\"><pre><span></span><code>[rocky@dataverse-test ~]$ python3 authTest.py\nCredentials are valid. Access token received successfully.\nAccess Token: bfd9ff28-07f9-4640-a7f6-e3f4e3f68e99\n</code></pre></div>\n<p>Any idea what could be the issue? Am I missing something fundamental ? </p>\n<div class=\"codehilite\"><pre><span></span><code>[rocky@dataverse-test ~]$ cat authTest.py\nimport requests\n\ndef check_orcid_credentials(client_id, client_secret, redirect_uri):\n    # ORCID API endpoint for obtaining OAuth token\n    token_url = &#39;https://orcid.org/oauth/token&#39;\n\n    # Parameters for the POST request\n    data = {\n        &#39;client_id&#39;: client_id,\n        &#39;client_secret&#39;: client_secret,\n        &#39;grant_type&#39;: &#39;client_credentials&#39;,\n        &#39;scope&#39;: &#39;/read-public&#39;,\n        &#39;redirect_uri&#39;: redirect_uri\n    }\n\n    # Make the HTTP POST request to get the access token\n    response = requests.post(token_url, data=data)\n\n    # Check if the request was successful\n    if response.status_code == 200:\n        print(&quot;Credentials are valid. Access token received successfully.&quot;)\n        print(&quot;Access Token:&quot;, response.json().get(&#39;access_token&#39;))\n    else:\n        print(&quot;Failed to validate credentials.&quot;)\n        print(&quot;Error:&quot;, response.text)\n\n# Replace these variables with your actual client ID, secret, and redirect URI\nclient_id = &#39;APP-EXAMPLE&#39;\nclient_secret = &#39;SECRET&#39;\nredirect_uri = &#39;https://dataverse-test.bsc.es&#39;\n\n# Call the function with your credentials\ncheck_orcid_credentials(client_id, client_secret, redirect_uri)\n</code></pre></div>\n<p>Thanks a lot!</p>",
+        "id": 438309609,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715590855
+    },
+    {
+        "content": "<p>I add the output of my authenticationProviders endpoint in case it helps</p>\n<div class=\"codehilite\"><pre><span></span><code>curl -X GET &quot;localhost:8080/api/admin/authenticationProviders&quot; -H &quot;X-Dataverse-key:***** -***** -***** -***** -***** &quot;\n{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[{&quot;id&quot;:&quot;builtin&quot;,&quot;factoryAlias&quot;:&quot;BuiltinAuthenticationProvider&quot;,&quot;title&quot;:&quot;Dataverse Local&quot;,&quot;subtitle&quot;:&quot;Datavers&#39; Internal Authentication provider&quot;,&quot;factoryData&quot;:&quot;&quot;,&quot;enabled&quot;:true},{&quot;id&quot;:&quot;orcid-production&quot;,&quot;factoryAlias&quot;:&quot;oauth2&quot;,&quot;title&quot;:&quot;ORCID&quot;,&quot;subtitle&quot;:&quot;Log in via ORCID&quot;,&quot;factoryData&quot;:&quot;type: orcid | userEndpoint: https://api.orcid.org/v2.0/{ORCID}/person | clientId: APP-***** | clientSecret: ***** -***** -***** -***** -*****  | scope: /authenticate&quot;,&quot;enabled&quot;:true}]}\n</code></pre></div>",
+        "id": 438312041,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715591452
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> do you have any suggestions?</p>",
+        "id": 438314076,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715592100
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> we have two JSON files to start from for ORCID: <a href=\"https://guides.dataverse.org/en/6.2/installation/oauth2.html\">https://guides.dataverse.org/en/6.2/installation/oauth2.html</a>.</p>\n<p>It seems like you are starting from orcid-member.json. Is your institution an ORCID member? If not, can you try starting from orcid-public.json?</p>",
+        "id": 438380530,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715611451
+    },
+    {
+        "content": "<p>(I was just reminding myself of the difference by looking at <a href=\"https://github.com/IQSS/dataverse/pull/7025\">https://github.com/IQSS/dataverse/pull/7025</a> where the \"public\" version was added.)</p>",
+        "id": 438380690,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715611494
+    },
+    {
+        "content": "<p>Great thank! That was the issue.</p>",
+        "id": 438530069,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715676682
+    },
+    {
+        "content": "<p>Another question if I may. Is it possible to change the Title of \"Orcid Sandbox\" here ? <br>\n<a href=\"/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png\">image.png</a>. In this scenario it would be a production dataverse connectiong to the public orcid system (not sandbox). However, it seems maybe with the ansible script this is populated.</p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/8WdFZPWbcaVDtntqzKOuHB8t/image.png\"></a></div>",
+        "id": 438530720,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715676938
+    },
+    {
+        "content": "<p>curl -X GET \"localhost:8080/api/admin/authenticationProviders\" -H \"X-Dataverse-key:<strong><em>-</em></strong>-<strong><em>-</em></strong>-***\"</p>\n<p>I am suprised not to see it explictly here: </p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[{&quot;id&quot;:&quot;builtin&quot;,&quot;factoryAlias&quot;:&quot;BuiltinAuthenticationProvider&quot;,&quot;title&quot;:&quot;Dataverse Local&quot;,&quot;subtitle&quot;:&quot;Datavers&#39; Internal Authentication provider&quot;,&quot;factoryData&quot;:&quot;&quot;,&quot;enabled&quot;:true},{&quot;id&quot;:&quot;orcid-production&quot;,&quot;factoryAlias&quot;:&quot;oauth2&quot;,&quot;title&quot;:&quot;ORCID Public&quot;,&quot;subtitle&quot;:&quot;Log in via ORCID&quot;,&quot;factoryData&quot;:&quot;type: orcid | userEndpoint: https://pub.orcid.org/v3.0/{ORCID}/person | clientId: APP-WSQC51RN6SVZ7MWE | clientSecret: ffd70b1b-56e9-4d8c-b342-c4f6d5761317 | scope: /authenticate&quot;,&quot;enabled&quot;:true}]}\n</code></pre></div>",
+        "id": 438530957,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715677019
+    },
+    {
+        "content": "<p>Instead of <code>\"id\":\"orcid-production\"</code> can you please try <code>\"id\":\"orcid\"</code>. It has to match exactly: <a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/impl/OrcidOAuth2AP.java#L236\">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/impl/OrcidOAuth2AP.java#L236</a></p>",
+        "id": 438553430,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685319
+    },
+    {
+        "content": "<p>opps! Thanks then all solved. Cheers</p>",
+        "id": 438560082,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715687906
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>[#|2024-05-14T12:13:38.617+0000|SEVERE|Payara 6.2023.8|edu.harvard.iq.dataverse.authorization.providers.oauth2.impl.OrcidOAuth2AP|_ThreadID=103;_ThreadName=http-thread-pool::jk-connector(2);_TimeMillis=1715688818617;_LevelValue=1000;|\n  XML error parsing response body from ORCiD: Attribute name &quot;data-critters-container&quot; associated with an element type &quot;html&quot; must be followed by the &#39; = &#39; character.\norg.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 50; Attribute name &quot;data-critters-container&quot; associated with an element type &quot;html&quot; must be followed by the &#39; = &#39; character.\n    at org.apache.xerces.parsers.DOMParser.parse(Unknown Source)\n    at org.apache.xerces.jaxp.DocumentBuilderImpl.parse(Unknown Source)\n    at edu.harvard.iq.dataverse.authorization.providers.oauth2.impl.OrcidOAuth2AP.parseUserResponse(OrcidOAuth2AP.java:117)\n</code></pre></div>\n<div class=\"codehilite\"><pre><span></span><code>\n</code></pre></div>",
+        "id": 438562850,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715688954
+    },
+    {
+        "content": "<p>everything seems to go well with the (sandbox) auth</p>",
+        "id": 438563142,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715689069
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/eWd_iZP605dFafh4oxhIknZQ/image.png\"></a></div>",
+        "id": 438563253,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715689099
+    },
+    {
+        "content": "<p>Sorry, I'm not following. New problem?</p>",
+        "id": 438568996,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715690964
+    },
+    {
+        "content": "<p>yes sorry!  the previous two resolved. I have 2 enviroments. One in which dataverse works perfectly with the orcid public api and another with the sandbox API in which I receive the above error after logging in.</p>",
+        "id": 438571026,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715691603
+    },
+    {
+        "content": "<p>The second (failing) enviroment is using dataverse 6.1. It previously worked with the public API and is just failing with the sandbox. I wonder if some remnant of using the previous auth system is the cause. The error seems at quite a low level.</p>",
+        "id": 438571740,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715691798
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/hsE6NMqo9PZQkh-X9PIv7eYq/orcidAuthError.log\">orcidAuthError.log</a></p>",
+        "id": 438571939,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715691860
+    },
+    {
+        "content": "<p>I add a much larger strack trace</p>",
+        "id": 438571968,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1715691870
+    },
+    {
+        "content": "<p><code>XML error parsing response body from ORCiD: Attribute name \"data-critters-container\" associated with an element type \"html\" must be followed by the ' = ' character</code></p>",
+        "id": 438604032,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715701500
+    },
+    {
+        "content": "<p>I'm not sure. You might need to ask ORCID about this. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 438604083,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715701516
+    }
+]

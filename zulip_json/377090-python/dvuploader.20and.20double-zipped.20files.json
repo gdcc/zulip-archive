@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>i've been starting to use python-dvuploader's cli  for most of our uploads, and i'm running into an issue for zip files that have been \"double-zipped\" to workaround cases where a zip file in the data set contains more files than the dataverse limit. the upload seems to succeed, but results in an error like <code>ValueError: ('File DXXFAM.zip.zip not found in Dataverse repository.', 'This may be due to the file not being uploaded to the repository:')</code>.</p>\n<p>i'm guessing this is fine, as the unpacked double-zipped files contents are actually there. any suggestions about what the error handling logic might be here?</p>",
+        "id": 508380134,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743024223
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"735407\">@María A. Matienzo</span> Thanks for the feedback! The issue likely stems from the postponed metadata update. I guess you are using the non-S3-upload? </p>\n<p>In this case, all files provided are zipped and uploaded. Due to the zipping, the individual file metadata cannot be passed, and this call updates the metadata for each file. My guess is that is that this is causing the issue.</p>\n<p>I will look into this and replicate it locally. Maybe the double-zipped case is an edge case I need to take care of.</p>",
+        "id": 508608286,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743105932
+    },
+    {
+        "content": "<p>yes, that's correct - we're still using the native API as opposed to direct upload.</p>\n<p>i'll also note that the error where a zip file is <em>not</em> double-zipped and it contains more than the limit is failing silently with dvuploader, which leads to a retry loop (this is based on testing a rebased version of the branch for the <a href=\"https://github.com/gdcc/python-dvuploader/pull/24\">tabIngest PR</a>).</p>",
+        "id": 508608955,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743106187
+    },
+    {
+        "content": "<p>silent failure in this case means that it's not reported back from dvuploader to the user, despite the API endpoint returning an error.</p>",
+        "id": 508609276,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743106301
+    },
+    {
+        "content": "<p>That's good to know! I was not aware of this. I guess it would make sense to explicitly check for this <a href=\"https://github.com/gdcc/python-dvuploader/blob/5fee264e7f6fd941cc6f7b0917747298dcb77d66/dvuploader/nativeupload.py#L255-L260\">here</a>.</p>\n<p>I am checking for the status through <code>raise_for_status</code>, but it seems like it is not catching the error. Is the status code a different one in this case?</p>",
+        "id": 508610076,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743106603
+    },
+    {
+        "content": "<p>i'm not sure what the HTTP return code for this is coming from Dataverse, but the following message is returned as JSON:</p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;The number of files in the zip archive is over the limit (1000); please upload a zip archive with fewer files, if you want them to be ingested as individual DataFiles.&quot;}\n</code></pre></div>",
+        "id": 508614128,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743108080
+    },
+    {
+        "content": "<p>Okay, it may have a different status code that <code>httpx</code> does not recognize as an error. Reproducing now and will look into the status code.</p>",
+        "id": 508699254,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743151931
+    },
+    {
+        "content": "<p>Okay, I got both cases fixed:</p>\n<p>The zip-zip case was related to the update metadata function, which tries to map the local file to the ones at Dataverse. Since the Zip is unpacked and not present in the dataset, this case will be skipped in the update step, since there is nothing to update.</p>\n<p><a href=\"/user_uploads/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"3680x2244\" src=\"/user_uploads/thumbnail/53090/NJ7wPciPcQ0T_rpy89nCP7CK/image.png/840x560.webp\"></a></div><p>The zip limit case is now handled explicitly as well. It raises a 400 and if that is the case, plus the message matches, the code will raise a ValueError and will stop the upload process. Hence, the retry logic is stopped.</p>\n<p><a href=\"/user_uploads/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"3680x2244\" src=\"/user_uploads/thumbnail/53090/AtaHKKK1r6iLdvDp-K9uY2SL/image.png/840x560.webp\"></a></div><p>Since these are rather small changes, I would ship it with the tabIngest PR after I have added test cases for this. Thanks again for raising awareness of this <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 508704683,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743153587
+    },
+    {
+        "content": "<p>thank you! this is great. :)</p>",
+        "id": 508947630,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743273606
+    },
+    {
+        "content": "<p>Perfect! I will add these to the PR this week and merge it <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 509276658,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743446549
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"735407\">@María A. Matienzo</span> The new version of python-uploader has just been released <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span></p>\n<p><a href=\"https://pypi.org/project/dvuploader/\">https://pypi.org/project/dvuploader/</a></p>",
+        "id": 512543800,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1744807426
+    },
+    {
+        "content": "<p>Nice, I added it to the <a href=\"https://docs.google.com/document/d/1peZPI6UQOo37zJ409l_J-yAUsNrn3SF4KxFsEwp3SR0/edit?usp=sharing\">upcoming news</a>.</p>",
+        "id": 512548991,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744808833
+    },
+    {
+        "content": "<p>wonderful!</p>",
+        "id": 512590059,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1744819229
+    }
+]

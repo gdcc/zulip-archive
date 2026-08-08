@@ -1,0 +1,140 @@
+[
+    {
+        "content": "<p>Using the following API I could fetch dataverses:</p>\n<p>export API_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx<br>\nexport SERVER_URL=https://demo.dataverse.org<br>\nexport ROLE_IDS=6<br>\nexport DVOBJECT_TYPES=Dataverse<br>\nexport PUBLISHED_STATES=Unpublished<br>\nexport PER_PAGE=10</p>\n<p>curl -H \"X-Dataverse-key:$API_TOKEN\" \"$SERVER_URL/api/mydata/retrieve?role_ids=$ROLE_IDS&amp;dvobject_types=$DVOBJECT_TYPES&amp;published_states=$PUBLISHED_STATES&amp;per_page=$PER_PAGE\"</p>\n<p>However, I am curious if it is possible to say to this API that I need only those dataverses that the user is the Admin or Member of.</p>\n<p>Also, Is it possible to say those dataverses that are Published or Unpublished or Draft?</p>",
+        "id": 435150104,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1713951447
+    },
+    {
+        "content": "<p>Hmm, I'm looking at <a href=\"https://guides.dataverse.org/en/6.2/api/native-api.html#mydata\">https://guides.dataverse.org/en/6.2/api/native-api.html#mydata</a></p>\n<p>What if you pass ROLE_IDS=1 for Admin?</p>",
+        "id": 435163622,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713956555
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435163622\">said</a>:</p>\n<blockquote>\n<p>Hmm, I'm looking at <a href=\"https://guides.dataverse.org/en/6.2/api/native-api.html#mydata\">https://guides.dataverse.org/en/6.2/api/native-api.html#mydata</a></p>\n<p>What if you pass ROLE_IDS=1 for Admin?</p>\n</blockquote>\n<p>That works, but I need to define more than just one role_id.</p>",
+        "id": 435164030,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1713956739
+    },
+    {
+        "content": "<p>Hmm <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 435166995,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713957947
+    },
+    {
+        "content": "<p>I looks like the API accepts a list: <code>@QueryParam(\"role_ids\") List&lt;Long&gt; roleIds</code></p>",
+        "id": 435167499,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713958116
+    },
+    {
+        "content": "<p>In a Java test we do this: <code>ArrayList&lt;Long&gt; emptyRoleIdsList = new ArrayList&lt;&gt;();</code></p>",
+        "id": 435167962,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713958296
+    },
+    {
+        "content": "<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>",
+        "id": 435168005,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713958315
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435168005\">said</a>:</p>\n<blockquote>\n<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>\n</blockquote>\n<p>I will check and let you know.</p>",
+        "id": 435320556,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1714026477
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435320556\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/MyData.20API/near/435168005\">said</a>:</p>\n<blockquote>\n<p>I'm not sure how to do it with curl. Maybe try comma-separated?</p>\n</blockquote>\n<p>I will check and let you know.</p>\n</blockquote>\n<p>Could you share the line of code in GitHub for this endpoint, please?</p>",
+        "id": 435407012,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1714056417
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"698782\">@Mohsen Jafari</span> I think this is what you are asking for:<br>\n<a href=\"https://github.com/IQSS/dataverse/blob/2f6d3aafaf75cf7b23ae4a9fd7865fbe681841ae/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java\">https://github.com/IQSS/dataverse/blob/2f6d3aafaf75cf7b23ae4a9fd7865fbe681841ae/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java</a></p>",
+        "id": 435416808,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1714059368
+    },
+    {
+        "content": "<p>Yes, thank you. This line is the entry point: <a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java#L271\">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/mydata/DataRetrieverAPI.java#L271</a></p>",
+        "id": 435417328,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714059560
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> I guess the link I have is the currently being worked on branch? You sent the branch for the current release 6.2? Still trying to understand github.......</p>",
+        "id": 435424138,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1714061813
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> ha. There's nothing wrong with your link. I just prefer putting version numbers (e.g. v6.2) in the URL when I can so it's clear which version we're talking about.</p>",
+        "id": 435439572,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714067559
+    },
+    {
+        "content": "<p>When you do a search on GitHub the results are always commits rather than versions. I'm not sure why.</p>",
+        "id": 435439667,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714067591
+    },
+    {
+        "content": "<p>I have those requests in my local history... <code>http://localhost:8080/api/mydata/retrieve?dvobject_types=Dataset&amp;role_ids=6&amp;role_ids=34&amp;published_states=In+Review&amp;published_states=Published&amp;published_states=Unpublished&amp;published_states=Draft&amp;selected_page=1</code></p>",
+        "id": 435521835,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1714112553
+    },
+    {
+        "content": "<p>Oh! Duplicate them! Thanks!</p>",
+        "id": 435545568,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714122257
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> has marked this topic as resolved.</p>",
+        "id": 435548895,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1714123477
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> has marked this topic as unresolved.</p>",
+        "id": 435548926,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1714123487
+    },
+    {
+        "content": "<p>Should we add a note to the docs? Does anyone want to create an issue?</p>",
+        "id": 435550300,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714123980
+    },
+    {
+        "content": "<p>I think this way of sending params to the endpoint should be added to the existing documentation, so other people also know about it.</p>",
+        "id": 435552428,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1714124770
+    },
+    {
+        "content": "<p>Right. Me too. Do you mind creating an issue?</p>",
+        "id": 435554213,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714125440
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> has marked this topic as resolved.</p>",
+        "id": 435555051,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1714125757
+    },
+    {
+        "content": "<p>Thanks for creating this issue! Add more information to the documentation about how api/mydata/retrieve is called <a href=\"https://github.com/IQSS/dataverse/issues/10530\">#10530</a></p>",
+        "id": 435559561,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714127496
+    }
+]

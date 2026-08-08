@@ -1,0 +1,536 @@
+[
+    {
+        "content": "<p>Just today I've been looking into options how to interact with our competitor, InvenioRDM, when you don't have an API Token yet and want to support users to make the process to get one as simple as possible.</p>\n<p>There is already an API endpoint to receive a token for a user, but it's not very usable at the moment.</p>\n<p>IMHO a nice feature for pyDataverse would be an option to enable an auth flow. Wouldn't it be nice if some users run a Python script with pyDataverse to open a browser window for them, make them login with their usual credentials and afterwards continue working with the API, all without asking them to create and provide an API token first? (Or even more complicated, a signed URL)</p>\n<p>Thoughts anyone?</p>",
+        "id": 454048893,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721939243
+    },
+    {
+        "content": "<p>That would be killer. <span aria-label=\"rock on\" class=\"emoji emoji-1f918\" role=\"img\" title=\"rock on\">:rock_on:</span></p>",
+        "id": 454050955,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721940100
+    },
+    {
+        "content": "<p>Getting the API key is difficult because it's behind some JavaScript, so that's not easily scriptable, although it might be possible. I just tried it for like 5 minutes or so.</p>\n<p>Opening the browser is <a href=\"https://docs.python.org/3/library/webbrowser.html#webbrowser.open\">possible</a>, but transferring something out of the browser without a cooperating website is difficult, as you would need to allow and trigger a callback URL like <code>http://localhost:9473/login-callback</code>, so this would require implementation efforts on Dataverse's side, unless they already support a similar callback for OIDC one could re-use.</p>\n<p>However, in general Dataverse seems to support this kind of authentication (and pyDataverse kind of as well in <a href=\"https://github.com/gdcc/pyDataverse/pull/201\">https://github.com/gdcc/pyDataverse/pull/201</a>, as that adds support for Bearer tokens), although it expects authentication to happen out-of-band: <a href=\"https://guides.dataverse.org/en/latest/developers/remote-users.html\">https://guides.dataverse.org/en/latest/developers/remote-users.html</a> . So if you use Shibboleth, Keycloak, or another OIDC provider, you can handle this use case by first logging in (potentially with any OIDC Python library) and using that token in BearerTokenAuth(...) in <a href=\"https://github.com/IQSS/dataverse/issues/201\">#201</a>.</p>\n<p>In general, all this should considered as part of <em>Phase 3</em> in <a href=\"https://py.gdcc.io/\">https://py.gdcc.io/</a> , especially when integrating DVCLI.</p>\n<p>For Signed URLs, I started a longer discussion here: <a href=\"https://github.com/gdcc/pyDataverse/issues/200\">https://github.com/gdcc/pyDataverse/issues/200</a>, and I am not sure those will solve the problem at hand as their use case is somewhat different.</p>",
+        "id": 454755564,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722240741
+    },
+    {
+        "content": "<p>I appreciate you digging into this. I'm afraid I don't have any bright ideas on how to move forward. Maybe we can brainstorm a bit at a future pyDataverse meeting.</p>",
+        "id": 454839921,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722261004
+    },
+    {
+        "content": "<p>Oh, wow, you even made diagrams: <a href=\"https://github.com/gdcc/pyDataverse/issues/200#issuecomment-2254517953\">https://github.com/gdcc/pyDataverse/issues/200#issuecomment-2254517953</a></p>",
+        "id": 454846394,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722262152
+    },
+    {
+        "content": "<p>Maybe it's fine to make this auth thing require people to use an OIDC provider. That will be a necessity as soon as the SPA is around anyway.</p>",
+        "id": 454861838,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265537
+    },
+    {
+        "content": "<p>WRT receiving an API token for a user, there are some not very well documented endpoints available.</p>",
+        "id": 454862011,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265570
+    },
+    {
+        "content": "<p>For instance one to recreate your token <a href=\"https://github.com/IQSS/dataverse/blob/c39ac8843738ebf3e48be17370b2a35f49432226/src/main/java/edu/harvard/iq/dataverse/api/Users.java#L160\">https://github.com/IQSS/dataverse/blob/c39ac8843738ebf3e48be17370b2a35f49432226/src/main/java/edu/harvard/iq/dataverse/api/Users.java#L160</a></p>",
+        "id": 454862063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265582
+    },
+    {
+        "content": "<p>It doesn't return a nice JSON response, but we could change that</p>",
+        "id": 454862129,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265604
+    },
+    {
+        "content": "<p>So folks could trade an OIDC access token for an API token.</p>",
+        "id": 454862245,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265635
+    },
+    {
+        "content": "<p>Using a shortlived localhost server started by pyDataverse, this should be fairly simple to achieve.</p>",
+        "id": 454863315,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265866
+    },
+    {
+        "content": "<p>Around the SPA has been discussion about making Dataverse an OAuth2/OIDC identity provider, too. Builtin users, migrations and such things would potentially be a lot easier that way.</p>",
+        "id": 454863990,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722265946
+    },
+    {
+        "content": "<p>That obviously would require much more implementation changes in DV... Which is why one of the ideas is to ask people to use Keycloak and add a HTTP Basic Auth against Dataverse to it.</p>",
+        "id": 454864307,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722266021
+    },
+    {
+        "content": "<p>Dang with this tutorial <a href=\"https://www.baeldung.com/java-ee-oauth2-implementation\">https://www.baeldung.com/java-ee-oauth2-implementation</a> it doesn't seem so complicated to make Dataverse an Authorization Server itself.</p>",
+        "id": 454872057,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722267989
+    },
+    {
+        "content": "<p>\"Login with Dataverse\" how's that sound <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span></p>",
+        "id": 454872214,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722268040
+    },
+    {
+        "content": "<p>Sounds nice <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 454875248,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722268824
+    },
+    {
+        "content": "<p>I cannot comment on identity management, so I'll instead focus on the token auth.</p>\n<p>Recreating a token might solve the issue for testing or single app access. However, since Dataverse only allows a single API token (and this one will be rotated with the recreation request), this will cause problems if you use your API token in multiple services. I didn't find another API endpoint to actually retrieve a (new) token.<br>\nI was about to try it though with the recreate (which would make the (local) test setup for pyDataverse much easier) and found another edge-case we should support in pyDataverse: Currently <a href=\"http://demo.dataverse.org\">demo.dataverse.org</a> is in maintenance mode and returns a 200 status code with a big html for every API call... I think this should maybe be a 503 status code, but well. I stored the html locally and will see if we can make that work in the error handling.</p>\n<p>Do you know how to call the users/token/recreate path? In the browser it's some very tricky POST call to the <a href=\"http://localhost:8080/dataverseuser.xhtml\">http://localhost:8080/dataverseuser.xhtml</a> which only works because at that point I already have a session cookie.<br>\nI tried it with POST to /users/token/recreate, /api/users/token/recreate, /api/v1/users/token/recreate and directly to dataverseuser.xhtml similar to what the web UI does. I tried the following form data:</p>\n<div class=\"codehilite\"><pre><span></span><code>loginForm:credentialsContainer:0:credValue = username\nloginForm:credentialsContainer:1:sCredValue = password\n</code></pre></div>\n<p>but it didn't work. So I guess I need to somehow perform a login, retrieve the cookie and can then interact with the token?</p>",
+        "id": 454955876,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722289279
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> re the diagrams, note that those are solely related to signed URLs, which I originally understood should work like variant 2 which seems... wrong. They seem to be intended more in light with variants 1 and 3 there.</p>",
+        "id": 454957483,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722289908
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"737658\">@Sebastian Höffner</span> you're asking how to recreate a token via API? Please see <a href=\"https://guides.dataverse.org/en/6.3/api/native-api.html#recreate-a-token\">https://guides.dataverse.org/en/6.3/api/native-api.html#recreate-a-token</a></p>",
+        "id": 455126923,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722347254
+    },
+    {
+        "content": "<p>Thanks, I was more asking how to bootstrap a token or retrieve it via the API, because recreating it with one app might break others.<br>\nIn this case, one already needs to know the API token to authenticate, but I am wondering how to get an API token without manually logging in. Although it is probably the safer way to simply not allow that, otherwise other services might want to grab your credentials to retrieve a token.</p>",
+        "id": 455199950,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722367194
+    },
+    {
+        "content": "<p>I'm pretty sure we can create new endpoints for this kind of thing.</p>",
+        "id": 455201011,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722367414
+    },
+    {
+        "content": "<p>To ensure safety, we can add filters so it would for example require logging in via bearer token.</p>",
+        "id": 455201297,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722367457
+    },
+    {
+        "content": "<p>Another thought I had: it would probably help if we can give people collection based access tokens and not just PATs</p>",
+        "id": 455201455,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722367498
+    },
+    {
+        "content": "<p>So many options :-)<br>\nI don't think it's really necessary right now.</p>\n<p>But I think since Dataverse supports various OIDC sources, we could make at least make the auth flow happen somehow. I'll read a little bit up on that to see how it might go.</p>",
+        "id": 455206672,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722368758
+    },
+    {
+        "content": "<p>Are there other apps that do this well? DataLad or whatever app?</p>",
+        "id": 455208021,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722369239
+    },
+    {
+        "content": "<p>I know that Vault and Nomad have such CLI login flows, but I haven't had a closer look at how they are implemented – I just know that I had to configure a localhost:... callback URL to make it work (<a href=\"https://github.com/hashicorp/nomad/blob/main/command/login.go\">https://github.com/hashicorp/nomad/blob/main/command/login.go</a>), and it works really well: you type <code>nomad login</code>, it opens the browser, you do your OIDC login, it performs a callback to localhost, you have a token. They also support the other way: <code>nomad ui -authenticate</code> will open the browser and pass a token to it, if you happen to have one on the CLI.</p>",
+        "id": 455215057,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722371109
+    },
+    {
+        "content": "<p>The most prominent example I know is Kubernetes, using kubectl with OIDC login</p>",
+        "id": 455215709,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722371287
+    },
+    {
+        "content": "<p>All you need is a local, shortlived webserver you redirect to. That way you get the auth code flow flgoing</p>",
+        "id": 455215930,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722371348
+    },
+    {
+        "content": "<p>I haven't tried <a href=\"https://github.com/zulip/zulip-terminal\">Zulip Terminal</a> but I wonder how auth works for it.</p>",
+        "id": 455215971,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722371363
+    },
+    {
+        "content": "<p>Another option is the device flow, but it is less commonly supported by OIDc/Oauth Idps</p>",
+        "id": 455215985,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722371367
+    },
+    {
+        "content": "<p>Pydv should also take care about caching tokens and refreshing them</p>",
+        "id": 455216412,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722371480
+    },
+    {
+        "content": "<p>Oh. \"<strong>NOTE:</strong> If you use Google, Github or another external authentication to access your Zulip organization then you likely won't have a password set and currently need to create one to use zulip-terminal.\" -- <a href=\"https://github.com/zulip/zulip-terminal#running-for-the-first-time\">https://github.com/zulip/zulip-terminal#running-for-the-first-time</a></p>",
+        "id": 455216439,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722371489
+    },
+    {
+        "content": "<p>This shouldn't be the case for nomad and k8s though, so I guess with the shortlived local server we are probably good to go.</p>",
+        "id": 455217522,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722371923
+    },
+    {
+        "content": "<p>I'll create an issue to track this and link to this thread for some details.</p>",
+        "id": 455217646,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722371987
+    },
+    {
+        "content": "<p><a href=\"https://github.com/gdcc/pyDataverse/issues/209\">https://github.com/gdcc/pyDataverse/issues/209</a></p>",
+        "id": 455220139,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722373172
+    },
+    {
+        "content": "<p>Awesome, thanks</p>",
+        "id": 455220648,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722373350
+    },
+    {
+        "content": "<p>I have to admit I have no experience with OIDC/OAuth yet, but I think this is a nice feature! I am happy to support you whereever possible <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 455316888,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1722414246
+    },
+    {
+        "content": "<p>On a different note, I’ve been experimenting with the <a href=\"https://crates.io/crates/keyring\">keyring crate</a> in Rust for the <a href=\"https://github.com/JR-1991/rust-dataverse\">rust-dataverse</a> library. This crate allows users to securely store credentials (URL and token) under an alias in the OS’s dedicated secure store. When these credentials are used within the CLI, access must be granted, with the option to permanently allow it for convenience.</p>\n<p>While it's not exactly the same as having an online login, it has made my workflow more convenient by eliminating the need to constantly copy the token and URL into my environment. Perhaps there's a similar solution in Python that could offer the same level of convenience.</p>",
+        "id": 455327032,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1722416916
+    },
+    {
+        "content": "<p>The OIDC/OAuth thing is mostly making it much more convenient to retrieve some token for further use. Either caching the access and refresh tokens to interact with the API or retrieve a longer lasting PAT. That could, as you said, be stored in some secure storage integrated with the OS.</p>",
+        "id": 455400258,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722438918
+    },
+    {
+        "content": "<p>Here's also an example of combining OIDC tokens with shortlived API tokens: <a href=\"https://docs.pypi.org/trusted-publishers\">https://docs.pypi.org/trusted-publishers</a></p>",
+        "id": 455402152,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722439221
+    },
+    {
+        "content": "<p>Thanks, that's fancy!</p>",
+        "id": 455407882,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1722440217
+    },
+    {
+        "content": "<p>I just learned that Zenodo is an OAuth2 Authorization Server! You can even add OAuth applications as a user <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span> Dataverse should certainly have the same functionality <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 456798454,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722933393
+    },
+    {
+        "content": "<p>I checked out the OIDC stuff but I wasn't able to spin it up properly without modifying the /etc/hosts file (see <a href=\"https://guides.dataverse.org/en/latest/developers/remote-users.html#openid-connect-oidc\">https://guides.dataverse.org/en/latest/developers/remote-users.html#openid-connect-oidc</a>). <br>\nThis makes it tricky to actually write some tests, so I'm gonna have to think about this a little more. Maybe I can configure keycloak in a different way than what the repo does (the config is not linked in the docs but referenced, it's located at <a href=\"https://github.com/IQSS/dataverse/tree/develop/conf/keycloak\">https://github.com/IQSS/dataverse/tree/develop/conf/keycloak</a>).</p>",
+        "id": 456961055,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1722980323
+    },
+    {
+        "content": "<p>At some point we should add this to the dataverse-action, so it at least is easy to test within CI</p>",
+        "id": 456961245,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1722980392
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> we could have a small hackathon and implement the <code>localstack</code>/<code>minio</code> services too. Would be beneficial for testing the direct S3 upload.</p>",
+        "id": 457020496,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1723011830
+    },
+    {
+        "content": "<p>It clicked after today's PyWG meeting and a deeper dive into OIDC. I took the server idea from <span class=\"user-mention\" data-user-id=\"737658\">@Sebastian Höffner</span> to Python and tested the auth flow using the <code>httpx.Auth</code> base class. Works just fine, although it is very much hard-coded to work with the local keycloak service. Maybe we can use this as a starter to work toward a general solution.</p>\n<p><a href=\"/user_uploads/53090/u0hjEBvfLX3kIGzjx5VRitWA/oidc-httpx-flow.mov\">oidc-httpx-flow.mov</a></p>\n<p>One thing I am still puzzled with is how one should know the <code>client_secret</code> &amp; <code>client_id</code> in advance. I am not very experienced with this type of auth flow, but I am sure there are clever ways to do this or work around.</p>",
+        "id": 464194326,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724283451
+    },
+    {
+        "content": "<p>Here are some additional thoughts: </p>\n<p>Would it make more sense for the callback and bearer token retrieval to be handled server-side?</p>\n<p>Given that Dataverse already has access to the Auth Provider’s ID and Secret, it could manage this process instead of pyDataverse. In this setup, pyDataverse would initiate the authentication flow, manage the web browser opening for user authentication, and then receive the token directly from Dataverse. To test this approach, we could consider extending the Docker Compose file with a small sidekick API using Flask (Python) or Rocket (Rust) for now instead of extending the Dataverse API.</p>\n<p>Additionally, I believe this workflow could eliminate the need for local etc/hosts modifications, as the sidekick server is already within the Docker network, making testing more straightforward.</p>\n<p>If this has already been implemented elsewhere or if this was the plan already, feel free to disregard— I'm just learning as I go <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 464293815,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724313818
+    },
+    {
+        "content": "<p>Regarding : client_secret and client_id you need to ask the OIDC provider <br>\nand they will register your return-url (the url after being logged in) on their side</p>\n<p>You can try with Helmholz-AAI ,its pretty straight forward<br>\n[Although completely unware of what the earlier conv. was/had been on the chat<br>\n]</p>",
+        "id": 464296066,
+        "sender_full_name": "Lincoln",
+        "timestamp": 1724314294
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"747915\">@Lincoln</span> I will look into this <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span></p>",
+        "id": 464297027,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724314646
+    },
+    {
+        "content": "<p>It reads like there are some mixups of concepts and tech here...</p>",
+        "id": 464297445,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724314778
+    },
+    {
+        "content": "<p>Just remembered in Helmholz-AAI portal you can actually register your return-url by yourself /customizatble</p>\n<p>but somehow for me the flask post response was not working</p>",
+        "id": 464297502,
+        "sender_full_name": "Lincoln",
+        "timestamp": 1724314791
+    },
+    {
+        "content": "<p>Probably someone trying to use pyDataverse as an OIDC client and interacting with Dataverse's API using an access token should use a public client. Then no secret is necessary.</p>",
+        "id": 464297942,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724314892
+    },
+    {
+        "content": "<p>These clients should always be different from the client credentials a Dataverse installation uses.</p>",
+        "id": 464298196,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724314955
+    },
+    {
+        "content": "<p>For pyDataverse usually acting as a CLI client, there are two ways to retrieve an access token. Either make pyDataverse run a simple localhost server that you send a browser window to - or - use the device auth flow.</p>",
+        "id": 464298936,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724315134
+    },
+    {
+        "content": "<p>if  accesstoken from an OIDC provider is merged with /used as Dataverse access token..<br>\nThat would be really cool  <br>\nHowever  access token from an OIDC provider (by default) are only short lived due to security reasons</p>",
+        "id": 464299741,
+        "sender_full_name": "Lincoln",
+        "timestamp": 1724315274
+    },
+    {
+        "content": "<p>Here's a work in progress using Github OAuth2 and a minimal local server for Hermes init purposes: <a href=\"https://github.com/softwarepub/hermes/blob/feature/init-command/src/hermes/commands/init/oauth_github.py\">https://github.com/softwarepub/hermes/blob/feature/init-command/src/hermes/commands/init/oauth_github.py</a> Just as a en example what this could look alike</p>",
+        "id": 464300003,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724315314
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> Yes, I did that in the example provided, but to make it work, I had to hard-code the ID and secret into the authentication flow at pyDataverse. However, this approach isn’t sustainable, so I was looking for alternative solutions. Apologies for the confusion—I’m still in the early stages of learning OIDC.</p>",
+        "id": 464300291,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724315362
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"747915\">Lincoln</span> <a href=\"#narrow/stream/377090-python/topic/auth.20options/near/464299741\">said</a>:</p>\n<blockquote>\n<p>if  accesstoken from an OIDC provider is merged with /used as Dataverse access token..</p>\n</blockquote>\n<p>This is already available as a feature, hidden behind a feature flag for now as experimental.</p>\n<blockquote>\n<p>token from an OIDC provider (by default) are only short lived due to security reasons</p>\n</blockquote>\n<p>True. But: when authenticating with the provider, you also receive a refresh token. That one is usually longer lived and can be used to get a new access token after it has expired.</p>",
+        "id": 464300720,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724315454
+    },
+    {
+        "content": "<blockquote>\n<p>hard-code the ID and secret into the authentication flow</p>\n</blockquote>\n<p>With a public client you can at least omit the secret, just need the client ID. There's not really a good way around that one.</p>\n<blockquote>\n<p>However, this approach isn’t sustainable, so I was looking for alternative solutions.</p>\n</blockquote>\n<p>Which is why I was suggesting making Dataverse an OAuth2 identity provider. It's probably a lot easier to make integrations between Dataverse and pyDataverse happen than some workaround how to get the OIDC provider going. We could create a discovery endpoint in Dataverse to retrieve a config that pyDataverse or others can work with.</p>",
+        "id": 464301670,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724315774
+    },
+    {
+        "content": "<p>With OIDC there exist mechanisms to register a client dynamically. But as far as I know, these are not very widespread in academia.</p>",
+        "id": 464302105,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724315853
+    },
+    {
+        "content": "<p>I agree, that would simplify the process by a lot. But I guess that's a lot of work to implement upstream, or am I wrong?</p>",
+        "id": 464303668,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724316149
+    },
+    {
+        "content": "<p>It's nothing done in 5 minutes, no. But it would solve a lot of problems and is also very relevant to the SPA work (builtin users compatibility). I don't know if there is an issue already, but it's certainly worth opening one.</p>",
+        "id": 464304393,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724316293
+    },
+    {
+        "content": "<p>Should we consider postponing the OIDC feature for pyDataverse? It seems that any current solution either requires users to have access to sensitive information or is more cumbersome than simply using an API Token. We could include the server you mentioned as a service within the compose setup, but I’m concerned that this might be a limited solution, as other installations are unlikely to have this server available if it is not part of the Dataverse instance itself.</p>",
+        "id": 464306487,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724316833
+    },
+    {
+        "content": "<p>Yeah, maybe postpone for now. The OIDC Bearer Access to the DV API is still experimental, too.</p>",
+        "id": 464306774,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724316913
+    },
+    {
+        "content": "<p>Makes sense. Have a great and relaxing vacation <span aria-label=\"island\" class=\"emoji emoji-1f3dd\" role=\"img\" title=\"island\">:island:</span></p>",
+        "id": 464307974,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1724317118
+    },
+    {
+        "content": "<p>Sorry for the long silence, but I had to a) think about some of the \"mixup of concepts and tech\" and b) think about the feature a little more.</p>\n<p>I met with <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> yesterday and we cleared up some of the \"mixup of concepts and tech\" by implementing a prototype for a login of pyDataverse via Dataverse and Keycloak. You can find the details in <a href=\"https://github.com/gdcc/pyDataverse/issues/209#issuecomment-2342862132\">https://github.com/gdcc/pyDataverse/issues/209#issuecomment-2342862132</a>. We'll meet next week to flesh out the details and maybe implement it in pyDataverse.</p>\n<p>Regarding tests and CI etc. I am not yet sure, as we still have a few manual/interactive steps:</p>\n<ul>\n<li>Setup: Creating a Keykloak user in the test realm</li>\n<li>Login: Entering the credentials in the browser<br>\nBoth might also be scriptable, but especially scripting the login will make the setup much more complicated again. But we'll take a look, I guess it is possible. Maybe, we have to mock a simpler OIDC server in the background to test the login flow for the time being, but let's see.</li>\n</ul>",
+        "id": 469317987,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1726042479
+    },
+    {
+        "content": "<p>Go go go! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 469400823,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726062114
+    },
+    {
+        "content": "<p>At standup <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> just mentioned that the frontend team might turn its attention to auth soon. There's a pretty good chance we'll talk about it at our next tech hours on Tuesday.</p>",
+        "id": 471284212,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726672501
+    },
+    {
+        "content": "<p>As a starting point, we have a <a href=\"https://docs.google.com/document/d/1624KuPj4zp_TQzWivqaNY3YUCzibwFib8tZUz_IshTo/edit?usp=sharing\">short</a> and <a href=\"https://docs.google.com/document/d/1mzPLbzAiED93hTXnTyw9rDBm7_dL1Qf4bPMg2j0c0NE/edit?usp=sharing\">long</a> doc on auth (via our list of <a href=\"https://groups.google.com/g/dataverse-community/c/2hfhWIHQddE/m/hATuWGGSAAAJ\">re-arch docs</a>).</p>",
+        "id": 471284647,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726672595
+    },
+    {
+        "content": "<p>Also, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> <span class=\"user-mention\" data-user-id=\"598432\">@Slava Tykhonov</span> and I just talked about auth a bit at the pyDataverse meeting. The recording should be up soon at <a href=\"https://py.gdcc.io\">https://py.gdcc.io</a></p>",
+        "id": 471285058,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726672685
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> ! Recording and date/notes of the next meeting are online at <a href=\"https://py.gdcc.io\">https://py.gdcc.io</a> <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span></p>",
+        "id": 471291244,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1726673940
+    },
+    {
+        "content": "<p>Check this out:</p>\n<ul>\n<li><a href=\"https://dataverse-guide--10905.org.readthedocs.build/en/10905/api/auth.html#bearer-tokens\">https://dataverse-guide--10905.org.readthedocs.build/en/10905/api/auth.html#bearer-tokens</a></li>\n<li><a href=\"https://github.com/IQSS/dataverse/tree/3cf9d4d52059f8bd70a6d51f17079b0a94bd82bf/bearer-token-example\">https://github.com/IQSS/dataverse/tree/3cf9d4d52059f8bd70a6d51f17079b0a94bd82bf/bearer-token-example</a></li>\n</ul>",
+        "id": 475346538,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1728320452
+    },
+    {
+        "content": "<p>Technically this has been around before, too <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> So no need to compile manual images, should work with what's in 6.2, 6.3 and 6.4</p>",
+        "id": 475346685,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1728320508
+    },
+    {
+        "content": "<p>Just checked it out! Looks great, will test it tomorrow <span aria-label=\"muscle\" class=\"emoji emoji-1f4aa\" role=\"img\" title=\"muscle\">:muscle:</span></p>",
+        "id": 475346789,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1728320537
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> it was nice to be reminded that the <code>gh</code> command line app shows the experience we want. Tell it to auth and a browser window pops up. You auth there and return to the command line.</p>",
+        "id": 477245458,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729092859
+    },
+    {
+        "content": "<p>I brought it up and standup and there was some talk of device flow but I don't have any particular insight to share with you.</p>",
+        "id": 477245616,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729092906
+    },
+    {
+        "content": "<p>We completely understand the need for this. We don't want people hard coding API tokens into their notebooks either! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 477245700,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729092947
+    },
+    {
+        "content": "<p>The bearer-token-example is not really what we want to achieve though.<br>\nIt's opening a full-blown test browser session to grab content from the DOM – it's a bit crazy to bring in selenium or similar just to open a browser page – instead, one could do what Jan and I did and simply do the requests with httpx, resulting in the same outcome.</p>\n<p>What we want to achieve is to have the normal browser session handle authentication and return some bearer token to a callback URL. Unfortunately, the way this currently works, we would need to MITM to the IdP (which kind of works in this case but is not a good practice). I think getting it to work the same way the gh CLI et al. do it will require some changes in Dataverse itself – that's what Jan and I figured out during our last coding session.</p>\n<p>We probably won't be able to stop people from storing some tokens in notebooks, though. It's tricky to do that right if you are in a remote-only context (as you might need JS–Python–interop), but also requires some conscious thoughts in a local notebook (e.g., storing tokens in a path or credential manager the server has access to and not accidentally committing it etc.) I think the only way to do that is to educate people about tokens and lead by example...</p>",
+        "id": 478657867,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1729757736
+    },
+    {
+        "content": "<p>The only way to avoid storing some kind of secret inside a notebook is by having it injected by the service that runs the notebook for you.</p>",
+        "id": 478684640,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766494
+    },
+    {
+        "content": "<p>This may be some kind of secret env var that is stored for your user account. Or, even better, the service injects an ID Token, which is a JWT. As long as the Dataverse backend trusts the origin of this token, it would grant you access.</p>",
+        "id": 478684656,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766503
+    },
+    {
+        "content": "<p>Injecting these tokens may happen in different ways. One is to have a service that already uses OIDC to request another access token on your behalf or forward one your already provide from the IdP and send it along to the Dataverse backend.</p>",
+        "id": 478684948,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766609
+    },
+    {
+        "content": "<p>The other way is to have the service create JWT tokens from its own provider and move those along. This is especially useful in unattended jobs like pipelines etc.</p>",
+        "id": 478685112,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766665
+    },
+    {
+        "content": "<p>Examples for those are the Github Tokens you can use to publish Python packages via OIDC. Gitlab offers the same type of tokens.</p>",
+        "id": 478685228,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766721
+    },
+    {
+        "content": "<p>Again, in any case it will require trust at the Dataverse backend side by configuring the IdPs.</p>",
+        "id": 478685365,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729766768
+    },
+    {
+        "content": "<p>And of course there are other options, how to get ahold of a secret without storing it in the Notebook... getpass, SOPS, integration with secrets managers, ...</p>",
+        "id": 478687727,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1729767631
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"737658\">@Sebastian Höffner</span> a while ago you and <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> <a href=\"#narrow/channel/377090-python/topic/auth.20options/near/464194326\">posted</a> a video called \"oidc-httpx-flow.mov\". Is the code available?</p>",
+        "id": 478694350,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729769853
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> This one required client <code>id</code> and <code>secret</code> to run, and I am not sure if this is suitable for a generic implementation. Ultimately, when <span class=\"user-mention\" data-user-id=\"737658\">@Sebastian Höffner</span> and I tried to replicate the browser flow, we encountered KeyCloak-specific issues, which prevented at least a single solution. </p>\n<p>Here is the code:</p>\n<p><a href=\"/user_uploads/53090/bE5shNe4s9fMysOJj7mhXEzw/OIDC_Auth_Prototype.zip\">OIDC_Auth_Prototype.zip</a></p>",
+        "id": 480854241,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1730875626
+    },
+    {
+        "content": "<p>I took a quick look. Thanks. Maybe it'll come in handy again. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 480920494,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730899817
+    },
+    {
+        "content": "<p>Thanks for uploading the sources, Jan!</p>\n<p>In general the main roadblock we faced was more of an \"ethical\" issue. We could pretend to be the browser and have the users pass their login credentials to us, effectively MITM'ing them. That's exactly what the bearer-token-example in <a href=\"#narrow/channel/377090-python/topic/auth.20options/near/475346538\">https://dataverse.zulipchat.com/#narrow/channel/377090-python/topic/auth.20options/near/475346538</a> does with a full blown browser driver they have control over. Then everything works. But the way it should work is without pretending to be the browser and not forcing the user to enter credentials in an \"untrusted\" browser or app.</p>\n<p>But that is something dataverse likely has to implement properly.</p>",
+        "id": 481106540,
+        "sender_full_name": "Sebastian Höffner",
+        "timestamp": 1730981549
+    }
+]

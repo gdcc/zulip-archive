@@ -1,0 +1,182 @@
+[
+    {
+        "content": "<p>Hi there, some update troubles again <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> </p>\n<p>After updating to v6.2, I get a 404 error for all dataset pages. The page only reads \"Page Not Found - The page you are looking for was not found.\", reports 404 in the DevTools and the Payara Logs tell me \"failed to retrieve version\"</p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2024-05-13T16:26:17.001+0200|WARNUNG|Payara 6.2023.8|edu.harvard.iq.dataverse.DatasetPage|_ThreadID=94;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1715610377001;_LevelValue=900;|\n  Failed to retrieve version|#]\n</code></pre></div>\n<p>There seems to be a problem to connect with the S3 connection that I have not seen before. From the logs:</p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2024-05-13T16:49:32.483+0200|WARNUNG|Payara 6.2023.8|com.amazonaws.internal.InstanceMetadataServiceResourceFetcher|_ThreadID=92;_ThreadName=http-thread-pool::jk-connector(1);_TimeMillis=1715611772483;_LevelValue=900;|\n  Fail to retrieve token\ncom.amazonaws.SdkClientException: Failed to connect to service endpoint:\n        at com.amazonaws.internal.EC2ResourceFetcher.doReadResource(EC2ResourceFetcher.java:100)\n        at com.amazonaws.internal.InstanceMetadataServiceResourceFetcher.getToken(InstanceMetadataServiceResourceFetcher.java:91)\n        at com.amazonaws.internal.InstanceMetadataServiceResourceFetcher.readResource(InstanceMetadataServiceResourceFetcher.java:69)\n        at com.amazonaws.internal.EC2ResourceFetcher.readResource(EC2ResourceFetcher.java:66)\n[...]\nCaused by: java.net.ConnectException: Verbindungsaufbau abgelehnt (Connection Refused)\n        at java.base/sun.nio.ch.Net.pollConnect(Native Method)\n        at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)\n        at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:554)\n        at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:602)\n        at java.base/java.net.Socket.connect(Socket.java:633)\n        at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178)\n        at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:533)\n        at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:638)\n        at java.base/sun.net.www.http.HttpClient.&lt;init&gt;(HttpClient.java:281)\n        at java.base/sun.net.www.http.HttpClient.New(HttpClient.java:386)\n        at java.base/sun.net.www.http.HttpClient.New(HttpClient.java:408)\n</code></pre></div>\n<p>Has anyone seen something like this before? Nothing with our S3 settings changed and on our staging server the update did not cause such issues.</p>",
+        "id": 438382860,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715612038
+    },
+    {
+        "content": "<p>The issue is stranger still, and probably S3 is not at fault. I definitely have access to the S3 storage and can download files. When I navigate directly to a File's page I can see and Download the file, so there seems to be a problem with the PID settings or SOLR.</p>",
+        "id": 438388473,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715613534
+    },
+    {
+        "content": "<p>Failed to retrieve version. Huh.</p>",
+        "id": 438390147,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715614036
+    },
+    {
+        "content": "<p>Is there more of server.log you can share?</p>",
+        "id": 438390173,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715614043
+    },
+    {
+        "content": "<p>Nothing that really seems to be connected. I tried to rebuild the SOLR index by first detecting orphans, then clearing the index and doing a full reindex. There I got this:</p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2024-05-13T17:19:43.062+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583062;_LevelValue=800;|\n  Beginning indexStatus()|#]\n\n[#|2024-05-13T17:19:43.063+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583063;_LevelValue=800;|\n  checking for stale or missing dataverses|#]\n\n[#|2024-05-13T17:19:43.084+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583084;_LevelValue=800;|\n  checking for stale or missing datasets|#]\n\n[#|2024-05-13T17:19:43.088+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583088;_LevelValue=800;|\n  completed check for stale or missing content.|#]\n\n[#|2024-05-13T17:19:43.088+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583088;_LevelValue=800;|\n  checking for dataverses in Solr only|#]\n\n[#|2024-05-13T17:19:43.128+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583128;_LevelValue=800;|\n  checking for datasets in Solr only|#]\n\n[#|2024-05-13T17:19:43.193+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583193;_LevelValue=800;|\n  checking for files in Solr only|#]\n\n[#|2024-05-13T17:19:43.570+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613583570;_LevelValue=800;|\n  completed check for content in Solr but not database|#]\n\n[#|2024-05-13T17:19:44.362+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584362;_LevelValue=800;|\n  checking for permissions in database but stale or missing from Solr|#]\n\n[#|2024-05-13T17:19:44.373+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584373;_LevelValue=800;|\n  completed checking for permissions in database but stale or missing from Solr|#]\n\n[#|2024-05-13T17:19:44.374+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584374;_LevelValue=800;|\n  contentInDatabaseButStaleInOrMissingFromIndex: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[]}|#]\n\n[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|\n  contentInIndexButNotDatabase: {&quot;dataverses&quot;:[],&quot;datasets&quot;:[],&quot;files&quot;:[]}|#]\n[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|\n  permissionsInDatabaseButStaleInOrMissingFromIndex: {&quot;dvobjects&quot;:[]}|#]\n\n[#|2024-05-13T17:19:44.375+0200|INFORMATION|Payara 6.2023.8|edu.harvard.iq.dataverse.search.IndexBatchServiceBean|_ThreadID=203;_ThreadName=__ejb-thread-pool7;_TimeMillis=1715613584375;_LevelValue=800;|\n  permissionsInIndexButNotDatabase: {&quot;permissions&quot;:[&quot;datafile_1000_draft_permission&quot;,&quot;datafile_1001_draft_permission&quot;,&quot;datafile_1004_draft_permission&quot;,\n&quot;datafile_1007_draft_permission&quot;,&quot;datafile_1008_draft_permission&quot;,&quot;datafile_1009_draft_permission&quot;,\n&quot;datafile_1012_draft_permission&quot;,&quot;datafile_1013_draft_permission&quot;,&quot;datafile_1015_draft_permission&quot;,\n&quot;datafile_1016_draft_permission&quot;,&quot;datafile_1019_draft_permission&quot;,&quot;datafile_1020_draft_permission&quot;,\n&quot;datafile_1021_draft_permission&quot;,&quot;datafile_1022_draft_permission&quot;,&quot;datafile_1023_draft_permission&quot;,&quot;datafile_1024_draft_permission&quot;,&quot;datafile_1027_draft_permission&quot;,&quot;datafile_1030_draft_permission&quot;,&quot;datafile_1031_draft_permission&quot;,&quot;datafile_1032_draft_permission&quot;,&quot;datafile_1034_draft_permission&quot;,&quot;datafile_1037_draft_permission&quot;,&quot;datafile_1038_draft_permission&quot;,&quot;datafile_1039_draft_permission&quot;,&quot;datafile_1041_draft_permission&quot;,&quot;datafile_1044_draft_permission&quot;,&quot;datafile_1046_draft_permission&quot;,&quot;datafile_1049_draft_permission&quot;,&quot;datafile_1051_draft_permission&quot;,&quot;datafile_1055_draft_permission&quot;,&quot;datafile_1057_draft_permission&quot;,&quot;datafile_1060_draft_permission&quot;,&quot;datafile_1061_draft_permission&quot;,&quot;datafile_1067_draft_permission&quot;,&quot;datafile_1068_draft_permission&quot;,&quot;datafile_1070_draft_permission&quot;,&quot;datafile_1073_draft_permission&quot;,&quot;datafile_1079_draft_permission&quot;,&quot;datafile_1088_draft_permission&quot;,&quot;datafile_1091_draft_permission&quot;,&quot;datafile_1092_draft_permission&quot;,&quot;datafile_1094_draft_permission&quot;,&quot;datafile_1097_draft_permission&quot;,&quot;datafile_1098_draft_permission&quot;,&quot;datafile_1102_draft_permission&quot;,&quot;datafile_1104_draft_permission&quot;,&quot;datafile_1108_draft_permission&quot;,&quot;datafile_1109_draft_permission&quot;,&quot;datafile_1114_draft_permission&quot;,&quot;datafile_1115_draft_permission&quot;,&quot;datafile_1125_draft_permission&quot;,&quot;datafile_1128_draft_permission&quot;,&quot;datafile_1137_draft_permission&quot;,&quot;datafile_1139_draft_permission&quot;,&quot;datafile_1140_draft_permission&quot;,&quot;datafile_1143_draft_permission&quot;,&quot;datafile_1146_draft_permission&quot;,&quot;datafile_1147_draft_permission&quot;,&quot;datafile_1150_draft_permission&quot;,&quot;datafile_1153_draft_permission&quot;,&quot;datafile_1154_draft_permission&quot;,&quot;datafile_1159_draft_permission&quot;,&quot;datafile_1161_draft_permission&quot;,&quot;datafile_1165_draft_permission&quot;,&quot;datafile_1171_draft_permission&quot;,&quot;datafile_1177_draft_permission&quot;,&quot;datafile_1178_draft_permission&quot;,&quot;datafile_1179_draft_permission&quot;,&quot;datafile_1182_draft_permission&quot;,&quot;datafile_1184_draft_permission&quot;,&quot;datafile_1186_draft_permission&quot;,&quot;datafile_1188_draft_permission&quot;,&quot;datafile_1192_draft_permission&quot;,&quot;datafile_1194_draft_permission&quot;,&quot;datafile_1195_draft_permission&quot;,&quot;datafile_1197_draft_permission&quot;,&quot;datafile_1200_draft_permission&quot;,&quot;datafile_1201_draft_permission&quot;,&quot;datafile_1202_draft_permission&quot;,&quot;datafile_1204_draft_permission&quot;,&quot;datafile_1205_draft_permission&quot;,&quot;datafile_1210_draft_permission&quot;,&quot;datafile_1214_draft_permission&quot;,&quot;datafile_1217_draft_permission&quot;,&quot;datafile_1219_draft_permission&quot;,&quot;datafile_1222_draft_permission&quot;,&quot;datafile_1223_draft_permission&quot;,&quot;datafile_1226_draft_permission&quot;,&quot;datafile_1227_draft_permission&quot;,&quot;datafile_1230_draft_permission&quot;,&quot;datafile_1231_draft_permission&quot;,&quot;datafile_1232_draft_permission&quot;,&quot;datafile_1236_draft_permission&quot;,&quot;datafile_1249_draft_permission&quot;,&quot;datafile_1250_draft_permission&quot;,&quot;datafile_1252_draft_permission&quot;,&quot;datafile_1259_draft_permission&quot;,&quot;datafile_1260_draft_permission&quot;,&quot;datafile_1262_draft_permission&quot;,&quot;datafile_1267_draft_permission&quot;,&quot;datafile_1269_draft_permission&quot;,&quot;datafile_1270_draft_permission&quot;,&quot;datafile_1277_draft_permission&quot;,&quot;datafile_1278_draft_permission&quot;,&quot;datafile_1281_draft_permission&quot;,&quot;datafile_1282_draft_permission&quot;,&quot;datafile_1285_draft_permission&quot;,&quot;datafile_1293_draft_permission&quot;,&quot;datafile_1302_draft_permission&quot;,&quot;datafile_1303_draft_permission&quot;,&quot;datafile_1304_draft_permission&quot;,&quot;datafile_1311_draft_permission&quot;,&quot;datafile_1317_draft_permission&quot;,&quot;datafile_1319_draft_permission&quot;,&quot;datafile_1321_draft_permission&quot;,&quot;datafile_1325_draft_permission&quot;,&quot;datafile_1326_draft_permission&quot;,&quot;datafile_1327_draft_permission&quot;,&quot;datafile_1331_draft_permission&quot;,&quot;datafile_1335_draft_permission&quot;,&quot;datafile_1336_draft_permission&quot;,&quot;datafile_1338_draft_permission&quot;,&quot;datafile_1342_draft_permission&quot;,&quot;datafile_1351_draft_permission&quot;,&quot;datafile_1352_draft_permission&quot;,&quot;datafile_1353_draft_permission&quot;,&quot;datafile_1359_draft_permission&quot;,&quot;datafile_1366_draft_permission&quot;,&quot;datafile_1368_draft_permission&quot;,&quot;datafile_1371_draft_permission&quot;,&quot;datafile_1372_draft_permission&quot;,&quot;datafile_1374_draft_permission&quot;,&quot;datafile_1376_draft_permission&quot;,&quot;datafile_1377_draft_permission&quot;,&quot;datafile_1378_draft_permission&quot;,&quot;datafile_1381_draft_permission&quot;,&quot;datafile_1382_draft_permission&quot;,&quot;datafile_1389_draft_permission&quot;,&quot;datafile_1391_draft_permission&quot;,&quot;datafile_1406_draft_permission&quot;,&quot;datafile_1413_draft_permission&quot;,&quot;datafile_1418_draft_permission&quot;,&quot;datafile_1422_draft_permission&quot;,&quot;datafile_1424_draft_permission&quot;,&quot;datafile_1425_draft_permission&quot;,&quot;datafile_1430_draft_permission&quot;,&quot;datafile_1432_draft_permission&quot;,&quot;datafile_1438_draft_permission&quot;,&quot;datafile_1439_draft_permission&quot;,&quot;datafile_1444_draft_permission&quot;,&quot;datafile_1449_draft_permission&quot;,&quot;datafile_1454_draft_permission&quot;,&quot;datafile_1456_draft_permission&quot;,&quot;datafile_1464_draft_permission&quot;,&quot;datafile_1466_draft_permission&quot;,&quot;datafile_1475_draft_permission&quot;,&quot;datafile_1479_draft_permission&quot;,&quot;datafile_1480_draft_permission&quot;,&quot;datafile_1486_draft_permission&quot;,&quot;datafile_1487_draft_permission&quot;,&quot;datafile_1489_draft_permission&quot;,&quot;datafile_1491_draft_permission&quot;,&quot;datafile_1498_draft_permission&quot;,&quot;datafile_1500_draft_permission&quot;,&quot;datafile_1502_draft_permission&quot;,&quot;datafile_1505_draft_permission&quot;,&quot;datafile_1513_draft_permission&quot;,&quot;datafile_1514_draft_permission&quot;,&quot;datafile_1520_draft_permission&quot;,&quot;datafile_1521_draft_permission&quot;,&quot;datafile_1523_draft_permission&quot;,&quot;datafile_1528_draft_permission&quot;,&quot;datafile_1533_draft_permission&quot;,&quot;datafile_1534_draft_permission&quot;,&quot;datafile_1544_draft_permission&quot;,&quot;datafile_1551_draft_permission&quot;,&quot;datafile_975_draft_permission&quot;,&quot;datafile_980_draft_permission&quot;,&quot;datafile_981_draft_permission&quot;,&quot;datafile_985_draft_permission&quot;,&quot;datafile_988_draft_permission&quot;,&quot;datafile_989_draft_permission&quot;,&quot;datafile_991_draft_permission&quot;,&quot;datafile_993_draft_permission&quot;,&quot;datafile_994_draft_permission&quot;,&quot;datafile_997_draft_permission&quot;,&quot;datafile_998_draft_permission&quot;]}|#]\n</code></pre></div>",
+        "id": 438392869,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715614797
+    },
+    {
+        "content": "<p>It found a lot of permissions that were in the index but not in the database, but those all seem to be for drafts.</p>",
+        "id": 438393410,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715614971
+    },
+    {
+        "content": "<p>Can you retrieve datasets via API?</p>",
+        "id": 438394142,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715615176
+    },
+    {
+        "content": "<p>I can find datasets via the search API, but when I try to access the dataset I get</p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;Dataset with Persistent ID perma:&lt;my-PID&gt; not found.&quot;}%\n</code></pre></div>\n<p>Where &lt;py_PID&gt; is one of the PIDs I got from the search.</p>",
+        "id": 438396354,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715615877
+    },
+    {
+        "content": "<p>Maybe I damaged my database during the update? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 438397602,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715616237
+    },
+    {
+        "content": "<p>Thank you for the help. I will need to go offline for a few hours. Its already 6pm in Germany ;)</p>",
+        "id": 438397611,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715616240
+    },
+    {
+        "content": "<p>No worries.</p>",
+        "id": 438398375,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715616452
+    },
+    {
+        "content": "<p>\"perma\". Hmm.</p>",
+        "id": 438398425,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715616466
+    },
+    {
+        "content": "<p>Some further digging: When manually querying SOLR for a dataset, all Datasets show up and all the Metadata are there. So I think the database is intact. It just seems that Dataverse does not find a page for the given PID.</p>\n<p>When I enter a URL with a bogus PID (e.g. substitute it with <code>fdaafdsa</code> or replace <code>perma:</code> with <code>doi:</code>) I get an Internal Server Error, only for valid PIDs I get the \"Page not Found\" error.</p>",
+        "id": 438530683,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715676922
+    },
+    {
+        "content": "<p>Ah, I bet you need this fix: IQSS/10516 fix perma legacy support <a href=\"https://github.com/IQSS/dataverse/issues/10521\">#10521</a></p>",
+        "id": 438554148,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685574
+    },
+    {
+        "content": "<p>Or an equivalent workaround.</p>",
+        "id": 438554168,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685580
+    },
+    {
+        "content": "<p>Oh, wait... this is you: <a href=\"https://github.com/IQSS/dataverse/issues/10516#issuecomment-2097916267\">https://github.com/IQSS/dataverse/issues/10516#issuecomment-2097916267</a></p>",
+        "id": 438554323,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685635
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"601943\">@Henning Timm</span> perhaps you should create a new GitHub issue</p>",
+        "id": 438554433,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685686
+    },
+    {
+        "content": "<p>And link to the old one</p>",
+        "id": 438554457,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715685699
+    },
+    {
+        "content": "<p>Will do.<br>\nI suspect some trouble with the Legacy PID system. In my staging server I had the following Database settings for PIDs:</p>\n<div class=\"codehilite\" data-code-language=\"JSON\"><pre><span></span><code><span class=\"p\">{</span>\n<span class=\"w\">  </span><span class=\"nt\">\"data\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"p\">{</span>\n<span class=\"w\">    </span><span class=\"nt\">\":Authority\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"thz\"</span><span class=\"p\">,</span>\n<span class=\"w\">    </span><span class=\"nt\">\":Shoulder\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"-ds\"</span><span class=\"p\">,</span>\n</code></pre></div>\n<p>In the production server that is giving me trouble now it looked like this:</p>\n<div class=\"codehilite\" data-code-language=\"JSON\"><pre><span></span><code><span class=\"p\">{</span>\n<span class=\"w\">  </span><span class=\"nt\">\"data\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"p\">{</span>\n<span class=\"w\">    </span><span class=\"nt\">\":Authority\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"thz-\"</span><span class=\"p\">,</span>\n<span class=\"w\">    </span><span class=\"nt\">\":Shoulder\"</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"s2\">\"ds-\"</span><span class=\"p\">,</span>\n</code></pre></div>\n<p>Maybe this is connected to this somehow.</p>",
+        "id": 438560211,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715687969
+    },
+    {
+        "content": "<p>Oh. Huh. Yeah, I suppose that could explain it. Not sure.</p>",
+        "id": 438569222,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715691028
+    },
+    {
+        "content": "<p>A look into the database supports that this might be the issue. In the database, the authority is (correctly) listed as <code>thz-</code>, when I create a new dataset it is just <code>thz</code> since the <code>-</code> is now the separator. I am not 100% sure how the split is performed, but I could imagine that the parsing function (<a href=\"https://github.com/IQSS/dataverse/blob/dae5ca7dc46c1272d65b36688f6fded224e7288c/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L291\">https://github.com/IQSS/dataverse/blob/dae5ca7dc46c1272d65b36688f6fded224e7288c/src/main/java/edu/harvard/iq/dataverse/pidproviders/AbstractPidProvider.java#L291</a>) is truncating the separator, so the DB is queries with \"thz\" when it should be queried with \"thz-\".</p>",
+        "id": 438574990,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715692806
+    },
+    {
+        "content": "<p>I could probably work around that by using another separator for the new PID provider.</p>",
+        "id": 438575221,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715692865
+    },
+    {
+        "content": "<p>Sounds good. If you need a hand, please just make some noise.</p>\n<p>Also, would you consider this a bug? If so, please feel free to create an issue.</p>",
+        "id": 438581946,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715694856
+    },
+    {
+        "content": "<p>It's running again! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> <br>\nUsing the separator \"/\" instead of \"-\" when setting up the new permalink provider solved this.</p>",
+        "id": 438767816,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715767540
+    },
+    {
+        "content": "<p>Thanks again for all the help!</p>",
+        "id": 438767833,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715767549
+    },
+    {
+        "content": "<p>I think I would consider this a bug and create an issue describing this. We were a bit flustered here how exactly the parsing of PIDs works, so we set aside some time in the first week of June to build up a test environment and dig into this. I am not sure we can provide a fix, but we will certainly try ;)</p>",
+        "id": 438768150,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715767665
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"601943\">Henning Timm</span> has marked this topic as resolved.</p>",
+        "id": 438768163,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1715767673
+    },
+    {
+        "content": "<p>At the very least, perhaps some documentation can be written. Please do go ahead and create an issue, if you don't mind! I'm glad you fixed it! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 438774711,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715770297
+    },
+    {
+        "content": "<p>Done :) <a href=\"https://github.com/IQSS/dataverse/issues/10564\">https://github.com/IQSS/dataverse/issues/10564</a></p>",
+        "id": 438839866,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1715789639
+    },
+    {
+        "content": "<p>Thanks! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 438843232,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715790664
+    }
+]

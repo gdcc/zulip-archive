@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Hi, I am struggling with the same issue, but with Handle. Previously we had only one relevant JVM option:</p>\n<div class=\"codehilite\"><pre><span></span><code>-Ddataverse.handlenet.admcredfile\n</code></pre></div>\n<p>Now I am not able to transform it to the dataverse.pid.providers based <code>dataverse.pid.*.</code> type setting, I always have a \"Unable to find property with name dataverse.pid.hdl.handlenet.key.path\" type of error message. <a href=\"https://guides.dataverse.org/en/latest/installation/config.html\">https://guides.dataverse.org/en/latest/installation/config.html</a> does not provide me enough instructions, for example this text: \"Can also be set via <em>MicroProfile Config API</em> sources, e.g. the environment variable <code>DATAVERSE_PID_HANDLENET_KEY_PATH</code>. This setting was formerly known as <code>dataverse.handlenet.admcredfile</code> and has been renamed.\" (<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#legacy-single-pid-provider-dataverse-pid-handlenet-key-path\">https://guides.dataverse.org/en/latest/installation/config.html#legacy-single-pid-provider-dataverse-pid-handlenet-key-path</a>) does not tell me renamed to what. Is there any sample config I could follow?</p>",
+        "id": 510700704,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744039097
+    },
+    {
+        "content": "<p>This issue seemingly blocks the upgrade from 6.1 to 6.2 (and the consecutive versions).</p>",
+        "id": 510700939,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744039165
+    },
+    {
+        "content": "<p>That looks like a typo.</p>\n<p>Do you want to continue with the legacy settings or switch to the new way?</p>",
+        "id": 510707581,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744040800
+    },
+    {
+        "content": "<p>I guess the legacy settings will not work in the up to date version (6.6), or in the near future, so I would like to switch to the new one</p>",
+        "id": 510711890,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744041962
+    },
+    {
+        "content": "<p>Great, a good starting point might be to look at <a class=\"stream-topic\" data-stream-id=\"446770\" href=\"/#narrow/channel/446770-docs/topic/domain.2Exml.20example.20for.20configuring.20DataCite.20PID.20provider/with/454296150\">#docs &gt; domain.xml example for configuring DataCite PID provider</a></p>",
+        "id": 510712290,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042075
+    },
+    {
+        "content": "<p>I know it's for DataCite, not Handles, but the pattern should be similar.</p>",
+        "id": 510712369,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042088
+    },
+    {
+        "content": "<p>The new way is similar to how storage is configured, if you're familiar with that.</p>",
+        "id": 510712713,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042180
+    },
+    {
+        "content": "<p>Thanks! I tried something similar, but I did not find equivalent for the <code>handlenet.admcredfile</code> key.</p>",
+        "id": 510712745,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744042190
+    },
+    {
+        "content": "<p>I tried e.g. dataverse.pid.hdl.handlenet.path, but Dataverse asked me to give some other properties. However this was the only property previously in our instance.</p>",
+        "id": 510713147,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744042304
+    },
+    {
+        "content": "<p>What about <code>dataverse.pid.hdl.handlenet.key.path</code>?</p>",
+        "id": 510713884,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042510
+    },
+    {
+        "content": "<p>Same. Anyway, I will keep experimenting this, and take the HandleProviderFactory class as a reference point.<br>\nThanks for the help!</p>",
+        "id": 510714121,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744042571
+    },
+    {
+        "content": "<p>Yes, I was hoping you'd dive into the code. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 510714589,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042698
+    },
+    {
+        "content": "<p>This thread might help: <a href=\"https://groups.google.com/g/dataverse-community/c/ZyhO54in3Jo/m/auUpWkerEAAJ\">https://groups.google.com/g/dataverse-community/c/ZyhO54in3Jo/m/auUpWkerEAAJ</a> <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 510714819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744042762
+    },
+    {
+        "content": "<p>I figured out the problem. Documentation says (<a href=\"https://guides.dataverse.org/en/6.2/installation/config.html#dataverse-pid-handlenet-passphrase\">https://guides.dataverse.org/en/6.2/installation/config.html#dataverse-pid-handlenet-passphrase</a>): <br>\n„The key file may (and should) be encrypted with a passphrase (used for encryption with AES-128). See also chapter 1.4 “Authentication” of the <a href=\"http://www.handle.net/tech_manual/HN_Tech_Manual_8.pdf\">Handle.Net Technical Documentation</a>” - This passphrase is mandatory in the code, while it is optional in the description, and in previous Dataverse versions. A fake passphrase worked in our case.</p>",
+        "id": 510877269,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1744102987
+    },
+    {
+        "content": "<p>Interesting! Can you please make a pull request?</p>",
+        "id": 510907458,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1744112076
+    },
+    {
+        "content": "<p>Hi everyone, Someone have an example about the handle's configuration?</p>",
+        "id": 555184058,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1762968883
+    }
+]
