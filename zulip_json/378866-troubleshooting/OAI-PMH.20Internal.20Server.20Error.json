@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Hi everyone, I and <span class=\"user-mention\" data-user-id=\"662399\">@zbenta</span>  are having some issues with OAI-PMH endpoint in our dataverse instalation at <a href=\"https://repositorio.polen.fccn.pt/oai\">https://repositorio.polen.fccn.pt/oai</a> , the server responds with an internal server error and the logs for payara shows as follow. Any ideas?</p>\n<p>[2023-10-26T15:33:47.554+0000] [Payara 5.2022.3] [WARNING] [] [javax.enterprise.web] [tid: _ThreadID=157 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1698334427554] [levelValue: 900] [[<br>\n  StandardWrapperValve[OAIServlet]: Servlet.service() for servlet OAIServlet threw exception<br>\nio.gdcc.xoai.exceptions.BadVerbException: No argument 'verb' found<br>\n    at io.gdcc.xoai.dataprovider.request.RequestBuilder.buildRawRequest(RequestBuilder.java:119)<br>\n    at edu.harvard.iq.dataverse.harvest.server.web.servlet.OAIServlet.processRequest(OAIServlet.java:265)<br>\n    at edu.harvard.iq.dataverse.harvest.server.web.servlet.OAIServlet.doGet(OAIServlet.java:250)<br>\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:645)<br>\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)<br>\n    at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1637)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\n    at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:282)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\n    at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)<br>\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\n    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)<br>\n    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:160)<br>\n    at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)<br>\n    at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)<br>\n    at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)<br>\n    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)<br>\n    at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:372)<br>\n    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)<br>\n    at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)<br>\n    at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)<br>\n    at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:182)<br>\n    at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:156)<br>\n    at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:201)<br>\n    at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:95)<br>\n    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:260)<br>\n    at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:177)<br>\n    at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:109)<br>\n    at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:88)<br>\n    at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:53)<br>\n    at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:524)<br>\n    at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:89)<br>\n    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:94)<br>\n    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.access$100(WorkerThreadIOStrategy.java:33)<br>\n    at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:114)<br>\n    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:569)<br>\n    at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:549)<br>\n    at java.base/java.lang.Thread.run(Thread.java:829)<br>\n]]</p>",
+        "id": 398720343,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1698335907
+    },
+    {
+        "content": "<p>Hi! Based on <a href=\"https://repositorio.polen.fccn.pt/api/info/version\">https://repositorio.polen.fccn.pt/api/info/version</a> it looks like you're running 5.13.</p>\n<p>So that's <a href=\"https://github.com/IQSS/dataverse/blob/v5.13/src/main/java/edu/harvard/iq/dataverse/harvest/server/web/servlet/OAIServlet.java#L250\">https://github.com/IQSS/dataverse/blob/v5.13/src/main/java/edu/harvard/iq/dataverse/harvest/server/web/servlet/OAIServlet.java#L250</a></p>\n<p>And <a href=\"https://github.com/gdcc/xoai/blob/xoai-5.0.0/xoai-data-provider/src/main/java/io/gdcc/xoai/dataprovider/request/RequestBuilder.java#L119\">https://github.com/gdcc/xoai/blob/xoai-5.0.0/xoai-data-provider/src/main/java/io/gdcc/xoai/dataprovider/request/RequestBuilder.java#L119</a></p>",
+        "id": 398732224,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698340185
+    },
+    {
+        "content": "<p><a href=\"https://repositorio.polen.fccn.pt/oai?verb=ListMetadataFormats\">https://repositorio.polen.fccn.pt/oai?verb=ListMetadataFormats</a> works. Is it just that you were missing a verb?</p>",
+        "id": 398732470,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698340273
+    },
+    {
+        "content": "<p><span aria-label=\"man gesturing ok\" class=\"emoji emoji-1f646-200d-2642\" role=\"img\" title=\"man gesturing ok\">:man_gesturing_ok:</span>  We could swear that we did not have to pass any extra arguments to the endpoint. Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> for the help.</p>",
+        "id": 398852006,
+        "sender_full_name": "zbenta",
+        "timestamp": 1698395867
+    },
+    {
+        "content": "<p>Sure! I don't know how OAI-PMH is supposed to work, if it's supposed to return a 404 if there's no verb.</p>",
+        "id": 398882876,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698407398
+    },
+    {
+        "content": "<p><a href=\"http://www.openarchives.org/OAI/openarchivesprotocol.html#StatusCodes\">http://www.openarchives.org/OAI/openarchivesprotocol.html#StatusCodes</a></p>",
+        "id": 398885147,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408242
+    },
+    {
+        "content": "<p>\"OAI-PMH repositories may employ HTTP Status-Codes in addition to \"200 OK\".\"</p>",
+        "id": 398885361,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698408320
+    },
+    {
+        "content": "<p>So I guess it's up to us. \"May\".</p>",
+        "id": 398885390,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698408333
+    },
+    {
+        "content": "<p>Simply throwing a <code>ServletException</code> in <a href=\"https://github.com/IQSS/dataverse/blob/6b2bcfb359648fe9d7f31ff579a9be0db2ec4d9e/src/main/java/edu/harvard/iq/dataverse/harvest/server/web/servlet/OAIServlet.java#L270\">OAIServlet</a> was maybe not the best choice in hindsight</p>",
+        "id": 398885689,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408446
+    },
+    {
+        "content": "<p>(Throwing such an exception will always trigger an error 500)</p>",
+        "id": 398885808,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408486
+    },
+    {
+        "content": "<p>I would prefer a non-JSF page for the 404 at /oai ... <a href=\"https://demo.dataverse.org/oai\">https://demo.dataverse.org/oai</a> for example. But I guess JSF is going away (thank goodness).</p>",
+        "id": 398885862,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698408510
+    },
+    {
+        "content": "<p>IMHO we should move that servlet to a JAX-RS endpoint</p>",
+        "id": 398885950,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408547
+    },
+    {
+        "content": "<p>Sure, sounds good. SWORD too?</p>",
+        "id": 398886015,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698408575
+    },
+    {
+        "content": "<p>This is starting to feel like it belongs in <a class=\"stream\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev\">#dev</a> <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 398886100,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698408603
+    },
+    {
+        "content": "<p>Probably. IIRC SWORD did have some support for this already, but not sure.</p>",
+        "id": 398886138,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408608
+    },
+    {
+        "content": "<p>Well what we should say here: <span class=\"user-mention\" data-user-id=\"662399\">@zbenta</span> <span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> if you want the behaviour changed, please open an issue. A link to this conversation would be much appreciated!</p>",
+        "id": 398886295,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698408661
+    }
+]

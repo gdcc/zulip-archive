@@ -1,0 +1,104 @@
+[
+    {
+        "content": "<p>Hello :) I have been contacted by <span class=\"user-mention\" data-user-id=\"700599\">@Aamir Muhammad</span> on CVOC subject and he would like to get a first experience under docker. Thought it would be great to have a basic starter kit, so here is a procedure to enable demo files of <a href=\"https://github.com/gdcc/dataverse-external-vocab-support\">https://github.com/gdcc/dataverse-external-vocab-support</a> project :</p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"c1\"># usual docker start</span>\nmvn<span class=\"w\"> </span>-Pct<span class=\"w\"> </span>clean<span class=\"w\"> </span>package<span class=\"w\"> </span>docker:run\n\n<span class=\"c1\"># add cvocdemo.tsv</span>\nwget<span class=\"w\"> </span>https://raw.githubusercontent.com/gdcc/dataverse-external-vocab-support/main/examples/metadatablocks/cvocdemo.tsv<span class=\"w\"> </span>-O<span class=\"w\"> </span>/tmp/cvocdemo.tsv\ndocker<span class=\"w\"> </span>cp<span class=\"w\"> </span>/tmp/cvocdemo.tsv<span class=\"w\"> </span>dataverse-1:/opt/payara/file.tsv\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>curl<span class=\"w\"> </span>http://localhost:8080/api/admin/datasetfield/load<span class=\"w\"> </span>-H<span class=\"w\"> </span><span class=\"s2\">\"Content-type: text/tab-separated-values\"</span><span class=\"w\"> </span>-X<span class=\"w\"> </span>POST<span class=\"w\"> </span>--data-binary<span class=\"w\"> </span>@/opt/payara/file.tsv\n\n<span class=\"c1\"># http://localhost:8080/dataverseuser.xhtml?selectTab=apiTokenTab to get API TOKEN</span>\ncurl<span class=\"w\"> </span>-H<span class=\"w\"> </span><span class=\"s2\">\"X-Dataverse-key:</span><span class=\"nv\">$API_TOKEN</span><span class=\"s2\">\"</span><span class=\"w\"> </span>-X<span class=\"w\"> </span>POST<span class=\"w\"> </span>-H<span class=\"w\"> </span><span class=\"s2\">\"Content-type:application/json\"</span><span class=\"w\"> </span>-d<span class=\"w\"> </span><span class=\"s2\">\"[\\\"citation\\\",\\\"extVocabDemoMetadata\\\"]\"</span><span class=\"w\"> </span>http://localhost:8080/api/dataverses/:root/metadatablocks\n\n<span class=\"c1\"># update solr schema via dataverse api</span>\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>wget<span class=\"w\"> </span>https://raw.githubusercontent.com/IQSS/dataverse/develop/conf/solr/9.3.0/update-fields.sh<span class=\"w\"> </span>-O<span class=\"w\"> </span>/opt/payara/update-fields.sh\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>wget<span class=\"w\"> </span>https://raw.githubusercontent.com/IQSS/dataverse/develop/conf/solr/9.3.0/schema.xml<span class=\"w\"> </span>-O<span class=\"w\"> </span>/opt/payara/schema.xml\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>chmod<span class=\"w\"> </span>u+x<span class=\"w\"> </span>/opt/payara/update-fields.sh\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>wget<span class=\"w\"> </span>http://localhost:8080/api/admin/index/solr/schema<span class=\"w\"> </span>-O<span class=\"w\"> </span>/opt/payara/partial-schema.xml\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>--user<span class=\"w\"> </span>root<span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>apt<span class=\"w\"> </span>install<span class=\"w\"> </span>bc<span class=\"w\"> </span>ed\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>dataverse-1<span class=\"w\"> </span>/opt/payara/update-fields.sh<span class=\"w\"> </span>/opt/payara/schema.xml<span class=\"w\"> </span>/opt/payara/partial-schema.xml\n\n<span class=\"c1\"># reload solr with schema</span>\ndocker<span class=\"w\"> </span>cp<span class=\"w\"> </span>dataverse-1:/opt/payara/schema.xml<span class=\"w\"> </span>/tmp/schema.xml\ndocker<span class=\"w\"> </span>cp<span class=\"w\"> </span>/tmp/schema.xml<span class=\"w\"> </span>solr-1:/var/solr/data/collection1/conf/\ndocker<span class=\"w\"> </span><span class=\"nb\">exec</span><span class=\"w\"> </span>solr-1<span class=\"w\"> </span>curl<span class=\"w\"> </span><span class=\"s2\">\"http://localhost:8983/solr/admin/cores?action=RELOAD&amp;core=collection1\"</span>\n\n<span class=\"c1\"># deploy demo cvoc conf</span>\nwget<span class=\"w\"> </span>https://raw.githubusercontent.com/gdcc/dataverse-external-vocab-support/main/examples/config/cvoc-conf.json<span class=\"w\"> </span>-O<span class=\"w\"> </span>/tmp/cvoc-conf.json\ncurl<span class=\"w\"> </span>-X<span class=\"w\"> </span>PUT<span class=\"w\"> </span>--upload-file<span class=\"w\"> </span>/tmp/cvoc-conf.json<span class=\"w\"> </span>http://localhost:8080/api/admin/settings/:CVocConf\n</code></pre></div>\n<p>After that, you can edit a dataset and see the new metadata block configured :<br>\n<a href=\"/user_uploads/53090/sgYMwksxJdvi5sr4xELJyVrh/Screenshot-from-2024-04-11-09-34-18.png\">Screenshot-from-2024-04-11-09-34-18.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/sgYMwksxJdvi5sr4xELJyVrh/Screenshot-from-2024-04-11-09-34-18.png\" title=\"Screenshot-from-2024-04-11-09-34-18.png\"><img src=\"/user_uploads/53090/sgYMwksxJdvi5sr4xELJyVrh/Screenshot-from-2024-04-11-09-34-18.png\"></a></div><p>Thanks to <span class=\"user-mention\" data-user-id=\"651106\">@Jérôme Roucou</span> for the script.</p>",
+        "id": 432645435,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1712821426
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> and <span class=\"user-mention\" data-user-id=\"651106\">@Jérôme Roucou</span> for putting in such effort to help.</p>",
+        "id": 432649759,
+        "sender_full_name": "Aamir Muhammad",
+        "timestamp": 1712823108
+    },
+    {
+        "content": "<p>Some interesting ideas here!</p>",
+        "id": 432649928,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823167
+    },
+    {
+        "content": "<p>Please note that the update-fields script is already included in the configbaker image</p>",
+        "id": 432649988,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823192
+    },
+    {
+        "content": "<p>Instead of copying around the files it might be easier to mount the conf dir when using docker run with configbaker</p>",
+        "id": 432650288,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823316
+    },
+    {
+        "content": "<p>IIRC when using the dev persona the API is not locked down, so there should be no need to run the curl commands inside the app container</p>",
+        "id": 432650518,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823391
+    },
+    {
+        "content": "<p>If you would like to do this in production, you should take a look at the demo persona. The admin api will require an unblock key to be reachable from outside of the container</p>",
+        "id": 432650987,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823580
+    },
+    {
+        "content": "<p>Glad to see our upstream containers work for you! <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 432651042,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712823602
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I think it would be great to a couple of scripts to fastly configure a docker  (adding language with package, adding/updating tsv, reload schema) as when we switch from PR to PR we kind of want to start from scratch and re-create a context</p>",
+        "id": 432651883,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1712823871
+    },
+    {
+        "content": "<p>I am doing this on my local computer. I am very new to these technologies. we don't have a production instance. I am trying to work with external vocabulary and understand how it integrates to dataverse.</p>",
+        "id": 432652084,
+        "sender_full_name": "Aamir Muhammad",
+        "timestamp": 1712823954
+    },
+    {
+        "content": "<p>Absolutely! That's why we have configbaker! <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span> Back in the day when we wrote our roadmap we already had on our radar to make the existing scripts more modular, so they can be easily reused as building blocks. For example we load a few metadata blocks by default, so this should be a small snippet, easy to run on its own as part of a customized bootstrapping or standalone execution</p>",
+        "id": 432652275,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712824013
+    },
+    {
+        "content": "<p>At some point we were also talking about including a flavor that simply is an nginx to serve static files like the vocab scripts and previewers. That way you could simply serve all of the stuff in one go, also ready for further development</p>",
+        "id": 432652566,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712824107
+    },
+    {
+        "content": "<p>Maybe you want to add this to the agenda of the container WG meeting later today? See <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a></p>",
+        "id": 432652637,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712824138
+    },
+    {
+        "content": "<p>You or <span class=\"user-mention\" data-user-id=\"651106\">@Jérôme Roucou</span>  could even give a little demo and maybe we can talk about how this can be improved and generalised for further use?</p>",
+        "id": 432652769,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712824179
+    },
+    {
+        "content": "<p>I'll talk with the team ;)</p>",
+        "id": 432654596,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1712824825
+    },
+    {
+        "content": "<p>Sure, you're all very welcome to come to our weekly containerization working group meeting. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>",
+        "id": 432676112,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712832143
+    },
+    {
+        "content": "<p>I'm thinking about loading a metadata block and updating Solr over at <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/update-fields.2Esh\">#containers &gt; update-fields.sh</a></p>",
+        "id": 481126471,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730987993
+    }
+]

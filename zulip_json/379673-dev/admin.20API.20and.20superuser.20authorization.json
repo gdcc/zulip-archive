@@ -1,0 +1,224 @@
+[
+    {
+        "content": "<p>Hey :) I would like to have a community view on this subject : <a href=\"https://github.com/IQSS/dataverse/pull/10612#issuecomment-2150667213\">https://github.com/IQSS/dataverse/pull/10612#issuecomment-2150667213</a></p>\n<p><code>/api/admin</code> API is blocked theoretically by settings :</p>\n<ul>\n<li><code>curl -X PUT -d localhost-only http://localhost:8080/api/admin/settings/:BlockedApiPolicy</code></li>\n<li><code>curl -X PUT -d \"admin,builtin-users\" http://localhost:8080/api/admin/settings/:BlockedApiEndpoints</code><br>\nmeaning it requires to be in localhost to excecute <code>/api/admin</code>.</li>\n</ul>\n<p>Some API need superuser API_TOKEN to work so my mind says : </p>\n<ul>\n<li>under <code>/api/admin</code> must be placed every sensible endpoint that change/show global and technical configuration of Dataverse</li>\n<li>under superuser credentials and not <code>/api/admin</code> must be placed every sensible endpoint that change/show the user rights/functionality of Dataverse</li>\n</ul>\n<p>does this mean <code>/api/admin</code> should never require uperuser authorization ? Ex: should we remove this check <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Admin.java#L617\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Admin.java#L617</a> ?</p>\n<p>when should we combine both superuser credentials + <code>/api/admin</code>?</p>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span class=\"user-mention\" data-user-id=\"651106\">@Jérôme Roucou</span></p>",
+        "id": 443079852,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717685636
+    },
+    {
+        "content": "<p>Right now we have a mix. It's quite inconsistent. We should probably pick one and stick with it.</p>\n<p>Recently, in <a href=\"https://github.com/IQSS/dataverse/issues/10440\">#10440</a>, we introduced PUT <code>/api/admin/superuser/$USERNAME</code>. It does not require a superuser API token. It's used by the setup process to promote the first user (dataverseAdmin) into a superuser. It's a use case I think we want to keep, unless we decide on some other way to make dataverseAdmin a superuser.</p>",
+        "id": 443081267,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717686013
+    },
+    {
+        "content": "<p>I agree : for deployment usage (sh/ansible) we should avoid working with supersuper api key (or Burrito Key <span aria-label=\"peep\" class=\"emoji emoji-1fae3\" role=\"img\" title=\"peep\">:peep:</span>).<br>\nmaybe the discussion should be around <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#blockedapipolicy\">:BlockedApiPolicy</a> setting : </p>\n<ul>\n<li>localhost-only: Allow from localhost. <strong>DEFAULT combined with <code>curl -X PUT -d \"admin,builtin-users\" http://localhost:8080/api/admin/settings/:BlockedApiEndpoints</code></strong></li>\n<li>unblock-key: Require a key defined in <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#blockedapikey\">:BlockedApiKey</a>.</li>\n<li>drop: Disallow the blocked endpoints completely.</li>\n</ul>\n<hr>\n<ul>\n<li><code>drop</code> exists but should never be set in real env</li>\n<li><code>unblock-key</code> can be use when you reallllly want not only localhost usage</li>\n</ul>\n<p>If that is OK, then we should remove every superadmin authorization check in <code>/api/admin</code> don't you think ?</p>",
+        "id": 443084656,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717686683
+    },
+    {
+        "content": "<p>For consistency, you mean? I guess that's ok, to remove superuser checks under <code>/api/admin</code>.</p>",
+        "id": 443280806,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717760781
+    },
+    {
+        "content": "<p>I agree that we should start using a single approach and not keep going with this mix of stuff</p>",
+        "id": 443281259,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717760948
+    },
+    {
+        "content": "<p>IMHO this whole blocking thing can be made obsolete</p>",
+        "id": 443281303,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717760971
+    },
+    {
+        "content": "<p>We can use other means to authorize access to the admin API</p>",
+        "id": 443281430,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717761013
+    },
+    {
+        "content": "<p>IMHO it would be much more consistent if we allow usage of access tokens</p>",
+        "id": 443281558,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717761073
+    },
+    {
+        "content": "<p>Access tokens = OIDC / JWT based</p>",
+        "id": 443281597,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717761091
+    },
+    {
+        "content": "<p>Allowing provisioning of a pre-generated thing would enable bootstrapping via any framework etc</p>",
+        "id": 443281759,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717761161
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization/near/443280806\">said</a>:</p>\n<blockquote>\n<p>For consistency, you mean? </p>\n</blockquote>\n<p>yes</p>",
+        "id": 443292754,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717764871
+    },
+    {
+        "content": "<p>Or do it the other way around: allow superusers access only and stop doing it in code manually but apply a proper auth filter</p>",
+        "id": 443293729,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717765219
+    },
+    {
+        "content": "<p>In development it's more convenient to have <code>/api/admin</code> open (no API token required, let alone a superuser token), but it freaks me out a bit when it comes to production installations.</p>\n<p>I most recently bumped into this when writing <a href=\"https://guides.dataverse.org/en/6.2/container/running/demo.html\">https://guides.dataverse.org/en/6.2/container/running/demo.html</a> . If you look for \"unblock\", you'll see that I wrote about how to set the <code>unblock-key</code>.  That way, you can change database setting securely.</p>",
+        "id": 443297116,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717766430
+    },
+    {
+        "content": "<p>If you're developing with containers, you need the unblock key anyway unkess you always go for running a curl command inside the app container</p>",
+        "id": 443298132,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766754
+    },
+    {
+        "content": "<p>That's making it harder because it's less documented and non standardized</p>",
+        "id": 443298240,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766782
+    },
+    {
+        "content": "<p>IMHO the default should be inversed</p>",
+        "id": 443298295,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766798
+    },
+    {
+        "content": "<p>Make it require AA by default</p>",
+        "id": 443298335,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766810
+    },
+    {
+        "content": "<p>But you can disable the filter using a feature flag</p>",
+        "id": 443298379,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766824
+    },
+    {
+        "content": "<p>Sure, as long as everything still works, especially having a superuser at installation time.</p>",
+        "id": 443298514,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717766881
+    },
+    {
+        "content": "<p>Also: if we ever want to have the SPA or other Frontends enable some admin UI, proper auth is the way to go</p>",
+        "id": 443298771,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766963
+    },
+    {
+        "content": "<p>Same goes for client libs like pyDataverse</p>",
+        "id": 443298831,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717766984
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/379673-dev/topic/admin.20API.20and.20superuser.20authorization/near/443293729\">said</a>:</p>\n<blockquote>\n<p>Or do it the other way around: allow superusers access only and stop doing it in code manually but apply a proper auth filter</p>\n</blockquote>\n<p>If we do this, do we also remove everything about <code>:BlockedApi</code>?<br>\nDo you see side effect for users/admins ?</p>",
+        "id": 443300984,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717767735
+    },
+    {
+        "content": "<p>Classic installations probably are not often using the unblock key feature. If they do, they can migrate to the new auth scheme. It would probably be good to have a fallback thing in place for migration. Haven't thought much about it yet.</p>",
+        "id": 443301414,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717767867
+    },
+    {
+        "content": "<p>Containers users probably will be greatful to have a simpler option than the unblock key...</p>",
+        "id": 443301547,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717767906
+    },
+    {
+        "content": "<p>Creating a feature flag to disable the filter should be good enough for backward compatibility for localhost devs</p>",
+        "id": 443301671,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717767952
+    },
+    {
+        "content": "<p>I'm a bit scared (security) about 1 setting that allow everything. Or it should be something not in :Setting</p>",
+        "id": 443302146,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717768095
+    },
+    {
+        "content": "<p>No no I'm talking about a feature flag. Not a database setting. I agree that would be a bad idea</p>",
+        "id": 443302356,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717768173
+    },
+    {
+        "content": "<p>that does not ring a bell for me can you explain <code>feature flag</code> ?</p>",
+        "id": 443302512,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717768215
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/latest/developers/configuration.html#adding-a-feature-flag\">https://guides.dataverse.org/en/latest/developers/configuration.html#adding-a-feature-flag</a></p>",
+        "id": 443302620,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717768251
+    },
+    {
+        "content": "<p>Maybe we should enable using both ways for some time, but deprecate the old ways. Log warnings etc</p>",
+        "id": 443302724,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717768288
+    },
+    {
+        "content": "<p>Should we start a DEP? Is what we called them? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> Like PEP or JEP or JSR. Dataverse Enhancement Proposals (DEPs).</p>",
+        "id": 443303724,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717768605
+    },
+    {
+        "content": "<p>As you prefere, hope it does fall into a forsaken box <span aria-label=\"face with peeking eye\" class=\"emoji emoji-1fae3\" role=\"img\" title=\"face with peeking eye\">:face_with_peeking_eye:</span></p>",
+        "id": 443307354,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1717769691
+    },
+    {
+        "content": "<p>Yes, a DEP would be good</p>",
+        "id": 443307515,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717769739
+    },
+    {
+        "content": "<p>We could use the template from <span class=\"user-mention\" data-user-id=\"600327\">@Ceilyn Boyd</span></p>",
+        "id": 443307624,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1717769764
+    },
+    {
+        "content": "<p>This one, sure: <a href=\"https://docs.google.com/document/d/1GnZiAyh2C6TQLlhKYD5m2JhtSGLg0ZwyiyF8M6y9cuw/edit?usp=sharing\">https://docs.google.com/document/d/1GnZiAyh2C6TQLlhKYD5m2JhtSGLg0ZwyiyF8M6y9cuw/edit?usp=sharing</a></p>",
+        "id": 443317980,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717773196
+    },
+    {
+        "content": "<p>Private? <img alt=\":doh:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/48103.png\" title=\"doh\"></p>",
+        "id": 443318163,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717773257
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>Purpose\nBackground\nApproach\n  Plan\n  Assessment\nParticipants\nAssumptions and Dependencies\n  Requirements and Resources\n  Requirements\nResources\nTimeline\nDeliverables\nOutcomes\nBenefits\nRisks\n  Risk Mitigation\n</code></pre></div>",
+        "id": 443318185,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1717773267
+    }
+]

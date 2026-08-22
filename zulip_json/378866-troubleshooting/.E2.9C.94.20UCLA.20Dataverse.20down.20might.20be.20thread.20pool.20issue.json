@@ -1,0 +1,212 @@
+[
+    {
+        "content": "<p>UCLA Dataverse has been down for about a day and we can't bring it up.  It might be thread-pool related. Current setting: <br>\n&lt;orb use-thread-pool-ids=\"thread-pool-1\"&gt;&lt;/orb&gt;</p>\n<p>What are people setting the thread pool to?</p>",
+        "id": 435457517,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714074849
+    },
+    {
+        "content": "<p>Definately screaming time.  At this point we can't start up Dataverse.</p>",
+        "id": 435477335,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714084222
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653479\">@jamie jamison</span> sorry, I don't know what Harvard Dataverse has this set to.</p>\n<p>And I don't see this in our guides.</p>\n<p><a href=\"https://github.com/IQSS/dataverse/blob/v6.2/modules/container-base/src/main/docker/Dockerfile#L177\">In our Docker image</a> we set this:</p>\n<p><code>${ASADMIN} set default-config.thread-pools.thread-pool.thread-pool-1.max-thread-pool-size=\"250\"</code></p>\n<p>But I'm not sure if that helps.</p>\n<p>You might want to post at <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> where you'll reach more people. Hang in there!</p>",
+        "id": 435494316,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714096518
+    },
+    {
+        "content": "<p>Guess I'm not the only one who works odd hours (9:42 in Los Angeles).  As you suggested I posted the question to the google group. Tim was wondering if this relates to the past bot problem.<br>\nAs always, thank you and I'll post what we change to fix this.</p>",
+        "id": 435513942,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714106669
+    },
+    {
+        "content": "<p>Thanks, yes, I see it: <a href=\"https://groups.google.com/g/dataverse-community/c/pD-TF7IJiQU/m/Tu7qhbExBAAJ\">https://groups.google.com/g/dataverse-community/c/pD-TF7IJiQU/m/Tu7qhbExBAAJ</a></p>",
+        "id": 435560122,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714127758
+    },
+    {
+        "content": "<p>what symptoms are you seeing when you try to launch Dataverse? sustained CPU usage, or does it go idle? what does server.log look like when things stall out?</p>",
+        "id": 435566395,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1714130477
+    },
+    {
+        "content": "<p>I should've asked first: how much RAM does the system have, and what's your Xmx setting in domain.xml?</p>",
+        "id": 435584079,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1714137278
+    },
+    {
+        "content": "<p>Its a t2.xlarge instance, 4 cpu, 16 gib ram<br>\nXms 4096m</p>",
+        "id": 435616230,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714147690
+    },
+    {
+        "content": "<p>Restarting seems to require I restart Shibboleth, httpd and payar5.  I'll check with Tim Dennis for a better description but it seems to go down within about 5 minutes.</p>",
+        "id": 435617421,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714148103
+    },
+    {
+        "content": "<p>[#|2024-04-25T23:26:32.917+0000|SEVERE|Payara 5.2022.4|org.glassfish.jersey.server.ServerRuntime$Responder|_ThreadID=99;_ThreadName=http-thread-pool::jk-connector(5);_TimeMillis=1714087592917;_LevelValue=1000;| An I/O error has occurred while writing a response message entity to the container output stream. org.glassfish.jersey.server.internal.process.MappableException: java.io.IOException: Connection is closed</p>",
+        "id": 435620760,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714149049
+    },
+    {
+        "content": "<p>thanks jamie for posting, any help would be appreciated.</p>",
+        "id": 435623207,
+        "sender_full_name": "Tim Dennis",
+        "timestamp": 1714149734
+    },
+    {
+        "content": "<p>try bumping your JVM heap to 8192m, and restarting Payara? if the problem is Payara, httpd/shibd shouldn't need a restart</p>",
+        "id": 435625069,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1714150441
+    },
+    {
+        "content": "<p>also feel free to send any pertinent server.logs to <a href=\"mailto:support@dataverse.org\">support@dataverse.org</a> , I'll be glad to take a look.</p>",
+        "id": 435625185,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1714150473
+    },
+    {
+        "content": "<p>Thanks Don</p>",
+        "id": 435629123,
+        "sender_full_name": "Tim Dennis",
+        "timestamp": 1714152017
+    },
+    {
+        "content": "<p>I raised the heap to 8192 and restarted.  Dataverse came up rather quickly, was able to log in.  Cautious success!</p>",
+        "id": 435629470,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714152176
+    },
+    {
+        "content": "<p>So far system still up and running.  I'm going to send the payara and access logs to the support email. </p>\n<p>I really need to learn how to monitor this system and catch problems before they get critical.  How to you guys monitor your installation?  (Subject wasn't covered in Art School)</p>",
+        "id": 435633528,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714153921
+    },
+    {
+        "content": "<p>Ha, well we do have a page at <a href=\"https://guides.dataverse.org/en/6.2/admin/monitoring.html\">https://guides.dataverse.org/en/6.2/admin/monitoring.html</a> but it's sort of a stub. We should add more from what various installations actually do (we could start a new topic for this).</p>",
+        "id": 435634638,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714154318
+    },
+    {
+        "content": "<p>I suggest you take a look at the /metrics endpoint, ready to be digested by Prometheus. <span aria-label=\"hamburger\" class=\"emoji emoji-1f354\" role=\"img\" title=\"hamburger\">:hamburger:</span></p>",
+        "id": 435639458,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1714156435
+    },
+    {
+        "content": "<p>You can have simple alerts with Prometheus, too.</p>",
+        "id": 435639550,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1714156471
+    },
+    {
+        "content": "<p>/me looks at <a href=\"https://demo.dataverse.org/metrics\">https://demo.dataverse.org/metrics</a></p>",
+        "id": 435639826,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714156584
+    },
+    {
+        "content": "<p>I have been to the monitoring page.  So far trying to install munin.  I seem to have depandancy problems (RedHat7.9).  I might try compiling it on our test server and see how that runs.</p>",
+        "id": 435801315,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714264875
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"626369\">Don Sizemore</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/UCLA.20Dataverse.20down.20might.20be.20thread.20pool.20issue/near/435625069\">said</a>:</p>\n<blockquote>\n<p>try bumping your JVM heap to 8192m, and restarting Payara? if the problem is Payara, httpd/shibd shouldn't need a restart</p>\n</blockquote>\n<p>Don - I've sent the payara5 server log to the support email.  <br>\nThank you,<br>\nJamie</p>",
+        "id": 435954044,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714366005
+    },
+    {
+        "content": "<p>About munin.  I've had no luck installing munin on RHEL7 either from rep or source.  I seem to have a problem with perl dependencies.</p>",
+        "id": 436149153,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714428664
+    },
+    {
+        "content": "<p>Hmm, maybe we could start a new thread about Munin but for me the killer feature was that it was so easy to install. If that has changed, it's way less attractive!</p>",
+        "id": 436170565,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714439676
+    },
+    {
+        "content": "<p>Perhaps it's because I'm running an older RHEL - RHEL 7.9.</p>",
+        "id": 436170620,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714439719
+    },
+    {
+        "content": "<p>Or not old enough. I probably last used it on CentOS 6. <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 436171089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714439999
+    },
+    {
+        "content": "<p>I'm just looking at <a href=\"https://guide.munin-monitoring.org/en/latest/installation/install.html#redhat-centos-fedora\">https://guide.munin-monitoring.org/en/latest/installation/install.html#redhat-centos-fedora</a></p>\n<p>... do you have EPEL installed?</p>",
+        "id": 436171547,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714440251
+    },
+    {
+        "content": "<p>I believe so.<br>\nRepo-id      : epel/x86_64<br>\nRepo-name    : Extra Packages for Enterprise Linux 7 - x86_64<br>\nRepo-revision: 1713925428<br>\nRepo-updated : Wed Apr 24 02:26:33 2024<br>\nRepo-pkgs    : 13,604<br>\nRepo-size    : 15 G<br>\nRepo-metalink: <a href=\"https://mirrors.fedoraproject.org/metalink?repo=epel-7&amp;arch=x86_64&amp;infra=$infra&amp;content=$contentdir\">https://mirrors.fedoraproject.org/metalink?repo=epel-7&amp;arch=x86_64&amp;infra=$infra&amp;content=$contentdir</a><br>\n  Updated    : Wed Apr 24 02:26:33 2024<br>\nRepo-baseurl : <a href=\"https://d2lzkl7pfhq30w.cloudfront.net/pub/epel/7/x86_64/\">https://d2lzkl7pfhq30w.cloudfront.net/pub/epel/7/x86_64/</a> (64<br>\n             : more)<br>\nRepo-expire  : 21,600 second(s) (last: Thu Apr 25 21:40:15 2024)<br>\n  Filter     : read-only:present<br>\nRepo-excluded: 194<br>\nRepo-filename: /etc/yum.repos.d/epel.repo</p>",
+        "id": 436173087,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714441182
+    },
+    {
+        "content": "<p>This is what I see on my Rocky 8 server when I run <code>yum install munin</code>:  <a href=\"/user_uploads/53090/8aNq68nZGA0aeMNo09s8KpZZ/yum-install-munin.txt\">yum-install-munin.txt</a></p>",
+        "id": 436326514,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714499973
+    },
+    {
+        "content": "<p>Bah, SELinux errors. I give up. <span aria-label=\"shrug\" class=\"emoji emoji-1f937\" role=\"img\" title=\"shrug\">:shrug:</span></p>",
+        "id": 436332477,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714502362
+    },
+    {
+        "content": "<p>I'm going to try setting up the payara5 web UI again and see if that helps.</p>",
+        "id": 436353754,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714511035
+    },
+    {
+        "content": "<p>Sounds good. I did ask at standup today if anyone had any monitoring ideas but it was just crickets. <span aria-label=\"cricket\" class=\"emoji emoji-1f997\" role=\"img\" title=\"cricket\">:cricket:</span></p>",
+        "id": 436354164,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714511220
+    },
+    {
+        "content": "<p>You might want to ask on the google group. I'm sure someone has set up monitoring.</p>",
+        "id": 436354201,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714511239
+    },
+    {
+        "content": "<p><span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span></p>",
+        "id": 436354340,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1714511297
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 439098585,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1715892410
+    }
+]

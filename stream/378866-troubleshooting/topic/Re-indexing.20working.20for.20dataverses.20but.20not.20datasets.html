@@ -1,0 +1,236 @@
+<html>
+<head><meta charset="utf-8"><title>Re-indexing working for dataverses but not datasets · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html">Re-indexing working for dataverses but not datasets</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="614788854"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614788854" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614788854">(Aug 05 2026 at 15:12)</a>:</h4>
+<p>I'm seeing a curious issue where dataverses appear in the search results but datasets do not.  Datasets can be accessed through the links in Notifications, but they don't show up in the search at all.  This first appeared when I was making changes to <a href="http://citation.properties">citation.properties</a> and <a href="http://geospatial.properties">geospatial.properties</a>.</p>
+<p>I've tried all of the commands on the <a href="https://guides.dataverse.org/en/latest/admin/solr-search-index.html">Solr Search Index</a> page with no success.  The commands appear to be successful, but still no datasets appear in the UI.</p>
+<p>For example, if I try to re-index a single dataset (curl <a href="http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000">http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000</a>), I see the result:</p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Reindexed dataset perma:DV/ZWIP4O&quot;,&quot;id&quot;:5,&quot;persistentId&quot;:&quot;perma:DV/ZWIP4O&quot;,&quot;versions&quot;:[{&quot;semanticVersion&quot;:&quot;1.0&quot;,&quot;id&quot;:1}]}}
+</code></pre></div>
+<p>If I clear the search index (curl <a href="http://localhost:8080/api/admin/index">http://localhost:8080/api/admin/index</a>) the dataverses disappear except for the root, but when I index again (curl <a href="http://localhost:8080/api/admin/index">http://localhost:8080/api/admin/index</a>), only the dataverses reappear.  The datasets do not.  And yes, they are published!</p>
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;availablePartitionIds&quot;:[0],&quot;args&quot;:{&quot;numPartitions&quot;:1,&quot;partitionIdToProcess&quot;:0},&quot;message&quot;:&quot;indexAllOrSubset has begun of 4 dataverses and 1 datasets.&quot;}}
+</code></pre></div>
+<p>The result for the Async Reindex shows the correct number of dataverses and dataset(s).</p>
+<p>I am using podman with containers.  Any advice is appreciated.</p>
+
+
+
+<a name="614793152"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614793152" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614793152">(Aug 05 2026 at 15:32)</a>:</h4>
+<p>Do you see any errors in the logs from the main Dataverse container?</p>
+
+
+
+<a name="614793310"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614793310" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614793310">(Aug 05 2026 at 15:33)</a>:</h4>
+<p>(For a non-Docker installation, I'm talking about server.log: <a href="https://guides.dataverse.org/en/6.11/admin/troubleshooting.html#finding-the-payara-log-file">https://guides.dataverse.org/en/6.11/admin/troubleshooting.html#finding-the-payara-log-file</a> )</p>
+
+
+
+<a name="614834131"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614834131" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614834131">(Aug 05 2026 at 18:56)</a>:</h4>
+<p>I don't see any errors, actually.   Here is a copy of the file, attached.<br>
+<a href="/user_uploads/53090/ihmMZPbt_bXtfS5p8WnEd-rt/dataverse_datacore_server.log">dataverse_datacore_server.log</a></p>
+
+
+
+<a name="614834487"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614834487" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614834487">(Aug 05 2026 at 18:58)</a>:</h4>
+<p>Wow, almost nothing in that log. No noise about timers and whatnot? Has the instance been up for a while?</p>
+<p>The noise I'm talking about looks like this:</p>
+<div class="codehilite"><pre><span></span><code>[#|2026-08-05T18:50:01.004+0000|INFO|Payara 7.2026.2|edu.harvard.iq.dataverse.timer.DataverseTimerServiceBean|_ThreadID=288;_ThreadName=__ejb-thread-pool12;_TimeMillis=1785955801004;_LevelValue=800;|
+  HarvesterService: checking timer 1|#]
+
+[#|2026-08-05T18:50:01.004+0000|INFO|Payara 7.2026.2|edu.harvard.iq.dataverse.timer.DataverseTimerServiceBean|_ThreadID=288;_ThreadName=__ejb-thread-pool12;_TimeMillis=1785955801004;_LevelValue=800;|
+  HarvesterService: checking timer 2|#]
+</code></pre></div>
+
+
+
+<a name="614835028"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614835028" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614835028">(Aug 05 2026 at 19:01)</a>:</h4>
+<p>No, because I keep stopping the containers and spinning them up again, trying different things.  So the instance hasn't been up long.</p>
+
+
+
+<a name="614835582"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614835582" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614835582">(Aug 05 2026 at 19:05)</a>:</h4>
+<p>I think we should verify that logging is working. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="614835658"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614835658" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614835658">(Aug 05 2026 at 19:05)</a>:</h4>
+<p>That would explain it!  <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="614835706"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614835706" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614835706">(Aug 05 2026 at 19:05)</a>:</h4>
+<p>You're doing something like this?</p>
+<div class="codehilite"><pre><span></span><code>docker logs -f dataverse
+</code></pre></div>
+<p>(For me, in dev, it's dev_dataverse.)</p>
+
+
+
+<a name="614836078"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614836078" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614836078">(Aug 05 2026 at 19:08)</a>:</h4>
+<p>What if you go to <a href="http://localhost:8080/api/dataverses/doesNotExist">http://localhost:8080/api/dataverses/doesNotExist</a></p>
+<p>In the logs, I see this:</p>
+<div class="codehilite"><pre><span></span><code>[#|2026-08-05T19:07:22.961+0000|WARNING|Payara 7.2026.2|edu.harvard.iq.dataverse.DataverseServiceBean|_ThreadID=148;_ThreadName=http-thread-pool::http-listener-1(4);_TimeMillis=1785956842961;_LevelValue=900;|
+  Unable to find a single dataverse using alias &quot;doesNotExist&quot;: jakarta.persistence.NoResultException: getSingleResult() did not retrieve any entities.|#]
+</code></pre></div>
+<p>Can you get something like that to show up in the logs?</p>
+
+
+
+<a name="614836554"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614836554" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614836554">(Aug 05 2026 at 19:11)</a>:</h4>
+<p>When I run <code>podman logs -f dataverse</code> I see something like you describe.  The previous log was from /appserver/glassfish/domains/domain1/logs/server.log</p>
+
+
+
+<a name="614836879"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614836879" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614836879">(Aug 05 2026 at 19:13)</a>:</h4>
+<p>Ah, makes sense. We definitely want the live log.</p>
+<p>Now! Can you please try reindexing a dataset? The command should be something like </p>
+<div class="codehilite"><pre><span></span><code>curl http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000
+</code></pre></div>
+<p>From <a href="https://guides.dataverse.org/en/6.11/admin/solr-search-index.html#reindexing-datasets">https://guides.dataverse.org/en/6.11/admin/solr-search-index.html#reindexing-datasets</a></p>
+
+
+
+<a name="614837606"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614837606" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614837606">(Aug 05 2026 at 19:17)</a>:</h4>
+<p>Here are the results from the live log, showing the "page not found" warning on down.</p>
+<p><a href="/user_uploads/53090/azyxSYsSROjDYlKLgBZOvS19/live_log.txt">live_log.txt</a></p>
+<p>"methodology" is one of the fields from the custom metadata .tsv file that I added.</p>
+
+
+
+<a name="614838077"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614838077" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614838077">(Aug 05 2026 at 19:19)</a>:</h4>
+<p>Yeah, it's the one that's preventing indexing.</p>
+<p>As you say: <code>unknown field 'methodology'</code></p>
+
+
+
+<a name="614838269"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614838269" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614838269">(Aug 05 2026 at 19:20)</a>:</h4>
+<p>You made a brand new tsv file, right?</p>
+
+
+
+<a name="614838480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614838480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614838480">(Aug 05 2026 at 19:22)</a>:</h4>
+<p>foobar.tsv instead of citation.tsv I mean</p>
+
+
+
+<a name="614839336"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614839336" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614839336">(Aug 05 2026 at 19:28)</a>:</h4>
+<p>Yes, according to these instructions:  <a href="https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadata-block-setup">Metadata Block Setup</a></p>
+<p>Looks like the  "Updating the Solr Schema" step was the one that was failing.  Possibly I was running it in the wrong container.</p>
+
+
+
+<a name="614839893"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614839893" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614839893">(Aug 05 2026 at 19:32)</a>:</h4>
+<p>Gotcha. If it helps, I wrote up some container-specific instructions here: <a href="https://guides.dataverse.org/en/6.11/container/running/demo.html#additional-metadata-blocks">https://guides.dataverse.org/en/6.11/container/running/demo.html#additional-metadata-blocks</a></p>
+
+
+
+<a name="614839994"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614839994" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614839994">(Aug 05 2026 at 19:32)</a>:</h4>
+<p>Sorry this is so hard and weird, by the way! It's just the way it's always been! <span aria-label="grimacing" class="emoji emoji-1f62c" role="img" title="grimacing">:grimacing:</span></p>
+
+
+
+<a name="614840093"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614840093" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614840093">(Aug 05 2026 at 19:33)</a>:</h4>
+<p><span aria-label="joy" class="emoji emoji-1f602" role="img" title="joy">:joy:</span></p>
+
+
+
+<a name="614846026"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614846026" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614846026">(Aug 05 2026 at 20:11)</a>:</h4>
+<p>Shall I create a pull request on GitHub for a podman-specific command to update the Solr schema?  The equivalent of </p>
+<blockquote>
+<p>curl <a href="http://localhost:8080/api/admin/index/solr/schema">http://localhost:8080/api/admin/index/solr/schema</a> | docker run -i --rm -v ./docker-dev-volumes/solr/data:/var/solr gdcc/configbaker:unstable <a href="http://update-fields.sh">update-fields.sh</a> /var/solr/data/collection1/conf/schema.xml</p>
+</blockquote>
+<p>Also, I am unable to find the schema.xml file.</p>
+
+
+
+<a name="614846872"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614846872" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614846872">(Aug 05 2026 at 20:16)</a>:</h4>
+<p>Hmm, yes, let's figure out how to document podman commands. I'd like to suggest we talk more in <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/podman.20instead.20of.20docker/with/613232834">#containers &gt; podman instead of docker</a> and tomorrow's container meeting! See <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/meetings/with/614768628">#containers &gt; meetings</a></p>
+
+
+
+<a name="614846989"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614846989" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614846989">(Aug 05 2026 at 20:16)</a>:</h4>
+<p>As for the schema.xml file, it's got to be in there somewhere! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="614847427"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614847427" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614847427">(Aug 05 2026 at 20:19)</a>:</h4>
+<p>Oh, right! Instead of docker-dev-volumes/solr you probably have data/solr?</p>
+
+
+
+<a name="614847588"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614847588" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614847588">(Aug 05 2026 at 20:20)</a>:</h4>
+<div class="codehilite"><pre><span></span><code>docker-compose-dev.yml
+81:      - ./docker-dev-volumes/app/data:/dv
+112:      - ./docker-dev-volumes/app/data:/dv
+
+docker/compose/demo/compose.yml
+42:      - ./data/app/data:/dv
+75:      - ./data/app/data:/dv
+</code></pre></div>
+
+
+
+<a name="614850918"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614850918" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Renee L. <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614850918">(Aug 05 2026 at 20:42)</a>:</h4>
+<p>Ah yes, it's in data/solr/conf/conf .  Thank you!</p>
+
+
+
+<a name="614852113"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/614852113" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#614852113">(Aug 05 2026 at 20:50)</a>:</h4>
+<p>Great! Sure!</p>
+<p>Since this is under <a href="https://guides.dataverse.org/en/6.11/container/running/demo.html">https://guides.dataverse.org/en/6.11/container/running/demo.html</a> (demo stuff rather than dev stuff ), I should have used "data/solr", obviously.</p>
+<p>If you feel like making a PR, please go ahead! But for now, please keep it as "docker" instead of "podman" if you do. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="615041493"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/615041493" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#615041493">(Aug 06 2026 at 17:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="1091328">@Renee L.</span> as discussed we created this issue today:</p>
+<p>In container guide, solr updates, change docker-dev-volumes to data <a href="https://github.com/IQSS/dataverse/issues/12588">#12588</a></p>
+<p>Are you interested in making a PR? If not, I can or add "good first issue" label on it.</p>
+
+
+
+<a name="615043852"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Re-indexing%20working%20for%20dataverses%20but%20not%20datasets/near/615043852" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Re-indexing.20working.20for.20dataverses.20but.20not.20datasets.html#615043852">(Aug 06 2026 at 17:52)</a>:</h4>
+<p>Nevermind! It's much quicker for me to fix.</p>
+<p>I just made PR <a href="https://github.com/IQSS/dataverse/issues/12589">#12589</a> and I'd appreciate a review!</p>
+
+
+
+<hr><p>Last updated: Aug 22 2026 at 19:17 UTC</p>
+</html>

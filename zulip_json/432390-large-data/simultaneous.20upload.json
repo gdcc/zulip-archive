@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Good morning! <br>\nI am testing uploading simaltenously 1gb files. I am quite often getting a failed with 500 error but doens't seem to output anything in the server.log. Has anyone done similar tests ? Smaller file sizes seem to work fine. I wonder what is provoking the 500 error and how i Can track it.</p>",
+        "id": 504555074,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1741607607
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> this fix might help: <a href=\"https://github.com/gdcc/python-dvuploader/pull/24\">https://github.com/gdcc/python-dvuploader/pull/24</a></p>",
+        "id": 504563254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741609464
+    },
+    {
+        "content": "<p>Thanks! Let me see (I was actually using the native API before).</p>",
+        "id": 504590507,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1741615183
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"671195\">Simon Carroll</span> <a href=\"#narrow/channel/432390-large-data/topic/setting.20parameters.20for.20direct.20upload.20with.20python-dvuploader/near/504590507\">said</a>:</p>\n<blockquote>\n<p>Thanks! Let me see (I was actually using the native API before).</p>\n</blockquote>\n<p>OK now I remember. We are not using S3 so the direct upload fails. It is not expect that 3 concurrent uploads would cause this with the Native API I suppose. I can try to investigate more.</p>",
+        "id": 504607881,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1741618548
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> are you using the Python-DVUploader native upload or the Native API directly?</p>",
+        "id": 504870622,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1741705947
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599841\">Jan Range</span> <a href=\"#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/504870622\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"671195\">Simon Carroll</span> are you using the Python-DVUploader native upload or the Native API directly?</p>\n</blockquote>\n<p>Good morning!  I was using the Native API. I was seeing 500 errors when launching 3 concurrent uploads of 1GB. Occasionally I was able to upload 2 concurrent but normally launching 3 causes all to fail. I just tried using the Python-DVUploader but since we dont have object storage (yet) it reverts to the using the Native API (I assume the results would be the same but I didn't test it yet). Is this somewhat expected or a suprising result ? We are imagining the use case of several users/jobs uploading data at the same time.</p>",
+        "id": 505084885,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1741774335
+    },
+    {
+        "content": "<p>Good morning <span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>\n<p>I assume that the 500 error stems from a dataset lock due to ingestion. This is typically the case for tabular files, which subsequently induce the lock and no further uploads/edits to the dataset are possible. There are two ways to circumvent this:</p>\n<ul>\n<li>\n<p>Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload.</p>\n</li>\n<li>\n<p>Disable <code>tabIngest</code> within the payload when sending the request to your instance. This will skip the ingestion process and no locks will happen. The downside is, that you need to manually trigger the ingestion, if wished.</p>\n</li>\n</ul>\n<p>I think the latter is the easiest way to get around this, but the zipping workflow really shines when you have a lot of small files.</p>\n<p>If you are uploading tabular files, this could potentially fix the issue <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 505096262,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1741777231
+    },
+    {
+        "content": "<p>As a last instance, you could move to sequential uploads and check for dataset locks, but I guess that's not as efficient as concurrent uploads.</p>",
+        "id": 505096557,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1741777294
+    },
+    {
+        "content": "<p>Good morning! Thanks a lot for the comprehensive feedback. I will try the different approaches to see what can work for us. Many thanks!</p>",
+        "id": 505354939,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1741855252
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599841\">Jan Range</span> <a href=\"#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/505096262\">said</a>:</p>\n<blockquote>\n<p>Good morning <span class=\"user-mention silent\" data-user-id=\"671195\">Simon Carroll</span> :)</p>\n<p>I assume that the 500 error stems from a dataset lock due to ingestion. This is typically the case for tabular files, which subsequently induce the lock and no further uploads/edits to the dataset are possible. There are two ways to circumvent this:</p>\n<ul>\n<li>\n<p>Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload.</p>\n</li>\n<li>\n<p>Disable <code>tabIngest</code> within the payload when sending the request to your instance. This will skip the ingestion process and no locks will happen. The downside is, that you need to manually trigger the ingestion, if wished.</p>\n</li>\n</ul>\n<p>I think the latter is the easiest way to get around this, but the zipping workflow really shines when you have a lot of small files.</p>\n<p>If you are uploading tabular files, this could potentially fix the issue :)</p>\n</blockquote>\n<p>Good moring! I am playing around. If  I upload via the native api 2 files iwith tab ingest diabled it seems one fails with internal server error 500 . I will attach an example. I am uploading files in to two  seperate datasets (in the same collection). The point is it seems another problem outside of the locks.</p>",
+        "id": 506100016,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742205723
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/EqvZUPS5qJZ4R2WPkO7INV7P/nativeAPIuploadTabIngestDisabledFailed.log\">nativeAPIuploadTabIngestDisabledFailed.log</a></p>",
+        "id": 506100088,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742205737
+    },
+    {
+        "content": "<p>I dont see anything in the server logs which is quite strange. Is there some class I need to explictly add to the debug options that can help ?</p>",
+        "id": 506100787,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742205898
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> thanks for testing! That is odd, given the <code>tabIngest</code> is turned off. Can you send me the script you are using? For debugging, upon failure the function will raise an error with the message returned by the Dataverse instance. Do you have a full traceback to inspect where the error is happening?</p>",
+        "id": 506585557,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1742333762
+    },
+    {
+        "content": "<p>OK here comes a bombardment. Here is the python script : </p>\n<p><a href=\"/user_uploads/53090/5LU2C79JTYCoOGEIqRUHNMFI/dataverse_uploader.py\">dataverse_uploader.py</a><br>\n. </p>\n<p>Here is a log if a single upload </p>\n<p><a href=\"/user_uploads/53090/lDpinR3ZZ5vx201ri8YyKjPA/singleUpload.log\">singleUpload.log</a></p>\n<p>here is a concurrent upload with ingestion on <br>\n<a href=\"/user_uploads/53090/SiE_BFdmbdqdgrkGLwH4LtNd/TwoConcurrentUploadsDiffEnvIngestionOn.log\">TwoConcurrentUploadsDiffEnvIngestionOn.log</a></p>\n<p>and here with it off <br>\n<a href=\"/user_uploads/53090/cnsxMlgyz196ClXOoPr-q7Xo/TwoConcurrentUploadsDiffEnvIngestionOff.log\">TwoConcurrentUploadsDiffEnvIngestionOff.log</a></p>\n<p>I have included the errors from just one enviroment. There is no error in dataverse actually and I have noticed <strong>it seems the file that seems vo fail via API upload is in dataverse and valid</strong>. I suppose this is why I am not seeing a error log sever side ?</p>",
+        "id": 506688345,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742380017
+    },
+    {
+        "content": "<p>Thanks for providing the files! Now it is a bit clearer, because I thought you were using <a href=\"https://github.com/gdcc/python-dvuploader\">python-dvuploader</a>. </p>\n<p>Have you tried adding the <code>tabIngest</code> into the <code>jsonData</code> payload? As far as I know, passing it into the query parameters is not working, but maybe I am wrong <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin ☀️</span>? In ther <a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#add-a-file-to-a-dataset\">docs</a> it says to add it to the payload.</p>",
+        "id": 506735572,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1742392510
+    },
+    {
+        "content": "<p>Yes, it looks like tabIngest:false goes into the payload, the JSON you send.</p>",
+        "id": 506736576,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742392731
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> which version of Dataverse are you running? tabIngest:false might be somewhat new. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 506736714,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742392762
+    },
+    {
+        "content": "<p>OK thanks. With the param in the jsonData it works as expected. About this :</p>\n<blockquote>\n<p>\"* Zip files into an archive and upload it. If enabled, Dataverse will unzip the files and register each individually. This is the way Python-DVUploader handles this case in the non-S3 upload.\"</p>\n</blockquote>\n<p>Do you mean the python libary does this automatically in the case of non-S3 upload when falling back on the  native API??</p>",
+        "id": 506914022,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742461642
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin ☀️</span> <a href=\"#narrow/channel/432390-large-data/topic/simultaneous.20upload/near/506736714\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"671195\">Simon Carroll</span> which version of Dataverse are you running? tabIngest:false might be somewhat new. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>\n</blockquote>\n<p>6.5 but I suppose it came down to me not reading the documentation properly :)</p>",
+        "id": 506914329,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1742461747
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"671195\">@Simon Carroll</span> yes, the Python library takes care of zipping the data and shipping it. Data &gt;2gb will be zipped into multiple zips and uploaded simultaneously.</p>",
+        "id": 506985532,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1742480128
+    }
+]

@@ -1,0 +1,188 @@
+[
+    {
+        "content": "<p>hello all .. i'm trying to add a global role to our dataverse installation, and not getting very far. I've tried these formats for the api command: </p>\n<p><code>curl http://localhost:8080/api/admin/roles -X POST -H 'Content-type:application/json' --upload-file roles.json</code></p>\n<p>and</p>\n<p><code>curl -H X-Dataverse-key:&lt;my api token&gt; -X POST \"http://localhost:8080/api/admin/roles\" --upload-file roles.json</code></p>\n<p>and neither works .. for the first one it just returns nothing, and the second one returns \"415 upsupported media type\" </p>\n<p>I used the format for the roles.json file that is in the docs</p>\n<p>any thoughts?</p>",
+        "id": 405413024,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701453612
+    },
+    {
+        "content": "<p>I also tried: <br>\n<code>curl -H X-Dataverse-key:&lt;my api token&gt; -X POST http://localhost:8080/api/admin/roles -H 'Content-type:application/json' --upload-file roles.json</code></p>",
+        "id": 405415853,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701454749
+    },
+    {
+        "content": "<p>and using env variables for server, token and export ID (and using the command directly from the docs)</p>",
+        "id": 405416001,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701454808
+    },
+    {
+        "content": "<p><code>curl -H \"X-Dataverse-key:$API_TOKEN\" -X POST \"$SERVER_URL/api/admin/roles\" --upload-file roles.json</code></p>",
+        "id": 405416058,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701454844
+    },
+    {
+        "content": "<p>Hmm, I'm looking at this: Unify and de-duplicate role creation information. <a href=\"https://github.com/IQSS/dataverse/issues/9646\">#9646</a></p>",
+        "id": 405421881,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457332
+    },
+    {
+        "content": "<p>Does your JSON look something like this?</p>\n<div class=\"codehilite\"><pre><span></span><code>{\n  &quot;alias&quot;: &quot;sys1&quot;,\n  &quot;name&quot;: “Restricted System Role”,\n  &quot;description&quot;: “A person who may only add datasets.”,\n  &quot;permissions&quot;: [\n    &quot;AddDataset&quot;\n  ]\n}\n</code></pre></div>",
+        "id": 405422100,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457388
+    },
+    {
+        "content": "<p>From <a href=\"https://guides.dataverse.org/en/6.0/api/native-api.html#json-representation-of-a-role\">https://guides.dataverse.org/en/6.0/api/native-api.html#json-representation-of-a-role</a></p>",
+        "id": 405422143,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457403
+    },
+    {
+        "content": "<p>yes here it is: <br>\n{<br>\n  \"alias\": \"dsRsrchContrib\",<br>\n  \"name\": “Research Contributor”,<br>\n  \"description\": “Lab manager, research data manager, graduate assistant.”,<br>\n  \"permissions\": [<br>\n       \"ViewUnpublishedDataset\",<br>\n      \"DownloadFile\",<br>\n       \"EditDataset\"<br>\n   ]<br>\n}</p>",
+        "id": 405422255,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457436
+    },
+    {
+        "content": "<p>Basically, I'm trying to say the docs were clean up recently so if you aren't looking at 5.14 or 6.0 docs you should. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 405422307,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457443
+    },
+    {
+        "content": "<p>although it is indented</p>",
+        "id": 405422323,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457445
+    },
+    {
+        "content": "<p>yeah, that looks right</p>",
+        "id": 405422372,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457466
+    },
+    {
+        "content": "<p>oh i'm looking at \"latest\"</p>",
+        "id": 405422378,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457471
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#create-global-role\">https://guides.dataverse.org/en/latest/api/native-api.html#create-global-role</a></p>",
+        "id": 405422423,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457492
+    },
+    {
+        "content": "<p>yeah, and latest is 6.0 right now, of course: <a href=\"https://guides.dataverse.org/en/6.0/api/native-api.html#create-global-role\">https://guides.dataverse.org/en/6.0/api/native-api.html#create-global-role</a></p>",
+        "id": 405422513,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457525
+    },
+    {
+        "content": "<p>That curl command matches the second one you posted.</p>",
+        "id": 405422534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457537
+    },
+    {
+        "content": "<p>should work!</p>",
+        "id": 405422538,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457540
+    },
+    {
+        "content": "<p>anything in server.log?</p>",
+        "id": 405422547,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457544
+    },
+    {
+        "content": "<p>hmmm .. i see this: \"[Payara 6.2023.8] [SEVERE] [] [] [tid: _ThreadID=71 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1701457596607] [levelValue: 1000] [[<br>\n  jakarta.ws.rs.ProcessingException: Error deserializing object from entity stream.\"</p>",
+        "id": 405422862,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457655
+    },
+    {
+        "content": "<p>and \"Internal error: Unexpected char 8,220 at (line no=3, column no=11, offset=43)\" .. must have something wrong in my json?</p>",
+        "id": 405422972,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457690
+    },
+    {
+        "content": "<p>oh ho!</p>",
+        "id": 405422998,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457701
+    },
+    {
+        "content": "<p>I see some not so smart quotes</p>",
+        "id": 405423084,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457738
+    },
+    {
+        "content": "<p>yes, that must be it! haha .. didn't even notice that .. will fix and try again  (sorry should have looked in the payara log)</p>",
+        "id": 405423204,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457789
+    },
+    {
+        "content": "<p>well, we should probably return a better error</p>",
+        "id": 405423303,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457812
+    },
+    {
+        "content": "<p>please feel free to open an issue about this</p>",
+        "id": 405423328,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457821
+    },
+    {
+        "content": "<p>yep it worked .. omg i feel stupid</p>",
+        "id": 405423341,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457826
+    },
+    {
+        "content": "<p>you could link back to this thread</p>",
+        "id": 405423350,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457830
+    },
+    {
+        "content": "<p>glad it worked!</p>",
+        "id": 405423380,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701457843
+    },
+    {
+        "content": "<p>thank you so much! next time i will check the log first!</p>",
+        "id": 405423449,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701457868
+    },
+    {
+        "content": "<p>No worries. I don't mind easy problems on a Friday afternoon. <span aria-label=\"stuck out tongue wink\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"stuck out tongue wink\">:stuck_out_tongue_wink:</span></p>",
+        "id": 405423906,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701458054
+    },
+    {
+        "content": "<p><span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 405423932,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1701458070
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> has marked this topic as resolved.</p>",
+        "id": 405758645,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1701673214
+    }
+]
