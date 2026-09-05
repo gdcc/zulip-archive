@@ -1,0 +1,812 @@
+[
+    {
+        "content": "<p>This just in from ErykKul at <a href=\"https://github.com/IQSS/dataverse/pull/9383#issuecomment-1486899586\">https://github.com/IQSS/dataverse/pull/9383#issuecomment-1486899586</a></p>\n<p>\"I think that running the integration tests with the Dockerized Dataverse is a great idea. Maybe we could use docker for that as well? For example: <a href=\"https://hub.docker.com/_/docker\">https://hub.docker.com/_/docker</a>. Right now, the aio-docker makes some assumptions about the environment that are not true for every system (I still could not run the integration tests lately...). I am not sure about this, but it looks to me that it is no longer possible to build aio-docker using latest Rocky Linux image, like specified in the docker file? I get errors about not sufficient entropy (it also takes very long time to start the Dataverse inside the aio-docker container). Also, the \"ps\" command is missing, preventing the solr starting properly (procps package is not installed by default). Finally, when I get everything running, then I get errors from the sword API... I am not sure how the continuous integration runs the integration tests, I was not successful in doing that (I did get them running when trying out payara 6, but I had upgraded many packages to do that, upgraded the jdk version to 17, changed some scripts, etc.).</p>\n<p>I have tried to fix the integration test, but since I was not able to run it locally, I am waiting for the continuous integration to finish.\"</p>",
+        "id": 345153378,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680014281
+    },
+    {
+        "content": "<p>I had ITs running in docker-aio at one point, but ran into trouble with merging PRs and nested environment variables. I definitely had ITs running, though.</p>",
+        "id": 345154039,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1680014422
+    },
+    {
+        "content": "<p>It is a long lasting dream of me to make our API tests (these are end-to-end tests, a very special and expensive kind of integration tests) use <a href=\"https://www.testcontainers.org/\">Testcontainers</a> and a Maven profile. I already asked on the IQSS Slack if we could transform the API tests to use JUnit5, so we can create actual extensions etc and make this great. I'm all in!</p>",
+        "id": 345154122,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014439
+    },
+    {
+        "content": "<p>But obviously, we could also run API tests \"just\" against a dockerized version of things, without containers. It will still need some control over the internal environment to setup and tweak certain things like stored procedures etc</p>",
+        "id": 345154514,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014521
+    },
+    {
+        "content": "<p>Probably this is also a good first step <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 345154621,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014537
+    },
+    {
+        "content": "<p>And of course I want ITs also to run inside a Github workflow, which might even be speedier than using Jenkins + cheap AWS EC2 instances. <span aria-label=\"smiling devil\" class=\"emoji emoji-1f608\" role=\"img\" title=\"smiling devil\">:smiling_devil:</span></p>",
+        "id": 345154930,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014615
+    },
+    {
+        "content": "<p>Ah, should I rename this topic to \"API tests\"? That's really what I'm talking about.</p>",
+        "id": 345154976,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680014627
+    },
+    {
+        "content": "<p>Probabyl <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span> Oh and didn't we talk about this somewhere already? Maybe in \"sunsetting\"?</p>",
+        "id": 345155244,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014673
+    },
+    {
+        "content": "<p>Hmm no we didn't. Maybe some place else, outside of this channel, some other context</p>",
+        "id": 345155397,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1680014705
+    },
+    {
+        "content": "<p>Do we have an open issue about running API tests in Docker?</p>",
+        "id": 345158053,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680015314
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/running.20API.20tests/near/345158053\">said</a>:</p>\n<blockquote>\n<p>Do we have an open issue about running API tests in Docker?</p>\n</blockquote>\n<p>I can open one. I never committed my branch because of said nested environment variable woes.</p>",
+        "id": 345160293,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1680015747
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598186\">@Don Sizemore</span> this would be for new Docker for dev setup. If you haven't tried it yet, I'm happy to walk you through it. Either way, yes, an issue would be great!</p>",
+        "id": 345165798,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680016829
+    },
+    {
+        "content": "<p>The test for <code>/api/info/version</code> works just fine. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 345167366,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680017108
+    },
+    {
+        "content": "<p>Actually, I can run a real API test just fine as well: <a href=\"https://github.com/IQSS/dataverse/pull/9383#issuecomment-1487151653\">https://github.com/IQSS/dataverse/pull/9383#issuecomment-1487151653</a></p>",
+        "id": 345172089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680018110
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598186\">@Don Sizemore</span> so maybe we don't need an issue</p>",
+        "id": 345172254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680018139
+    },
+    {
+        "content": "<p>Or rather, maybe the issue is about:</p>\n<ul>\n<li>documenting how to run the tests, probably against containerized Dataverse (I'm trying this now)</li>\n<li>removing docker-aio and docker-dcm, including from the guides, of course. See also the <a href=\"#narrow/stream/375812-containers/topic/sunsetting/near/342567078\">sunsetting</a> topic</li>\n</ul>",
+        "id": 345210439,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680028240
+    },
+    {
+        "content": "<p>Bah. Running all these tests at once failed. 500 errors.</p>",
+        "id": 345213679,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680029313
+    },
+    {
+        "content": "<p>Ah, but some of these failures are expected, like this one:</p>\n<p>Caused by: org.postgresql.util.PSQLException: ERROR: function generateidentifierfromstoredprocedure() does not exist</p>\n<p>That's because our Docker image doesn't have that sequence inserted.</p>",
+        "id": 345214537,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680029577
+    },
+    {
+        "content": "<p>That must be this test:</p>\n<p>[ERROR]   DatasetsIT.testStoredProcGeneratedAsIdentifierGenerationStyle:816 » IllegalArgument</p>",
+        "id": 345214694,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680029626
+    },
+    {
+        "content": "<p>Anyway, here are the errors I saw:</p>\n<p>[ERROR] Failures: <br>\n[ERROR]   DatasetsIT.testAddEmptyDatasetViaNativeAPI:362 Expected status code &lt;403&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testCuratePublishedDatasetVersionCommand:2686 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testDeleteDatasetWhileFileIngesting:1367 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testFilesUnchangedAfterDatasetMetadataUpdate:2620 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testLinkingDatasets:2189 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testRestrictFileExportDdi:2279 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testRestrictFilesWORequestAccess:2901 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   DatasetsIT.testUpdateDatasetVersionWithFiles:2132 Expected status code &lt;201&gt; doesn't match actual status code &lt;500&gt;.</p>\n<p>[ERROR]   HarvestingClientsIT.testHarvestingClientRun:234 Last harvest not reported a success (took 0 seconds) expected:&lt;SUCCESS&gt; but was:&lt;null&gt;<br>\n[ERROR]   HarvestingServerIT.testMultiRecordOaiSet:606 Wrong number of items on the first ListIdentifiers page expected:&lt;2&gt; but was:&lt;5&gt;<br>\n[ERROR]   MakeDataCountApiIT.testMakeDataCountGetMetric:61 Expected status code &lt;200&gt; doesn't match actual status code &lt;400&gt;.</p>",
+        "id": 345215654,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680029915
+    },
+    {
+        "content": "<p>I'm on this commit: 753ee8451b</p>",
+        "id": 345215735,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680029946
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> explained to me that we should be able to run our own base/app containers within GitHub Actions.</p>\n<p>This is huge.</p>\n<p>I'm not sure yet how it will work but maybe this blog post will help: <a href=\"https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/\">https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/</a></p>\n<p>They build Docker images and push them and then run them during API tests, I think.</p>",
+        "id": 351037341,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681908544
+    },
+    {
+        "content": "<p>Might depend a little on whether you want to push images to registries only after API tests passed or not</p>",
+        "id": 351038114,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1681908718
+    },
+    {
+        "content": "<p>Could of course push to a temp registry first.</p>",
+        "id": 351038277,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1681908738
+    },
+    {
+        "content": "<p>Has the advantage of splitting the runs</p>",
+        "id": 351038332,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1681908748
+    },
+    {
+        "content": "<p>What if we get all this working in a small app like <a href=\"https://github.com/IQSS/dataverse-people\">https://github.com/IQSS/dataverse-people</a> ? Faster, lighter, no red tape.</p>",
+        "id": 351055223,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681912279
+    },
+    {
+        "content": "<p>I just created this related topic: <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing\">https://dataverse.zulipchat.com/#narrow/stream/377090-python/topic/containers.20for.20API.20testing</a></p>",
+        "id": 353967277,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682699444
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599841\">Jan Range</span> <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/354959912\">said</a>:</p>\n<blockquote>\n<p>Thanks! Didn't expect it to be that simple</p>\n</blockquote>\n<p>Sounds like we have a first happy customer for the working group's output!</p>",
+        "id": 355053749,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683012201
+    },
+    {
+        "content": "<p>I suppose the action about this topic now somehow happens in <a class=\"stream\" data-stream-id=\"377090\" href=\"/#narrow/stream/377090-python\">#python</a> ... I'm gonna resolve this here.</p>",
+        "id": 355680952,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683184078
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> has marked this topic as resolved.</p>",
+        "id": 355681000,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1683184084
+    },
+    {
+        "content": "<p>Maybe. It would be nice to deliver on what Eryk wanted in the top post, the ability to run the REST Assured API test suite.</p>",
+        "id": 355740273,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683198849
+    },
+    {
+        "content": "<p>Oh yeah sure, but let's stick to milestones - integrations come first :-D</p>",
+        "id": 355758118,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683203209
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as unresolved.</p>",
+        "id": 355770086,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1683205952
+    },
+    {
+        "content": "<p>That's a little like saying \"let's close all the open GitHub issues we aren't actively working  on\", isn't it? <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>\n<p>Like Eryk, I'm interested in this too so I'm unresolving this topic.</p>\n<p>Next steps (yes, as time allows) as I see them:</p>\n<ul>\n<li>build on work by <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> and <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> in <a href=\"https://github.com/IQSS/dataverse-sample-data/compare/container-test\">https://github.com/IQSS/dataverse-sample-data/compare/container-test</a> to spin up Dataverse in containers within a GitHub Actions VM</li>\n<li>always add the database sequence to prevent certain PID tests from failing (see \"generateidentifierfromstoredprocedure\" above)</li>\n</ul>",
+        "id": 355770092,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683205954
+    },
+    {
+        "content": "<p>I see <span class=\"user-mention\" data-user-id=\"614964\">@Eryk Kulikowski</span> is interested in Jenkins access: <a href=\"#narrow/stream/379673-dev/topic/jenkins.20access/near/362673296\">https://dataverse.zulipchat.com/#narrow/stream/379673-dev/topic/jenkins.20access/near/362673296</a></p>\n<p>That's fine, but longer term we should circle back to this topic of getting API tests running in containers, right? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 362741875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685623661
+    },
+    {
+        "content": "<p>YEs of course! Just wanted to make sure they communicate and he's unblocked</p>",
+        "id": 362744421,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685624174
+    },
+    {
+        "content": "<p>Yes, thank you, thank you.</p>\n<p>I'm just conscious of the fact that we closed and reopened this topic. If we need to start a new topic that's more specific, that's fine.</p>",
+        "id": 362744810,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624262
+    },
+    {
+        "content": "<p>Also, I can run an idea by you if you like.</p>",
+        "id": 362744850,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624272
+    },
+    {
+        "content": "<p>'bout API testing? Hit me!</p>",
+        "id": 362745101,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685624316
+    },
+    {
+        "content": "<p>What if we made a new repo called \"second opinion\".</p>",
+        "id": 362745223,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624343
+    },
+    {
+        "content": "<p>The first doctor said your health is not so good. You'd like a second opinion.</p>",
+        "id": 362745293,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624358
+    },
+    {
+        "content": "<p>Not sure I'm following <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 362745394,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685624386
+    },
+    {
+        "content": "<p>We use GitHub Actions workflow dispatch or whatever it's called. We click a button to trigger it. For now at least.</p>",
+        "id": 362745419,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624391
+    },
+    {
+        "content": "<p>It spins up the develop branch in containers and configures them. Then it runs the API tests.</p>",
+        "id": 362745657,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624427
+    },
+    {
+        "content": "<p>The idea is you can look at Jenkins, see failures on develop, go over to Second Opinion, click the button, and see what the other doctor thinks.</p>",
+        "id": 362745871,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685624470
+    },
+    {
+        "content": "<p>Still not following?</p>",
+        "id": 362882063,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685653872
+    },
+    {
+        "content": "<p>Oh sry missed that one</p>",
+        "id": 362882563,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685654017
+    },
+    {
+        "content": "<p>I think we share the same vision but I don't believe we need a second repo for that</p>",
+        "id": 362882700,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685654057
+    },
+    {
+        "content": "<p>We can have Jenkins do Jenkins and make Github Actions do the same with containers</p>",
+        "id": 362882780,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685654089
+    },
+    {
+        "content": "<p>That's what I figured you'd say: put it in the main repo.</p>",
+        "id": 362886496,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685655471
+    },
+    {
+        "content": "<p>But! With a new repo we can merge and innovate as fast as we want. And we can retire it when the code goes in the main repo.</p>",
+        "id": 362886604,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685655505
+    },
+    {
+        "content": "<p>Ideas how to replicate the PRs?</p>",
+        "id": 362887824,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685655999
+    },
+    {
+        "content": "<p>Does Kevin do QA for Workflow files?</p>",
+        "id": 362887948,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656058
+    },
+    {
+        "content": "<p>People seemed to detest red crosses but love green checkmarks. So as long as we don't break to many builds...</p>",
+        "id": 362888247,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656182
+    },
+    {
+        "content": "<p>Oh I might have missed sth here: you said \"develop\". Not PRs</p>",
+        "id": 362888367,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656224
+    },
+    {
+        "content": "<p>Yeah, I hate it when develop is broken.</p>",
+        "id": 362888689,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656386
+    },
+    {
+        "content": "<p>Sometimes Jenkins is 100% right. Sometimes there's nothing wrong with develop.</p>",
+        "id": 362888755,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656430
+    },
+    {
+        "content": "<p>Hackathon on Sunday? <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 362888764,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656434
+    },
+    {
+        "content": "<p>Sure!</p>",
+        "id": 362888836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656446
+    },
+    {
+        "content": "<p>But I think we have a couple talks to write too. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 362888862,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656463
+    },
+    {
+        "content": "<p>Who? Me? You? <span aria-label=\"shrug\" class=\"emoji emoji-1f937\" role=\"img\" title=\"shrug\">:shrug:</span></p>",
+        "id": 362888893,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656480
+    },
+    {
+        "content": "<p>The auth talk. The container demo.</p>",
+        "id": 362888953,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656508
+    },
+    {
+        "content": "<p>Hey I added some bits for the auth talk already</p>",
+        "id": 362888985,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656526
+    },
+    {
+        "content": "<p>oh, phew, thank you!</p>",
+        "id": 362889008,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656537
+    },
+    {
+        "content": "<p>they might record it, you know</p>",
+        "id": 362889028,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656545
+    },
+    {
+        "content": "<p>Very basic. Just some ideas.</p>",
+        "id": 362889036,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656550
+    },
+    {
+        "content": "<p>Ugh</p>",
+        "id": 362889045,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656556
+    },
+    {
+        "content": "<p>Last time I checked it said I'm not presenting anything</p>",
+        "id": 362889122,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656574
+    },
+    {
+        "content": "<p>Well, the auth talk <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span> brb <span aria-label=\"smiling imp\" class=\"emoji emoji-1f608\" role=\"img\" title=\"smiling imp\">:smiling_imp:</span></p>",
+        "id": 362889182,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685656611
+    },
+    {
+        "content": "<p>I want this. <a href=\"https://github.com/marketplace/actions/test-reporter\">https://github.com/marketplace/actions/test-reporter</a></p>",
+        "id": 362889215,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656625
+    },
+    {
+        "content": "<p>Or this. <a href=\"https://github.com/marketplace/actions/publish-test-results\">https://github.com/marketplace/actions/publish-test-results</a></p>",
+        "id": 362889502,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685656744
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/running.20API.20tests/near/362886604\">said</a>:</p>\n<blockquote>\n<p>But! With a new repo we can merge and innovate as fast as we want. And we can retire it when the code goes in the main repo.</p>\n</blockquote>\n<p>I was going to delete <a href=\"https://github.com/gdcc/dataverse\">https://github.com/gdcc/dataverse</a> soon as we have almost all from the container branches incorporated (phew!)</p>",
+        "id": 362890251,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685657000
+    },
+    {
+        "content": "<p>It already contains stuff to update branches with content from the main repo</p>",
+        "id": 362890312,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685657037
+    },
+    {
+        "content": "<p>Maybe we can reuse some of that?</p>",
+        "id": 362890397,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1685657060
+    },
+    {
+        "content": "<p>Sure!</p>",
+        "id": 362897509,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1685659928
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> should I try to explain Second Opinion again?</p>",
+        "id": 365852547,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686659345
+    },
+    {
+        "content": "<p>I <em>think</em> I know what you're up to... <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 365852668,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1686659376
+    },
+    {
+        "content": "<p>BTW this run took 44 minutes to complete on Jenkins <span aria-label=\"rolling eyes\" class=\"emoji emoji-1f644\" role=\"img\" title=\"rolling eyes\">:rolling_eyes:</span></p>",
+        "id": 365852883,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1686659420
+    },
+    {
+        "content": "<p>It would be nice to have at least one test runner saying everything is fine.</p>",
+        "id": 365862731,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686661564
+    },
+    {
+        "content": "<p>After waiting another 40 minutes, it says: all good!</p>",
+        "id": 365863827,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1686661780
+    },
+    {
+        "content": "<p>Phew!</p>",
+        "id": 365872680,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686663510
+    },
+    {
+        "content": "<p>I finally got around to creating <a href=\"https://github.com/pdurbin/dataverse-api-test-runner\">https://github.com/pdurbin/dataverse-api-test-runner</a></p>",
+        "id": 376376160,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689691393
+    },
+    {
+        "content": "<p>My current problem is that I'm running FitsIT which uploads a file. I get this error:</p>\n<p>{\"status\":\"ERROR\",\"message\":\"There was an error when trying to add the new file. Temp directory is not configured.\"}</p>",
+        "id": 376376351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689691435
+    },
+    {
+        "content": "<p>See <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5588687039/jobs/10215838726#step:5:33283\">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5588687039/jobs/10215838726#step:5:33283</a></p>",
+        "id": 376376442,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689691445
+    },
+    {
+        "content": "<p>Here's my GitHub Action as of this writing: <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/blob/f4cce7e919846ac14acaad5de2ca2ce41b36936b/.github/workflows/test.yml\">https://github.com/pdurbin/dataverse-api-test-runner/blob/f4cce7e919846ac14acaad5de2ca2ce41b36936b/.github/workflows/test.yml</a></p>",
+        "id": 376376807,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689691525
+    },
+    {
+        "content": "<p>It ends with this:</p>\n<div class=\"codehilite\"><pre><span></span><code>- name: Start Dataverse containers\n  run: |\n    cd dataverse\n    docker compose -f docker-compose-dev.yml up -d\n- name: Run API tests\n  run: |\n    cd dataverse\n    mvn test -Ddataverse.test.baseurl=http://localhost:8080 -Dtest=UtilIT,FitsIT\n</code></pre></div>",
+        "id": 376377267,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689691612
+    },
+    {
+        "content": "<p>[#|2023-07-18T14:57:33.342+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.util.FileUtil|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253342;_LevelValue=1000;|<br>\n    Failed to create filesTempDirectory: /dv/temp|#]</p>\n<p>[#|2023-07-18T14:57:33.345+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253345;_LevelValue=1000;|<br>\n    There was an error when trying to add the new file. Temp directory is not configured.|#]</p>\n<p>[#|2023-07-18T14:57:33.346+0000|SEVERE|Payara 5.2022.5|edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper|_ThreadID=85;_ThreadName=http-thread-pool::http-listener-1(2);_TimeMillis=1689692253346;_LevelValue=1000;|<br>\n    java.io.IOException: Temp directory is not configured.|#]</p>",
+        "id": 376381425,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689692408
+    },
+    {
+        "content": "<p>I'm having deja vu. I'm pretty sure we talked about this before.</p>",
+        "id": 376381515,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689692422
+    },
+    {
+        "content": "<p>Right, stuff like <code>${RUNNER_TEMP}/app/data:/dv</code> at <a href=\"https://github.com/IQSS/dataverse-sample-data/blob/bbc104832ab0b55c2d9340df7f73f83e401ee3f5/docker-compose-ci.yml\">https://github.com/IQSS/dataverse-sample-data/blob/bbc104832ab0b55c2d9340df7f73f83e401ee3f5/docker-compose-ci.yml</a></p>",
+        "id": 376391920,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689694321
+    },
+    {
+        "content": "<p>Related conversation: <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434190\">https://dataverse.zulipchat.com/#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434190</a></p>",
+        "id": 376394783,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689694839
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/375812-containers/topic/running.20API.20tests/near/365852883\">said</a>:</p>\n<blockquote>\n<p>BTW this run took 44 minutes to complete on Jenkins <span aria-label=\"rolling eyes\" class=\"emoji emoji-1f644\" role=\"img\" title=\"rolling eyes\">:rolling_eyes:</span></p>\n</blockquote>\n<p>Out of curiosity here (we had a similar problem, and resolved it, a few years back); how are tests presently organized? Are they split into separate suites/modules or are they monolithic in nature?</p>",
+        "id": 376544006,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1689746842
+    },
+    {
+        "content": "<p>Yes, modules, well Java classes. Please see how <a href=\"https://github.com/IQSS/dataverse/blob/v5.13/conf/docker-aio/run-test-suite.sh\">https://github.com/IQSS/dataverse/blob/v5.13/conf/docker-aio/run-test-suite.sh</a> references the classes in this file: <a href=\"https://github.com/IQSS/dataverse/blob/v5.13/tests/integration-tests.txt\">https://github.com/IQSS/dataverse/blob/v5.13/tests/integration-tests.txt</a></p>",
+        "id": 376659088,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689771929
+    },
+    {
+        "content": "<p>So if I'm reading this correctly (correct me if I'm wrong, I'm not a Java native), these are run sequential? If so; would it make sense to split this file into separated test suites? You could run those suites parallel.</p>\n<p>Background anecdote is that we had this in Python as well; build took 1.5 hours to complete on account of needing to run ~2000 tests, including some very, very fixture-heavy xml test suites. We split those out as we were revamping our runner infrastructure (migrated from Jenkins to autoscaling runners on DigitalOcean using Gitlab Bastion), and as a result, could run those build steps in parallel. Build took about 30 minutes afterwards and we could run several at a time as opposed to creating gridlock on Jenkins.</p>",
+        "id": 376869665,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1689837336
+    },
+    {
+        "content": "<p>Sure. It probably makes sense to try running API tests in parallel. That would be a good topic for <a class=\"stream\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev\">#dev</a> . This topic is about running the API test suite in Docker and GitHub Actions. I'm struggling with the latter.</p>",
+        "id": 376956074,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689855275
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> thanks for reminding me about how you're doing something similar. I just copied your config from <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/commit/c7d1fef\">https://github.com/pdurbin/dataverse-api-test-runner/commit/c7d1fef</a> over to my repo and the (only a few so far) Rest Assured tests passed: <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5612377863/jobs/10270069291\">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5612377863/jobs/10270069291</a></p>",
+        "id": 377009853,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1689864671
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"601950\">Thomas van Erven</span> <a href=\"#narrow/stream/375812-containers/topic/running.20API.20tests/near/376869665\">said</a>:</p>\n<blockquote>\n<p>So if I'm reading this correctly (correct me if I'm wrong, I'm not a Java native), these are run sequential? If so; would it make sense to split this file into separated test suites? You could run those suites parallel.</p>\n<p>Background anecdote is that we had this in Python as well; build took 1.5 hours to complete on account of needing to run ~2000 tests, including some very, very fixture-heavy xml test suites. We split those out as we were revamping our runner infrastructure (migrated from Jenkins to autoscaling runners on DigitalOcean using Gitlab Bastion), and as a result, could run those build steps in parallel. Build took about 30 minutes afterwards and we could run several at a time as opposed to creating gridlock on Jenkins.</p>\n</blockquote>\n<p>Yes, they're sequential by default. Just be careful of tests such as the one Jim mentioned in Slack (concerning the <code>:publicInstall</code> DB setting) which may interfere with one another.</p>",
+        "id": 377260814,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1689938131
+    },
+    {
+        "content": "<p>Yeap, non-avoidable interdependency between tests due to order or database state is the limiting factor for parallelization. You will always have n test suites, where n is interdependent test suites.</p>",
+        "id": 377310807,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1689947908
+    },
+    {
+        "content": "<p>I got a good number of API tests to run on the Payara 6 branch: <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5649829177/job/15304980462\">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5649829177/job/15304980462</a></p>",
+        "id": 378471726,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690291038
+    },
+    {
+        "content": "<p>Heads up that we need <a href=\"https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/pull/264\">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/pull/264</a> in container-land for one of the harvesting tests to pass.</p>\n<p>Discussion at <a href=\"https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650561229\">https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650561229</a></p>",
+        "id": 378604976,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690319465
+    },
+    {
+        "content": "<p>I just ran the API tests against the develop branch: <a href=\"https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650852969\">https://github.com/IQSS/dataverse/issues/9457#issuecomment-1650852969</a></p>",
+        "id": 378644890,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690336527
+    },
+    {
+        "content": "<p>All tests are passing on the Payara 6 branch. It has a fix that develop and master don't having to do with harvesting. See <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/error.20running.20a.20harvest\">#containers &gt; error running a harvest</a></p>",
+        "id": 382582164,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691405583
+    },
+    {
+        "content": "<p><a href=\"https://github.com/pdurbin/dataverse-api-test-runner\">https://github.com/pdurbin/dataverse-api-test-runner</a> is by no means perfect but shows that the full API test suite can be run against containers. I'm closing this long topic. We can open up fresh topics.</p>",
+        "id": 383991800,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691765046
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 383991834,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1691765051
+    },
+    {
+        "content": "<p>Hi all, not sure if this is the correct stream or not. Actually I was trying to run the tests in BuiltinUsersIT file. I started the application in docker and then ran these tests but all tests that are hitting the create API are giving this error message:<br>\n{<br>\n    \"status\": \"ERROR\",<br>\n    \"message\": \"Dataverse config issue: No API key defined for built in user management\"<br>\n}<br>\nCan anyone help me out?<br>\n<span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span></p>",
+        "id": 397378518,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660492
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as unresolved.</p>",
+        "id": 397378701,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1697660577
+    },
+    {
+        "content": "<p>Sure. Let's use this stream. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 397378730,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660594
+    },
+    {
+        "content": "<p>It's strange that the key is not defined. It should be \"burrito\". Given your trouble over in <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/gitattributes.20files.20and.20windows.20auto.20conversion\">#containers &gt; gitattributes files and windows auto conversion</a> I'm worried that a later script didn't run.</p>",
+        "id": 397378935,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660692
+    },
+    {
+        "content": "<p>You had to fix the first script manually, right?</p>",
+        "id": 397378982,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660718
+    },
+    {
+        "content": "<p>There are a lot of scripts. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 397379002,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660726
+    },
+    {
+        "content": "<p>yes I did</p>",
+        "id": 397379011,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660731
+    },
+    {
+        "content": "<p>haha got it, I'll check logs once if any other script got the same error</p>",
+        "id": 397379043,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660752
+    },
+    {
+        "content": "<p>That's fine but it could get a bit tedious.</p>",
+        "id": 397379106,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660770
+    },
+    {
+        "content": "<p>Maybe we should resolve the line endings thing first.</p>",
+        "id": 397379138,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660787
+    },
+    {
+        "content": "<p>On opening the localhost:8080 also I'm getting error<br>\n<a href=\"/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png\">login-page-error.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png\" title=\"login-page-error.png\"><img src=\"/user_uploads/53090/RtLh40O__v_RM2lGRzOP9qpH/login-page-error.png\"></a></div>",
+        "id": 397379150,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660798
+    },
+    {
+        "content": "<p>Right, I'm assuming the root collection wasn't created.</p>",
+        "id": 397379190,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660816
+    },
+    {
+        "content": "<p>Probably there will be lots of errors in the logs. Instead of ending with \"have a nice day\".</p>",
+        "id": 397379233,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660837
+    },
+    {
+        "content": "<p>Ohh, okay then I'll try and fix the line ending issue first</p>",
+        "id": 397379266,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660860
+    },
+    {
+        "content": "<p>Awesome. Thanks. Sorry for the trouble! You get the pain but (hopefully) it will be easier for others in the future!</p>",
+        "id": 397379378,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697660906
+    },
+    {
+        "content": "<p>I understand :)</p>",
+        "id": 397379430,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697660934
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> even after resolving the line end issue I'm getting this same error on running the tests in BuiltinUsersIT file <span aria-label=\"face with diagonal mouth\" class=\"emoji emoji-1fae4\" role=\"img\" title=\"face with diagonal mouth\">:face_with_diagonal_mouth:</span></p>",
+        "id": 397385570,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697664467
+    },
+    {
+        "content": "<p>although now the localhost:8080 is opening and not giving error, but tests are giving error</p>",
+        "id": 397385664,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697664522
+    },
+    {
+        "content": "<p>Can you please try:</p>\n<ul>\n<li>ctrl-c to stop the containers</li>\n<li><code>rm -rf docker-dev-volumes</code></li>\n<li>start the containers up again</li>\n</ul>",
+        "id": 397385857,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697664626
+    },
+    {
+        "content": "<p>\"Note that data is persisted in ./docker-dev-volumes in the root of the Git repo. For a clean start, you should remove this directory before running the mvn commands above.\" -- <a href=\"https://guides.dataverse.org/en/6.0/container/dev-usage.html\">https://guides.dataverse.org/en/6.0/container/dev-usage.html</a></p>",
+        "id": 397385975,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697664717
+    },
+    {
+        "content": "<p>Removing the directory will delete your settings. Then, when you try again, that key you need should be inserted.</p>",
+        "id": 397390142,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697667316
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> , tried these steps but still getting the same result <span aria-label=\"face with diagonal mouth\" class=\"emoji emoji-1fae4\" role=\"img\" title=\"face with diagonal mouth\">:face_with_diagonal_mouth:</span></p>",
+        "id": 397477657,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697712024
+    },
+    {
+        "content": "<p>D'oh! <img alt=\":doh:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/48103.png\" title=\"doh\"></p>",
+        "id": 397481738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697713609
+    },
+    {
+        "content": "<p>What's the status of your Dataverse installation? Can you see the root dataverse in a browser? Can you log in as dataverseAdmin? (password: admin1)</p>",
+        "id": 397481832,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697713656
+    },
+    {
+        "content": "<p>I am able to see this screen on localhost:8080<br>\n<a href=\"/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png\">dataverse_homepage.png</a><br>\nBut when I open the administration console and tried to login using the credentials in the doc I got error that incorrect username or password</p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png\" title=\"dataverse_homepage.png\"><img src=\"/user_uploads/53090/80n00fUV47UgBHFx8PkLbQJI/dataverse_homepage.png\"></a></div>",
+        "id": 397577265,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1697749465
+    },
+    {
+        "content": "<p>Oh. That's the Payara screen.</p>",
+        "id": 397577807,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749708
+    },
+    {
+        "content": "<p>You should see something more like this: <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> ... a running Dataverse instance.</p>",
+        "id": 397577849,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749733
+    },
+    {
+        "content": "<p>You probably see a lot of output in your terminal. Somewhere in there might be a useful error message. I hope. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 397577921,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697749784
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> when you have a minute... perhaps you could start a new topic about the trouble you're (unfortunately) having setting up a dev environment. We're happy to help you out! Then we can circle back to actually running API tests.</p>",
+        "id": 397727392,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697813649
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"656977\">@Sakshi Jain</span> any news? We're happy to help you get a dev environment set up!</p>",
+        "id": 398747917,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698346192
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> ,  I was sick so haven't been able to work on this since we last talked. Will try running this again today.</p>",
+        "id": 398790148,
+        "sender_full_name": "Sakshi Jain",
+        "timestamp": 1698367356
+    },
+    {
+        "content": "<p>Oh! I'm sorry to hear! I hope you're feeling better!</p>",
+        "id": 398796167,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698370108
+    }
+]

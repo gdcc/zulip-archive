@@ -1,0 +1,283 @@
+<html>
+<head><meta charset="utf-8"><title>OAI feed change · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html">OAI feed change</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="512728045"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/512728045" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#512728045">(Apr 17 2025 at 03:28)</a>:</h4>
+<p>I had a different question, but deleted it. I see the issues related to dc:type and dc:date fields and noticed that dc:rights was discussed. So is it in the plan to eventually include dc:rights in the oai_dc feed? We are trying to figure out a way to designate records as not open access, or restricted just to asu affiliates so that the feed to Primo can recognize it and also mark them that way. I think Primo requires the oai_dc format. Is there a way to add the dc:rights field to the oai_dc feed manually in the dataverse code?</p>
+
+
+
+<a name="513530165"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/513530165" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#513530165">(Apr 22 2025 at 06:53)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span>,</p>
+<p>We have changed the oai dc:rights output in e-cienciaDatos. You can check it here: <a href="https://edatos.consorciomadrono.es/oai?verb=ListRecords&amp;metadataPrefix=oai_dc">https://edatos.consorciomadrono.es/oai?verb=ListRecords&amp;metadataPrefix=oai_dc</a></p>
+<p>Our implementation is based in Dataverse v6.5, you can find the differences  with the IQSS implementation here: <a href="https://github.com/IQSS/dataverse/compare/v6.5...Consorcio-Madrono:dataverse:v6.5Madrono">https://github.com/IQSS/dataverse/compare/v6.5...Consorcio-Madrono:dataverse:v6.5Madrono</a></p>
+<p>dc:rights changes are in the file DublinCoreExportUtil.java. Searching "rigths" in this file you can find our changes.</p>
+<p>The information about closed / open access is copied from the oai_datacite oai output, but in this case is automatic, not manual.</p>
+
+
+
+<a name="513643119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/513643119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#513643119">(Apr 22 2025 at 15:40)</a>:</h4>
+<p>This is awesome .. thank you for sharing! That is exactly what we need. We may want to do a similar thing for now, although I'm hoping eventually it will be added back as part of the default feed.</p>
+
+
+
+<a name="513647055"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/513647055" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#513647055">(Apr 22 2025 at 15:56)</a>:</h4>
+<p>Do you have any records in the repo that are marked as "closedAccess" or "restrictedAccess"? Just want to see how the feed looks.</p>
+
+
+
+<a name="513649020"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/513649020" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#513649020">(Apr 22 2025 at 16:05)</a>:</h4>
+<p>We only have some datasets with embargoed files that are shown as "restrictedAccess". Here is an example: <a href="https://edatos.consorciomadrono.es/oai?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=doi:10.21950/3XF0IT">https://edatos.consorciomadrono.es/oai?verb=GetRecord&amp;metadataPrefix=oai_dc&amp;identifier=doi:10.21950/3XF0IT</a></p>
+
+
+
+<a name="513651920"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/513651920" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#513651920">(Apr 22 2025 at 16:18)</a>:</h4>
+<p>Perfect! Thank you!</p>
+
+
+
+<a name="514828720"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/514828720" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#514828720">(Apr 28 2025 at 14:25)</a>:</h4>
+<p>Over at <a href="https://github.com/IQSS/dataverse/issues/5920#issuecomment-2339072490">https://github.com/IQSS/dataverse/issues/5920#issuecomment-2339072490</a> I mentioned some unfinished dc:rights work that needs to be done.</p>
+<p><span class="user-mention" data-user-id="663397">@Juan</span> please feel free to make a pull request. <span aria-label="big smile" class="emoji emoji-1f604" role="img" title="big smile">:big_smile:</span></p>
+
+
+
+<a name="514829297"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/514829297" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#514829297">(Apr 28 2025 at 14:27)</a>:</h4>
+<p>Basically, I started working on dc:rights but <a href="https://github.com/IQSS/dataverse/pull/10737#issuecomment-2339064765">backed out</a> my changes when it got tricky.</p>
+
+
+
+<a name="515034304"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/515034304" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#515034304">(Apr 29 2025 at 11:19)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin ☀️</span> , sorry for the delay in the response, It was a little dark yesterday: <a href="https://edition.cnn.com/2025/04/28/europe/spain-portugal-power-outages-intl/index.html">https://edition.cnn.com/2025/04/28/europe/spain-portugal-power-outages-intl/index.html</a> . </p>
+<p>I am not sure that our approach is the best one for the general case. I think that for the dc metadata, it could be better to either:</p>
+<ul>
+<li>Write the uri as <a href="https://dataverse.harvard.edu/oai?verb=GetRecord&amp;metadataPrefix=Datacite&amp;identifier=doi:10.7910/DVN/00CIUU">here for the DataCite metadata</a>  </li>
+<li>Write content: uri (Ex: Creative Commons CC0 1.0 Universal Public Domain Dedication: <a href="http://creativecommons.org/publicdomain/zero/1.0">http://creativecommons.org/publicdomain/zero/1.0</a>)</li>
+</ul>
+<p>What do you think? I can create a pull request with our current approach or any of the alternatives above.</p>
+
+
+
+<a name="515059319"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/515059319" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#515059319">(Apr 29 2025 at 13:10)</a>:</h4>
+<p><span class="user-mention" data-user-id="621770">@Julian Gautier</span> and <span class="user-mention" data-user-id="651833">@Philipp Conzett</span> are active on <a href="https://github.com/IQSS/dataverse/issues/5920">#5920</a>. I'd like to hear what they think. Thanks for being willing to create a pull request! <span aria-label="heart" class="emoji emoji-2764" role="img" title="heart">:heart:</span></p>
+
+
+
+<a name="515076764"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/515076764" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Julian Gautier <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#515076764">(Apr 29 2025 at 14:18)</a>:</h4>
+<p>Hey all. <span class="user-mention" data-user-id="598112">@Philip Durbin ☀️</span> thanks for the ping. I'd say I was active on <a href="https://github.com/IQSS/dataverse/issues/5920">#5920</a> but haven't been in a while and can't refocus on it for now. Too many other projects <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="515077145"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/515077145" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#515077145">(Apr 29 2025 at 14:20)</a>:</h4>
+<p>real</p>
+
+
+
+<a name="617040164"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617040164" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617040164">(Aug 17 2026 at 20:11)</a>:</h4>
+<p>hi there .. jumping back into this conversation as we still haven't figured out a solution to the issue of marking records in the default Dataverse OAI feed as "NOT open access" or "restricted" .. is there a plan to include the dc:rights field back into that feed ever, or does anyone have a solution for sending the feed and using one of the fields to designate a "type" (ie: open access, affiliates-only) for datasets, other than hard-coding the oai output? We could try sending the feed in a different format but Primo is really set up for dc .. it would require a lot of mapping to make a different one work ..</p>
+
+
+
+<a name="617206938"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617206938" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617206938">(Aug 18 2026 at 13:32)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> I probably should have said this over a year ago when you started this thread but could you please create an issue describing your use case? It makes sense to me!</p>
+
+
+
+<a name="617248480"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617248480" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617248480">(Aug 18 2026 at 16:21)</a>:</h4>
+<p>Yes will do .. I probably should have done that before! <span aria-label="slight smile" class="emoji emoji-1f642" role="img" title="slight smile">:slight_smile:</span> I was just curious if anyone else had figured out a cool way to accomplish this. I do see that Juan (above) has managed to hard-code the dc:rights field .. so we may try that for now.</p>
+
+
+
+<a name="617248628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617248628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617248628">(Aug 18 2026 at 16:21)</a>:</h4>
+<p>Sure, sure. If you get something working, please feel free to make a pull request!</p>
+
+
+
+<a name="617366019"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617366019" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617366019">(Aug 19 2026 at 06:07)</a>:</h4>
+<p>Hi <span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> , <br>
+We have some new changes in the DublinCoreExportUtilClass and now the dc:rights is not harcoded. <br>
+The dc:rights metadata is taken from the dataset version reusing code from the DataCite metadata: <br>
+<a href="https://edatos.consorciomadrono.es/oai?verb=ListRecords&amp;metadataPrefix=oai_dc">https://edatos.consorciomadrono.es/oai?verb=ListRecords&amp;metadataPrefix=oai_dc</a><br>
+You can see the code here in the lines 260-291: <a href="https://github.com/Consorcio-Madrono/dataverse/blob/v6.11Madrono/src/main/java/edu/harvard/iq/dataverse/export/dublincore/DublinCoreExportUtil.java">https://github.com/Consorcio-Madrono/dataverse/blob/v6.11Madrono/src/main/java/edu/harvard/iq/dataverse/export/dublincore/DublinCoreExportUtil.java</a></p>
+
+
+
+<a name="617560548"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617560548" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617560548">(Aug 19 2026 at 22:25)</a>:</h4>
+<p>Oh hmm this is interesting .. so what gets written to dc:type is based on whether there are restricted access files and/or if request access to the files is enabled?</p>
+
+
+
+<a name="617751259"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617751259" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617751259">(Aug 20 2026 at 17:23)</a>:</h4>
+<p>thanks for the code change idea .. i was able to do a similar thing .. modify the OAI export to read the Kind of Data field (where we currently have the label to show NOT open access) and if that is there, add that label to the <code>dc:rights</code> OAI feed field and export that .. I will have to rebuild the war file every time we upgrade, but i'm also going to put a ticket in asking for something like this as a permanent solution</p>
+
+
+
+<a name="617759432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617759432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617759432">(Aug 20 2026 at 18:00)</a>:</h4>
+<p>You are right, we use the dc:rights to indicate the open/embargoed/closed access to the dataset, I didn't see that you wanted to use the dc:type. I also think that having a permanent solution in the Dataverse code is a good idea.</p>
+
+
+
+<a name="617990091"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617990091" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617990091">(Aug 21 2026 at 18:07)</a>:</h4>
+<p>oops i wrote dc:type and meant dc:rights .. dc:type is defaulted to "Dataset" .. we are using dc:rights since it isn't in the feed otherwise .. i will submit a ticket requesting .. perhaps that dc:rights field could just display all of the licenses applied to the dataset and one of those could be a custom label? idk?</p>
+
+
+
+<a name="617990393"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617990393" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617990393">(Aug 21 2026 at 18:08)</a>:</h4>
+<p>Generally, I like it when the issue doesn't specify the solution.</p>
+<p>I mean, it doesn't hurt to suggest some options, but I'm usually more interested in the pain point.</p>
+
+
+
+<a name="617993115"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617993115" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617993115">(Aug 21 2026 at 18:21)</a>:</h4>
+<p>got it .. I don't know the solution anyway</p>
+
+
+
+<a name="617993431"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617993431" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617993431">(Aug 21 2026 at 18:23)</a>:</h4>
+<p>We used to have this whole pattern.</p>
+<p>"As a [type of user], I [description of problem]".</p>
+
+
+
+<a name="617993595"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617993595" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617993595">(Aug 21 2026 at 18:24)</a>:</h4>
+<p>"As a contributor, I'd like the dev environment to allow uploading files (LocalStack instead of AWS with credentials)" -- <a href="https://github.com/IQSS/dataverse-frontend/issues/1056">https://github.com/IQSS/dataverse-frontend/issues/1056</a></p>
+<p>Maybe a bad example because I'm suggesting a solution there. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="617993753"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/617993753" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#617993753">(Aug 21 2026 at 18:25)</a>:</h4>
+<p>Anyway, I do love it when you all open issues and they are expressed in your own words, unfiltered by us.</p>
+
+
+
+<a name="618643423"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618643423" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618643423">(Aug 24 2026 at 19:18)</a>:</h4>
+<p><a href="https://github.com/IQSS/dataverse/issues/12641">https://github.com/IQSS/dataverse/issues/12641</a></p>
+
+
+
+<a name="618644108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618644108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618644108">(Aug 24 2026 at 19:21)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> looks great. I added a link back to this topic in Zulip.</p>
+<p>oai_dc is the only format you care about for this, right? If so, can you please add that to the title?</p>
+
+
+
+<a name="618647357"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618647357" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618647357">(Aug 24 2026 at 19:38)</a>:</h4>
+<p>For our use case this is specifically about the  <code>oai_dc</code> feed. Primo harvests our Dataverse records with <code>oai_dc</code>, and that is the standard format our current Primo configuration is built around. Using a different metadata format would require us to create and maintain a custom mapping in Primo and could have other implications for the harvest, so changing formats isn't a good solution. There may be similar use cases involving other export formats, but for this ticket I think it makes sense to focus the request to <code>oai_dc</code>.</p>
+
+
+
+<a name="618647563"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618647563" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618647563">(Aug 24 2026 at 19:39)</a>:</h4>
+<p>Cool. Often a smaller, more focused issue is better, anyway. Thanks for updating the title!</p>
+
+
+
+<a name="618648039"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618648039" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618648039">(Aug 24 2026 at 19:42)</a>:</h4>
+<p><span class="user-mention" data-user-id="663397">@Juan</span> do you want to go ahead and create a pull request that closes <a href="https://github.com/IQSS/dataverse/issues/12641">#12641</a>? Can you make the solution cover both your use case and Deirdre's?</p>
+
+
+
+<a name="618653432"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618653432" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618653432">(Aug 24 2026 at 20:12)</a>:</h4>
+<p>Well, our solutions are different .. although we are both using the <code>dc:rights</code> field .. we are using the value in one field (Data Type) to populate the <code>dc:rights</code>. They are using file restrictions or access control state to populate it. I don't think we could use their solution as some of our datasets are metadata only. </p>
+<p>Is there a way to just populate the dc:rights field with the selected license name, and perhaps add a "Custom Label" option?</p>
+<p>IDK .. there I go speculating solutions again! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="618653926"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618653926" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618653926">(Aug 24 2026 at 20:15)</a>:</h4>
+<p>Ha, no the ideas are good!</p>
+
+
+
+<a name="618653984"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618653984" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618653984">(Aug 24 2026 at 20:16)</a>:</h4>
+<p>Sorry I guess I was just hoping for a single fix. Sounds complicated.</p>
+
+
+
+<a name="618656434"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618656434" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618656434">(Aug 24 2026 at 20:30)</a>:</h4>
+<p><span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span> ooo, did you see Jim's idea of creating a custom exporter?</p>
+
+
+
+<a name="618658266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618658266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618658266">(Aug 24 2026 at 20:42)</a>:</h4>
+<p>yes I looked at that briefly before our code modification .. that would be a great solution but I was unsure of how it worked .. i think we can use that if an external exporter registered as <code>oai_dc</code> can replace the built-in OAI-DC exporter used for OAI-PMH harvesting .. I put a question on there about it .. and i will look into that more as well .. that could be our solution .. thanks!</p>
+
+
+
+<a name="618658440"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618658440" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618658440">(Aug 24 2026 at 20:43)</a>:</h4>
+<p>You're right. You have to replace the entire exporter.</p>
+
+
+
+<a name="618658553"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618658553" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618658553">(Aug 24 2026 at 20:44)</a>:</h4>
+<p>Or create a new one, I guess. If you can point Primo at it.</p>
+
+
+
+<a name="618662899"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/618662899" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#618662899">(Aug 24 2026 at 21:01)</a>:</h4>
+<p>okay i'll look into that .. i'm honestly not sure how much work it would be on the Primo side but I'll find out .. would be better than modifying the war file.</p>
+
+
+
+<a name="621001263"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/621001263" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Juan <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#621001263">(Sep 02 2026 at 12:43)</a>:</h4>
+<p>Sorry for the late response—I was on vacation and then catching up on all the information here and on GitHub.</p>
+<p>As you mentioned, finding a comprehensive global solution is tricky.</p>
+<p>A potential option that can cover <span class="user-mention" data-user-id="598843">@Deirdre Kirmis</span>  needs is using the COAR vocabularies (<a href="https://vocabularies.coar-repositories.org/access_rights/printable/">https://vocabularies.coar-repositories.org/access_rights/printable/</a>). However, this doesn't  address complex cases like those indicated on GitHub (such as files with different access levels or distinguishing between closed and restricted access). Another challenge is that DC doesn't handle identifiers particularly well.</p>
+<p>Creating a new exporter could be also complex. I am sorry but I think that I can't be useful in searching a global solution.</p>
+
+
+
+<a name="621055801"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/OAI%20feed%20change/near/621055801" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/OAI.20feed.20change.html#621055801">(Sep 02 2026 at 15:19)</a>:</h4>
+<p>No worries .. thank you for the suggestion. I think the best option for us at this point is just adding a little custom code and rebuilding the war file after upgrading. That is working for now, and it is not as complicated as I thought it would be. For now that is our plan.</p>
+
+
+
+<hr><p>Last updated: Sep 05 2026 at 18:45 UTC</p>
+</html>

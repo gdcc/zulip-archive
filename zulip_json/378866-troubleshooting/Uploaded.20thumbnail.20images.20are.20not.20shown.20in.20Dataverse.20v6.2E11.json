@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>There is a behavioral difference between Dataverse v6.5 and Dataverse v6.11 that appears to be a bug. After uploading a thumbnail image to a dataset, it cannot be viewed from either the dataset page or the dataverse page.</p>\n<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"659x545\" data-original-src=\"/user_uploads/53090/nXw_H4A43DYnUtmCQqMAF7ZZ/image.png\" src=\"/user_uploads/thumbnail/53090/nXw_H4A43DYnUtmCQqMAF7ZZ/image.png/840x560.webp\"></p>\n<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"659x545\" data-original-src=\"/user_uploads/53090/LUyMrrG7NeHU1-sT2OXOyJfc/image.png\" src=\"/user_uploads/thumbnail/53090/LUyMrrG7NeHU1-sT2OXOyJfc/image.png/840x560.webp\"></p>\n<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"659x545\" data-original-src=\"/user_uploads/53090/vxPVtOAtrX8qUxoue1Ygvw0Y/image.png\" src=\"/user_uploads/thumbnail/53090/vxPVtOAtrX8qUxoue1Ygvw0Y/image.png/840x560.webp\"></p>\n<p>This issue occurs because <code>getThumbnailUrl()</code> in <code>Dataset.java</code> checks that <code>thumbnailFile</code> is not <code>null</code>:</p>\n<div class=\"codehilite\"><pre><span></span><code>public String getThumbnailUrl() {\n    return thumbnailFile != null ? SystemConfig.getDataverseSiteUrlStatic() + \"/api/datasets/\" + this.getId() + \"/logo\" : null;\n}\n</code></pre></div>\n<p>However, after uploading a thumbnail image, <code>thumbnailFile</code> is explicitly set to <code>null</code>:</p>\n<p>Java</p>\n<div class=\"codehilite\"><pre><span></span><code>public Dataset setNonDatasetFileAsThumbnail(Dataset dataset, InputStream inputStream) {\n[....]\n    dataset = DatasetUtil.persistDatasetLogoToStorageAndCreateThumbnails(dataset, inputStream);\n    dataset.setThumbnailFile(null);\n    dataset.setUseGenericThumbnail(false);\n    return merge(dataset);\n}\n</code></pre></div>\n<p>I think that the <code>getThumbnailUrl()</code> method should check <code>!useGenericThumbnail</code> instead of <code>thumbnailFile != null</code>.</p>",
+        "id": 621040903,
+        "sender_full_name": "Juan",
+        "timestamp": 1788359849
+    },
+    {
+        "content": "<p>Hmm, do you think the behavior changed to due <a href=\"https://github.com/IQSS/dataverse/issues/12403\">#12403</a> which was included in 6.11?</p>",
+        "id": 621078620,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788366158
+    },
+    {
+        "content": "<p>Yes, sure. Before these changes , the file was accessed from the ThumbnailServiceWrapper.java without checking the  contents  of the<code>thumbnailFile</code> variable.<br>\n<code>String url = SystemConfig.getDataverseSiteUrlStatic() + \"/api/datasets/\" + dataset.getId() + \"/logo\";</code></p>\n<p>Now, it checks for <code>null</code> first  in the Dataset.java file:<br>\n<code>return thumbnailFile != null ? SystemConfig.getDataverseSiteUrlStatic() + \"/api/datasets/\" + this.getId() + \"/logo\" : null;</code></p>",
+        "id": 621164983,
+        "sender_full_name": "Juan",
+        "timestamp": 1788384991
+    },
+    {
+        "content": "<p>Gotcha. Thanks.</p>\n<p>For the dataset page, I can see the dataset-thumbnail as the author but not when I'm logged out:</p>\n<p><img alt=\"Screenshot 2026-09-03 at 7.42.31 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"2856x1182\" data-original-src=\"/user_uploads/53090/W7Uv-Pd70UxIDmYqno2urA3G/Screenshot-2026-09-03-at-7.42.31AM.png\" src=\"/user_uploads/thumbnail/53090/W7Uv-Pd70UxIDmYqno2urA3G/Screenshot-2026-09-03-at-7.42.31AM.png/840x560.webp\"></p>\n<p>Do you see the same?</p>",
+        "id": 621354754,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788435907
+    },
+    {
+        "content": "<p>Thanks,<br>\nIn my case, I do not see the logo in both cases.  Only I can see the logo from the \"Thumbnails + Widgets\" edition page .</p>",
+        "id": 621356706,
+        "sender_full_name": "Juan",
+        "timestamp": 1788436325
+    },
+    {
+        "content": "<p>Interesting. Are you thinking about creating an issue or pull request?</p>",
+        "id": 621382272,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788441240
+    },
+    {
+        "content": "<p>Ok, I will create the issue and the pull request.</p>",
+        "id": 621383480,
+        "sender_full_name": "Juan",
+        "timestamp": 1788441483
+    },
+    {
+        "content": "<p>Thanks! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 621385882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788441952
+    },
+    {
+        "content": "<p>Created the issue: <a href=\"https://github.com/IQSS/dataverse/issues/12666\">#12666</a> and pull request <a href=\"https://github.com/IQSS/dataverse/pull/12667\">#12667</a></p>",
+        "id": 621405426,
+        "sender_full_name": "Juan",
+        "timestamp": 1788445401
+    },
+    {
+        "content": "<p>Wow, both! Thanks!</p>",
+        "id": 621445905,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788452777
+    }
+]

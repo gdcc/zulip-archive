@@ -1,0 +1,107 @@
+<html>
+<head><meta charset="utf-8"><title>HTTP 500 during multipart upload finalization (~25 GB file) · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html">HTTP 500 during multipart upload finalization (~25 GB file)</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="621188574"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621188574" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Manaswini Ganjam <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621188574">(Sep 02 2026 at 23:45)</a>:</h4>
+<p>Hi everyone,</p>
+<p>I am uploading a large dataset to Harvard Dataverse using DVUploader v1.4.0 in direct-upload mode from a university HPC data transfer node.</p>
+<p>I am encountering an HTTP 500 error during the finalization of a multipart upload, and I am hoping someone familiar with the Dataverse/S3 upload pipeline can help determine whether this is a known issue.</p>
+<ul>
+<li>Total dataset size: ~957 GB</li>
+<li>DVUploader: v1.4.0</li>
+<li>Upload mode: Direct upload</li>
+<li>Failed file: zip file (~25 GB)</li>
+<li>Multipart parts: 25</li>
+</ul>
+<p>The upload proceeds normally through the S3 multipart stage:</p>
+<ul>
+<li>All 25 parts uploaded successfully to the Dataverse S3 bucket.</li>
+<li>Each part reached 100% and returned a valid ETag.</li>
+<li>The subsequent Dataverse request to complete/finalize the multipart upload returned HTTP 500.</li>
+<li>The file was consequently not registered in the dataset.</li>
+</ul>
+<ol>
+<li>
+<ul>
+<li>The DVUploader log reports: “Partial upload of [...]/beam_rad_annual_conus_tiles.zip, complete upload failed with status: 500”</li>
+</ul>
+</li>
+<li>followed by:   “Not uploaded due to error during processing.”</li>
+</ol>
+<p>Unfortunately, DVUploader does not appear to log the response body from the HTTP 500, so I do not have the server-side exception.</p>
+<p>I previously encountered a different error (SignatureDoesNotMatch) during another large-file upload, but the current failure is specifically an HTTP 500 after all multipart parts have successfully uploaded.</p>
+<p>I am particularly interested in whether anyone has encountered this sequence:</p>
+<p>S3 multipart parts successfully uploaded → Dataverse multipart completion/finalization → HTTP 500 → file not registered</p>
+<p>and whether there are known limitations related to file size (~25 GB), number of multipart parts (25), or the Dataverse finalization/registration step.</p>
+<p>I have approximately 39 archives, averaging ~24 GB each to upload. If anyone has suggestions for additional logging, relevant Dataverse configuration, known issues, or a GitHub issue that matches this behavior, I would greatly appreciate the guidance.</p>
+<p>Thank you,<br>
+Manaswini</p>
+
+
+
+<a name="621350831"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621350831" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621350831">(Sep 03 2026 at 11:30)</a>:</h4>
+<p><span class="user-mention" data-user-id="1195694">@Manaswini Ganjam</span> hi! Thanks for all the details. Can you please send them to <a href="mailto:support@dataverse.harvard.edu">support@dataverse.harvard.edu</a>? This will generate a ticket and once the problem is solved we can summarize here in Zulip.</p>
+
+
+
+<a name="621386408"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621386408" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621386408">(Sep 03 2026 at 13:27)</a>:</h4>
+<p>Oh good, you also posted to <a href="https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ</a></p>
+
+
+
+<a name="621454233"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621454233" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Manaswini Ganjam <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621454233">(Sep 03 2026 at 16:55)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  Hi, I submitted a ticket and the response is below.  <br>
+Response: Hi Manaswini,<br>
+Yes, I understand the problem with dv-uploader. Let me see if someone can look<br>
+at this when they have time. No guarantees, since the team is in the middle of<br>
+a release. You may want to connect with the Google community or the Dataverse<br>
+Zulip community and ask your question there and see if anyone has encountered<br>
+the same problem before.</p>
+<p>What I am saying is that, since the project is so large, you would not have to<br>
+deal with DV uploader issues if you used the paid storage option. It's $11/TB<br>
+per year, plus 30% overhead on the total price. Minimum 6 years of storage. But<br>
+if you would rather wait for a solution, that is completely an option.<br>
+Regards</p>
+
+
+
+<a name="621475677"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621475677" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621475677">(Sep 03 2026 at 18:08)</a>:</h4>
+<p>Ah, in <a href="https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045">https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045</a> . Thanks.</p>
+<p>As stated, we're trying to get a release out. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span> See <a class="stream-topic" data-stream-id="375707" href="/#narrow/channel/375707-community/topic/Release.206.2E12.20Timeline/with/615705804">#community &gt; Release 6.12 Timeline</a> </p>
+<p>What's your take on the responses you've gotten so far at <a href="https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ</a> ?</p>
+
+
+
+<a name="621492668"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621492668" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Manaswini Ganjam <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621492668">(Sep 03 2026 at 19:09)</a>:</h4>
+<p>I believe the responses are suggesting admin-side config change (<code>DataFileChecksumValidationSizeLimit</code> + disabling <code>FileValidationOnPublishEnabled</code>), and checksum computation on a 25 GB file finalizing server-side is a very plausible timeout culprit for an HTTP 500 that happens right at completion. But I will need Harvard's Dataverse admins to apply it. I submitted the intake form for large data.</p>
+
+
+
+<a name="621717991"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621717991" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621717991">(Sep 04 2026 at 13:52)</a>:</h4>
+<p>Right, hmm. I think it's unlikely we'll turn off <code>FileValidationOnPublishEnabled</code> on Harvard Dataverse. I'm not sure if we have <code>DataFileChecksumValidationSizeLimit</code> set or not. The person would who advise on the technical side is on vacation, it being Labor Day weekend and all. We he gets back I'll ask him to look at <a href="https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045">your ticket</a>. Meanwhile, thanks for submitting the large data intake form. (The person who reads those is also on vacation, though.)</p>
+
+
+
+<a name="621725328"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/HTTP%20500%20during%20multipart%20upload%20finalization%20%28~25%20GB%20file%29/near/621725328" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/HTTP.20500.20during.20multipart.20upload.20finalization.20.28~25.20GB.20file.29.html#621725328">(Sep 04 2026 at 14:22)</a>:</h4>
+<p>Oh, I see Jim replied as well: <a href="https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/4fgJJ9E_BgAJ">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/4fgJJ9E_BgAJ</a></p>
+<p>He's the author of DVUploader and worked a lot on this part of the backend as well.</p>
+
+
+
+<hr><p>Last updated: Sep 05 2026 at 18:45 UTC</p>
+</html>

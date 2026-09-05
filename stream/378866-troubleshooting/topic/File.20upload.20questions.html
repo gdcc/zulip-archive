@@ -1,0 +1,116 @@
+<html>
+<head><meta charset="utf-8"><title>File upload questions · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html">File upload questions</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="618394094"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618394094" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618394094">(Aug 24 2026 at 15:40)</a>:</h4>
+<p>Hello, </p>
+<p>We had a large upload over the weekend and our server misbehaved because of it.   We've since reduced our upload limits to help with these situations til we figure this out, but have a few questions. </p>
+<p>1) does DV it try to upload all files at once, or queue them in the case that there are 1000 files in one upload?  We are wondering how many connections the server needs to have available to service uploads.  Many of these files were 3-4 GB tif files -- perhaps thumbnail processing caused a bottleneck?</p>
+<p>2) this dataset (still draft) has 154,000 files and the dataset page loads slowly (30s). Is the slowness mostly likely due to Solr?   We are not seeing a huge CPU load when loading the page.   Just wondering what is going on behind the scenes and how to optimize this. </p>
+<p>We probably need to fine tune things, and just need to figure out what.  Thanks for any help!</p>
+
+
+
+<a name="618395924"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618395924" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618395924">(Aug 24 2026 at 15:47)</a>:</h4>
+<p>154,000 files?! Um. That's a lot! I owe you a better reply but for now, please take a look at <a href="https://guides.dataverse.org/en/6.11/admin/big-data-administration.html#avoiding-many-files">https://guides.dataverse.org/en/6.11/admin/big-data-administration.html#avoiding-many-files</a></p>
+<p>I'm wondering if you can store the files as a zip and use the zip previewer/downloader. Also from that page:</p>
+<p>Dataverse can be configured to use a “Zip File Previewer” that allows users to see the contents of a zip file and even download individual files from within it (see <a href="https://guides.dataverse.org/en/6.11/user/dataset-management.html#compressed-files">Compressed Files</a>).</p>
+
+
+
+<a name="618396201"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618396201" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618396201">(Aug 24 2026 at 15:49)</a>:</h4>
+<p>Thanks, Philip. I'm not sure if they uploaded them in batches - hopefully they did.</p>
+
+
+
+<a name="618645966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618645966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618645966">(Aug 24 2026 at 19:30)</a>:</h4>
+<p>I am curious -- how often, in your experience, have you run across a super large number of files in a dataset?</p>
+
+
+
+<a name="618646538"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618646538" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618646538">(Aug 24 2026 at 19:33)</a>:</h4>
+<p>Hmm, it's a better question for <span class="user-mention" data-user-id="637063">@Leo Andreev</span>. He tells us about them. Pretty often, I think! But this setting should help:</p>
+<ul>
+<li><a href="https://guides.dataverse.org/en/6.11/installation/config.html#multipleuploadfileslimit">:MultipleUploadFilesLimit</a> - the number of files the GUI user is allowed to upload in one batch, via drag-and-drop, or through the file select dialog</li>
+</ul>
+
+
+
+<a name="618646900"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618646900" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618646900">(Aug 24 2026 at 19:35)</a>:</h4>
+<p>It looks like Harvard Dataverse allows 1000 files:</p>
+<p><img alt="Screenshot 2026-08-24 at 3.34.47 PM.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="639x160" data-original-src="/user_uploads/53090/g6dy9z_X4ZjZtkSGjYKEhw0v/Screenshot-2026-08-24-at-3.34.47PM.png" src="/user_uploads/thumbnail/53090/g6dy9z_X4ZjZtkSGjYKEhw0v/Screenshot-2026-08-24-at-3.34.47PM.png/840x560.webp"></p>
+
+
+
+<a name="618647188"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618647188" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618647188">(Aug 24 2026 at 19:37)</a>:</h4>
+<p>Thanks! I changed ours this morning to be similar, so that will help some.</p>
+
+
+
+<a name="618647322"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/618647322" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#618647322">(Aug 24 2026 at 19:38)</a>:</h4>
+<p>It looks like it's possible to set a total number of files via API: <a href="https://guides.dataverse.org/en/6.11/api/native-api.html#storage-quotas-on-individual-datasets">https://guides.dataverse.org/en/6.11/api/native-api.html#storage-quotas-on-individual-datasets</a></p>
+<p>I'm seeing <code>"numberOfFilesRemaining": 20,</code></p>
+
+
+
+<a name="619373922"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/619373922" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#619373922">(Aug 26 2026 at 20:04)</a>:</h4>
+<p>Hi Philip - is the Harvard system also limited to 1000 files in a zip file?  So it's 1000 across the board, either zipped up or through drag/drop?</p>
+
+
+
+<a name="619374584"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/619374584" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#619374584">(Aug 26 2026 at 20:09)</a>:</h4>
+<p>Well, the settings says this...</p>
+<ul>
+<li><a href="https://guides.dataverse.org/en/6.11/installation/config.html#zipuploadfileslimit">:ZipUploadFilesLimit</a> - the maximum number of files allowed in an uploaded zip file - only relevant for file stores and S3 when direct upload is not used.</li>
+</ul>
+<p>... which means it isn't relevant for Harvard Dataverse, which uses S3 direct upload.</p>
+
+
+
+<a name="619375085"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/619375085" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#619375085">(Aug 26 2026 at 20:11)</a>:</h4>
+<p>So in practice, I'm pretty sure a zip can have an unlimited number of files.</p>
+
+
+
+<a name="619647857"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/619647857" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#619647857">(Aug 27 2026 at 20:44)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="737390">Bethany Seeger</span> <a href="#narrow/channel/378866-troubleshooting/topic/File.20upload.20questions/near/618394094">said</a>:</p>
+<blockquote>
+<p>1) does DV it try to upload all files at once, or queue them in the case that there are 1000 files in one upload?</p>
+</blockquote>
+<p><span class="user-mention" data-user-id="737390">@Bethany Seeger</span> are these uploads happening via the web interface? Or via API?</p>
+
+
+
+<a name="621155200"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/621155200" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Bethany Seeger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#621155200">(Sep 02 2026 at 20:54)</a>:</h4>
+<p>They are happening via the web interface, I believe - via a zip file.</p>
+
+
+
+<a name="621348972"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/File%20upload%20questions/near/621348972" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/File.20upload.20questions.html#621348972">(Sep 03 2026 at 11:22)</a>:</h4>
+<p>Interesting. So the zips files are unzipped, then, resulting in lots and lots of files?</p>
+
+
+
+<hr><p>Last updated: Sep 05 2026 at 18:45 UTC</p>
+</html>

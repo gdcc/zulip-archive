@@ -1,0 +1,266 @@
+[
+    {
+        "content": "<p>Hey everyone, at a particular Dataverse instance (<a href=\"https://ssh.datastations.nl\">https://ssh.datastations.nl</a>) users are able to login with an institutional account (SURFconext, which supports both OIDC and SAML). For a service I'm developing for this DV instance I want to use this institutional account to make API calls for that user (mainly: does user have access to this data? If so, allow to download). I understand the user can do this himself using the API-key (generated via a webinterface).</p>\n<p>I want to avoid my service having any knowledge of the API-key and instead use the (federative) institutional login to authenticate the service to fetch data from this DV instance on his behalf. AFAICT from the docs, this is not possible.</p>\n<p>Two questions: 1) is there a way to do this currently in DV (have their been use cases before perhaps?), 2) If not, there must be some link between the institutional account &lt;-&gt; DV internal account. Is there a way to programmatically get a handle this?</p>",
+        "id": 418286983,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706279553
+    },
+    {
+        "content": "<p>To give a bit of context: this service is a collaborative effort between the hosting DV party and the institute I work at. If there needs to be consensus on what this service is allowed to do on behalf of the user; that can be agreed upon</p>",
+        "id": 418287324,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706279650
+    },
+    {
+        "content": "<p>Hmm, would bearer tokens help here? <a href=\"https://guides.dataverse.org/en/6.1/api/auth.html#bearer-tokens\">https://guides.dataverse.org/en/6.1/api/auth.html#bearer-tokens</a></p>",
+        "id": 418288776,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706280129
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> or <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> know more about them than I do. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 418288819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706280147
+    },
+    {
+        "content": "<p>Yap, that  more or less our use case. We enabled only OIDC signup (ensure that each user is an OIDC user); enabled OIDC bearer tokens via feature flag and can happily interact with dataverse using access tokens from our IdP. The open challenges are signup (the user must create an account via dataverse UI), and propagation of property changes within the IdP (they are only read once during account creation...). Besides those issues it works really great :).</p>",
+        "id": 418290144,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706280582
+    },
+    {
+        "content": "<p>Very cool, Johannes! That sounds very much like what I was looking for. So as long as the OIDC user has signed in once in Dataverse (i.e. registered) through the IdP, any service that support that same OIDC user can make requests to DV on behalf of that user?</p>",
+        "id": 418291602,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706281085
+    },
+    {
+        "content": "<p>Yes.</p>",
+        "id": 418291848,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706281164
+    },
+    {
+        "content": "<p>Cool! That's already very useful. Do you know if there as a way to make the registration part of the authentication process: \"if a user doesn't already have a dataverse account, click here to make the link\". That would save a user to separately go to the DV portal, log in again with OIDC and go back to the 'on-behalf service'</p>",
+        "id": 418292386,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706281322
+    },
+    {
+        "content": "<p>You can use this <a href=\"http://preview.guides.gdcc.io/en/develop/api/native-api.html#create-an-authenticated-user\">API</a> to create a user account . However, this call need admin rights and hence cannot be invoked by the user needing the account.</p>",
+        "id": 418295849,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706282369
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> : We could extend the <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/auth/BearerTokenAuthMechanism.java\">BearerTokenAuthMechanism</a> to create an account if not existing. Possible hiding the function behind a configuration flag. What do you think about that?</p>",
+        "id": 418296533,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706282567
+    },
+    {
+        "content": "<p>I like the idea of hiding it behind a feature flag for now. <span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> would you create a PR?</p>",
+        "id": 418297249,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706282767
+    },
+    {
+        "content": "<p>Sure do, I have some free time this weekend :) Would that approach help you <span class=\"user-mention\" data-user-id=\"686955\">@Ahmad Hesam</span> ?</p>",
+        "id": 418298796,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706283197
+    },
+    {
+        "content": "<p>I pointed Jim Myers to this thread and he indicated he's giving a talk at <a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/stream/375707-community/topic/.23dataverse2024\">#community &gt; #dataverse2024</a> in Mexico entitled \"Using OIDC to Support Dataverse Integrations in a Research Commons Environment\"</p>",
+        "id": 418298836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706283210
+    },
+    {
+        "content": "<p>Here's the abstract: \"Modern research environments, like research “commons”, allow users to combine data and compute resources to pursue their research goals. In these settings, the interaction between applications can occur asynchronously rather than only when the user is logged in. Dataverse’s API keys provide one mechanism for supporting asynchronous authentication by a trusted application to, for example, retrieve restricted data for use in a computation. However, API keys are non-standard and potentially insecure, and there is no automatic way to transfer a key. Offline tokens, as defined in the OpenID Connect (OIDC) standard, are a potential alternative. OIDC is one of the available options for authentication in Dataverse and is expected to become the preferred option when using the new single-page front-end. The Qualitative Data Repository (QDR) at Syracuse University already uses OIDC and the Keycloak OIDC Broker to support single-sign-on between Dataverse and QDR’s content management system. It is also now using OIDC’s offline token mechanism instead of API keys as a means of supporting long-term and asynchronous access to the QDR Dataverse instance from within a Gen3-based Data Commons environment developed to support the US National Institutes of Health (NIH) Helping to End Addiction Long-term® (HEAL) Initiative. Offline tokens allow a user to log into QDR from the HEAL platform and for the platform to request and store an offline token which can then be used as needed over time to allow the platform to access QDR data on behalf of the user. This talk will overview the OIDC offline token mechanism, describe how it has been configured and is being used by QDR to support HEAL use cases, and outline the usability and security benefits OIDC offline tokens have relative to API keys. We will also discuss how the combination of OIDC offline tokens and Dataverse’s ability to generate signed URLs for less trusted applications, may ultimately be a replacement for Dataverse’s API key mechanism.\"</p>",
+        "id": 418298899,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706283230
+    },
+    {
+        "content": "<p>Good to here that more people are using the Tokens now!</p>",
+        "id": 418299247,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706283337
+    },
+    {
+        "content": "<p>So just to be sure I understand the PR correctly: a Dataverse admin would be able to configure globally that any incoming requests through the OIDC bearer token will be executed, regardless if a user has an DV account, because the account will now be automatically created based on the user data coming from the IdP?</p>",
+        "id": 418300426,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706283680
+    },
+    {
+        "content": "<p>Yes, the idea is: If a valid OIDC Token is presented to the system but no associated user account is present in dataverse (i.e valid IdP user that never used dataverse before). A dataverse account is generated for that users (identified by the Token) on the fly.</p>",
+        "id": 418301213,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706283921
+    },
+    {
+        "content": "<p>Great, then we are talking about the same thing indeed! I believe the DV instance I work with also has a T&amp;A that a user needs to agree with. Would this then implicitly be accepted? Or is there a way to forward this to the 'on-behalf service'?</p>",
+        "id": 418301604,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706284049
+    },
+    {
+        "content": "<p>Yes, every Dataverse instance has an <a href=\"https://guides.dataverse.org/en/6.1/installation/config.html#applicationtermsofuse\">application-wide terms of use</a> and when you create an account via the web interface, you have to check a box to agree with it.</p>",
+        "id": 418302885,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706284399
+    },
+    {
+        "content": "<p>Good point, implicit accepting the T&amp;C isn't a good idea. This means the sketched idea does not work as the user must actively accept the T&amp;C. Hence, we  need another approach...</p>",
+        "id": 418303735,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706284642
+    },
+    {
+        "content": "<p>Hmm there must be a way to direct the user to a T&amp;C page before granting access to the API. It's similar to how I just made my Zulip account: Github asked me if I accept sharing information with Zulip (could've been a T&amp;C) and I had to accept it before my Zulip account could be made</p>",
+        "id": 418304533,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706284872
+    },
+    {
+        "content": "<p>Well, that <a href=\"https://guides.dataverse.org/en/6.1/api/native-api.html#create-an-authenticated-user\">Create an Authenticated User</a> API you pointed out also doesn't allow users to accept terms. It's morally equivalent.</p>",
+        "id": 418304631,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706284916
+    },
+    {
+        "content": "<p>True.. although the registration request in that case would explicitly be coming from an admin if I understood Johannes correctly.</p>",
+        "id": 418305431,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706285154
+    },
+    {
+        "content": "<p>Ideally ( I think) you'd want to keep a whitelist of approved services to auto-agree the T&amp;C step on the user's behalf, with the trust that the service offers the T&amp;C from their side to be accepted</p>",
+        "id": 418305833,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706285269
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"686955\">@Ahmad Hesam</span> What you described is the <code>[promt=consent</code>](<a href=\"https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters\">https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters</a>). Maybe its a good idea to integrate the flow into the API usecase...</p>",
+        "id": 418308854,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706286233
+    },
+    {
+        "content": "<p>Ah nice, this is something Dataverse could impose on the auto-registration step indeed. I'm just not clear on how this consent would manifest itself on the service side. Would the user be directed to a 'consent page' that contains the T&amp;C statement and checkbox?</p>",
+        "id": 418310171,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706286591
+    },
+    {
+        "content": "<p>It must be a common story. Lots of services have some sort of T&amp;C you must agree to.</p>",
+        "id": 418311159,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706286910
+    },
+    {
+        "content": "<p>I never looked into this part, but <a href=\"https://www.keycloak.org/docs/latest/server_admin/#consent-related-settings\">this</a> looks quite good. This at least means the user approved a screen in keycloack...</p>",
+        "id": 418311583,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706287072
+    },
+    {
+        "content": "<p>What exactly is the role of keycloak in this case? Because keycloack can act as either an OIDC provider or as a kind of proxy to an OIDC client</p>",
+        "id": 418313041,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706287619
+    },
+    {
+        "content": "<p>Sorry, we (my usecase) uses keycloak as a IdP in production. Similarly keycloak is used during testing/development of dataverse (<a href=\"https://github.com/IQSS/dataverse/tree/develop/conf/keycloak\">see</a> and <a href=\"https://github.com/IQSS/dataverse/blob/develop/docker-compose-dev.yml\">here</a>). Hence, I looked into the options of that ODIC implementation.</p>",
+        "id": 418313966,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706287927
+    },
+    {
+        "content": "<p>Ah gotcha. But then wouldn't a solution to this T&amp;C prompt have to work for other IdPs as well? Or does the OIDC standard impose the same behavior across various IdPs?</p>",
+        "id": 418314681,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706288174
+    },
+    {
+        "content": "<p>If the latter is true, then I see a nice way to facilitate this flow :)</p>",
+        "id": 418315204,
+        "sender_full_name": "Ahmad Hesam",
+        "timestamp": 1706288355
+    },
+    {
+        "content": "<p>I've played around with the code and it could be implemented, but it's not as easy as I originally thought.</p>\n<p>However, we should not create an account without the explicit consent of the user.<br>\nThe [OIDC spec] (<a href=\"https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters\">https://openid.net/specs/openid-connect-basic-1_0.html#RequestParameters</a>) includes `promt=consent' for these use cases. We can easily build authentication requests, including the Promt parameter, using the<br>\nof the <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/oidc/OIDCAuthProvider.java#L175\">builAuthzUrl method</a>.<br>\nThe user is redirected to the IdP, has to agree to the use of properties for the registered client and we are done. At least the user has actively agreed. <br>\nThe tricky part is handling the IdP response, which is implemented <a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L94\">here</a>. <br>\nThe code flow is bound to the JSF pages and shows a special login page. We want a different behaviour for the API. <br>\nI'm not sure how to do this without changing or duplicating too much code....</p>",
+        "id": 418522537,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706464945
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I believe you have an idea :)</p>",
+        "id": 418522776,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706465162
+    },
+    {
+        "content": "<p>Nevermind, I got a PoC working. . For the PoC I used a dedicated URL to trigger the signup process.</p>",
+        "id": 418589309,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706518657
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/MoXo4YDourWYYruAmydoMGWC/PoC_OIDC_signup.mov\">PoC_OIDC_signup.mov</a><br>\nThe code is <a href=\"https://github.com/IQSS/dataverse/pull/10278\">here</a></p>",
+        "id": 418591111,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706519207
+    },
+    {
+        "content": "<p>Not too much code, really. Nice.</p>",
+        "id": 418634254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706534100
+    },
+    {
+        "content": "<p>The video is great.</p>",
+        "id": 418634381,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706534154
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> have you seen this?</p>",
+        "id": 418634418,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1706534162
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> : Sadly it's duplicated and security relevant code. Therefore, we should refactor the codebase a bit to avoid the duplication.</p>",
+        "id": 418636480,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706534859
+    },
+    {
+        "content": "<p>Great to see more activity around OIDC here!<br>\nJust a few comments:<br>\n1) Note that OIDC bearer tokens are hidden behind a feature flag at the moment. They are not considered mature enough for production but enable delivery of feature previews, use at your own risk.<br>\n2) It's nice to initialize the code auth flow using the API endpoint. Yet, I am not sure it fully covers the intended goal: an API endpoint is also intended to be used with a service not running in a browser, right? (For example: some Python script)<br>\n3) I like that this code extension allows skipping the signup form. This can probably be useful in the non-API-endpoint \"user clicks on login link\" scenario as well.<br>\n4) This should be coordinated or at least brought to the attention of <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> as this certainly is SPA relevant</p>",
+        "id": 418642218,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1706536741
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span> we just noticed in the docs that there are no docs for the API Bearer Token flag... Would you be able to provide a PR?</p>",
+        "id": 418660047,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1706541692
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> : Concerning 2) It't is the best we can do. The only alternative in the OAuth2/OIDC context would be a device auth flow. Do we really expect API clients that cannot open a browser and do we wan't them to create user accounts?  Besides, how can an API client authenticate users via OIDC if it cannot open a browser? The only options I know, are the device auth flow and resource owner credentials flow. The latter is deprecated and shall not be used according to <a href=\"https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#name-resource-owner-password-cre\">this document.</a> and the former requires a browser session potentially on another device.</p>",
+        "id": 418778981,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1706598648
+    },
+    {
+        "content": "<p>I agree - best effort we can make. Just saying we should manage expectations and document the limitations.</p>",
+        "id": 418782491,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1706600853
+    }
+]

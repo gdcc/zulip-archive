@@ -1,0 +1,194 @@
+[
+    {
+        "content": "<p>I'm on an M2 Mac and trying to build the base image from the <code>8305-payara6-ee10-v3</code> branch.</p>\n<p>I'm seeing \"Command start-domain failed\" and <code>[INFO] DOCKER&gt; ERROR: failed to solve: process \"/bin/bash -euo pipefail -c     # Set admin password</code></p>",
+        "id": 378471263,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690290943
+    },
+    {
+        "content": "<p>Here's the output: <br>\n<a href=\"/user_uploads/53090/0Nevzg2VDhfCPY1NLD0XRjDD/p6builderr.txt\">p6builderr.txt</a></p>",
+        "id": 378471409,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690290965
+    },
+    {
+        "content": "<p>Any ideas? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 378471516,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690290987
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"601950\">@Thomas van Erven</span> since you mentioned M1/M2, lemme know if you have time to try to reproduce this. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 379260640,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690481681
+    },
+    {
+        "content": "<p>I'll ask a colleague next Monday; I don't have a M2 nor have intentions to use it : )</p>",
+        "id": 379449801,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1690540532
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/can't.20build.20Payara.206.20base.20image/near/378471516\">said</a>:</p>\n<blockquote>\n<p>Any ideas? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>\n</blockquote>\n<p>I thought you all were building with Ubuntu? That matches the stack trace Payara generated on fresh installs when the latest RHEL-packaged OpenJDK failed to include <code>tzdata-java</code> as a dependency.</p>",
+        "id": 379475848,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1690545379
+    },
+    {
+        "content": "<p>Yes, the base image is Ubuntu but from my Mac (M2 at home and Intel at work), I've been running this to build the base image locally:</p>\n<p><code>mvn -Pct -f modules/container-base install</code></p>\n<p>It works on the intel Mac but not the M2. I'm not sure why.</p>",
+        "id": 380315578,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1690805372
+    },
+    {
+        "content": "<p>I looked into your error log</p>",
+        "id": 383260493,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691583809
+    },
+    {
+        "content": "<p>Did you see that there was a Java EE OSGI error refusing to load &gt;6.0?</p>",
+        "id": 383260637,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691583833
+    },
+    {
+        "content": "<p>2 messages were moved here from <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/base.20image.20build.20matrix\">#containers &gt; base image build matrix</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 383260958,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1691583896
+    },
+    {
+        "content": "<p>No, I didn't notice that.</p>",
+        "id": 383262339,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691584159
+    },
+    {
+        "content": "<p>Should we try building an arm image using GitHub Actions?</p>",
+        "id": 383262454,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691584179
+    },
+    {
+        "content": "<p>I'm not sure what you mean - we do build ARM images using GHA already?</p>",
+        "id": 383264750,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691584577
+    },
+    {
+        "content": "<p>For PRs we build app and configbaker but not base: <a href=\"https://github.com/IQSS/dataverse/pull/9685#issuecomment-1670371449\">https://github.com/IQSS/dataverse/pull/9685#issuecomment-1670371449</a></p>",
+        "id": 383279087,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691586895
+    },
+    {
+        "content": "<p>Oh. Yeah. True. Should we do that? Is it worth the extra minutes? We would need to push the image to some registry though - we can't keep both architectures in the local cache</p>",
+        "id": 383283655,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691587687
+    },
+    {
+        "content": "<p>We could push a P6 image manually for the time being to some place. It's not like we are altering much in the base image so far.</p>",
+        "id": 383283998,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691587754
+    },
+    {
+        "content": "<p>Yes, we should push the base image somewhere.</p>",
+        "id": 383342786,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691597396
+    },
+    {
+        "content": "<p>Not necessarily on every commit. Maybe manually with workflow dispatch?</p>",
+        "id": 383342951,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691597416
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is there something you'd like me to try on my M2? I have a couple hours until I bike to work.</p>",
+        "id": 383573347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691663753
+    },
+    {
+        "content": "<p>We could try stuff if you want to</p>",
+        "id": 383580286,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691665243
+    },
+    {
+        "content": "<p>I'm around</p>",
+        "id": 383580318,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691665252
+    },
+    {
+        "content": "<p>Want me to light the fire in a Zoom room?</p>",
+        "id": 383580402,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691665269
+    },
+    {
+        "content": "<p>Sure, but gimme 5 min plz</p>",
+        "id": 383580513,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691665297
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <a href=\"https://harvard.zoom.us/j/94466543559?pwd=MC9ZVTFNT3RHd1JvbWE5V21YR2JXdz09\">https://harvard.zoom.us/j/94466543559?pwd=MC9ZVTFNT3RHd1JvbWE5V21YR2JXdz09</a></p>",
+        "id": 383582811,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691665818
+    },
+    {
+        "content": "<p>Now people are asking me to join a work meeting. Sry. Raincheck? (Hopefully will not take very long)</p>",
+        "id": 383582967,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691665860
+    },
+    {
+        "content": "<p>Raincheck is fine. I'll go eat breakfast. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 383583181,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691665920
+    },
+    {
+        "content": "<p>Done. Should we give it a go?</p>",
+        "id": 383602606,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691670104
+    },
+    {
+        "content": "<p>Sure, but don't make me late for the ct meeting in an hour. I still need to bike to work. <a href=\"https://harvard.zoom.us/j/92566286460?pwd=bzdKamdrM09oYUQrdktqcmZtNTl3QT09\">https://harvard.zoom.us/j/92566286460?pwd=bzdKamdrM09oYUQrdktqcmZtNTl3QT09</a></p>",
+        "id": 383603155,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691670234
+    },
+    {
+        "content": "<p>This seems to help!<br>\n<code>mvn clean -f modules/container-base</code></p>",
+        "id": 383608359,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691671043
+    },
+    {
+        "content": "<p>My educated guess: the builder saves a state locally to reuse cached layers. Probably you got caught in the middle here, so cleaning up the target dir removed that state and you're good to go again.</p>",
+        "id": 383608830,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1691671114
+    },
+    {
+        "content": "<p>It worked! Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 383610658,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691671419
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 383655692,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1691679027
+    }
+]
