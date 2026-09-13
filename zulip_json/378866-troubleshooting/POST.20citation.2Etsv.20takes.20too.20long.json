@@ -1,0 +1,242 @@
+[
+    {
+        "content": "<p>Hi, I have recently updated Dataverse to version 6.5 and I noticed that updating citation.tsv, something that could be done in a few seconds, now takes too long as you can check bellow. I assume that this behavior has started because of the new values added for the Language datasetfield.</p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"nb\">time</span><span class=\"w\"> </span>curl<span class=\"w\"> </span><span class=\"s2\">\"http://localhost:8080/api/admin/datasetfield/load\"</span><span class=\"w\"> </span>-X<span class=\"w\"> </span>POST<span class=\"w\"> </span>--upload-file<span class=\"w\"> </span>/tmp/dvinstall/data/metadatablocks/citation.tsv<span class=\"w\"> </span>-H<span class=\"w\"> </span><span class=\"s2\">\"Content-type: text/tab-separated-values\"</span>\nreal<span class=\"w\">    </span>27m33.218s\nuser<span class=\"w\">    </span>0m0.059s\nsys<span class=\"w\">     </span>0m0.094s\n</code></pre></div>\n<p>Is there any alternative that can speed up this process for future updates or is this behavior solved in a newer version?</p>",
+        "id": 544203522,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760111831
+    },
+    {
+        "content": "<p>Yes, exactly, it's because of all the new languages in <a href=\"https://github.com/IQSS/dataverse/issues/10762\">#10762</a>, added in Dataverse 6.4.</p>",
+        "id": 544203904,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760111961
+    },
+    {
+        "content": "<p>Hmm starting with <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.6\">https://github.com/IQSS/dataverse/releases/tag/v6.6</a> we say this:</p>\n<p>\"Expect the loading of the citation block to take several seconds <br>\nbecause of its size (especially due to the number of languages).\"</p>",
+        "id": 544204295,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112061
+    },
+    {
+        "content": "<p>I just added this to <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.4\">https://github.com/IQSS/dataverse/releases/tag/v6.4</a> which is where <a href=\"https://github.com/IQSS/dataverse/issues/10762\">#10762</a> was merged.</p>",
+        "id": 544204603,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112157
+    },
+    {
+        "content": "<p>At <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.5\">https://github.com/IQSS/dataverse/releases/tag/v6.5</a> I didn't add anything because we don't ask you to reload citation.tsv.</p>",
+        "id": 544204732,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112196
+    },
+    {
+        "content": "<p>27 minutes is crazy though! Is that right?!? For me, it takes maybe 5-10 seconds which was enough to annoy me and prompt me to add that note about several seconds.</p>",
+        "id": 544205007,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112291
+    },
+    {
+        "content": "<p>Yes, it took me 27 minutes.</p>",
+        "id": 544205158,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760112332
+    },
+    {
+        "content": "<p>Can you please say a little more about your hardware?</p>",
+        "id": 544205748,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112518
+    },
+    {
+        "content": "<p>I am monitoring the machine and I don't see any load increase. I am running the container on a machine with 64GB of RAM and 32 cores.</p>",
+        "id": 544206030,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760112606
+    },
+    {
+        "content": "<p>a pretty beefy machine</p>",
+        "id": 544206206,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112661
+    },
+    {
+        "content": "<p>Please feel free to create an issue: <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a></p>",
+        "id": 544206309,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760112691
+    },
+    {
+        "content": "<p>This is well known from my experiments with migrations in containers. Please make sure to recheck your resource allocations for the Postgres and Dataverse container. I found more RAM and a few CPU cores helped. Depending on your setup you may have a beefy machine but not necessarily use all of it.</p>",
+        "id": 544228608,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760121834
+    },
+    {
+        "content": "<p>And <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> I kinda disbelieve about the seconds stuff for this change. Even after adding a lot more hardware it was still well into minutes.</p>",
+        "id": 544228855,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760121949
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> I ran all of these migrations tests on a snapshot of prod, so less anxiousness involved <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 544229068,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760122050
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/POST.20citation.2Etsv.20takes.20too.20long/near/544228855\">said</a>:</p>\n<blockquote>\n<p>And <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> I kinda disbelieve about the seconds stuff for this change. Even after adding a lot more hardware it was still well into minutes.</p>\n</blockquote>\n<p>On my laptop it takes 13 seconds:</p>\n<p><code>% time curl http://localhost:8080/api/admin/datasetfield/load -H \"Content-type: text/tab-separated-values\" -X POST --upload-file scripts/api/data/metadatablocks/citation.tsv</code></p>\n<p><code>0.01s user 0.01s system 0% cpu 12.791 total</code></p>",
+        "id": 544229752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760122390
+    },
+    {
+        "content": "<p>That's where I write the release notes. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 544230008,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760122490
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"760290\">@Omer M Fahim</span> how long does it take on any of our test servers, would you say? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 544230130,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760122544
+    },
+    {
+        "content": "<p>your times align with mines</p>",
+        "id": 544233417,
+        "sender_full_name": "Omer M Fahim",
+        "timestamp": 1760123997
+    },
+    {
+        "content": "<p>Whaaaaaat <span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span><span aria-label=\"flushed\" class=\"emoji emoji-1f633\" role=\"img\" title=\"flushed\">:flushed:</span></p>",
+        "id": 544240943,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760127397
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> is saying it's much slower when you go from 200 langs to 8000.</p>\n<p>Versus staying at 8000, I mean, which is what I just tested.</p>",
+        "id": 544241077,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760127453
+    },
+    {
+        "content": "<p>Is this a fresh DB or a snapshot of an existing instance?</p>",
+        "id": 544241093,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760127459
+    },
+    {
+        "content": "<p>For me a fresh db.</p>",
+        "id": 544241117,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760127471
+    },
+    {
+        "content": "<p>Hmm that may make difference with updating all the datasets and have 8000 new entries. Not sure. Might need some more testing again...</p>",
+        "id": 544241211,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760127521
+    },
+    {
+        "content": "<p>Oh wait - you mean it takes 13 secs now that you had it loaded before to reload the block again? That would make sense...</p>",
+        "id": 544241352,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760127606
+    },
+    {
+        "content": "<p>Yeah, exactly.</p>",
+        "id": 544241386,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760127624
+    },
+    {
+        "content": "<p>ehh gonna run a test right now</p>",
+        "id": 544241398,
+        "sender_full_name": "Omer M Fahim",
+        "timestamp": 1760127630
+    },
+    {
+        "content": "<p>Then I probably misunderstood earlier. Sry</p>",
+        "id": 544241421,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760127645
+    },
+    {
+        "content": "<p>No worries.</p>",
+        "id": 544243049,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760128385
+    },
+    {
+        "content": "<p>If I drop my database and add this to scripts/api/setup-datasetfields.sh</p>\n<div class=\"codehilite\"><pre><span></span><code>+echo &quot;BEGIN loading citation&quot;\n+date\n curl &quot;${DATAVERSE_URL}/api/admin/datasetfield/load&quot; -X POST --data-binary @&quot;$SCRIPT_PATH&quot;/data/metadatablocks/citation.tsv -H &quot;Content-type: text/tab-separated-values&quot;\n+date\n+echo &quot;END loading citation&quot;\n</code></pre></div>\n<p>I get this:</p>\n<div class=\"codehilite\"><pre><span></span><code>dev_bootstrap&gt; BEGIN loading citation\ndev_bootstrap&gt; Fri Oct 10 20:25:01 UTC 2025\ndev_bootstrap&gt; {&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;added&quot;:[{&quot;name&quot;:&quot;citation&quot;...\ndev_bootstrap&gt; Fri Oct 10 20:25:14 UTC 2025\ndev_bootstrap&gt; END loading citation\n</code></pre></div>\n<p>So also 13 seconds for an initial load of citation.tsv. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 544243280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760128492
+    },
+    {
+        "content": "<p>Thank you for all the feedback, I will try to adjust container resources as <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> suggested. I did the same test on another \"fresh\" instance, it only has one dataset, and POST time was 1m30s. Could this time be increased by the number of existing datasets?</p>",
+        "id": 544499066,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760346645
+    },
+    {
+        "content": "<p>After some tests I suspect that these POST requests are taking too long because of the filesystem. We have our Dataverse instances running on Openstack and we have found out previously, while stress testing our main instance, that PostgreSQL doesn't work well with the Openstack filesystem. Because of that our production instance has a DB running outside of Openstack and the POST request takes 1m25s without any resource tuning.</p>",
+        "id": 544537223,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760357981
+    },
+    {
+        "content": "<p>What filesystem are you using in your Openstack?</p>",
+        "id": 544556231,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760362809
+    },
+    {
+        "content": "<p>Also are we talking Cinder or Mantis? (I hope Cinder <span aria-label=\"alien\" class=\"emoji emoji-1f47d\" role=\"img\" title=\"alien\">:alien:</span>)</p>",
+        "id": 544556506,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760362849
+    },
+    {
+        "content": "<p>If you're looking into running some FS statistics, maybe this little tool I put together in a container helps. <a href=\"https://jugit.fz-juelich.de/fdm/k8s/k8s-storage-benchmark\">https://jugit.fz-juelich.de/fdm/k8s/k8s-storage-benchmark</a></p>",
+        "id": 544557064,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760362950
+    },
+    {
+        "content": "<p>We're on Openstack as well and use Cinder block devices backed by Ceph librbd mounts. I'd rather have krbd because it has even better performance, but it's not bad either. The storage link is a 10G per OpenStack Nova Host and they run a 2-replica config in Ceph.</p>",
+        "id": 544557727,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1760363135
+    },
+    {
+        "content": "<p>I am not sure but I think it is Cinder. I can ask my colleague in charge of Openstack for more details. When we detected issues with Openstack we also ran some performance tests with Ansible. We generated test files with the command <code>head -c {{ filesize }} /dev/zero | tr '\\000' '\\377'</code> and we used <a href=\"https://github.com/scottchiefbaker/dool/\">dool</a> for filesystem monitoring.</p>",
+        "id": 544559454,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760363587
+    },
+    {
+        "content": "<p>I deployed Dataverse on a different Openstack with newer hardware and I got better results. The other Openstack instance has older hardware and that could be one of the reasons for the bad performance. Now the POST only takes 1-2min. I get the same times either if it is a fresh install or if the database already exists. I even tried run it locally and I got the same results.</p>",
+        "id": 544768333,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760452892
+    },
+    {
+        "content": "<p>That's good. Please remind me, is the going from ~200 langs to ~8000? Or from 8k to 8k?</p>",
+        "id": 544769581,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760453174
+    },
+    {
+        "content": "<p>From 8k to 8k. My citations.tsv also has about 300 more subjects, but I also test with the one on GitHub and results were the same.<br>\n<a href=\"/user_uploads/53090/aOFC2C6UO25oJhGoBcLB6B3e/citation.tsv\">citation.tsv</a></p>",
+        "id": 544770761,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1760453451
+    },
+    {
+        "content": "<p>Ok, thanks. I'm just thinking we should update our release notes to say minutes instead of seconds.</p>",
+        "id": 544770893,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760453486
+    }
+]

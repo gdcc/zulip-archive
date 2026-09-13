@@ -1,0 +1,656 @@
+[
+    {
+        "content": "<p>A quick question: is there any problem known regarding sending mails vie the <code>maildev</code> service? I can't get it to work. Mails are simply stored as files on the containers volume but not sent out. I think that the auto-relay feature is off (by default) and enabling it via an environment variable does not work since the set value (like <code>true</code>) is then taken as the receiver mail address. I opened an issue here <a href=\"https://github.com/maildev/maildev/issues/501\">https://github.com/maildev/maildev/issues/501</a> but no answer yet.<br>\nMaybe I am doing something wrong ;)<br>\nThe mails are here</p>\n<div class=\"codehilite\"><pre><span></span><code>root@ecap-s051:/raid/km3net-dataverse/mail# ls -al\ntotal 48\ndrwxr-xr-x  2 tgal tgal 4096 Sep 20 16:01 .\ndrwxr-xr-x 10 root root 4096 Jul  3 22:56 ..\n-rw-r--r--  1 tgal tgal  799 Sep 13 15:11 6CCFTjjF.eml\n-rw-r--r--  1 tgal tgal  738 Sep 13 10:23 8nszk2Cu.eml\n-rw-r--r--  1 tgal tgal  797 Sep 20 16:01 AdhVA5rZ.eml\n-rw-r--r--  1 tgal tgal  752 Sep 13 10:46 cnpXNCO8.eml\n</code></pre></div>\n<p>and look OK-ish (apart that the link to Dataverse is shown as <code>localhost:8080</code>)</p>",
+        "id": 471741595,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726841311
+    },
+    {
+        "content": "<p>Do you mean you don't see emails at <a href=\"http://localhost:1080\">http://localhost:1080</a> like this?</p>\n<p><a href=\"/user_uploads/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png\">maildev.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png\" title=\"maildev.png\"><img data-original-dimensions=\"957x677\" src=\"/user_uploads/thumbnail/53090/ONqJSkGcSL8rD2661PUjBN5X/maildev.png/840x560.webp\"></a></div>",
+        "id": 471763032,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726846381
+    },
+    {
+        "content": "<p>I did not expose that port. I thought it would send the mals automatically ;) I assume that if the mails are stored locally, they are not sent yet.</p>",
+        "id": 471778695,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726850712
+    },
+    {
+        "content": "<p>to be clear: I meant that nothing is arriving at the user. The instance has a valid URL with proper SSL certificate. I don’t know why it still puts “localhost” in the mail body but the mail header itself looks fine with the correct noreply email address etc. They are simply not arriving in anyone’s inbox. I can only see those mails as files in the mail folder of the maildev container.</p>",
+        "id": 471779238,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726850895
+    },
+    {
+        "content": "<p>Please don't use maildev as an MTA. You should look into either use some MTA of your institution or, if you need to mangle the mail before it's sent to a user (e.g. for SMIME signing), into deploying Postfix or other small-scale MTAs and use it as a relay.</p>",
+        "id": 471781331,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726851494
+    },
+    {
+        "content": "<p>Maildev really is meant to be used within a development scenario, where you don't want mails to be sent to arbitrary places. We use maildev also in integration tests to verify the sending process, etc.</p>",
+        "id": 471781564,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726851555
+    },
+    {
+        "content": "<p>In 6.2 the mail subsystem configuration of Dataverse has been reworked and should be pretty easy to use with any MTA out there.</p>",
+        "id": 471781814,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726851606
+    },
+    {
+        "content": "<p>Also keep in mind that for real usage, you should make sure you use servers as your final MTAs when leaving your organization that are added to the DNS based SPF records. Otherwise alot of receiving mailservers of your users will start rejecting/discarding the mails you're sending as Spam.</p>",
+        "id": 471782166,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726851692
+    },
+    {
+        "content": "<p>(I'm not even starting to talk about DANE and DKIM. SPF is the most crucial one these days.)</p>",
+        "id": 471783946,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726852115
+    },
+    {
+        "content": "<p>Hmm, you're making me think that when we declare our containers ready for <a href=\"https://guides.dataverse.org/en/6.3/container/running/production.html\">production</a>, in the <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/docker/compose/demo/compose.yml\">compose file</a> we should swap out Maildev for a real SMTP server. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 471791655,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726853821
+    },
+    {
+        "content": "<p>To be honest, i was already wondering <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>\n<p>alright, i will amend ;)</p>",
+        "id": 471825721,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726863364
+    },
+    {
+        "content": "<p>Maildev is very handy in dev! I used it <a href=\"https://github.com/IQSS/dataverse/pull/10504#issuecomment-2358862099\">this week</a>! <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 471827597,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726863982
+    },
+    {
+        "content": "<p>Actually we probably should leave any MTA out or just have a commented out Postfix example. People need to make up their minds about this stuff for production.</p>",
+        "id": 471829680,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726864890
+    },
+    {
+        "content": "<p>I agree <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> !</p>",
+        "id": 471900260,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726904668
+    },
+    {
+        "content": "<p>Now that I use the GMail SMTP server directly, I get a</p>\n<div class=\"codehilite\"><pre><span></span><code>jakarta.mail.AuthenticationFailedException: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-42e754a69a7sm69421145e9.34 - gsmtp\n</code></pre></div>\n<p>which is strange since the credentials are definitely correct.<br>\nI am using these environment variables</p>\n<div class=\"codehilite\"><pre><span></span><code>      DATAVERSE_MAIL_MTA_HOST: &quot;smtp.gmail.com&quot;\n      DATAVERSE_MAIL_MTA_PORT: &quot;465&quot;\n      DATAVERSE_MAIL_MTA_SSL_ENABLE: &quot;true&quot;\n      DATAVERSE_MAIL_MTA_AUTH: &quot;true&quot;\n      DATAVERSE_MAIL_MTA_USER: &quot;foo@gmail.com&quot;\n      DATAVERSE_MAIL_MTA_PASSWORD: &quot;...&quot;\n</code></pre></div>\n<p>According to the docs, the settings should be named correctly. <span aria-label=\"confused\" class=\"emoji emoji-1f615\" role=\"img\" title=\"confused\">:confused:</span></p>",
+        "id": 471900472,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726904790
+    },
+    {
+        "content": "<p>Did you activate SMTP in your Gmail Account?</p>",
+        "id": 471901058,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905232
+    },
+    {
+        "content": "<p>Did you use an application password? (In case you're using 2FA)</p>",
+        "id": 471901137,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905264
+    },
+    {
+        "content": "<p>Can you use the same credentials and connection details from some other app, like an email program?</p>",
+        "id": 471901339,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905394
+    },
+    {
+        "content": "<p>Ah, that's a new Google Account and I just realised that they restricted the authentication methods<br>\nI now need to activate 2FA and create an App password</p>",
+        "id": 471902121,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905845
+    },
+    {
+        "content": "<p>Please note that you might also need to enable SMTP access!</p>",
+        "id": 471902172,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905884
+    },
+    {
+        "content": "<p>yep, now going through all the hassle ;)</p>",
+        "id": 471902182,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905895
+    },
+    {
+        "content": "<p>thanks for the hint</p>",
+        "id": 471902199,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905904
+    },
+    {
+        "content": "<p>this also means I will need to update a few other services with Gmail SMTP, since end of september they drop the basic auth method</p>",
+        "id": 471902259,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905929
+    },
+    {
+        "content": "<p>You could try using Sasl Oauth2</p>",
+        "id": 471902345,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905963
+    },
+    {
+        "content": "<p>It should be possibly to configure this since v6.2</p>",
+        "id": 471902377,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726905981
+    },
+    {
+        "content": "<p>aah that's also an option</p>",
+        "id": 471902395,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905992
+    },
+    {
+        "content": "<p>very nice</p>",
+        "id": 471902404,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726905997
+    },
+    {
+        "content": "<p>It would also be helpful to document your findings in the guide</p>",
+        "id": 471902419,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906004
+    },
+    {
+        "content": "<p>So others can benefit, too</p>",
+        "id": 471902431,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906015
+    },
+    {
+        "content": "<p>yes, definitely</p>",
+        "id": 471902579,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906083
+    },
+    {
+        "content": "<p>Keep in mind that there is a debug switch in the mail settings. It will make the logs more verbose in case you need to do some diggin'</p>",
+        "id": 471902594,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906087
+    },
+    {
+        "content": "<p>ok</p>",
+        "id": 471902605,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906095
+    },
+    {
+        "content": "<p>Happy hacking!</p>",
+        "id": 471902628,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906114
+    },
+    {
+        "content": "<p>currently the only annoying thing is that i need to restart the full service, which takes about 10 minutes to start up</p>",
+        "id": 471902632,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906114
+    },
+    {
+        "content": "<p>thanks ;)</p>",
+        "id": 471902638,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906117
+    },
+    {
+        "content": "<p>10 minutes????</p>",
+        "id": 471902672,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906146
+    },
+    {
+        "content": "<p>yes roughly</p>",
+        "id": 471902680,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906153
+    },
+    {
+        "content": "<p><span aria-label=\"exploding head\" class=\"emoji emoji-1f92f\" role=\"img\" title=\"exploding head\">:exploding_head:</span></p>",
+        "id": 471902682,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906154
+    },
+    {
+        "content": "<p>I see the Payara page for a very long time until the actual Dataverse appears</p>",
+        "id": 471902695,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906166
+    },
+    {
+        "content": "<p>Man you need some beef on that machine!</p>",
+        "id": 471902704,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906173
+    },
+    {
+        "content": "<p>oh i have</p>",
+        "id": 471902709,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906179
+    },
+    {
+        "content": "<p>It usually takes about 2 minutes</p>",
+        "id": 471902713,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906182
+    },
+    {
+        "content": "<p>128 corese, 512GB RAM</p>",
+        "id": 471902724,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906193
+    },
+    {
+        "content": "<p>10 is very odd!</p>",
+        "id": 471902725,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906194
+    },
+    {
+        "content": "<p>currently not restricted at all</p>",
+        "id": 471902732,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906199
+    },
+    {
+        "content": "<p>Can you say from the timestamps in the logs where it slows down?</p>",
+        "id": 471902826,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906236
+    },
+    {
+        "content": "<p>There might be some timeout for sth</p>",
+        "id": 471902839,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906249
+    },
+    {
+        "content": "<p>Usually I redeploy on my laptop in under 2 minutes, full cycle</p>",
+        "id": 471902874,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906272
+    },
+    {
+        "content": "<p>ah wait, i am an idiot, i have restricted it to 2GB RAM and 1 CPU <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 471902888,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906285
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png\">Screenshot-2024-09-21-at-10.11.37.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png\" title=\"Screenshot-2024-09-21-at-10.11.37.png\"><img data-original-dimensions=\"918x110\" src=\"/user_uploads/thumbnail/53090/vHCuaVaO49WgS_aa3Tf1Y7VO/Screenshot-2024-09-21-at-10.11.37.png/840x560.webp\"></a></div>",
+        "id": 471902901,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906302
+    },
+    {
+        "content": "<p>That's the default for the container, yes</p>",
+        "id": 471902910,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906310
+    },
+    {
+        "content": "<p>i totally missed that...</p>",
+        "id": 471902994,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906348
+    },
+    {
+        "content": "<p>ok so it will utilise all the CPUs if i give more, or is there a maximum?</p>",
+        "id": 471903004,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906357
+    },
+    {
+        "content": "<p>If you don't give any restrictions, it will take and run with what's there</p>",
+        "id": 471903046,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906389
+    },
+    {
+        "content": "<p>perfect</p>",
+        "id": 471903055,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906395
+    },
+    {
+        "content": "<p>Beware that you really should limit the Ram</p>",
+        "id": 471903067,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906405
+    },
+    {
+        "content": "<p>Otherwise it will allocate a very large heap, 70% of what the container has available</p>",
+        "id": 471903073,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906418
+    },
+    {
+        "content": "<p>You won't want that to happen <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 471903092,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906436
+    },
+    {
+        "content": "<p>A reasonable size to getting started would be 4g or 8g. Probably <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> ears are burning now</p>",
+        "id": 471903253,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906513
+    },
+    {
+        "content": "<p>yes don't worry :D</p>",
+        "id": 471903264,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906524
+    },
+    {
+        "content": "<p>i started with 8GB and 4CPUs, initialises much faster</p>",
+        "id": 471903278,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906541
+    },
+    {
+        "content": "<p>SMTP works too</p>",
+        "id": 471903286,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906544
+    },
+    {
+        "content": "<p>one last thing: the URL is still <code>localhost:8080</code></p>",
+        "id": 471903296,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906555
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png\">Screenshot-2024-09-21-at-10.14.57.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png\" title=\"Screenshot-2024-09-21-at-10.14.57.png\"><img data-original-dimensions=\"223x196\" src=\"/user_uploads/thumbnail/53090/hmR9LB1KwjT2wMBYagvt4ciT/Screenshot-2024-09-21-at-10.14.57.png/840x560.webp\"></a></div>",
+        "id": 471903342,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906563
+    },
+    {
+        "content": "<p>i could not figure out yet where to change that ;)</p>",
+        "id": 471903367,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906582
+    },
+    {
+        "content": "<p>i have a commented out <code>_CT_DATAVERSE_SITEURL</code> env var</p>",
+        "id": 471903420,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906624
+    },
+    {
+        "content": "<p>but don't remember anymore what it was commented out <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 471903432,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906636
+    },
+    {
+        "content": "<p>If you're running 6.3 with Payara 6.2024.6 you don't need the _ct thing anymore</p>",
+        "id": 471903444,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906651
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/latest/installation/config.html\">https://guides.dataverse.org/en/latest/installation/config.html</a></p>",
+        "id": 471903451,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906661
+    },
+    {
+        "content": "<p>ok so i use that with <code>DATAVERSE_SITEURL</code> as env var,</p>",
+        "id": 471903461,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906674
+    },
+    {
+        "content": "<p>You can just use Dataverse_siteurl and dataverse_fqdn now</p>",
+        "id": 471903462,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906674
+    },
+    {
+        "content": "<p>ok</p>",
+        "id": 471903466,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906679
+    },
+    {
+        "content": "<p>All uppercase please. Too hard to type on mobile</p>",
+        "id": 471903542,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906704
+    },
+    {
+        "content": "<p>yesyes :) thanks, just confirming</p>",
+        "id": 471903554,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726906716
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"733331\">Tamas Gal</span> has marked this topic as resolved.</p>",
+        "id": 471903617,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1726906768
+    },
+    {
+        "content": "<p>One last thing: if you would like to see a reload admin api endpoint to trigger re-init of subsystems like mail etc, please create an issue! I've been thinking about this for some time. Not sure when it would get implemented, but it certainly would help. Might become relevant for SPA work which makes it more likely to be implemented quicker</p>",
+        "id": 471903887,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726906943
+    },
+    {
+        "content": "<p>Yes that might be something but not sure if it's worth the hassle. I mean, it might save one or two hours of deployment work but that's usually a one-time thing ;)</p>",
+        "id": 471904096,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907080
+    },
+    {
+        "content": "<p>everything works now :) deployed in Docker Swarm successfully</p>",
+        "id": 471904320,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907198
+    },
+    {
+        "content": "<p>sorry for being off-topic but the bootstrap service is still trying every few seconds, I guess i can simply remove it now? i understood that it's only needed for the very first deployment</p>",
+        "id": 471904533,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907319
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png\">Screenshot-2024-09-21-at-10.28.44.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png\" title=\"Screenshot-2024-09-21-at-10.28.44.png\"><img data-original-dimensions=\"608x82\" src=\"/user_uploads/thumbnail/53090/CMCvQk7XyInKt_6LEI-ie0DT/Screenshot-2024-09-21-at-10.28.44.png/840x560.webp\"></a></div>",
+        "id": 471904546,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907329
+    },
+    {
+        "content": "<p>It might be nice to put down your experiences with Swarm. It's a nice compromise between compose and k8s</p>",
+        "id": 471904560,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907341
+    },
+    {
+        "content": "<p>i will check out how to contribute to your docs in the next days</p>",
+        "id": 471904598,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907375
+    },
+    {
+        "content": "<p>The bootstrap will detect it doesn't need to do anything and quit. If it bothers you, drop it.</p>",
+        "id": 471904615,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907392
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>  bootstrap:\n    image: gdcc/configbaker:alpha\n    environment:\n      - TIMEOUT=3m\n    command:\n      - bootstrap.sh\n      - dev\n</code></pre></div>",
+        "id": 471904625,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907401
+    },
+    {
+        "content": "<p>that's the service right now. not sure if <code>dev</code> is correct in production</p>",
+        "id": 471904705,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907420
+    },
+    {
+        "content": "<p>No it usually isn't 1<span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 471904725,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907435
+    },
+    {
+        "content": "<p>ok ;) so remove <code>dev</code> and let it cycle? ;)</p>",
+        "id": 471904743,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907451
+    },
+    {
+        "content": "<p>You really shouldn't <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 471904745,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907453
+    },
+    {
+        "content": "<p>No, you need to provide a different profile</p>",
+        "id": 471904770,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907466
+    },
+    {
+        "content": "<p>IIRC the demo guides page had something about this documented</p>",
+        "id": 471904789,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907483
+    },
+    {
+        "content": "<p>ok i will check</p>",
+        "id": 471904805,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907493
+    },
+    {
+        "content": "<p>We are officially not yet production ready with all of this. Still a long way to go to make it easily accessible and polished enough</p>",
+        "id": 471904918,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907552
+    },
+    {
+        "content": "<p>You're breaking new ground <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 471904945,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907564
+    },
+    {
+        "content": "<p>ahah ok ;)</p>",
+        "id": 471904952,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907570
+    },
+    {
+        "content": "<p>i only found this about bootstrap: <a href=\"https://guides.dataverse.org/en/latest/container/running/demo.html\">https://guides.dataverse.org/en/latest/container/running/demo.html#</a> and it lists <code>dev</code> and <code>demo</code><br>\ni am a bit confused but I think <code>demo</code>is now the correct choice? or is bootstrapping not needed at all since settings are already settled? maybe I just don't understand if \"boostrapping\" is related to the very first deployment (setting up databases, directories etc.) or the actual start of the docker service stack...</p>",
+        "id": 471905408,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907853
+    },
+    {
+        "content": "<p>especially this sentence:</p>\n<blockquote>\n<p>One of the main differences between the “dev” persona and our new “demo” persona is that we are now running the setup-all script without the <code>--insecure</code> flag. This makes our installation more secure, though it does block “admin” APIs that are useful for configuration.</p>\n</blockquote>",
+        "id": 471905480,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907898
+    },
+    {
+        "content": "<p>So if I now switch to <code>demo</code>, will it \"reset\" the settings or is no setup-all triggered anymore?</p>",
+        "id": 471905501,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907925
+    },
+    {
+        "content": "<p>sorry for the dumb questions ;)</p>",
+        "id": 471905521,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907931
+    },
+    {
+        "content": "<p>Once bootstrapped, it will not do it again</p>",
+        "id": 471905552,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907956
+    },
+    {
+        "content": "<p>The main difference is the securing of certain api endpoints</p>",
+        "id": 471905569,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907973
+    },
+    {
+        "content": "<p>ok so now i need to manually secure everything through the admin API</p>",
+        "id": 471905571,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907975
+    },
+    {
+        "content": "<p>You can do that manually</p>",
+        "id": 471905573,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726907979
+    },
+    {
+        "content": "<p>alright, thanks!</p>",
+        "id": 471905578,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907981
+    },
+    {
+        "content": "<p>i will then leave it as it is</p>",
+        "id": 471905591,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1726907994
+    },
+    {
+        "content": "<p>You should think about creating your own persona with all your settings, etc</p>",
+        "id": 471905659,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726908015
+    },
+    {
+        "content": "<p>That way it's easy to spin up a new instance with the same configuration</p>",
+        "id": 471905681,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726908038
+    },
+    {
+        "content": "<p>The configbaker image guides page has more details on that IIRC</p>",
+        "id": 471905717,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726908070
+    },
+    {
+        "content": "<p>Wrote it myself but keep forgetting these details <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 471905739,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726908094
+    },
+    {
+        "content": "<p>Yes, please open issues to document things. Or if it's easier, you can start a thread in <a class=\"stream\" data-stream-id=\"446770\" href=\"/#narrow/stream/446770-docs\">#docs</a></p>",
+        "id": 471935103,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726921370
+    }
+]

@@ -1,0 +1,266 @@
+[
+    {
+        "content": "<p>Help! I'm getting this error:</p>\n<div class=\"codehilite\"><pre><span></span><code>% poetry install\n\nInstalling dependencies from lock file\n\nNo dependencies to install or update\n\nInstalling the current project: gdcc-website (0.1.0)\nWarning: The current project could not be installed: No file/folder found for package gdcc-website\nIf you do not want to install the current project use --no-root.\nIf you want to use Poetry only for dependency management but not for packaging, you can disable package mode by setting package-mode = false in your pyproject.toml file.\nIn a future version of Poetry this warning will become an error!\n</code></pre></div>",
+        "id": 497741675,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738697759
+    },
+    {
+        "content": "<p>For context, please see <a href=\"https://github.com/gdcc/www.gdcc.io/issues/21\">https://github.com/gdcc/www.gdcc.io/issues/21</a></p>",
+        "id": 497741741,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738697773
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> you love Poetry. Any suggestions?</p>",
+        "id": 497741817,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738697795
+    },
+    {
+        "content": "<p><a href=\"https://stackoverflow.com/questions/75445290/poetry-no-file-folder-for-package/78188646#78188646\">https://stackoverflow.com/questions/75445290/poetry-no-file-folder-for-package/78188646#78188646</a> seems to suggest that this might fix it, but it doesn't unfortunately:</p>\n<div class=\"codehilite\"><pre><span></span><code>% git diff\ndiff --git a/pyproject.toml b/pyproject.toml\nindex 0d67ae2..71dbd74 100644\n--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -1,5 +1,5 @@\n [tool.poetry]\n-name = &quot;gdcc-website&quot;\n+name = &quot;www.gdcc.io&quot;\n version = &quot;0.1.0&quot;\n description = &quot;Sphinx project for GDCC&#39;s main website&quot;\n homepage = &quot;https://dataverscommunity.global&quot;\n</code></pre></div>",
+        "id": 497745761,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738699161
+    },
+    {
+        "content": "<p>For the GitHub Action it's an error rather than a warning and it exits as non-zero:</p>\n<div class=\"codehilite\"><pre><span></span><code>Installing the current project: gdcc-website (0.1.0)\n\nError: The current project could not be installed: No file/folder found for package gdcc-website\nIf you do not want to install the current project use --no-root.\nIf you want to use Poetry only for dependency management but not for packaging, you can disable package mode by setting package-mode = false in your pyproject.toml file.\nIf you did intend to install the current project, you may need to set `packages` in your pyproject.toml file.\n\nError: Process completed with exit code 1.\n</code></pre></div>",
+        "id": 497748758,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738700184
+    },
+    {
+        "content": "<p>GitHub Actions is using poetry 2.0.1</p>\n<p>My laptop is using poetry 1.8.3</p>",
+        "id": 497748911,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738700251
+    },
+    {
+        "content": "<p>It looks like they switched it from a warning to an error here: <a href=\"https://github.com/python-poetry/poetry/pull/9333\">https://github.com/python-poetry/poetry/pull/9333</a></p>",
+        "id": 497749513,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738700484
+    },
+    {
+        "content": "<p>I downgraded Poetry to the latest 1.x version and that fixed it. Here's a new issue for trying again to get Poetry 2 working some day: <a href=\"https://github.com/gdcc/www.gdcc.io/issues/36\">https://github.com/gdcc/www.gdcc.io/issues/36</a></p>\n<p>Poetry 2 came out on January 5th, by the way.</p>",
+        "id": 497753345,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738701985
+    },
+    {
+        "content": "<p>I am using poetry merely as a dependency manager and not its <code>install</code> feature. Also, haven't touched down on poetry 2 yet, but I saw you've resolved it by hard coding the version. As an alternative, you can always install via <code>pip</code>, because the <code>pyproject.toml</code> can be universally used between installers.</p>",
+        "id": 498283678,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738916876
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> would you be able to show me a diff of what you mean? An untested diff is fine. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 498347269,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738936819
+    },
+    {
+        "content": "<p>Sure, will check and send you the diff <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 498413377,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738956890
+    },
+    {
+        "content": "<p>Thank you!</p>",
+        "id": 498413401,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738956900
+    },
+    {
+        "content": "<p>Have you tried running <code>poetry install --no-root</code> in the workflow? I guess the error boils down to that poetry is looking for a package within the directory, but cant find one. Hence, the error.</p>",
+        "id": 498414367,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738957306
+    },
+    {
+        "content": "<p>Testing it on my fork</p>",
+        "id": 498414440,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738957330
+    },
+    {
+        "content": "<p>I haven't tried in the workflow, no.</p>",
+        "id": 498414650,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738957424
+    },
+    {
+        "content": "<p>It is easy for you to switch between poetry versions locally?</p>",
+        "id": 498415670,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738957886
+    },
+    {
+        "content": "<p>Opened a PR here <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>\n<p><a href=\"https://github.com/gdcc/www.gdcc.io/pull/37\">https://github.com/gdcc/www.gdcc.io/pull/37</a></p>",
+        "id": 498416411,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738958175
+    },
+    {
+        "content": "<p>Cool, thanks but about the other diff? Installing via pip or something?</p>",
+        "id": 498416622,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738958270
+    },
+    {
+        "content": "<blockquote>\n<p>It is easy for you to switch between poetry versions locally?</p>\n</blockquote>\n<p>I am using Conda for my virtual environments and Poetry mostly for the dependency management, like adding or updating new ones.</p>",
+        "id": 498416638,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738958275
+    },
+    {
+        "content": "<p>I don't think that is necessary anymore. You could also install via <code>pip</code>, but that is the same thing.</p>",
+        "id": 498416766,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738958318
+    },
+    {
+        "content": "<p>With this out of the way everything should work as before.</p>",
+        "id": 498416831,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738958343
+    },
+    {
+        "content": "<p>I don't have a great way to test PR 37. Should I just merge it and revert if it breaks stuff?</p>",
+        "id": 498417509,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738958580
+    },
+    {
+        "content": "<p>I think everything should work fine. Tested it here without the deployment:</p>\n<p><a href=\"https://github.com/JR-1991/dataversecommunity.global/actions/runs/13206936782\">https://github.com/JR-1991/dataversecommunity.global/actions/runs/13206936782</a></p>\n<p>Since the issue was due to poetry I guess the subsequent steps should be fine.</p>",
+        "id": 498418202,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738958871
+    },
+    {
+        "content": "<p>I'll merge it. But I should mark it to close <code># Poetry version hard coded to a 1.x version #36</code>, right?</p>",
+        "id": 498418668,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959058
+    },
+    {
+        "content": "<p>Also, should we remove this comment? <a href=\"https://github.com/gdcc/www.gdcc.io/pull/37#pullrequestreview-2602738760\">https://github.com/gdcc/www.gdcc.io/pull/37#pullrequestreview-2602738760</a></p>",
+        "id": 498418871,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959151
+    },
+    {
+        "content": "<p>Oh yes, the comment can leave</p>",
+        "id": 498418933,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738959183
+    },
+    {
+        "content": "<p>Great. And I added <code>closes #36</code></p>",
+        "id": 498419801,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959457
+    },
+    {
+        "content": "<p>Merged! Fingers crossed! <a href=\"https://github.com/gdcc/www.gdcc.io/actions/runs/13207377691\">https://github.com/gdcc/www.gdcc.io/actions/runs/13207377691</a></p>",
+        "id": 498419889,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959487
+    },
+    {
+        "content": "<p><code>pipx install: error: the following arguments are required: package_spec</code> <span aria-label=\"bomb\" class=\"emoji emoji-1f4a3\" role=\"img\" title=\"bomb\">:bomb:</span></p>",
+        "id": 498419931,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959508
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/zsr8h_4Z6sPAMMdUWdhLb_y_/Screenshot-2025-02-07-at-3.18.34PM.png\">Screenshot 2025-02-07 at 3.18.34 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/zsr8h_4Z6sPAMMdUWdhLb_y_/Screenshot-2025-02-07-at-3.18.34PM.png\" title=\"Screenshot 2025-02-07 at 3.18.34 PM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1819x1316\" src=\"/user_uploads/thumbnail/53090/zsr8h_4Z6sPAMMdUWdhLb_y_/Screenshot-2025-02-07-at-3.18.34PM.png/840x560.webp\"></a></div>",
+        "id": 498419972,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959527
+    },
+    {
+        "content": "<p>Got it - <a href=\"https://github.com/gdcc/www.gdcc.io/pull/38\">https://github.com/gdcc/www.gdcc.io/pull/38</a></p>",
+        "id": 498420230,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738959627
+    },
+    {
+        "content": "<p>Thanks! Merged! Second time's the charm, right? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> <a href=\"https://github.com/gdcc/www.gdcc.io/actions/runs/13207420393\">https://github.com/gdcc/www.gdcc.io/actions/runs/13207420393</a></p>",
+        "id": 498420325,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959675
+    },
+    {
+        "content": "<p>Worked! Thanks!</p>",
+        "id": 498420348,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959686
+    },
+    {
+        "content": "<p>I've deleted the whole package spec in the PR - Sorry <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 498420349,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738959687
+    },
+    {
+        "content": "<p>Haha yea that's true <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 498420380,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1738959700
+    },
+    {
+        "content": "<p>I blame my poor code review <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 498420404,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959710
+    },
+    {
+        "content": "<p>Ok, and it's still working for me locally on poetry 1.8.3. Makes sense. All we changed was the github action.</p>",
+        "id": 498421144,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1738959996
+    },
+    {
+        "content": "<p>Hmm, now I'm getting the same error on my Mac, with poetry 2.2.0 newly installed through homebrew:</p>\n<div class=\"codehilite\"><pre><span></span><code>pdurbin@beamish www.gdcc.io % poetry install\nCreating virtualenv gdcc-website-ovyJev99-py3.13 in /Users/pdurbin/Library/Caches/pypoetry/virtualenvs\nInstalling dependencies from lock file\n\nPackage operations: 51 installs, 0 updates, 0 removals\n\n  - Installing certifi (2024.7.4)\n  - Installing charset-normalizer (3.2.0)\n  - Installing idna (3.7)\n  - Installing markupsafe (2.1.3)\n  - Installing mdurl (0.1.2)\n  - Installing urllib3 (2.2.2)\n  - Installing alabaster (0.7.13)\n  - Installing pygments (2.16.1)\n  - Installing six (1.16.0)\n  - Installing imagesize (1.4.1)\n  - Installing jinja2 (3.1.6)\n  - Installing markdown-it-py (3.0.0)\n  - Installing packaging (23.1)\n  - Installing requests (2.32.2)\n  - Installing babel (2.12.1)\n  - Installing docutils (0.20.1)\n  - Installing snowballstemmer (2.2.0)\n  - Installing soupsieve (2.5)\n  - Installing sphinxcontrib-applehelp (1.0.7)\n  - Installing sphinxcontrib-devhelp (1.0.5)\n  - Installing sphinxcontrib-htmlhelp (2.0.4)\n  - Installing sphinxcontrib-jsmath (1.0.1)\n  - Installing sphinxcontrib-qthelp (1.0.6)\n  - Installing sphinxcontrib-serializinghtml (1.1.9)\n  - Installing tornado (6.4.2)\n  - Installing wrapt (1.15.0)\n  - Installing accessible-pygments (0.0.4)\n  - Installing beautifulsoup4 (4.12.2)\n  - Installing colorama (0.4.6)\n  - Installing deprecated (1.2.14)\n  - Installing livereload (2.6.3)\n  - Installing mdit-py-plugins (0.4.0)\n  - Installing psutil (5.9.5)\n  - Installing pyyaml (6.0.1)\n  - Installing setuptools (78.1.1)\n  - Installing sphinx (7.2.6)\n  - Installing typing-extensions (4.8.0)\n  - Installing tomli (2.0.1)\n  - Installing wheel (0.41.2)\n  - Installing myst-parser (2.0.0)\n  - Installing sphinx-icon (0.1.2)\n  - Installing sphinxcontrib-contentui (0.2.5)\n  - Installing sphinxext-opengraph (0.6.3)\n  - Installing pydata-sphinx-theme (0.14.1)\n  - Installing sphinxcontrib-mermaid (0.8.1)\n  - Installing sphinxemoji (0.2.0)\n  - Installing taskipy (1.12.0)\n  - Installing sphinx-autobuild (2021.3.14)\n  - Installing sphinx-favicon (0.2)\n  - Installing sphinx-togglebutton (0.3.2)\n  - Installing sphinxcontrib-images (0.9.4)\n\nInstalling the current project: gdcc-website (0.1.0)\nError: The current project could not be installed: No file/folder found for package gdcc-website\nIf you do not want to install the current project use --no-root.\nIf you want to use Poetry only for dependency management but not for packaging, you can disable package mode by setting package-mode = false in your pyproject.toml file.\nIf you did intend to install the current project, you may need to set `packages` in your pyproject.toml file.\n</code></pre></div>",
+        "id": 540309435,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758224916
+    },
+    {
+        "content": "<p>In <a href=\"https://github.com/gdcc/www.gdcc.io/pull/37\">https://github.com/gdcc/www.gdcc.io/pull/37</a> we added <code>--no-root</code> so I guess I'll try it.</p>",
+        "id": 540309670,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225014
+    },
+    {
+        "content": "<p>Hmm, not sure what this means, but no error at least!</p>\n<div class=\"codehilite\"><pre><span></span><code>pdurbin@beamish www.gdcc.io % poetry install --no-root\nInstalling dependencies from lock file\n\nNo dependencies to install or update\n</code></pre></div>",
+        "id": 540309740,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225051
+    },
+    {
+        "content": "<p><code>poetry run task docs-build</code> worked. That's good. I guess I'll update the README.</p>",
+        "id": 540309851,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225108
+    },
+    {
+        "content": "<p>Made <a href=\"https://github.com/gdcc/www.gdcc.io/pull/59\">https://github.com/gdcc/www.gdcc.io/pull/59</a> and requested a review from <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> and <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span></p>",
+        "id": 540310496,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758225387
+    },
+    {
+        "content": "<p>Reviewing now <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span></p>",
+        "id": 540311469,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1758225813
+    },
+    {
+        "content": "<p>Merged.</p>",
+        "id": 540381611,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1758263265
+    }
+]

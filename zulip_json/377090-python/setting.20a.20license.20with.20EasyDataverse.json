@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>Hmm, it seems like it isn't possible to set a license with EasyDataverse: <a href=\"https://github.com/gdcc/easyDataverse/issues/29\">https://github.com/gdcc/easyDataverse/issues/29</a></p>\n<p>For me, datasets are being created with \"Custom Dataset Terms\" and a blank \"Terms of Use\". This is suboptimal because its an invalid state. Terms of Use are required when Custom Dataset Terms is selected.</p>",
+        "id": 493635094,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736875808
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png\">Screenshot 2025-01-14 at 12.29.52 PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png\" title=\"Screenshot 2025-01-14 at 12.29.52 PM.png\"><img data-original-dimensions=\"1182x666\" src=\"/user_uploads/thumbnail/53090/WFMqpfEllv1G3Ss0Pay9AfJM/Screenshot-2025-01-14-at-12.29.52PM.png/840x560.webp\"></a></div>",
+        "id": 493635125,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736875821
+    },
+    {
+        "content": "<p>What's the easiest workaround I wonder? Hit the dataset with <code>requests</code> to flip the license to CC0? That's the license I'd like to use. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 493635226,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736875864
+    },
+    {
+        "content": "<p>Bah. I couldn't figure out how to set a license easily with <code>requests</code>. So I flipped the whole thing around. I'm creating a dataset with <code>requests</code> and then using EasyDataverse to pull down that dataset and set the metadata fields I need.</p>",
+        "id": 493659245,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736884699
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code># Strangely, datasets created with EasyDataverse have\n# Custom Terms rather than CC0, which is the default,\n# and it&#39;s not possible to change the license afterward\n# using EasyDataverse: https://github.com/gdcc/easyDataverse/issues/29\n# So, we create a basic dataset using requests and\n# then update the fields later with EasyDataverse.\nwith open(&#39;initial-dataset.json&#39;) as f:\n    r = requests.post(server_url + &quot;/api/dataverses/&quot; + collection + &quot;/datasets&quot;, data=f, headers={&quot;X-Dataverse-key&quot;: api_token})\n    # We&#39;ll use this pid later to update the dataset\n    pid = r.json()[&#39;data&#39;][&#39;persistentId&#39;]\ndataset = dataverse.load_dataset(pid)\ndataset.citation.title = title\ndataset.update()\n</code></pre></div>",
+        "id": 493659648,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736884846
+    },
+    {
+        "content": "<p>I am happy to implement this to the <code>Dataset</code> class. This has been on my list for far too long now :-D About to schedule a new release this week and it would be a good opportunity to sneak it in.</p>",
+        "id": 493917568,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945039
+    },
+    {
+        "content": "<p>In terms of how to tackle this some questions:</p>\n<ul>\n<li>Is there a fixed set of licenses given by Dataverse or can users add others dynamically?</li>\n<li>Can the licenses be acquired via API?</li>\n<li>Can we specify a default license or is it it bad practice?</li>\n</ul>\n<p>In general I would opt for an Enum approach to handle licenses. We either create them dynamically, similar to the metadata blocks, or we bake them into EasyDataverse.</p>",
+        "id": 493918127,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945192
+    },
+    {
+        "content": "<p>Yes, you can them from <a href=\"https://demo.dataverse.org/api/licenses\">https://demo.dataverse.org/api/licenses</a></p>",
+        "id": 493918785,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736945395
+    },
+    {
+        "content": "<p>And yes, you can add new licenses and change what the default license is: <a href=\"https://guides.dataverse.org/en/6.5/installation/config.html#configuring-licenses\">https://guides.dataverse.org/en/6.5/installation/config.html#configuring-licenses</a></p>",
+        "id": 493919011,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736945454
+    },
+    {
+        "content": "<p>Great, thanks! Thats a good start :-)</p>",
+        "id": 493919504,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945579
+    }
+]

@@ -1,0 +1,158 @@
+[
+    {
+        "content": "<p>Hi there, we have a Dataverse installation using Docker containers and whenever the Dataverse container loses the connection with the Database container, for example if there is a DB container failure, the server responds with this page, as expected:</p>\n<div class=\"codehilite\"><pre><span></span><code>HTTP Status 500 - Internal Server Error\n\ntype Exception report\n\nmessageInternal Server Error\n\ndescriptionThe server encountered an internal error that prevented it from fulfilling this request.\n\nexception\n\njakarta.ejb.EJBException: Exception [EclipseLink-4002] (Eclipse Persistence Services - 4.0.1.payara-p1.v202304041433): org.eclipse.persistence.exceptions.DatabaseException\nInternal Exception: org.postgresql.util.PSQLException: Connection has been closed.\nError Code: 0\nCall: SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG IS NULL))\n    bind =&gt; [1 parameter bound]\nQuery: ReadAllQuery(name=&quot;Setting.findByName&quot; referenceClass=Setting sql=&quot;SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG IS NULL))&quot;)\n\nnote The full stack traces of the exception and its root causes are available in the Payara Server 6.2023.8 #badassfish logs.\nPayara Server 6.2023.8 #badassfish\n</code></pre></div>\n<p>After the DB container is recovered this page persists and the only solution we found to recover the connection is to restart the Dataverse container. Is there any more \"elegant\" solution we could use to force the connection to be reestablished from the Dataverse side and solve this problem instead of the good old \"restart the service\" solution?</p>",
+        "id": 533069651,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754475289
+    },
+    {
+        "content": "<p>Well, it's easy enough for me to replicate this! In Docker Desktop I stopped the postgres container and get the same error.</p>",
+        "id": 533099809,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754485941
+    },
+    {
+        "content": "<p>Then I clicked \"start\" on the postgres container and refreshed my browser.</p>\n<p>Yeah, I see what you mean. Dataverse is still dead in the water. <img alt=\":sad-docker:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/1f831097.png\" title=\"sad-docker\"></p>",
+        "id": 533100004,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754486004
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> do you feel like creating an issue about this? <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a></p>",
+        "id": 533100104,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754486037
+    },
+    {
+        "content": "<p>This seems related:</p>\n<p>Is there a way to reopen the connection pools to database without needing to restart all server? - <a href=\"https://github.com/payara/Payara/issues/887\">https://github.com/payara/Payara/issues/887</a></p>",
+        "id": 533103641,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754487073
+    },
+    {
+        "content": "<p>\"Use connection checking in the datasource configuration\" they say.</p>",
+        "id": 533103720,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754487096
+    },
+    {
+        "content": "<p>I was creating an issue, but I can take a look on that issue first.</p>",
+        "id": 533104324,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754487238
+    },
+    {
+        "content": "<p>\"You can also enable connection validation in the administration console as this will check a connection before handing it out of the pool and if it is broken it will reconnect to the database.</p>\n<p>See <a href=\"http://blog.payara.fish/an-introduction-to-connection-pools-in-payara-server\">http://blog.payara.fish/an-introduction-to-connection-pools-in-payara-server</a> \"</p>",
+        "id": 533104325,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754487238
+    },
+    {
+        "content": "<p>Sure, whatever you want.</p>",
+        "id": 533104488,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754487275
+    },
+    {
+        "content": "<p>Also, please note that there is a whole world of database settings we can use: <a href=\"https://guides.dataverse.org/en/6.7.1/installation/config.html#advanced-database-settings\">https://guides.dataverse.org/en/6.7.1/installation/config.html#advanced-database-settings</a></p>",
+        "id": 533104567,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754487295
+    },
+    {
+        "content": "<p>I am using v6.2, but I am currently on the update process of Dataverse to the latest version. Since I am using a custom .war file it will probably take some time until I catch up with v6.7. This could probably be fixed with this setting <code>dataverse.db.is-connection-validation-required</code> then.</p>",
+        "id": 533105891,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754487643
+    },
+    {
+        "content": "<p>All of those options are available in 6.2 as well: <a href=\"https://guides.dataverse.org/en/6.2/installation/config.html#advanced-database-settings\">https://guides.dataverse.org/en/6.2/installation/config.html#advanced-database-settings</a></p>",
+        "id": 533107935,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754488207
+    },
+    {
+        "content": "<p>OK, good news. I will check that setting then.</p>",
+        "id": 533108139,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754488263
+    },
+    {
+        "content": "<p>After some tests, I got it to work as expected with the following settings and the database connection is now automatically recovered:</p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code>asadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s2\">\"-Ddataverse.db.is-connection-validation-required=true\"</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s2\">\"-Ddataverse.db.connection-validation-method=table\"</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s2\">\"-Ddataverse.db.validation-table-name=setting\"</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s2\">\"-Ddataverse.db.validate-atmost-once-period-in-seconds=60\"</span>\n</code></pre></div>\n<p>I wasn't sure which table I should choose for validation, I guess any table can be chosen for that purpose.<br>\n<span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  Thank you for the support <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 533124433,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754493109
+    },
+    {
+        "content": "<p>The <code>setting</code> table seems fine, I guess. It's pretty fundamental. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> </p>\n<p>I'm glad you got it working! Do you want to add this to the Dataverse documentation somewhere? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 533126598,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754493832
+    },
+    {
+        "content": "<p>I think it would be interesting to document this situation as an example. I can look into that tomorrow. Can you send me the instructions on how can I do it? It has been a while since I have contributed to the documentation.</p>",
+        "id": 533127787,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754494242
+    },
+    {
+        "content": "<p>Sure, here's the latest advice: <a href=\"https://guides.dataverse.org/en/6.7.1/contributor/documentation.html\">https://guides.dataverse.org/en/6.7.1/contributor/documentation.html</a></p>",
+        "id": 533128089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754494324
+    },
+    {
+        "content": "<p>I guess I would suggest a new section under <a href=\"https://guides.dataverse.org/en/6.7.1/installation/config.html#database-persistence\">https://guides.dataverse.org/en/6.7.1/installation/config.html#database-persistence</a> after \"Advanced Database Settings\".</p>\n<p>Maybe \"Database Configuration Tips\"? And then a nested bullet for \"Database Connection Recovery\" (and then all those details you figured out).</p>",
+        "id": 533128676,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754494532
+    },
+    {
+        "content": "<p>Yes, I could do that.</p>",
+        "id": 533240045,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754554293
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/11730\">#11730</a> looks great! (Preview at <a href=\"https://dataverse-guide--11730.org.readthedocs.build/en/11730/installation/config.html#database-configuration-tips\">https://dataverse-guide--11730.org.readthedocs.build/en/11730/installation/config.html#database-configuration-tips</a> ). Thanks!</p>\n<p>I left a little feedback, especially about init.d vs configuring it once. Maybe I'm misunderstanding. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 533283016,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754569803
+    },
+    {
+        "content": "<p>I only suggested an init.d script because we are using docker containers and as the project is still under development the container may need to be recreated and in that case the payara configs are lost.</p>",
+        "id": 533290069,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754572336
+    },
+    {
+        "content": "<p>Ok. Maybe it should we worded more generically so the advice can be used by \"classic\" (non-Docker) installations as well. What do you think?</p>",
+        "id": 533291483,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754572818
+    },
+    {
+        "content": "<p>Yes, I agree. I will change that to be more generic.</p>",
+        "id": 533292369,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1754573073
+    },
+    {
+        "content": "<p>Awesome, thanks!</p>",
+        "id": 533292704,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754573165
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"622863\">@César Ferreira</span> we merged <a href=\"https://github.com/IQSS/dataverse/issues/11730\">#11730</a>! Thanks!</p>",
+        "id": 533803861,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754921735
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"622863\">César Ferreira</span> has marked this topic as resolved.</p>",
+        "id": 533936011,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1754988995
+    }
+]

@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Hello, <br>\nI'm trying to understand the level of logging using Payara.  I'm new to using payara, but I've developed in Java using the Spring framework.  I'm used to seeing every HTTP request in the log and I'm not seeing that level of logging here. I realize that has to do with configuration of logs, but if INFO is set, shouldn't we be seeing every request in the server.log?  I'm trying to get a base line understanding of how logging works in this system and am not sure what to expect. </p>\n<p>For example, I've used our test site many times over the last few days and there are no messages related to specific requests in the server.log.   There are hardly any messages to start with.</p>\n<p>I'm wondering if I'm either misunderstanding the level of logging to expect by default (assuming things are at an INFO level), or if we have some sort of misconfiguration.</p>\n<p>Should I be seeing every HTTP request being logged?  </p>\n<p>Thanks!</p>",
+        "id": 468282463,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725653962
+    },
+    {
+        "content": "<p>Hi! Please try this:</p>\n<p><code>asadmin get server.http-service.access-logging-enabled</code></p>\n<p><code>asadmin set server.http-service.access-logging-enabled=true</code></p>",
+        "id": 468282974,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654206
+    },
+    {
+        "content": "<p>It's surprising we don't have any docs on this. Please feel free to create an issue!</p>",
+        "id": 468283657,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654484
+    },
+    {
+        "content": "<p>I see it mentioned in passing here: <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.0\">https://github.com/IQSS/dataverse/releases/tag/v6.0</a></p>",
+        "id": 468283689,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654492
+    },
+    {
+        "content": "<p>Hi Phil, <br>\nThanks!  That was set to false. I just set it to true and now an \"access\" directory shows up in the logs directory for that domain. </p>\n<p>It's not actually logging anything, but that's a step closer.   Is there a log level associated with this one?</p>",
+        "id": 468283704,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725654499
+    },
+    {
+        "content": "<p>And here: <a href=\"https://guides.dataverse.org/en/6.3/installation/config.html#recording-user-ip-addresses\">https://guides.dataverse.org/en/6.3/installation/config.html#recording-user-ip-addresses</a></p>",
+        "id": 468283767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654528
+    },
+    {
+        "content": "<p>Oh, hmm. Nothing? There's a bit of a delay.</p>",
+        "id": 468283814,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654548
+    },
+    {
+        "content": "<p>server.http-service.access-log.write-interval-seconds</p>",
+        "id": 468283838,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654565
+    },
+    {
+        "content": "<p>Maybe give it a minute.</p>",
+        "id": 468283864,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654579
+    },
+    {
+        "content": "<p>Ohhh, it's set to 300 seconds.  That seems a bit long.  Is that what folks typically set it to?</p>",
+        "id": 468284051,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725654648
+    },
+    {
+        "content": "<p>In addition to the server.log, which is mostly for errors, you might be interested in the <code>actionlogrecord</code> database table: <a href=\"https://guides.dataverse.org/en/6.3/admin/monitoring.html#actionlogrecord\">https://guides.dataverse.org/en/6.3/admin/monitoring.html#actionlogrecord</a></p>",
+        "id": 468284059,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654651
+    },
+    {
+        "content": "<p>Buh. I'm not sure if people use 300 seconds in production or not.</p>",
+        "id": 468284102,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654676
+    },
+    {
+        "content": "<p>I assume the Payara folks have it set to that for a reason.</p>",
+        "id": 468284125,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725654691
+    },
+    {
+        "content": "<p>I am starting to see log messages show up.   Thanks for your help - I'd been a bit mystified. :)   I'll check out the  actionlogrecord. </p>\n<p>Do you know if you have to explicitly enable the \"logs/process-failures\" logging?  I am seeing the \"logs/edit-drafts\" directory with logs in it, but not the \"logs/process-failures\" one.    (we are using 5.13, so there's the possibility it wasn't a feature then?)</p>",
+        "id": 468284883,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725655059
+    },
+    {
+        "content": "<p>Huh, I remember the \"edit-drafts\" one.</p>",
+        "id": 468285236,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725655243
+    },
+    {
+        "content": "<p>I'm not sure about the process failures. Is it in the guides somewhere?</p>",
+        "id": 468285254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725655256
+    },
+    {
+        "content": "<p>It's related to solr:  <a href=\"https://guides.dataverse.org/en/6.3/admin/monitoring.html#solr-indexing-failures-logging\">https://guides.dataverse.org/en/6.3/admin/monitoring.html#solr-indexing-failures-logging</a></p>",
+        "id": 468285860,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725655556
+    },
+    {
+        "content": "<p>Hmm, it was added here: <a href=\"https://github.com/IQSS/dataverse/pull/5987/commits/4078c96953f77cd59c93a7291eb816c11bbf718c\">https://github.com/IQSS/dataverse/pull/5987/commits/4078c96953f77cd59c93a7291eb816c11bbf718c</a></p>",
+        "id": 468286430,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725655840
+    },
+    {
+        "content": "<p>My assumption is that you haven't had any indexing failures but if you do, that directory will be created.</p>",
+        "id": 468286527,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725655900
+    },
+    {
+        "content": "<p>That makes sense. Thanks for looking into it.</p>",
+        "id": 468287100,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1725656232
+    }
+]

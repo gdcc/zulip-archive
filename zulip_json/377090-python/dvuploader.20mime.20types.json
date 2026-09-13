@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Uploading a PNG file via dvuploader resulted in a file of type plain text???</p>",
+        "id": 431658273,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712396074
+    },
+    {
+        "content": "<p>You need to supply the  <code>mimeType</code> for the file. I did experiment with leaving <code>mimeType</code> out of the request body, but it did not work. <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> once mentioned that there is a trick to trigger detecting the mime type at Dataverse, but I dont remember exactly. Happy to fix this!</p>",
+        "id": 431676596,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712412660
+    },
+    {
+        "content": "<p>Please note that it’s possible to “trick” a Dataverse installation into giving a file a content type (MIME type) of your choosing. For example, you can make a text file be treated like a video file with <code>-F 'file=@README.txt;type=video/mpeg4'</code>, for example. If the Dataverse installation does not properly detect a file type, specifying the content type via API like this a potential workaround.</p>",
+        "id": 431676925,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712412935
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/6.2/api/native-api.html#add-a-file-to-a-dataset\">https://guides.dataverse.org/en/6.2/api/native-api.html#add-a-file-to-a-dataset</a></p>",
+        "id": 431676944,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712412957
+    },
+    {
+        "content": "<p>Works for the native upload now! In the S3 case, it seems not to be possible to leave out the <code>mimeType</code> in the JSON. It will result in a failed registration of each file:</p>\n<p><code>Bad Request: The file content type cannot be determined.</code> &lt;-- Is actually an XML file</p>\n<p>I guess that due to the direct upload to S3, no type detection is happening at Dataverse. Is this correct? If so, I would add a step that checks whether each file object has a mime type before the upload is happening.</p>",
+        "id": 431678614,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712414300
+    },
+    {
+        "content": "<p>IIRC when registering these files you need to provide this metadata. There is also no ingest / analysis / unzip happening when using direct upload</p>",
+        "id": 431678809,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712414491
+    },
+    {
+        "content": "<p>Alright, the mime type is then essential for the upload. I will add a check before uploading.</p>",
+        "id": 431678948,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712414619
+    },
+    {
+        "content": "<p>It would mean more deps, but would it make sense to have a mime detection library do this for us?</p>",
+        "id": 431679257,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712414827
+    },
+    {
+        "content": "<p>There is one built into Python <code>mimetypes</code> - Covers most of it but has boundaries</p>",
+        "id": 431679794,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712415226
+    },
+    {
+        "content": "<p>An option would be <code>magic</code> but it requires <code>libmagic</code> to be installed, which is not a Python library.</p>",
+        "id": 431680367,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712415712
+    },
+    {
+        "content": "<p>I don't know if this is worth it since there are extra steps required to make it work.</p>",
+        "id": 431680452,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1712415766
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> what would you think about some sort of interface here? e.g., dvuploader could ship with <code>mimetypes</code> usage, but if you wanted to use another option (e.g. <code>magic</code>, or something that calls an external tool)</p>",
+        "id": 508598563,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743102236
+    },
+    {
+        "content": "<p>Sure, that is a great idea. As far as I know, the <code>magic</code> package requires the <code>libmagic</code> binaries. </p>\n<p>An alternative would be to port <a href=\"https://crates.io/crates/infer\">infer</a> from Rust via Python bindings. This way, users do not need to install these manually, and we can ship the interface without the need to install <code>libmagic</code>. Maybe there are some existing already. Otherwise, it is quite easy to set these up - The crate is quite simple.</p>",
+        "id": 508609391,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743106332
+    },
+    {
+        "content": "<p>yeah, there's a similar approach used in the <code>marcel</code> gem as used by Ruby on Rails - it uses the signatures from Apache Tika without otherwise adding a dependency on Tika itself.</p>",
+        "id": 508610049,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1743106587
+    },
+    {
+        "content": "<p>There are no bindings yet, but I have created a simple one that guesses the mime type.</p>\n<p><a href=\"/user_uploads/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"2034x590\" src=\"/user_uploads/thumbnail/53090/ru6UXiuIfDuZgpxEogyh0nNu/image.png/840x560.webp\"></a></div>",
+        "id": 508698617,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743151713
+    },
+    {
+        "content": "<p>It is exclusive to binary formats and fails at CSV and other text-based ones. I can either include another one, or we can simply combine it with Python <code>mimetypes</code>.</p>",
+        "id": 508699016,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1743151857
+    }
+]

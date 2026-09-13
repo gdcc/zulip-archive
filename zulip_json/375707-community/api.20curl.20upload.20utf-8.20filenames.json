@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>I am trying to upload files with accented filenames. <br>\nExample try:</p>\n<div class=\"codehilite\"><pre><span></span><code>curl -f -H &quot;X-Dataverse-key:$API_KEY&quot; -X POST -F &quot;file=@\\&quot;Boldogság\\&quot;&quot; -F &#39;\njsonData={&quot;filename&quot;: &quot;Boldogs%C3%A1g&quot;}&#39; &quot;$SERVER/api/datasets/:persistentId/add?persistentId=$PID&quot;\n</code></pre></div>\n<p>This results in \"BoldogsÃ¡g\" as filename. If I leave the jsonData without urlencoding, the result is the same. If I use utf-8 escape sequences (like \\045F), the result is the same.<br>\nI can easily rename the file on the user interface, but I would not like to do that to hundreds of files...</p>",
+        "id": 602195207,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781191316
+    },
+    {
+        "content": "<p>Interesting. You definitely want to use curl? I'm just wondering if pyDataverse handles this.</p>",
+        "id": 602195910,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781191447
+    },
+    {
+        "content": "<p>I will try pydataverse. Unfortunately, uploading big files with pydataverse is really slow and memory hungry, or - after 2GB - even impossible.</p>",
+        "id": 602382569,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781239267
+    },
+    {
+        "content": "<p>Maybe you could try DVUploader as well: <a href=\"https://guides.dataverse.org/en/6.10.1/user/dataset-management.html#command-line-dvuploader\">https://guides.dataverse.org/en/6.10.1/user/dataset-management.html#command-line-dvuploader</a></p>",
+        "id": 602459701,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781257818
+    },
+    {
+        "content": "<p>To be clear, I'm wondering if there's a bug in the backend (Dataverse) or if we need add a flag or something to curl.</p>",
+        "id": 602459898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781257859
+    },
+    {
+        "content": "<p>I triesd uploading with pydataverse, and the error is the same: all non-8bit UTF-8 characters are represented with two characters -- the two bytes for the actual UTF-8 characters interpreted in a different code page (iso-8859-1 maybe?). If this is not a bug in the backend, it seems at least an outdated default codepage for processing input. <br>\nHow can the uploaded content's encoding be specified?</p>",
+        "id": 602501053,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781266978
+    },
+    {
+        "content": "<p>I also tried dvuploader, but it failed to upload the file with a 400 error (it connected good, and detected if the file MD5 existed before, and nothing was logged in the server logs). So it failed before the two other methods.</p>",
+        "id": 602505263,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781267838
+    },
+    {
+        "content": "<p>Boo. I'm calling for reinforcements. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 602519427,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781270494
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602779\">@Péter Pallinger</span> one more thing to try if you're willing! <a href=\"https://github.com/gdcc/python-dvuploader\">https://github.com/gdcc/python-dvuploader</a></p>",
+        "id": 602519576,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781270526
+    },
+    {
+        "content": "<p>python-dvuploader did upload the file, but the resulting file name was the same...</p>",
+        "id": 602551524,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781276167
+    },
+    {
+        "content": "<p>bah</p>",
+        "id": 602560464,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781277818
+    },
+    {
+        "content": "<p>I filed a bug report:<br>\n<a href=\"https://github.com/IQSS/dataverse/issues/12470\">https://github.com/IQSS/dataverse/issues/12470</a></p>\n<p>There is also a working workaround: You can rename the file after upload. But this is quite slow in case of many small files.</p>",
+        "id": 604129451,
+        "sender_full_name": "Péter Pallinger",
+        "timestamp": 1781698425
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602779\">@Péter Pallinger</span> thanks!</p>",
+        "id": 604147197,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781701723
+    }
+]

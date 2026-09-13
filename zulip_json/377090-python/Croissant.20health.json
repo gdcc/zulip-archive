@@ -1,0 +1,110 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598432\">@Slava Tykhonov</span> or anyone interested in Python or Croissant, are you able to follow the README at <a href=\"https://github.com/mlcommons/croissant/tree/main/health\">https://github.com/mlcommons/croissant/tree/main/health</a> ?</p>\n<p>When I get to the <code>scrapydweb</code> step, I get crazy errors:</p>\n<p><a href=\"/user_uploads/53090/WJ4K4n6qT96JXiEGqFMXz4Ua/err.txt\">err.txt</a></p>",
+        "id": 437324022,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715023414
+    },
+    {
+        "content": "<p>I should point out I did uncomment the early return because I don't want to actually crawl all of Hugging Face:</p>\n<div class=\"codehilite\"><pre><span></span><code>diff --git a/health/crawler/spiders/huggingface.py b/health/crawler/spiders/huggingface.py\nindex bbfc91b..e06fed3 100644\n--- a/health/crawler/spiders/huggingface.py\n+++ b/health/crawler/spiders/huggingface.py\n@@ -17,13 +17,13 @@ class HuggingfaceSpider(BaseSpider):\n     def list_datasets(self):\n         &quot;&quot;&quot;See base class.&quot;&quot;&quot;\n         # Uncomment this early return for debugging purposes:\n-        # return [\n-        #     &quot;lkarjun/Malayalam-Artiicles&quot;,\n-        #     &quot;lkndsjkndgskjngkjsndkj/jsjdjsdvkjvszlhdskb&quot;,\n-        #     &quot;foo&quot;,  # does not exist\n-        #     &quot;Recag/Rp_CommonC_636_2&quot;,  # 500\n-        #     &quot;common_voice&quot;,  # timeout from Hugging Face\n-        # ]\n+        return [\n+            &quot;lkarjun/Malayalam-Artiicles&quot;,\n+            &quot;lkndsjkndgskjngkjsndkj/jsjdjsdvkjvszlhdskb&quot;,\n+            &quot;foo&quot;,  # does not exist\n+            &quot;Recag/Rp_CommonC_636_2&quot;,  # 500\n+            &quot;common_voice&quot;,  # timeout from Hugging Face\n+        ]\n         return [dataset.id for dataset in huggingface_hub.list_datasets()]\n\n     def get_url(self, dataset_id: str):\n</code></pre></div>",
+        "id": 437324167,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715023460
+    },
+    {
+        "content": "<p>Anyway, for more context, we'd like to add a crawler for Dataverse some day, one Croissant is in place for a few installations: <a href=\"https://github.com/mlcommons/croissant/issues/530\">https://github.com/mlcommons/croissant/issues/530</a></p>",
+        "id": 437324270,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715023521
+    },
+    {
+        "content": "<p>I asked for help here: <a href=\"https://github.com/mlcommons/croissant/issues/530#issuecomment-2096806017\">https://github.com/mlcommons/croissant/issues/530#issuecomment-2096806017</a></p>",
+        "id": 437329315,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715025640
+    },
+    {
+        "content": "<p>Shall we put it on the PyDataverse WG agenda?</p>",
+        "id": 437330896,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715026305
+    },
+    {
+        "content": "<p>If you want. I'm just trying to reach Python people. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 437335332,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715028444
+    },
+    {
+        "content": "<p>Sure, let's try to debug it <span aria-label=\"nerd\" class=\"emoji emoji-1f913\" role=\"img\" title=\"nerd\">:nerd:</span></p>",
+        "id": 437337751,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715029622
+    },
+    {
+        "content": "<p>It seems like the error originates from <code>scrapydweb,</code> which tries to talk to a database where a certain table is missing. Maybe there are some prequesites necessary to set up <code>scrapyd</code> and it is missing here.</p>",
+        "id": 437339871,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715030147
+    },
+    {
+        "content": "<p>Trying to reproduce it on my machine now</p>",
+        "id": 437340113,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715030212
+    },
+    {
+        "content": "<p>Getting the same error on Python 3.11</p>",
+        "id": 437340647,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715030475
+    },
+    {
+        "content": "<p>Seems to be know and is fixed in 1.4.1</p>\n<p><a href=\"https://github.com/my8100/scrapydweb/issues/205\">https://github.com/my8100/scrapydweb/issues/205</a></p>",
+        "id": 437343168,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715031743
+    },
+    {
+        "content": "<p><del>Current <code>scrapydweb</code> on PyPI is 1.4.0 though</del> Scrapydweb is 1.5.0 on PyPI but coming from the <code>requirements.txt</code> it installs 1.4.0. I guess due to other dependencies using it already.</p>",
+        "id": 437343202,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715031766
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/nCh7jIECqYOZoXs6hWxv6D7j/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/nCh7jIECqYOZoXs6hWxv6D7j/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/nCh7jIECqYOZoXs6hWxv6D7j/image.png\"></a></div>",
+        "id": 437343358,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715031858
+    },
+    {
+        "content": "<p>Works when you install the current dev version via:</p>\n<p><code>python -m pip install git+https://github.com/my8100/scrapydweb.git</code></p>",
+        "id": 437343402,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715031890
+    },
+    {
+        "content": "<p>Nice! Thanks! Gotta take my dog for a walk, but I'll try it. Thanks! <img alt=\":midnight:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44318.png\" title=\"midnight\"></p>",
+        "id": 437343579,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715032012
+    },
+    {
+        "content": "<p>Hey, it works! Thanks, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> !</p>\n<p><a href=\"/user_uploads/53090/K5lyGLrsvdMNS5L5DXdqxRWO/scrapydweb.png\">scrapydweb.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/K5lyGLrsvdMNS5L5DXdqxRWO/scrapydweb.png\" title=\"scrapydweb.png\"><img src=\"/user_uploads/53090/K5lyGLrsvdMNS5L5DXdqxRWO/scrapydweb.png\"></a></div>",
+        "id": 437462351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715090866
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> I opened an issue and gave you a shout out: <a href=\"https://github.com/mlcommons/croissant/issues/647\">https://github.com/mlcommons/croissant/issues/647</a></p>\n<p>Thanks again! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 437464617,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1715091537
+    },
+    {
+        "content": "<p>Glad to hear it works!</p>",
+        "id": 437496243,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1715102034
+    }
+]

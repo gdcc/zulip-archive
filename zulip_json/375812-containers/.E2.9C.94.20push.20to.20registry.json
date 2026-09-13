@@ -1,0 +1,668 @@
+[
+    {
+        "content": "<p>With <a href=\"https://github.com/IQSS/dataverse/issues/9439\">#9439</a> almost done, one of the next steps is <a href=\"https://github.com/IQSS/dataverse/issues/9444\">#9444</a>. To play with this, I created <a href=\"https://github.com/poikilotherm/test-image-push-flows\">https://github.com/poikilotherm/test-image-push-flows</a>, avoiding lots of noise in the main project and faster turn around times.</p>",
+        "id": 342138502,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905445
+    },
+    {
+        "content": "<p>This actually works quite well already... See the packages <a href=\"https://github.com/poikilotherm/test-image-push-flows/pkgs/container/test\">at GHCR</a> and <a href=\"https://hub.docker.com/repository/docker/poikilotherm/testbase/general\">at Docker Hub 1</a>, <a href=\"https://hub.docker.com/repository/docker/poikilotherm/test/general\">Docker Hub 2</a></p>",
+        "id": 342138870,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905558
+    },
+    {
+        "content": "<p>One of the crucial parts is to switch the Maven Unittest workflow to not run on push to any branch, but only for <code>master</code> and <code>develop</code></p>",
+        "id": 342139180,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905653
+    },
+    {
+        "content": "<p>This is a good idea anyway, as we avoid running the tests twice that way: once for the PR, once for the push</p>",
+        "id": 342139307,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905690
+    },
+    {
+        "content": "<p>Just to clarify, we never push to master nor develop. These branches are protected. We do merge to them.</p>",
+        "id": 342139462,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678905737
+    },
+    {
+        "content": "<p>What I want to know:</p>\n<ol>\n<li>Shall we push all PRs to GHCR as feature images or use some selection criterion like a label, text in description or other?</li>\n<li>Should we remove tags on GHCR once a PR has been closed / merged?</li>\n</ol>",
+        "id": 342139744,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905824
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> opinions plz?!</p>",
+        "id": 342139848,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678905849
+    },
+    {
+        "content": "<p>Oh and 3. do we need some kind of report comment what the name of the generated image is, so one does not need to dig through logs?</p>",
+        "id": 342140673,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678906081
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/push.20to.20registry/near/342139462\">said</a>:</p>\n<blockquote>\n<p>Just to clarify, we never push to master nor develop. These branches are protected. We do merge to them.</p>\n</blockquote>\n<p>Absolutely - but when a PR is merged for these branches, this triggers a push event. So this is important to ship the stable/unstable images</p>",
+        "id": 342141477,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678906316
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> WDYT? <a href=\"https://github.com/poikilotherm/test-image-push-flows/pull/4#issuecomment-1470702800\">https://github.com/poikilotherm/test-image-push-flows/pull/4#issuecomment-1470702800</a></p>",
+        "id": 342149708,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678908753
+    },
+    {
+        "content": "<p>I would remove PR images once PRs are closed or merged. I would update the develop and master tags once anything gets merged into them.</p>",
+        "id": 342155852,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1678910737
+    },
+    {
+        "content": "<p>What he said. I agree. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 342156001,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678910785
+    },
+    {
+        "content": "<p>What does it mean to remove a tag? Does that delete the image?</p>",
+        "id": 342156053,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678910804
+    },
+    {
+        "content": "<p>It should delete that particular version of the image and make it no more accesible for pulling</p>",
+        "id": 342156359,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1678910892
+    },
+    {
+        "content": "<p>So the decision is that we are only going to use GitHub registry, not Docker Hub. Correct me if I am wrong please!</p>",
+        "id": 342156691,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1678911003
+    },
+    {
+        "content": "<p>It sounds <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> might have three open questions. Let's please take them one at a time. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 342157840,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678911393
+    },
+    {
+        "content": "<p>Oh and by the way, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I just tried to get this PR into the sprint (we were in a kickoff meeting) but we have other work to do. Sorry! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 342158036,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678911467
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/push.20to.20registry/near/342158036\">said</a>:</p>\n<blockquote>\n<p>Oh and by the way, <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> I just tried to get this PR into the sprint (we were in a kickoff meeting) but we have other work to do. Sorry! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>\n</blockquote>\n<p>Meh. <span aria-label=\"melting face\" class=\"emoji emoji-1fae0\" role=\"img\" title=\"melting face\">:melting_face:</span> Containers still are not important.</p>",
+        "id": 342158629,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911664
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/push.20to.20registry/near/342156053\">said</a>:</p>\n<blockquote>\n<p>What does it mean to remove a tag? Does that delete the image?</p>\n</blockquote>\n<p>That kind of depends on the registry policies</p>",
+        "id": 342158733,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911702
+    },
+    {
+        "content": "<p>Docker is much more strict with this than GHCR.</p>",
+        "id": 342159027,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911789
+    },
+    {
+        "content": "<p>On the other hand, usually GHCR storage isn't free</p>",
+        "id": 342159063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911801
+    },
+    {
+        "content": "<p>It is free for public things on GHCR though</p>",
+        "id": 342159197,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911843
+    },
+    {
+        "content": "<p>So maybe we could use sth. like <a href=\"https://github.com/marketplace/actions/container-retention-policy\">https://github.com/marketplace/actions/container-retention-policy</a> to cleanup once in a while</p>",
+        "id": 342159285,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911872
+    },
+    {
+        "content": "<p>Delete old images. Sure. Makes sense.</p>",
+        "id": 342159368,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678911906
+    },
+    {
+        "content": "<p>So question 3 is already solved - I added an automated commenting already</p>",
+        "id": 342159600,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678911981
+    },
+    {
+        "content": "<p>Good! What's the next question?</p>",
+        "id": 342159661,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912010
+    },
+    {
+        "content": "<p>What remains is question 1: be more strict with building?</p>",
+        "id": 342159680,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912018
+    },
+    {
+        "content": "<p>Should we have some filter?</p>",
+        "id": 342159697,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912023
+    },
+    {
+        "content": "<p>Filter can basically be anything</p>",
+        "id": 342159727,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912035
+    },
+    {
+        "content": "<p>I mean maybe it's just fine to push images for all of it</p>",
+        "id": 342159805,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912066
+    },
+    {
+        "content": "<p>What are the risks of simply pushing everything?</p>",
+        "id": 342159806,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912066
+    },
+    {
+        "content": "<p>It would help with testing</p>",
+        "id": 342159816,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912071
+    },
+    {
+        "content": "<p>As we don't pay a dime for our public images, I don't see much risk</p>",
+        "id": 342159911,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912094
+    },
+    {
+        "content": "<p>Of course CPU cycles might be a thing</p>",
+        "id": 342159965,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912111
+    },
+    {
+        "content": "<p>Maybe we can leave a comment in some code or in a doc that we can start filtering if need be and link to how.</p>",
+        "id": 342160052,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912147
+    },
+    {
+        "content": "<p>RIght.</p>",
+        "id": 342160083,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912159
+    },
+    {
+        "content": "<p>I think I'm quite fond of how this works now in the pet project</p>",
+        "id": 342160226,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912203
+    },
+    {
+        "content": "<p>Looks like you're building an image with Java in it.</p>",
+        "id": 342160463,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912291
+    },
+    {
+        "content": "<p>Yeah nothing fancy. Just some stupid stuff. Doesn't matter what is inside, the hard part was getting the flows right</p>",
+        "id": 342160635,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912356
+    },
+    {
+        "content": "<p>Sure. Was there a last question? I've lost track. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Thanks for hacking on all this! It's great! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 342161050,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912502
+    },
+    {
+        "content": "<p>I think I'm good</p>",
+        "id": 342161358,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912601
+    },
+    {
+        "content": "<p>I wonder if I should put something into a Dataverse PR from this...</p>",
+        "id": 342161400,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912620
+    },
+    {
+        "content": "<p>Given that even the most basic thing isn't even prioritized</p>",
+        "id": 342161477,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912648
+    },
+    {
+        "content": "<p>Oh, we have a plan but you're not sure if it's worth coding it up? Because it isn't a priority?</p>",
+        "id": 342161782,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912766
+    },
+    {
+        "content": "<p>Basically this stuff is done</p>",
+        "id": 342161825,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912781
+    },
+    {
+        "content": "<p>It works as expected</p>",
+        "id": 342161834,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912786
+    },
+    {
+        "content": "<p>Has all the features to make people happy</p>",
+        "id": 342161848,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912793
+    },
+    {
+        "content": "<p>People can get going with this (at least for the application image)</p>",
+        "id": 342161924,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912813
+    },
+    {
+        "content": "<p>Let's at least put an estimate on it, please.</p>",
+        "id": 342161928,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912814
+    },
+    {
+        "content": "<p>Size: 3</p>",
+        "id": 342161960,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912828
+    },
+    {
+        "content": "<p>Because I already did all the coding</p>",
+        "id": 342161991,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912841
+    },
+    {
+        "content": "<p>And for testing it's better to use the pet project. Turnaround times in the main project are gonna be tremendously larger</p>",
+        "id": 342162070,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912869
+    },
+    {
+        "content": "<p>I dunno if someone wants to write some docs how the pipeline works. Might be neat</p>",
+        "id": 342162170,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912915
+    },
+    {
+        "content": "<p>Haha even the scheduled execution worked like a champ</p>",
+        "id": 342162301,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912952
+    },
+    {
+        "content": "<p><a href=\"https://github.com/poikilotherm/test-image-push-flows/actions/runs/4430739909\">https://github.com/poikilotherm/test-image-push-flows/actions/runs/4430739909</a></p>",
+        "id": 342162313,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912958
+    },
+    {
+        "content": "<p>It build the base image anew, deployed it to Docker Hub and then rebuilt the app image on top of the new base</p>",
+        "id": 342162376,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678912991
+    },
+    {
+        "content": "<p>Thanks. I gave it a 3 and left a comment: <a href=\"https://github.com/IQSS/dataverse/pull/9447#issuecomment-1470812282\">https://github.com/IQSS/dataverse/pull/9447#issuecomment-1470812282</a></p>",
+        "id": 342162392,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678912999
+    },
+    {
+        "content": "<p>Thx. I added a comment about the pet project and the next step to get this into the PR</p>",
+        "id": 342162935,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913197
+    },
+    {
+        "content": "<p>I think this is a better URL for the clean diff: <a href=\"https://github.com/IQSS/dataverse/compare/9434-app-container...9444-push-images\">https://github.com/IQSS/dataverse/compare/9434-app-container...9444-push-images</a> . If you don't mind, I'll update the description. It's tiny! But this only pushes the base image, right? Not the app image.</p>",
+        "id": 342162980,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913216
+    },
+    {
+        "content": "<p>Yeah, these were some initial fixes of stuff.</p>",
+        "id": 342163063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913260
+    },
+    {
+        "content": "<p>There's more in the pet project.</p>",
+        "id": 342163084,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913271
+    },
+    {
+        "content": "<p>I probably shouldn't have done it in the pet project. I won't get as much commit counts now!</p>",
+        "id": 342163188,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913298
+    },
+    {
+        "content": "<p>So... what does it take to move this PR from draft to ready? Start pushing the base image?</p>",
+        "id": 342163217,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913307
+    },
+    {
+        "content": "<p>The base image will already be pushed. The addition in the PR was only about _scheduled_ pushes and a fix for getting a push to the stable tag when in main/master</p>",
+        "id": 342163321,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913354
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375812-containers/topic/push.20to.20registry/near/342163217\">said</a>:</p>\n<blockquote>\n<p>So... what does it take to move this PR from draft to ready? Start pushing the base image?</p>\n</blockquote>\n<p><a href=\"https://github.com/IQSS/dataverse/pull/9447#issuecomment-1470815116\">https://github.com/IQSS/dataverse/pull/9447#issuecomment-1470815116</a> <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 342163386,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913385
+    },
+    {
+        "content": "<p>Oh, I was clearly confused. This is about stable. Got it.</p>",
+        "id": 342163424,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913401
+    },
+    {
+        "content": "<p>\"ci(ct): fix pushing the correct tag (stable) for master branch\" :-D</p>",
+        "id": 342163529,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913428
+    },
+    {
+        "content": "<p>Ok, and copy workflows, add docs, etc. I think I get it.</p>",
+        "id": 342163568,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913442
+    },
+    {
+        "content": "<p>The hard part is <em>done</em>.</p>",
+        "id": 342163755,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913503
+    },
+    {
+        "content": "<p>Right. And the details are in the pet project.</p>",
+        "id": 342163855,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913525
+    },
+    {
+        "content": "<p>-details +solutions</p>",
+        "id": 342163926,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913554
+    },
+    {
+        "content": "<p>The details are the somewhat missing docs in a page in the guide</p>",
+        "id": 342163958,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1678913568
+    },
+    {
+        "content": "<p>Ok. Still a 3. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 342164060,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1678913606
+    },
+    {
+        "content": "<p>So, with <a href=\"https://github.com/IQSS/dataverse/issues/9434\">#9434</a> resolved, one next step is \"do some push ups\". (Pun intended)</p>",
+        "id": 343213810,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1679341960
+    },
+    {
+        "content": "<p>I did give this a 3 and I just moved it to the top of the Dataverse Team column in the <a href=\"https://github.com/orgs/IQSS/projects/34/views/1\">backlog</a>.</p>\n<p>Instead of \"push images\" can we give it a more specific title? \"push dev app images to registries\" maybe?</p>",
+        "id": 343494484,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1679424629
+    },
+    {
+        "content": "<p>Morning <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  - I am adding the necessary workflow scripts to push the images (so we can fulfill Milestone B). Would you be so kind to create two secrets in IQSS/dataverse for me? (GHCR_USERNAME &amp; GHCR_TOKEN)</p>",
+        "id": 352179506,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682318926
+    },
+    {
+        "content": "<p>Thank you!</p>",
+        "id": 352256380,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682338891
+    },
+    {
+        "content": "<p>What should we put into the README for gdcc/dataverse that will be pushed to Docker Hub?</p>",
+        "id": 352287590,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682345343
+    },
+    {
+        "content": "<p>Suggestions welcome!</p>",
+        "id": 352287634,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682345349
+    },
+    {
+        "content": "<p>OK here's a draft. <a href=\"https://github.com/IQSS/dataverse/pull/9447/files#diff-774e1f5fbbba6ff5f99dbdc3457c545bb945a88402b69080516ecca7fcd4fdce\">https://github.com/IQSS/dataverse/pull/9447/files#diff-774e1f5fbbba6ff5f99dbdc3457c545bb945a88402b69080516ecca7fcd4fdce</a></p>",
+        "id": 352294686,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682346721
+    },
+    {
+        "content": "<p>Looks good!</p>",
+        "id": 352315439,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682350812
+    },
+    {
+        "content": "<p>And I see the PR is no longer draft!</p>",
+        "id": 352315491,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682350820
+    },
+    {
+        "content": "<p>Yes it isn't. Might need polishing by review, otherwise probably good to go</p>",
+        "id": 352317050,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682351169
+    },
+    {
+        "content": "<p>And some front-end dev should test pulling from GHCR. Maybe <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span>  is up for it?</p>",
+        "id": 352317212,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682351209
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> was JUST talking about the need for a containerized dev env: <a href=\"https://github.com/IQSS/dataverse-frontend/issues/65\">https://github.com/IQSS/dataverse-frontend/issues/65</a></p>\n<p>I suspect he'll be happy to see this pull request is no longer a draft! <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 352317534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682351284
+    },
+    {
+        "content": "<p>There is a low volume but constant flow of output here</p>",
+        "id": 352317827,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682351363
+    },
+    {
+        "content": "<p>I would be glad to know if that crazy idea from my head is now actually of any use</p>",
+        "id": 352317955,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682351397
+    },
+    {
+        "content": "<p>Limited so far, of course. But a step in the hopefully right direction</p>",
+        "id": 352318094,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682351420
+    },
+    {
+        "content": "<p>I merged <a href=\"https://github.com/IQSS/dataverse/pull/9447\">https://github.com/IQSS/dataverse/pull/9447</a></p>",
+        "id": 352508234,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682422035
+    },
+    {
+        "content": "<p>Now we have <a href=\"https://hub.docker.com/r/gdcc/dataverse\">https://hub.docker.com/r/gdcc/dataverse</a></p>",
+        "id": 352508269,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682422046
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 352508307,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682422058
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> check this out ^^</p>",
+        "id": 352508347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682422079
+    },
+    {
+        "content": "<p>Awesome! I will be happy to test it when working in the <a href=\"https://github.com/IQSS/dataverse-frontend/issues/65\">development environment for frontend developers</a></p>",
+        "id": 352544326,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1682430874
+    },
+    {
+        "content": "<p>Interesting first find already: the PR from ErykKul did not go through with pushing the PR Image because his workflow run does not have permission to access the credentials. Let's see if it works property for IQSS folks</p>",
+        "id": 352576321,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682437568
+    },
+    {
+        "content": "<p>This one was pushed: <a href=\"https://github.com/orgs/gdcc/packages/container/dataverse/88346793?tag=9361-storage-quotas\">https://github.com/orgs/gdcc/packages/container/dataverse/88346793?tag=9361-storage-quotas</a></p>\n<p>Via <a href=\"https://github.com/IQSS/dataverse/pull/9409#issuecomment-1522340389\">https://github.com/IQSS/dataverse/pull/9409#issuecomment-1522340389</a></p>",
+        "id": 352637115,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682455702
+    },
+    {
+        "content": "<p>Yes of course - that PR is based on a branch living at IQSS/dataverse and thus has access to the secrets. PRs with branches in forks don't have access to the secrets, so they won't be pushing images.</p>",
+        "id": 352716993,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682495571
+    },
+    {
+        "content": "<p>Probably the only way to resolve that is to push these images not to GDCC but IQSS as packages, because then the GITHUB_TOKEN should be enabled to write</p>",
+        "id": 352717529,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682495676
+    },
+    {
+        "content": "<p>Sounds fine to me. I'm not aware of any downsides.</p>",
+        "id": 352762024,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682507018
+    },
+    {
+        "content": "<p>I might have another idea. We could try using comments for these cases.</p>",
+        "id": 352776475,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682510441
+    },
+    {
+        "content": "<p>We can trigger actions on comments. So some core dev could trigger pushing the image by leaving a certain comment</p>",
+        "id": 352776675,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682510485
+    },
+    {
+        "content": "<p>This _should_ run the workflow with all the access to secrets...</p>",
+        "id": 352776828,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682510520
+    },
+    {
+        "content": "<p>Interesting. Sure, worth a shot.</p>",
+        "id": 352789077,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682513124
+    },
+    {
+        "content": "<p>I just added \"push to registry\" (this topic) to the agenda for tomorrow's meeting: <a href=\"https://docs.google.com/document/d/1Hz47lLjE9h1-YE5zD2wu4tT1ObB6vB6Nr3m16pQ4LF4/edit?usp=sharing\">https://docs.google.com/document/d/1Hz47lLjE9h1-YE5zD2wu4tT1ObB6vB6Nr3m16pQ4LF4/edit?usp=sharing</a></p>",
+        "id": 352818729,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682519332
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> I just added a parameter to set the tag in the command comment. It will still default to branch name, but you can override via named parameter. Here's the example: <a href=\"https://github.com/poikilotherm/test-image-push-flows/pull/8#issuecomment-1527054755\">https://github.com/poikilotherm/test-image-push-flows/pull/8#issuecomment-1527054755</a></p>",
+        "id": 353689675,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682665767
+    },
+    {
+        "content": "<p>Note to self: make the job status visible by adding it as a check with <a href=\"https://github.com/marketplace/actions/github-checks\">https://github.com/marketplace/actions/github-checks</a></p>",
+        "id": 353774879,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682676914
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> may I require your assistance this evening during tech hour?</p>",
+        "id": 355071096,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683016181
+    },
+    {
+        "content": "<p>Sure, what can I do for you?</p>",
+        "id": 355111867,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683025303
+    },
+    {
+        "content": "<p>Would you be so kind to create a fork of <a href=\"https://github.com/poikilotherm/test-image-push-flows\">https://github.com/poikilotherm/test-image-push-flows</a>, edit something so you can create a pull request this evening?</p>",
+        "id": 355118829,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683026868
+    },
+    {
+        "content": "<p>Just so we have a proper demo of what happens...</p>",
+        "id": 355118886,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683026879
+    },
+    {
+        "content": "<p>Whoops, I guess I missed this, sorry.</p>\n<p>I just started a fresh topic for /push-images: <a href=\"#narrow/stream/375812-containers/topic/.2Fpush-images\">https://dataverse.zulipchat.com/#narrow/stream/375812-containers/topic/.2Fpush-images</a></p>",
+        "id": 355830549,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683218225
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> has marked this topic as resolved.</p>",
+        "id": 356603860,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1683526670
+    }
+]

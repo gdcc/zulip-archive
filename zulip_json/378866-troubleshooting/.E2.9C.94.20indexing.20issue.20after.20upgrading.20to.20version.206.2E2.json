@@ -1,0 +1,164 @@
+[
+    {
+        "content": "<p>After upgrading to version 6.2, I got zero dataverse and dataset under dataverse/root/ on the web. But \"curl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a>\" gives the right number of dataverses and datasets. What could be the reason? Please help. Thanks!</p>",
+        "id": 436694681,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714656666
+    },
+    {
+        "content": "<p>Anything in server.log?</p>",
+        "id": 436694834,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714656713
+    },
+    {
+        "content": "<p>It says \"4 dataverses and 10 datasets indexed. index all took 2639 milliseconds. Solr index was not cleared before indexing.\" Does that mean I need to clear it before indexing after upgrading?</p>",
+        "id": 436698132,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714657605
+    },
+    {
+        "content": "<p>The log file is pretty long with the activities from yesterday. I also see this \"[2024-05-01T17:14:03.144-0400] [Payara 6.2023.8] [INFO] [] [edu.harvard.iq.dataverse.search.SearchServiceBean] [tid: _ThreadID=90 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1714598043144] [levelValue: 800] [[<br>\n  Search Syntax Error: Error from server at http://<em>.</em>.<em>.</em>:8983/solr/collection1: undefined field: \"license\"]]\"</p>",
+        "id": 436699707,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714658024
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"663833\">Hansen C.</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/issue.20after.20upgrading.20to.20version.206.2E2/near/436698132\">said</a>:</p>\n<blockquote>\n<p>It says \"4 dataverses and 10 datasets indexed. index all took 2639 milliseconds. Solr index was not cleared before indexing.\" Does that mean I need to clear it before indexing after upgrading?</p>\n</blockquote>\n<p>if it's not done, yes you need <code>curl http://localhost:8080/api/admin/index/clear</code> before <code>curl http://localhost:8080/api/admin/index</code></p>",
+        "id": 436699969,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658071
+    },
+    {
+        "content": "<p>In production consider <a href=\"https://guides.dataverse.org/en/latest/admin/solr-search-index.html#reindex-in-place\">https://guides.dataverse.org/en/latest/admin/solr-search-index.html#reindex-in-place</a></p>\n<div class=\"codehilite\"><pre><span></span><code>curl -X DELETE http://localhost:8080/api/admin/index/timestamps\ncurl http://localhost:8080/api/admin/index/continue\n</code></pre></div>\n<p>to avoid blank home page</p>",
+        "id": 436700541,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658205
+    },
+    {
+        "content": "<p>Done it. Got this: {\"status\":\"OK\",\"data\":{\"availablePartitionIds\":[0],\"args\":{\"numPartitions\":1,\"partitionIdToProcess\":0},\"message\":\"indexAllOrSubset has begun of 4 dataverses and 10 datasets.\"}}<br>\nBut still not records.</p>",
+        "id": 436702445,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714658724
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"663833\">Hansen C.</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/issue.20after.20upgrading.20to.20version.206.2E2/near/436699707\">said</a>:</p>\n<blockquote>\n<p>The log file is pretty long with the activities from yesterday. I also see this \"[2024-05-01T17:14:03.144-0400] [Payara 6.2023.8] [INFO] [] [edu.harvard.iq.dataverse.search.SearchServiceBean] [tid: _ThreadID=90 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1714598043144] [levelValue: 800] [[<br>\n  Search Syntax Error: Error from server at http://<em>.</em>.<em>.</em>:8983/solr/collection1: undefined field: \"license\"]]\"</p>\n</blockquote>\n<p>This one, I suspect you didn't <strong>Run the <code>update-fields.sh</code> script</strong> (<a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.2\">step 8</a>)</p>",
+        "id": 436702472,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658730
+    },
+    {
+        "content": "<p>it must be done before reindexing, some SOLR fields are missing</p>",
+        "id": 436702695,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658778
+    },
+    {
+        "content": "<p>Isn't step 8 optional? I am not using custom or experimental metadata blocks.</p>",
+        "id": 436702910,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714658834
+    },
+    {
+        "content": "<p>You are right</p>",
+        "id": 436702941,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658844
+    },
+    {
+        "content": "<p>Have you update the default schema.xml ? * <code>wget https://raw.githubusercontent.com/IQSS/dataverse/v6.2/conf/solr/9.3.0/schema.xml</code></p>",
+        "id": 436703039,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658872
+    },
+    {
+        "content": "<p>Because it looks like you are missing <code>&lt;field name=\"license\" type=\"string\" stored=\"true\" indexed=\"true\" multiValued=\"false\"/&gt;</code> in your solr</p>",
+        "id": 436703202,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658907
+    },
+    {
+        "content": "<p>And SOLR restart/reload after</p>",
+        "id": 436703279,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714658927
+    },
+    {
+        "content": "<p>Yes. I updated schema.xml and did solr restart a couple of times.</p>",
+        "id": 436703506,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714658979
+    },
+    {
+        "content": "<p><code>Search Syntax Error: Error from server at http://*.*.*.*:8983/solr/collection1: undefined field: \"license\"]]\"</code> is really clear, your SOLR didn't have the update</p>",
+        "id": 436703705,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714659026
+    },
+    {
+        "content": "<p>Let me check again to be sure.</p>",
+        "id": 436703793,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714659054
+    },
+    {
+        "content": "<p>Check Solr Logs maybe ~ <a href=\"http://localhost:8983/solr/#/~logging\">http://localhost:8983/solr/#/~logging</a></p>",
+        "id": 436704027,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1714659117
+    },
+    {
+        "content": "<p>Sorry, I was in a container meeting. <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a></p>",
+        "id": 436706661,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714659875
+    },
+    {
+        "content": "<p>Yes, it sounds like \"license\" is missing from your schema.xml. Thanks, <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span></p>",
+        "id": 436706766,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714659911
+    },
+    {
+        "content": "<p>Temporarily lost access to the DB server. I will check the file and log and report back to you. Thank you  both so much for your help!</p>",
+        "id": 436707588,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714660149
+    },
+    {
+        "content": "<p>This is more of a Solr thing than a DB thing, but sure. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 436708019,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714660254
+    },
+    {
+        "content": "<p>I am not sure how problematic it is, but our solr is running on our DB server. I will check the solr files.</p>",
+        "id": 436709768,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714660799
+    },
+    {
+        "content": "<p>Oh, I see. We've done that in the past (before we moved our database to AWS RDS.) Should be fine.</p>",
+        "id": 436711484,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714661288
+    },
+    {
+        "content": "<p>Hi Philip and Daniel, It turns out that I forgot to point solr to solr9.3.0, it was still running 8.11.1. Issue was solved after changing the path to solr. Thank you so much for directing me to schema.xml as the source of problem and sorry for wasting your time on my silly mistakes.  Best, Hansen</p>",
+        "id": 436745687,
+        "sender_full_name": "Hansen C.",
+        "timestamp": 1714671988
+    },
+    {
+        "content": "<p>No worries! Others have seen that error about the license field being missing. I'm glad you're all set.</p>",
+        "id": 436747575,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714672656
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 436747591,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1714672661
+    }
+]
