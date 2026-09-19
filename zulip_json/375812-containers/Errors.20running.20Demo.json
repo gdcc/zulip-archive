@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>As suggested by Philip, I have moved my reports from GitHub to here :-)</p>\n<p>Philip, you suggested that I try running the demo (<a href=\"https://guides.dataverse.org/en/6.4/container/running/demo.html\">https://guides.dataverse.org/en/6.4/container/running/demo.html</a>).  I did so.  The first step (running docker-compose up, with no \"demo\" folder) was fine.  Dataverse came up and I could login.  The second step failed.  Creating a \"demo\" folder with the <a href=\"http://init.sh\">init.sh</a> script, then docker-compose up results in an endless cycle of:</p>\n<p>bootstrap           | 2024-12-04T07:49:28Z INF [HTTP] Checking the <a href=\"http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version</a> ...<br>\nbootstrap           | 2024-12-04T07:49:28Z ERR Expectation failed error=\"the status code doesn't expect\" actual=404 expect=200<br>\nbootstrap           | 2024-12-04T07:49:36Z INF [HTTP] Checking the <a href=\"http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version</a> ...<br>\nbootstrap           | 2024-12-04T07:49:36Z ERR Expectation failed error=\"the status code doesn't expect\" actual=404 expect=200</p>\n<p>until the timeout is reached.</p>\n<p>Suggestions?</p>\n<p>thanks!</p>",
+        "id": 486030279,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1733298621
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653164\">@Mark Wilkinson</span> hi! Thanks for trying our containers! I'm sorry to hear you're having problems. If that /api/info/version endpoint failed there's a good chance the Dataverse war file could not be deployed to the Payara app server. Can you please provide more of the logs from the \"dataverse\" container so we can see what went wrong?</p>",
+        "id": 486074264,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733313152
+    },
+    {
+        "content": "<p>You could try something like this, for example:</p>\n<div class=\"codehilite\"><pre><span></span><code>docker logs dataverse &gt; logs.txt 2&gt;&amp;1\n</code></pre></div>",
+        "id": 486314790,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733408150
+    },
+    {
+        "content": "<p>Also, I forgot to mention this but we have a meeting about containers every week. The next one is in 15 minutes! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Please feel free to join sometime! <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>",
+        "id": 486314982,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733408203
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/4EGAwN4TI10ms90Xom8gPj3l/logs.txt\">logs.txt</a></p>",
+        "id": 486925979,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1733730918
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🐉</span> <a href=\"#narrow/channel/375812-containers/topic/Errors.20running.20Demo/near/486314982\">said</a>:</p>\n<blockquote>\n<p>Also, I forgot to mention this but we have a meeting about containers every week. The next one is in 15 minutes! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Please feel free to join sometime! <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a></p>\n</blockquote>\n<p>If I have to add another meeting to my calendar I will scream!  LOL!</p>",
+        "id": 486926060,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1733730944
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653164\">@Mark Wilkinson</span> thanks! This error is definitely fatal but I'm not sure why you're seeing it:</p>\n<div class=\"codehilite\"><pre><span></span><code>Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V4.11__5513-database-variablemetadata.sql failed\n----------------------------------------------------------\nSQL State  : 42P01\nError Code : 0\nMessage    : ERROR: relation &quot;datavariable&quot; does not exist\nLocation   : db/migration/V4.11__5513-database-variablemetadata.sql (/opt/payara/deployments/dataverse/WEB-INF/classes/db/migration/V4.11__5513-database-variablemetadata.sql)\nLine       : 4\nStatement  : -- universe is dropped since it is empty in the dataverse\n-- this column will be moved to variablemetadata table\n-- issue 5513\nALTER TABLE datavariable\nDROP COLUMN  if exists universe\n</code></pre></div>",
+        "id": 486981076,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733746911
+    },
+    {
+        "content": "<p>I'm curious about why you're seeing it but practically speaking I'd like to get you unblocked so you can continue with your setup of Dataverse.</p>\n<p>What if you move the <code>data</code> directory aside and try again? Instead of <a href=\"https://guides.dataverse.org/en/6.4/container/running/demo.html#deleting-data-and-starting-over\">deleting it</a> in case we want to try to reproduce the problem later, I mean.</p>\n<p>And then try again?</p>",
+        "id": 486981645,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733747062
+    },
+    {
+        "content": "<p>That works!   I will continue following the tutorial!  thanks!</p>",
+        "id": 486985022,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1733748085
+    },
+    {
+        "content": "<p>Phew! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Go, go, go! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 486994263,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1733750584
+    },
+    {
+        "content": "<p>Hi Philip!  Coming back to this... is there anything I will be missing if I am not able to get the <a href=\"http://init.sh\">init.sh</a> script to run?  Or will Dataverse be fully functional, back-uppable, etc.?  If everything is OK, I will start to move into Production :-)</p>",
+        "id": 490976844,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1735295791
+    },
+    {
+        "content": "<p>Well... the previous question doesn't matter in any case!  I switched to my production server, and had exactly the opposite result:  I could NOT bring up the demo server without the <a href=\"http://init.sh\">init.sh</a> script!  It ran, and then everything was fine!</p>\n<p>So the new question is:  should I remove the <a href=\"http://init.sh\">init.sh</a> script now that it has been run once?  Or just leave it there?</p>",
+        "id": 490980891,
+        "sender_full_name": "Mark Wilkinson",
+        "timestamp": 1735298656
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653164\">@Mark Wilkinson</span> the <a href=\"http://init.sh\">init.sh</a> script should only run once. It's fine to leave in place, as part of the configbaker image. When the configbaker image runs it should detect if Dataverse has already been configured or not and only run the <a href=\"http://init.sh\">init.sh</a> script if Dataverse hasn't been configured.</p>",
+        "id": 492521803,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736348200
+    },
+    {
+        "content": "<p>Regarding production, as we say at <a href=\"https://guides.dataverse.org/en/6.5/container/running/production.html\">https://guides.dataverse.org/en/6.5/container/running/production.html</a> we are still working on tagging images so that you can be locked to a specific image (e.g. 6.4 or 6.5). We also plan to add more docs. Please keep the feedback coming! We want people with an eye toward production use to let us know what we've missed! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 492522191,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736348307
+    }
+]

@@ -1,0 +1,56 @@
+<html>
+<head><meta charset="utf-8"><title>Spreadsheet previewer issues when locally installed · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html">Spreadsheet previewer issues when locally installed</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="624142149"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624142149" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624142149">(Sep 14 2026 at 18:34)</a>:</h4>
+<p>Hi .. we are running dataverse v6.11 .. we recently installed the previewers locally since that is recommended and we were having some issues with CORs .. I'm noticing that with files that are ingested to tabular format .. whether they already existed, or if I upload an .xlsx file and it gets ingested .. the spreadsheet previewer appears next to the file but it does not work/display anything. (It acts like it is going to preview but nothing is there). If I disable ingestion and upload an .xlsx file no previewer appears next to the file, which I know is expected. </p>
+<p>The filetype on the uningested file is "MS Excel Spreadsheet" and the filetype on the ingested file is "Tab-Delimited".  All of the other previewers are working as expected. We have the recommended CORs on the bucket permissions and JVM options. Any ideas on why the spreadsheet viewer would invoke but not display anything?</p>
+
+
+
+<a name="624142838"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624142838" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624142838">(Sep 14 2026 at 18:37)</a>:</h4>
+<p>More testing reveals that this is related to the header " Header always set X-Content-Type-Options nosniff" .. I believe that is a good header to have .. Is there a way around it?</p>
+
+
+
+<a name="624144226"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624144226" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624144226">(Sep 14 2026 at 18:42)</a>:</h4>
+<p>.. nosniff makes the browser refuse to run the JavaScript library that reads CSV/TSV-style spreadsheet data because Apache is serving that library as text/plain, so the spreadsheet previewer loses its parser and renders blank</p>
+
+
+
+<a name="624158641"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624158641" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624158641">(Sep 14 2026 at 19:24)</a>:</h4>
+<p>update: i was able to copy <code>dataverse-previewers/previewers/v1.5/papaparse@5</code> to <code>papaparse@5.js</code> and change the reference in SpreadsheetPreview.html to that and that fixed it .. in case anyone comes across this</p>
+
+
+
+<a name="624165565"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624165565" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624165565">(Sep 14 2026 at 19:55)</a>:</h4>
+<p>Huh. Are you planning to make a pull request with this fix?</p>
+
+
+
+<a name="624182411"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624182411" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Deirdre Kirmis <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624182411">(Sep 14 2026 at 21:14)</a>:</h4>
+<p>Well this was kind of specific to how we are running them locally, and with our security headers, so not sure it is a fix for everyone. Someone else may have a better solution. ?? IDK</p>
+
+
+
+<a name="624208332"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Spreadsheet%20previewer%20issues%20when%20locally%20installed/near/624208332" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Spreadsheet.20previewer.20issues.20when.20locally.20installed.html#624208332">(Sep 15 2026 at 00:19)</a>:</h4>
+<p>Well, I'm glad you figured it out. <img alt=":dataverse_woman:" class="emoji" src="https://avatars.zulip.com/53090/emoji/images/e231c302.png" title="dataverse woman"></p>
+
+
+
+<hr><p>Last updated: Sep 19 2026 at 17:39 UTC</p>
+</html>

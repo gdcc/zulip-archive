@@ -1,0 +1,158 @@
+[
+    {
+        "content": "<p>Hi, I was just playing around with the Dataverse Search API and I noticed that almost all fields are indexed in Solr as <code>text_en</code> fields, which doesn't allow e.g. range searches for integer and date fields. I found this relatively old (and now closed) issue from 2014 talking about using more fitting index data types: <a href=\"https://github.com/IQSS/dataverse/issues/370\">https://github.com/IQSS/dataverse/issues/370</a> It seems that since the date range facet was so far not implemented, the index types have not been touched yet (?) Is there any open issue currently talking about this? Or any ongoing work? :)</p>",
+        "id": 469950974,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1726229717
+    },
+    {
+        "content": "<p>Yes, we should do this and no, there hasn't been any recent discussion.</p>",
+        "id": 469957019,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726231655
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> are you mostly interested in date ranges?</p>",
+        "id": 469957061,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726231672
+    },
+    {
+        "content": "<p><span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span> I'm interested in both date ranges and integer ranges</p>",
+        "id": 469958185,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1726231991
+    },
+    {
+        "content": "<p>Cool. Out of curiosity, are the integers in one of your custom metadata blocks? Or one of the standard blocks we ship with Dataverse?</p>",
+        "id": 469963928,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726233586
+    },
+    {
+        "content": "<p>They're in custom metadata blocks.</p>",
+        "id": 469965367,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1726233859
+    },
+    {
+        "content": "<p>Ok. I'm wondering if we should also fix anything in the standard blocks. There are dates everywhere. And I believe some of the astro fields use integers.</p>\n<p>That way, when we make a release, there are some nice examples people can see without installing custom metadata blocks.</p>",
+        "id": 469965791,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726233981
+    },
+    {
+        "content": "<p>Yes, sure! I think this could benefit integer and date fields in any metadata block.</p>\n<p>Even without implementing any new facet with sliders, I think if the fields were indexed as integers/dates, you could run Solr range queries via the search input field (or the search API <code>?q=...</code>) like <code>integerfield:[25 TO 50]</code> or <code>datefield:[2000-11-01 TO 2014-12-01]</code>.</p>",
+        "id": 469967170,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1726234378
+    },
+    {
+        "content": "<p>Yes, definitely. Please see <a href=\"https://guides.dataverse.org/en/6.3/api/search.html#date-range-search-example\">https://guides.dataverse.org/en/6.3/api/search.html#date-range-search-example</a></p>",
+        "id": 469968369,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726234623
+    },
+    {
+        "content": "<p>And <code>fileSizeInBytes:[32212254720 TO *]</code> at <a href=\"https://github.com/IQSS/dataverse/issues/4439#issuecomment-468685228\">https://github.com/IQSS/dataverse/issues/4439#issuecomment-468685228</a></p>",
+        "id": 469969064,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726234741
+    },
+    {
+        "content": "<p>I've been playing around with trying to index fields as something other than <code>text_en</code> and it seems to be working OK.</p>\n<p>You can try it out here: <a href=\"http://solr-fieldtypes-test-dataverse.qa.km.k8s.zbmed.de/\">http://solr-fieldtypes-test-dataverse.qa.km.k8s.zbmed.de/</a> (note, this is on our dev cluster that is offline during the night, so if you're in the US, it might be offline if you are checking after 2pm-ish, sorry about that)</p>\n<p>I've added an experimental metadata block containing an integer, a float and a date field and indexed them in Solr as plong, pdouble and date_range (by just manually editing the schema.xml) and created 3 test datasets with the following values:</p>\n<ul>\n<li>Test dataset 1: integer 10, float 0.5, date 2024-09-01</li>\n<li>Test dataset 2: integer 3, float 23.5, date 2024-01-15</li>\n<li>Test dataset 3: integer 500, float -4.3, date 1980-04</li>\n</ul>\n<p>Here are some sample queries based on these fields:</p>\n<ul>\n<li>exampleIntegerField:[100 TO *] ⇨ test dataset 3</li>\n<li>exampleIntegerField:500 ⇨ test dataset 3</li>\n<li>exampleIntegerField:[0 TO 10] ⇨ test dataset 1 + 2</li>\n<li>exampleIntegerField:[0 TO 10] AND exampleFloatField:[20 TO 50] ⇨ test dataset 2</li>\n</ul>\n<p>(Filtering the date field still has some issues and needs some more testing)</p>",
+        "id": 472709297,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727274109
+    },
+    {
+        "content": "<p>Great! I'm glad the testing is going well!</p>",
+        "id": 472709788,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727274234
+    },
+    {
+        "content": "<p>Found the issue with the date field. The date fields were getting indexed as years only, without months or days (if present). It seems this is intentional: <a href=\"https://github.com/IQSS/dataverse/blob/050064ef264c667c2473c78b893def832c33f992/src/main/java/edu/harvard/iq/dataverse/search/IndexServiceBean.java#L1070\">https://github.com/IQSS/dataverse/blob/050064ef264c667c2473c78b893def832c33f992/src/main/java/edu/harvard/iq/dataverse/search/IndexServiceBean.java#L1070</a> Do you see any issue with changing this? I assume maybe there might be an issue if the date field is set to be facetable? That's something I didn't test yet.</p>",
+        "id": 472849826,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727341911
+    },
+    {
+        "content": "<p>Yes, probably we did that to have a reasonable (string-based) facet of four digits. But if we had a proper range facet... <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 472868347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727348073
+    },
+    {
+        "content": "<p>Would you want to add the UI for this in JSF? I always hesitate with this since it will be replaced by the <a href=\"https://github.com/IQSS/dataverse-frontend\">new frontend</a>. Would you rather see it added there instead?</p>",
+        "id": 472868564,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727348156
+    },
+    {
+        "content": "<p>Could we index the full date in \"&lt;dateFieldName&gt;\", but only the year in \"&lt;dateFieldName&gt;_s\"? From a quick test, that seems to allow proper range searches (using the <code>[... TO ...]</code> syntax) but keeps the facets as-is for now.</p>",
+        "id": 472877848,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727351501
+    },
+    {
+        "content": "<p>And yes, if we were to add a proper range facet to the UI, I would like to see it in the new frontend :)</p>",
+        "id": 472878032,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727351555
+    },
+    {
+        "content": "<p>Hmm, that might work.</p>",
+        "id": 472881103,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727352484
+    },
+    {
+        "content": "<p>Yep, seems to work</p>",
+        "id": 473102285,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727441326
+    },
+    {
+        "content": "<p>I've opened a PR with my changes here: <a href=\"https://github.com/IQSS/dataverse/pull/10887\">https://github.com/IQSS/dataverse/pull/10887</a></p>",
+        "id": 473102316,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727441339
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> looks great! Should the title of the PR have something about highlighting in it?</p>",
+        "id": 473105511,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727442223
+    },
+    {
+        "content": "<p>Also, can you please add a release note snippet?</p>",
+        "id": 473107099,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727442689
+    },
+    {
+        "content": "<p>Both done <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 473114277,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727444605
+    },
+    {
+        "content": "<p>Looks great. Amazing release note. Do you think it's worth it to add an API test?</p>",
+        "id": 473116224,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727445058
+    },
+    {
+        "content": "<p>Thanks! <img alt=\":dataverse_woman:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/e231c302.png\" title=\"dataverse woman\">  Hm, yes maybe. I'll try and take a look on Monday!</p>",
+        "id": 473118598,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1727445651
+    },
+    {
+        "content": "<p>Wonderful! Thanks!</p>",
+        "id": 473120565,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1727446160
+    }
+]

@@ -1,0 +1,26 @@
+[
+    {
+        "content": "<p>Hello! We received the mandate to enable only FIP-compliant encrypted network communication, and we want to use HTTPS to query the solr server. Do you have any recommendations? I went through the relevant dataverse JAVA  search code, checked files like \"SolrClientService.java\", \"AbstractSolrClientService.java\", the Http2SolrClient.Builder (getSolrUrl), JvmSettings.SOLR_PROT.lookup() and it looks like the environment variable \"DATAVERSE_SOLR_PROTOCOL\" may help (we are not running containers, though). I am wondering how can I still squeeze in the HTTPS bit into \":SolrHostColonPort\". Can you please point me to some documentation page (even experimental) on how to enable solr queries using HTTPS for dataverse? Thank you, Steve.<br>\nPS. the PostgreSQL JDBC driver talks seamless encryption over the network: TLSv1.3, cipher=TLS_AES_256_GCM_SHA384 <br>\nRE: CMMC L2-3.13.8 - Data in Transit: Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission.</p>",
+        "id": 501176493,
+        "sender_full_name": "Steve Baroti",
+        "timestamp": 1740167512
+    },
+    {
+        "content": "<p>Please don't use the database SolrColonHostPort setting anymore. It's deprecated and may go away soon.</p>\n<p>The JVM options dataverse.solr.* are your friends in any environment, whether you're using containers or not. So using <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#dataverse-solr-protocol\">dataverse.solr.protocol=https</a> is what you're looking for.</p>\n<p>You can set these using <a href=\"https://docs.payara.fish/community/docs/Technical%20Documentation/MicroProfile/Config/Overview.html\">any MPC source</a>, there should be a doc hint about that, too.</p>\n<p>Regarding Postgres look put for <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#basic-database-settings\">these options</a>, especially the .parameters one.</p>",
+        "id": 501178996,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1740168568
+    },
+    {
+        "content": "<p>Wonderful! Thank you, Oliver. Yes indeed, we found the HTTPS setting as you indicated:<br>\n<a href=\"https://borealisdata.ca/guides/en/latest/installation/config.html#id318\">dataverse.solr.protocol</a>: The Solr server URL protocol for the connection. Remember to restart / redeploy Dataverse after changing the setting (as with <a href=\"https://borealisdata.ca/guides/en/latest/installation/config.html#solrhostcolonport\">:SolrHostColonPort</a>). Defaults to <code>http</code>, but might be set to <code>https</code> for extra secure Solr installations.</p>",
+        "id": 501205892,
+        "sender_full_name": "Steve Baroti",
+        "timestamp": 1740182310
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"692987\">@Steve Baroti</span> The JDBC Postgres driver prefers SSL when available IIRC, but can be enforced to \"always\". I understand your compliant security mandate, but out of curiosity, will you have any sensitive information indexed in Solr unless you turn on full-text indexing?</p>",
+        "id": 501269585,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1740232660
+    }
+]

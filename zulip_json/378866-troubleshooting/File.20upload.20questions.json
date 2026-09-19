@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>Hello, </p>\n<p>We had a large upload over the weekend and our server misbehaved because of it.   We've since reduced our upload limits to help with these situations til we figure this out, but have a few questions. </p>\n<p>1) does DV it try to upload all files at once, or queue them in the case that there are 1000 files in one upload?  We are wondering how many connections the server needs to have available to service uploads.  Many of these files were 3-4 GB tif files -- perhaps thumbnail processing caused a bottleneck?</p>\n<p>2) this dataset (still draft) has 154,000 files and the dataset page loads slowly (30s). Is the slowness mostly likely due to Solr?   We are not seeing a huge CPU load when loading the page.   Just wondering what is going on behind the scenes and how to optimize this. </p>\n<p>We probably need to fine tune things, and just need to figure out what.  Thanks for any help!</p>",
+        "id": 618394094,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1787586035
+    },
+    {
+        "content": "<p>154,000 files?! Um. That's a lot! I owe you a better reply but for now, please take a look at <a href=\"https://guides.dataverse.org/en/6.11/admin/big-data-administration.html#avoiding-many-files\">https://guides.dataverse.org/en/6.11/admin/big-data-administration.html#avoiding-many-files</a></p>\n<p>I'm wondering if you can store the files as a zip and use the zip previewer/downloader. Also from that page:</p>\n<p>Dataverse can be configured to use a “Zip File Previewer” that allows users to see the contents of a zip file and even download individual files from within it (see <a href=\"https://guides.dataverse.org/en/6.11/user/dataset-management.html#compressed-files\">Compressed Files</a>).</p>",
+        "id": 618395924,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787586472
+    },
+    {
+        "content": "<p>Thanks, Philip. I'm not sure if they uploaded them in batches - hopefully they did.</p>",
+        "id": 618396201,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1787586551
+    },
+    {
+        "content": "<p>I am curious -- how often, in your experience, have you run across a super large number of files in a dataset?</p>",
+        "id": 618645966,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1787599821
+    },
+    {
+        "content": "<p>Hmm, it's a better question for <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span>. He tells us about them. Pretty often, I think! But this setting should help:</p>\n<ul>\n<li><a href=\"https://guides.dataverse.org/en/6.11/installation/config.html#multipleuploadfileslimit\">:MultipleUploadFilesLimit</a> - the number of files the GUI user is allowed to upload in one batch, via drag-and-drop, or through the file select dialog</li>\n</ul>",
+        "id": 618646538,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787600021
+    },
+    {
+        "content": "<p>It looks like Harvard Dataverse allows 1000 files:</p>\n<p><img alt=\"Screenshot 2026-08-24 at 3.34.47 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"639x160\" data-original-src=\"/user_uploads/53090/g6dy9z_X4ZjZtkSGjYKEhw0v/Screenshot-2026-08-24-at-3.34.47PM.png\" src=\"/user_uploads/thumbnail/53090/g6dy9z_X4ZjZtkSGjYKEhw0v/Screenshot-2026-08-24-at-3.34.47PM.png/840x560.webp\"></p>",
+        "id": 618646900,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787600133
+    },
+    {
+        "content": "<p>Thanks! I changed ours this morning to be similar, so that will help some.</p>",
+        "id": 618647188,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1787600243
+    },
+    {
+        "content": "<p>It looks like it's possible to set a total number of files via API: <a href=\"https://guides.dataverse.org/en/6.11/api/native-api.html#storage-quotas-on-individual-datasets\">https://guides.dataverse.org/en/6.11/api/native-api.html#storage-quotas-on-individual-datasets</a></p>\n<p>I'm seeing <code>\"numberOfFilesRemaining\": 20,</code></p>",
+        "id": 618647322,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787600301
+    },
+    {
+        "content": "<p>Hi Philip - is the Harvard system also limited to 1000 files in a zip file?  So it's 1000 across the board, either zipped up or through drag/drop?</p>",
+        "id": 619373922,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1787774698
+    },
+    {
+        "content": "<p>Well, the settings says this...</p>\n<ul>\n<li><a href=\"https://guides.dataverse.org/en/6.11/installation/config.html#zipuploadfileslimit\">:ZipUploadFilesLimit</a> - the maximum number of files allowed in an uploaded zip file - only relevant for file stores and S3 when direct upload is not used.</li>\n</ul>\n<p>... which means it isn't relevant for Harvard Dataverse, which uses S3 direct upload.</p>",
+        "id": 619374584,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787774943
+    },
+    {
+        "content": "<p>So in practice, I'm pretty sure a zip can have an unlimited number of files.</p>",
+        "id": 619375085,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787775115
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"737390\">Bethany Seeger</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/File.20upload.20questions/near/618394094\">said</a>:</p>\n<blockquote>\n<p>1) does DV it try to upload all files at once, or queue them in the case that there are 1000 files in one upload?</p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"737390\">@Bethany Seeger</span> are these uploads happening via the web interface? Or via API?</p>",
+        "id": 619647857,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1787863446
+    },
+    {
+        "content": "<p>They are happening via the web interface, I believe - via a zip file.</p>",
+        "id": 621155200,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1788382474
+    },
+    {
+        "content": "<p>Interesting. So the zips files are unzipped, then, resulting in lots and lots of files?</p>",
+        "id": 621348972,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788434545
+    }
+]

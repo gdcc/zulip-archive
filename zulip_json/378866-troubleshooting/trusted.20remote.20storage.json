@@ -1,0 +1,50 @@
+[
+    {
+        "content": "<p>Hi, I am trying to setup a trusted remote storage and I am encountering some errors. To give you a better context, I have an S3 bucket with Sentinel 2 data downloaded and my idea was to create dataset aggregating that data and use that bucket as a trusted remote storage. The settings I used to configure are as follows:</p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code>asadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.type=remote'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.label=sentinel2'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.base-store=s3'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.base-url=\"https://stratus.d.incd.pt:8080/sentinel\"'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.download-redirect=true'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.upload-redirect=true'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.remote-store-name=Sentinel2'</span>\nasadmin<span class=\"w\"> </span>create-jvm-options<span class=\"w\"> </span><span class=\"s1\">'-Ddataverse.files.sentinel2.upload-out-of-band=true'</span>\n</code></pre></div>\n<p>I tried to create a file on the dataset with the following script:</p>\n<div class=\"codehilite\"><pre><span></span><code>export API_TOKEN=XXX\nexport SERVER_URL=https://repositorio.cloud.acnca.pt\nexport PERSISTENT_IDENTIFIER=doi:10.5072/FK2/PKUVLP\nexport JSON_DATA=&#39;{&quot;description&quot;:&quot;Test file&quot;,&quot;tabIngest&quot;: false,&quot;categories&quot;:[&quot;Data&quot;], &quot;restrict&quot;:&quot;false&quot;, &quot;storageIdentifier&quot;:&quot;sentinel2://DGT2015/S2A_MSIL1C_20150708T113056_N0500_R080_T29SMA_20231010T003232.SAFE/DATASTRIP/DS_S2RP_20231010T003232_S20150708T113621/MTD_DS.xml&quot;, &quot;fileName&quot;:&quot;MTD_DS.xml&quot;,&quot;mimeType&quot;:&quot;application/xml&quot;,&quot;checksum&quot;: {&quot;@type&quot;: &quot;MD5&quot;, &quot;@value&quot;: &quot;e0cd675d26aa50e80f6a9d1992955db9&quot;}}&#39;\n\ncurl -X POST -H &quot;X-Dataverse-key: $API_TOKEN&quot; &quot;$SERVER_URL/api/datasets/:persistentId/add?persistentId=$PERSISTENT_IDENTIFIER&quot; -F &quot;jsonData=$JSON_DATA&quot;\n</code></pre></div>\n<p>but it failed and I got the following messages in <code>server.log</code>:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2025-12-17T15:34:24.641+0000] [Payara 6.2025.3] [INFO] [] [] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664641] [levelValue: 800] [[\n  -------------------------------]]\n\n[2025-12-17T15:34:24.642+0000] [Payara 6.2025.3] [INFO] [] [] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664642] [levelValue: 800] [[\n  jsonData: {&quot;description&quot;:&quot;Test file&quot;,&quot;tabIngest&quot;: false,&quot;categories&quot;:[&quot;Data&quot;], &quot;restrict&quot;:&quot;false&quot;, &quot;storageIdentifier&quot;:&quot;sentinel2://DGT2015/S2A_MSIL1C_20150708T113056_N0500_R080_T29SMA_20231010T003232.SAFE/DATASTRIP/DS_S2RP_20231010T003232_S20150708T113621/MTD_DS.xml&quot;, &quot;fileName&quot;:&quot;MTD_DS.xml&quot;,&quot;mimeType&quot;:&quot;application/xml&quot;,&quot;checksum&quot;: {&quot;@type&quot;: &quot;MD5&quot;, &quot;@value&quot;: &quot;e0cd675d26aa50e80f6a9d1992955db9&quot;}}]]\n\n[2025-12-17T15:34:24.642+0000] [Payara 6.2025.3] [INFO] [] [] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664642] [levelValue: 800] [[\n  -------------------------------]]\n\n[2025-12-17T15:34:24.880+0000] [Payara 6.2025.3] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.RemoteOverlayAccessIO] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664880] [levelValue: 900] [[\n  Not Supported: edu.harvard.iq.dataverse.dataaccess.RemoteOverlayAccessIO store with base store type: null]]\n\n[2025-12-17T15:34:24.881+0000] [Payara 6.2025.3] [WARNING] [] [edu.harvard.iq.dataverse.ingest.IngestServiceBean] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664881] [levelValue: 900] [[\n  Failed to get file size, storage id, or failed to remove the temp tag on the saved S3 objectsentinel2://19b2cf2bef3-4aac2735d32e//DGT2015/S2A_MSIL1C_20150708T113056_N0500_R080_T29SMA_20231010T003232.SAFE/DATASTRIP/DS_S2RP_20231010T003232_S20150708T113621/MTD_DS.xml (Not supported)]]\n\n[2025-12-17T15:34:24.881+0000] [Payara 6.2025.3] [WARNING] [] [edu.harvard.iq.dataverse.dataaccess.RemoteOverlayAccessIO] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664881] [levelValue: 900] [[\n  Not Supported: edu.harvard.iq.dataverse.dataaccess.RemoteOverlayAccessIO store with base store type: null]]\n\n[2025-12-17T15:34:24.882+0000] [Payara 6.2025.3] [WARNING] [] [edu.harvard.iq.dataverse.ingest.IngestServiceBean] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664882] [levelValue: 900] [[\n  Error getting ingest limit for file: null : Not supported]]\n\n[2025-12-17T15:34:24.882+0000] [Payara 6.2025.3] [INFO] [] [edu.harvard.iq.dataverse.ingest.IngestServiceBean] [tid: _ThreadID=128 _ThreadName=http-thread-pool::http-listener-1(16)] [timeMillis: 1765985664882] [levelValue: 800] [[\n  Incrementing recorded storage use by 0 bytes for dataset 4]]\n</code></pre></div>",
+        "id": 564283524,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1765986411
+    },
+    {
+        "content": "<p>Hmm. What version of Dataverse are you using? Also, can you please post to <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> as well so Jim sees it?</p>",
+        "id": 564284700,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1765986700
+    },
+    {
+        "content": "<p>Version 6.8</p>",
+        "id": 564284786,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1765986728
+    },
+    {
+        "content": "<p>Thanks for posting <a href=\"https://groups.google.com/g/dataverse-community/c/3faRy2l9iUc/m/z8gupidiCQAJ\">https://groups.google.com/g/dataverse-community/c/3faRy2l9iUc/m/z8gupidiCQAJ</a></p>",
+        "id": 564295896,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1765989476
+    },
+    {
+        "content": "<p>Sounds like you got it working! Based on what I'm reading in that email thread.</p>",
+        "id": 564327691,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1765999709
+    },
+    {
+        "content": "<p>Yes. The remote store had a base-store that didn't exist. After switching the value to the id of an existing storage driver I uploaded files from the remote storage successfully.</p>",
+        "id": 564428622,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1766054842
+    },
+    {
+        "content": "<p>Great. Do you want to make a pull request to improve the documentation? Or is it good enough?</p>",
+        "id": 564444551,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1766060110
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  As I shared in <a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/Production.20examples.20of.20trusted.20remote.20store.3F/with/567107373\">#community &gt; Production examples of trusted remote store?</a> I am currently trying to create a dataset with about 110k. That dataset has 1454 Sentinel 2 products, each one with about 50 files, and I have multiple datasets with more than 10k products that I also want to create in the future, probably those datasets would have about 500k files each.</p>",
+        "id": 567115552,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1767955875
+    }
+]

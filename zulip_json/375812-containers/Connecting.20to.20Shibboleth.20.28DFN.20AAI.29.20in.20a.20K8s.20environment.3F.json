@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>Hi,</p>\n<p>we've received a request to setup connection of a Dataverse to <a href=\"https://doku.tid.dfn.de/de:dfnaai:start\">DFN AAI</a>. The Dataverse is running in Kubernetes.</p>\n<p>From what  I could gather, it seems that integration of a Shibboleth-based identity provider like DFN AAI in this kind of environment is relatively complicated (e.g.  <a href=\"https://guides.dataverse.org/en/latest/installation/shibboleth.html#shibboleth\">https://guides.dataverse.org/en/latest/installation/shibboleth.html#shibboleth</a> + <a href=\"https://github.com/IQSS/dataverse/issues/5974\">https://github.com/IQSS/dataverse/issues/5974</a> \"Shibboleth as an SP IMHO is a nightmare\" <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ).</p>\n<p>Is there any recommended approach for this? Or has anyone done something like this? I've only worked with OIDC-based providers thus far...</p>\n<p>Thanks in advance!</p>",
+        "id": 599798870,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1780493588
+    },
+    {
+        "content": "<p>Ha, I don't think it's SO bad.</p>",
+        "id": 599799660,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780493744
+    },
+    {
+        "content": "<p>We use Shibboleth in production at Harvard Dataverse.</p>",
+        "id": 599799737,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780493763
+    },
+    {
+        "content": "<p>And lots of Dataverse installations use it, I'd say.</p>",
+        "id": 599799786,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780493776
+    },
+    {
+        "content": "<p>Maybe you can help us learn any shortcomings in those docs you linked.</p>",
+        "id": 599799875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780493795
+    },
+    {
+        "content": "<p>I'm not sure how suitable those installation instructions from the docs are for a Docker/Kubernetes-based environment. I.e., when running a <code>gdcc/dataverse</code> image, those instructions would need to be applied on top?</p>",
+        "id": 599805570,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1780494473
+    },
+    {
+        "content": "<p>Not critiquing the docs per se, I'll admit I am feeling slightly out of my depth here <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 599805840,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1780494531
+    },
+    {
+        "content": "<p>Also found these notes here:</p>\n<blockquote>\n<p>Shibboleth is perfectly suited for use as an identity provider.</p>\n<p>Running it as a service provider for Dataverse on a Kubernetes deployment is a bad idea. It violates best practices of one service per container and locks you into an Apache-based reverse proxy. You will want to avoid that by all means on Kubernetes cluster.</p>\n</blockquote>\n<p><a href=\"https://k8s-docs.gdcc.io/en/v4.20/day3/auth.html\">https://k8s-docs.gdcc.io/en/v4.20/day3/auth.html</a></p>\n<p>(author is also <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>  I believe? <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> )</p>",
+        "id": 599806071,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1780494583
+    },
+    {
+        "content": "<p>Yeah, let's drag <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> into this if we can. I may be missing something!</p>",
+        "id": 599807689,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780494922
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> knows all about Shib as well.</p>",
+        "id": 599807752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780494934
+    },
+    {
+        "content": "<p>I can only advice against using shibd. There is nothing wrong with using SAML though. IMO the best way forward is using a Broker. Dataverse talks OIDC with it. Any heavy lifting and mapping can be done by the broker (Keycloak, DeX, Unity,...)</p>",
+        "id": 599808976,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495207
+    },
+    {
+        "content": "<p>Dex is really lightweight. Keycloak better if you need advanced stuff. Unity is what drives Helmholtz AAI and some others.</p>",
+        "id": 599809314,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495278
+    },
+    {
+        "content": "<p>As you are going to federate, maybe DeX is _too_ lightweight. Not sure if and how they support discovery and feeds.</p>",
+        "id": 599809806,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495378
+    },
+    {
+        "content": "<p>If your institution already runs shibd as IDP and is federated with DFN, they may be able to run the SP for you and enable OIDC brokering on it.</p>",
+        "id": 599810624,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495575
+    },
+    {
+        "content": "<p>Can't you use NFDI AAI from Base4NFDI? IIRC they federate with DFN already and provide OIDC.</p>",
+        "id": 599811215,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495712
+    },
+    {
+        "content": "<p>All that said: you can of course run Shibd on K8s in SP mode. But maybe use the OIDC brokering module they provide and don't use the special reverse proxy setup Dataverse suggests. As you run an OIDC based frontend, IMO this won't be a viable/sustainable option for you (or anyone else looking into the Modern UI).</p>",
+        "id": 599811700,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780495828
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"616555\">@Vera Clemens</span> I remember that Slava got Shibboleth working in Kubernetes, but he had to forward some additional headers to the Apache mod_shib proxy.</p>",
+        "id": 599814897,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1780496532
+    },
+    {
+        "content": "<p>Some of that may be found here IIRC: <a href=\"https://github.com/search?q=repo%3AIQSS%2Fdataverse-docker%20shibboleth&amp;type=code\">https://github.com/search?q=repo%3AIQSS%2Fdataverse-docker%20shibboleth&amp;type=code</a></p>",
+        "id": 599819183,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780496895
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"626369\">Don Sizemore</span> <a href=\"#narrow/channel/375812-containers/topic/Connecting.20to.20Shibboleth.20.28DFN.20AAI.29.20in.20a.20K8s.20environment.3F/near/599814897\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"616555\">Vera Clemens</span> I remember that Slava got Shibboleth working in Kubernetes, but he had to forward some additional headers to the Apache mod_shib proxy.</p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598432\">@Slava Tykhonov</span> ^^</p>",
+        "id": 599822121,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780497537
+    },
+    {
+        "content": "<p>Thanks for the detailed info!! I will take a look and we'll consider our options. Integration via a broker sounds like the most straightforward approach, considering we already have some experience running a Keycloak. But we'll see. Integrating the Base4NFDI AAI also sounds like an interesting idea.</p>\n<p>(Just btw, this is for a new &amp; separate Dataverse instance we are administrating, which is using the standard Dataverse UI)</p>",
+        "id": 599826398,
+        "sender_full_name": "Vera Clemens",
+        "timestamp": 1780498490
+    },
+    {
+        "content": "<p>If this is for a \"Classic UI\" based Dataverse, using the Apache + mod_shib + AJP approach may be feasible. I still wouldn't advise to do it for any _new_ installation, as the Classic UI is phasing out and you'll need OIDC anyway for the Modern UI.</p>",
+        "id": 599827572,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780498734
+    }
+]

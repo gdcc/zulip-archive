@@ -1,0 +1,224 @@
+[
+    {
+        "content": "<p>Hello, <br>\nI've just installed a new custom metadata block on our production server and it's not showing up.  I've already tested this in our test/staging environment and am a bit confused as to why it's not showing up in this environment. </p>\n<p>I can see it when I query the API: </p>\n<div class=\"codehilite\"><pre><span></span><code> curl http://localhost:8080/api/metadatablocks | jq\n  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n                                 Dload  Upload   Total   Spent    Left  Speed\n100   585  100   585    0     0  53181      0 --:--:-- --:--:-- --:--:-- 53181\n{\n  \"status\": \"OK\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"displayName\": \"Citation Metadata\",\n      \"name\": \"citation\"\n    },\n    {\n      \"id\": 2,\n      \"displayName\": \"Geospatial Metadata\",\n      \"name\": \"geospatial\"\n    },\n    {\n      \"id\": 3,\n      \"displayName\": \"Social Science and Humanities Metadata\",\n      \"name\": \"socialscience\"\n    },\n    {\n      \"id\": 4,\n      \"displayName\": \"Astronomy and Astrophysics Metadata\",\n      \"name\": \"astrophysics\"\n    },\n    {\n      \"id\": 5,\n      \"displayName\": \"Life Sciences Metadata\",\n      \"name\": \"biomedical\"\n    },\n    {\n      \"id\": 6,\n      \"displayName\": \"Journal Metadata\",\n      \"name\": \"journal\"\n    },\n    {\n      \"id\": 7,\n      \"displayName\": \"ISPS Metadata\",\n      \"name\": \"customISPS\"\n    },\n    {\n      \"id\": 8,\n      \"displayName\": \"Software Metadata (CodeMeta v2.0)\",\n      \"name\": \"codeMeta20\"\n    }\n  ]\n}\n</code></pre></div>\n<p>It's ID 7  - customISPS - But it's not in our UI: <br>\n<a href=\"/user_uploads/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"690x247\" src=\"/user_uploads/thumbnail/53090/rmCCwDRemRtcjakEQBTnBcQK/image.png/840x560.webp\"></a></div><p>What am I missing? Thanks!</p>",
+        "id": 544990351,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760539917
+    },
+    {
+        "content": "<p>Huh. Do you have to restart Payara?</p>",
+        "id": 544990600,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760539976
+    },
+    {
+        "content": "<p>Yes, I did once so it would pick up the properties file - and that was after I installed the tsv file.  I installed the codeMeta block at the same time, fyi... that one shows up fine.</p>",
+        "id": 544990819,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760540026
+    },
+    {
+        "content": "<p>Any errors in server.log?</p>",
+        "id": 544990978,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760540059
+    },
+    {
+        "content": "<p>It's strange that you see it in the API but not the UI. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 544991060,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760540078
+    },
+    {
+        "content": "<p>none that I could find. I will look again.</p>",
+        "id": 544991161,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760540100
+    },
+    {
+        "content": "<p>It works fine in staging, I assume.</p>",
+        "id": 544992223,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760540351
+    },
+    {
+        "content": "<p>yeah, staging and test worked fine.</p>",
+        "id": 544993664,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760540714
+    },
+    {
+        "content": "<p>What's different in prod? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 544993782,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760540747
+    },
+    {
+        "content": "<p>Thinking outloud here.... I don't think there's much different.  One thing I did differently was the order I loaded them in (codeMeta and customISPS)... aside from system size, I can't think of other differences. </p>\n<p>There are no messages about these blocks in the log (server.log) - is there another spot I should look?</p>",
+        "id": 544996386,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760541415
+    },
+    {
+        "content": "<p>You're using Datavere 5.14, right? Here's where that help text appears: <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L282\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L282</a></p>\n<p><code>dataverse.metadataElements.tip=Choose the metadata fields to use in dataset templates and when adding a dataset to this dataverse.</code></p>",
+        "id": 544998788,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760542032
+    },
+    {
+        "content": "<p>It looks like it's looping over blocks with this:</p>\n<p><code>&lt;ui:repeat value=\"#{DataversePage.allMetadataBlocks}\" var=\"mdb\"&gt;</code></p>\n<p><a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L303\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/webapp/dataverse.xhtml#L303</a></p>",
+        "id": 544999120,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760542104
+    },
+    {
+        "content": "<p>And allMetadataBlocks is defined here: <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DataversePage.java#L968\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/DataversePage.java#L968</a></p>",
+        "id": 544999316,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760542155
+    },
+    {
+        "content": "<p>If that was erroring out, where would the errors go?  </p>\n<p>I'll look through those to see if something stands out for this block.</p>",
+        "id": 544999422,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760542182
+    },
+    {
+        "content": "<p>Do you have the ability to add some println debugging, recompile the war file, and redeploy? That's all I can think at the moment. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 544999534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760542212
+    },
+    {
+        "content": "<p>Hmmm... no, sadly not.  I'll poke around and see if anything stands out.</p>",
+        "id": 544999793,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760542269
+    },
+    {
+        "content": "<p>Thank you for all the links.</p>",
+        "id": 544999832,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760542278
+    },
+    {
+        "content": "<p>One thing of note -- the metadata block has an ownerID in prod, but not staging. </p>\n<p><a href=\"/user_uploads/53090/l5F69oaFbNpaBGi9PMR0c424/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/l5F69oaFbNpaBGi9PMR0c424/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1040x234\" src=\"/user_uploads/thumbnail/53090/l5F69oaFbNpaBGi9PMR0c424/image.png/840x560.webp\"></a></div>",
+        "id": 545000598,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760542482
+    },
+    {
+        "content": "<p>Do you see the block on dataverse/collection 5?</p>",
+        "id": 545001889,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760542830
+    },
+    {
+        "content": "<p>Oh wow - yeah, it's showing up there.... what did I do to make that happen?  <br>\nThis block is for the whole system, not one setup. But I wonder if some sort of naming scheme lined up? </p>\n<p>The collection with id 5 is named \"isps\" with identifier \"ISPS\", and my block has a name of  \"customISPS\" and dataverseAlias of \"ISPS\".  </p>\n<p>Did we unknowingly make a link between the block and the collection?</p>",
+        "id": 545002761,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760543069
+    },
+    {
+        "content": "<p>Possibly. It may be a way to hide (in the UI anyway) the metadata block. <span class=\"user-mention\" data-user-id=\"621770\">@Julian Gautier</span> or <span class=\"user-mention\" data-user-id=\"690603\">@Gustavo Durand</span> do you know anything about this?</p>",
+        "id": 545003196,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543186
+    },
+    {
+        "content": "<p>If you look at <a href=\"https://github.com/IQSS/dataverse/blob/v6.8/scripts/api/data/metadatablocks/geospatial.tsv\">https://github.com/IQSS/dataverse/blob/v6.8/scripts/api/data/metadatablocks/geospatial.tsv</a> for example, you'll see that \"dataverseAlias\" is null. That block is supposed to appear everywhere.</p>\n<p>Contrast it with <a href=\"https://github.com/IQSS/dataverse.harvard.edu/blob/96a97bfdfc97773cc58075e54252b4caca3b98e5/metadatablocks/customSAEF.tsv\">https://github.com/IQSS/dataverse.harvard.edu/blob/96a97bfdfc97773cc58075e54252b4caca3b98e5/metadatablocks/customSAEF.tsv</a> where \"dataveseAlias=SAEF\". So that block only appears there.</p>\n<p>I believe that's how it works.</p>",
+        "id": 545003970,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543418
+    },
+    {
+        "content": "<p>So yeah, that 5 is in the database because you have a matching dataverseAlias (ISPS) in the tsv.</p>",
+        "id": 545004113,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543459
+    },
+    {
+        "content": "<p>Do you think if I take out the dataverseAlias and reload the block, that will fix it?  Is it as simple as that?  :)</p>",
+        "id": 545004252,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760543493
+    },
+    {
+        "content": "<p>Here's where the owner is set when you load the block: <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/api/DatasetFieldServiceApi.java#L390\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/api/DatasetFieldServiceApi.java#L390</a></p>",
+        "id": 545004299,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543504
+    },
+    {
+        "content": "<p>If we have any documentation on this, I can't find it. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 545004333,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543517
+    },
+    {
+        "content": "<p>It's worth a shot! But judging from the code you might need to remove that 5 manually.</p>",
+        "id": 545004525,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543568
+    },
+    {
+        "content": "<p>It's here and we missed it:  <a href=\"https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadatablock-properties\">https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadatablock-properties</a></p>",
+        "id": 545004530,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760543570
+    },
+    {
+        "content": "<p>Ah, thanks. Yes, those are the docs I couldn't find. Phew! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 545004636,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543597
+    },
+    {
+        "content": "<p>\"If specified, this metadata block will be available only to the Dataverse collection designated here by its alias and to children of that Dataverse collection.\"</p>\n<p>Sounds like what you're seeing!</p>",
+        "id": 545004733,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760543621
+    },
+    {
+        "content": "<p>Thank you for all your help with this!   I'll report back how it goes in changing it.</p>",
+        "id": 545004783,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760543635
+    },
+    {
+        "content": "<p>Hmm, this is actually a bug in the SPA, which shows all the blocks regardless of if dataverseAlias/owner is specified. I just opened <a href=\"https://github.com/IQSS/dataverse-frontend/issues/873\">https://github.com/IQSS/dataverse-frontend/issues/873</a></p>",
+        "id": 545008701,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760544745
+    },
+    {
+        "content": "<p>I just reloaded the block without the alias in the tsv file and that doesn't remove the owner, so I manually removed the owner id from the database.  Things look good now.</p>",
+        "id": 545010063,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1760545128
+    },
+    {
+        "content": "<p>I have a related question and hope nobody minds me hijacking this thread. Today I did some experimentation and when I loaded a faulty schema (<a href=\"https://jugit.fz-juelich.de/fdm/schemas/-/blob/prod/fzj.tsv?ref_type=heads#L7\">it's using a not-supported field type</a>), I saw an error in the logs and in the response. What I didn't expect: the schema was still loaded half way! Honestly, my anticipation was that if loading a block fails, the database should rollback any changes! Is it just me finding this troubling?</p>",
+        "id": 554269400,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762506116
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> woof. Can you please create an issue and upload that tsv to it? Yes, it's troubling. Yes, it should roll back. <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 554299901,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762515067
+    },
+    {
+        "content": "<p>Right away Sir. Here you go: <a href=\"https://github.com/IQSS/dataverse/issues/11962\">https://github.com/IQSS/dataverse/issues/11962</a></p>",
+        "id": 554301880,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762515637
+    },
+    {
+        "content": "<p>Thank you!</p>",
+        "id": 554305465,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762516846
+    }
+]

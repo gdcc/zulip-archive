@@ -1,0 +1,30 @@
+<html>
+<head><meta charset="utf-8"><title>file PID registration always fails for non-published dataset · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/file.20PID.20registration.20always.20fails.20for.20non-published.20dataset.html">file PID registration always fails for non-published dataset</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="624598875"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/file%20PID%20registration%20always%20fails%20for%20non-published%20dataset/near/624598875" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/file.20PID.20registration.20always.20fails.20for.20non-published.20dataset.html#624598875">(Sep 16 2026 at 10:14)</a>:</h4>
+<p>I am using handles, this may go down differently for different PID providers.</p>
+<p>If file pid generation is enabled, and registerWhenPublished is false for the current PID provider, AbstractDatasetCommand.registerFilePidsIfNeeded() will try to register file pids immediately after upload. It will even try to register pids for all files in the dataset that do not have them. <br>
+It will then call registerFileExternalIdentifier() that calls <code>pidProvider.createIdentifier(dataFile)</code> that calls <code>registerNewHandle(dataFile)</code> which then tries to get the authority and handle from the dataFile object, which are of course empty, then sends this null/null to the handle server to register a PID, which fails. </p>
+<p>Therefore, file pid registration always fails. What is worse, it sends one request for each file in the dataset, for each uploaded file. This compounds as more files are uploaded, making the upload ever slower.</p>
+
+
+
+<a name="624599214"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/file%20PID%20registration%20always%20fails%20for%20non-published%20dataset/near/624599214" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Péter Pallinger <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/file.20PID.20registration.20always.20fails.20for.20non-published.20dataset.html#624599214">(Sep 16 2026 at 10:16)</a>:</h4>
+<p>I am using dataverse 6.9 . <br>
+I could not find any similar bugs in the bug tracker.<br>
+Did anyone have a similar problem, or should I just try to create a fix?</p>
+
+
+
+<hr><p>Last updated: Sep 19 2026 at 17:39 UTC</p>
+</html>

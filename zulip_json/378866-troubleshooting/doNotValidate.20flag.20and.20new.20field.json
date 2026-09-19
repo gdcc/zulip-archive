@@ -1,0 +1,98 @@
+[
+    {
+        "content": "<p>Hello, <br>\nWe are working with someone who is testing out a migration into our test server.  We enabled a few of the blocks and are noticing that a new field is showing up in one of them: Geospatial Metadata.  He is using the \"doNotValidate\" flag -- could that cause this new field creation?  (he does have super user admin perms)</p>\n<p><a href=\"/user_uploads/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1067x313\" src=\"/user_uploads/thumbnail/53090/so2KkaqYNPWQ7iZ20Hj8deR7/image.png/840x560.webp\"></a></div><p>I'm guessing theres a bug in the consultant's code, as the field Other should really be in the Geographics Coverage -&gt; Other field.   Could the \"doNotValidate\" be creating this \"Other\" field?  If not, what would cause this field to be created? </p>\n<p>We have not modified the block at all.</p>\n<p>Thanks!<br>\nBethany</p>",
+        "id": 538660052,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757512887
+    },
+    {
+        "content": "<p>I'm pretty sure that even if the block (geospatial in this case) is not enabled for the collection one can still populate the block's fields (I see \"Other\" and \"Geographical Unit\").</p>\n<p>I'd take a look at the JSON being used to create this dataset. Do you see those two geospatial fields in there?</p>",
+        "id": 538660866,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757513067
+    },
+    {
+        "content": "<p>Sorry to not be clear -- we did have it enabled first.  It's just that, in our setup now, there's an \"Other\" field that's part of the compound group and then there's another \"Other\" field that's disconnected from that.  There are not two \"Other\" fields in the actual block.  </p>\n<p>It looks like our consultant was able to add a field that wasn't there via adding a record.   I didn't realize that was possible.   But I'm also still troubleshooting what's going on. </p>\n<p>He started testing on our 5.14 server and on our 6.6 server -- both places magically have this new field. </p>\n<p>I'll get a sample of his JSON.  <br>\nThanks!</p>",
+        "id": 538662241,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757513400
+    },
+    {
+        "content": "<p>Oh, I now see how there are two \"Other\" fields in your screenshot of the geospatial block, one as part of geographic coverage and one on its own. Hmm.</p>\n<p>For reference, here's how the geographic block looks on <a href=\"https://demo.dataverse.org\">demo</a>, with only one \"Other\" field (under geographic coverage):</p>\n<p><a href=\"/user_uploads/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png\">Screenshot 2025-09-10 at 10.16.45 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png\" title=\"Screenshot 2025-09-10 at 10.16.45 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1164x450\" src=\"/user_uploads/thumbnail/53090/hoelYl9GS4H3q6jzKJlxS30E/Screenshot-2025-09-10-at-10.16.45AM.png/840x560.webp\"></a></div>",
+        "id": 538664215,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757513892
+    },
+    {
+        "content": "<p>Yeah, that's what helped me realize there was an issue.  Is this a side effect of using the \"doNotValidate\" flag?  That new fields could be accidentally created?</p>",
+        "id": 538665222,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757514120
+    },
+    {
+        "content": "<p>I have this note to myself: \"can create publicationIDURL even thought it isn't valid\". I discovered (or rediscovered this?) accidentally the other day when writing a test.</p>",
+        "id": 538665349,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757514146
+    },
+    {
+        "content": "<p>I suspect it's an old bug, that you might be able to create arbitrary fields in Dataverse. If you have a moment to test this, please do!</p>",
+        "id": 538665501,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757514182
+    },
+    {
+        "content": "<p>:-)    Sounds like we are in the same boat.  If I have a chance I'll test it out.</p>",
+        "id": 538665731,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757514235
+    },
+    {
+        "content": "<p>If you can create a weird field, please open an issue!</p>",
+        "id": 538665882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757514268
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/11809\">https://github.com/IQSS/dataverse/issues/11809</a></p>\n<p>It appears to only happen when you use a subfield outside of it's compound field setup.</p>",
+        "id": 538679484,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757517523
+    },
+    {
+        "content": "<p>Yikes! Thanks! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 538680698,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757517824
+    },
+    {
+        "content": "<p>Did you include the JSON for this one?</p>\n<ul>\n<li>tries to add a \"Name\" for an author outside of the author compound field -- this will succeed.</li>\n</ul>\n<p>It's this, right?</p>\n<div class=\"codehilite\"><pre><span></span><code>{\n  &quot;typeName&quot;: &quot;authorName&quot;,\n  &quot;multiple&quot;: false,\n  &quot;typeClass&quot;: &quot;primitive&quot;,\n  &quot;value&quot;: &quot;This is a fun and new field, I just made it up!&quot;\n},\n</code></pre></div>\n<p>You're adding authorName, which is normally a subfield of author, as a higher-level field, at the same level as author, title, etc.</p>",
+        "id": 538681752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757518089
+    },
+    {
+        "content": "<p>That should work to demonstrate the issue<br>\n -- I could include the full JSON, if that's helpful.</p>",
+        "id": 538681973,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757518144
+    },
+    {
+        "content": "<p>It basically seems to happen when you use a field in a different spot (like outside of it's compound field).  I have not tried the reverse, of using a name from a non-compund field w/i a compound.</p>",
+        "id": 538682242,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757518210
+    },
+    {
+        "content": "<p>Okay, just tried that and it failed: </p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;ERROR&quot;,&quot;message&quot;:&quot;Error parsing Json: field title is not a child of author&quot;}\n</code></pre></div>",
+        "id": 538682715,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1757518330
+    },
+    {
+        "content": "<p>Yes, if you'd update the issue description and attach the full JSON, I'd appreciate it!</p>",
+        "id": 538683105,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757518430
+    }
+]

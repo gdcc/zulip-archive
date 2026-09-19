@@ -1,0 +1,188 @@
+[
+    {
+        "content": "<p>the docs for <a href=\"https://guides.dataverse.org/en/6.1/api/native-api.html#configure-when-a-dataset-guestbook-appears-if-enabled\">Configure When a Dataset Guestbook Appears (If Enabled)</a> suggest that it can be configured in three ways: </p>\n<blockquote>\n<p>a global default, collection-level settings, or directly at the dataset level via these API calls</p>\n</blockquote>\n<p>however, i'm not sure whether it's possible to change the global default, or how to change this at the collection level. can anyone give me potential clues?</p>",
+        "id": 454361463,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722023865
+    },
+    {
+        "content": "<p>I'm pretty sure if you want the new behavior (at request), you have to start by turning it on globally: <a href=\"https://guides.dataverse.org/en/6.1/installation/config.html#dataverse-files-guestbook-at-request\">https://guides.dataverse.org/en/6.1/installation/config.html#dataverse-files-guestbook-at-request</a></p>",
+        "id": 454370899,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722026706
+    },
+    {
+        "content": "<p>The feature was added in this pull request: ADA/Guestbook-at-request <a href=\"https://github.com/IQSS/dataverse/issues/9599\">#9599</a></p>",
+        "id": 454371086,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722026795
+    },
+    {
+        "content": "<p>But I don't see any more docs.</p>",
+        "id": 454371110,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722026806
+    },
+    {
+        "content": "<p>got it, thanks. once the current upload is done i'll give it a shot <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 454372043,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722027297
+    },
+    {
+        "content": "<p>I don't see in the code (or the docs) how to set it for a collection. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 454372599,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722027559
+    },
+    {
+        "content": "<p>But setting it for a dataset should work.</p>",
+        "id": 454372630,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722027576
+    },
+    {
+        "content": "<p>got it. and to make sure i understand, setting it at the instance/global level will only impact datasets that have restricted files, correct?</p>",
+        "id": 454372745,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722027619
+    },
+    {
+        "content": "<p>if that's the case then setting it globally should be fine for us for now</p>",
+        "id": 454372780,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722027633
+    },
+    {
+        "content": "<p>Well, I'm not so sure. Guestbooks should be orthogonal to restricted files. You can use them in combination or separately.</p>",
+        "id": 454838614,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722260715
+    },
+    {
+        "content": "<p>for what it's worth, our use case is providing a means to ensure users complete clickthrough agreements before downloading files in a dataset.</p>",
+        "id": 454894473,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722273547
+    },
+    {
+        "content": "<p>The combination of a guestbook and restricted files should help.</p>",
+        "id": 454894908,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722273648
+    },
+    {
+        "content": "<p>okay - i just enabled this with <code>-Ddataverse.files.guestbook-at-request=true</code> and i'm seeing some strange behavior. a guestbook has been assigned to this dataset, and when i try to download the files, i get the terms pop up, but it's not prompting for a response to the guestbook data.</p>",
+        "id": 454922492,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722280061
+    },
+    {
+        "content": "<p>also, clicking the \"accept\" button doesn't seem to do anything on the user's side other than dismiss the modal that pops up. i can confirm it's writing the guestbook response, but the file doesn't download for the user account.</p>",
+        "id": 454923872,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722280424
+    },
+    {
+        "content": "<p>oh, interesting. if i switch the behavior back (removing that setting from domain.xml and restarting), i <em>do</em> see the guestbook questions in the modal when i try to download, but the download still doesn't occur after completion.</p>",
+        "id": 454929697,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722281777
+    },
+    {
+        "content": "<p>Weird. What version of Dataverse are you using, please?</p>",
+        "id": 454930129,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722281924
+    },
+    {
+        "content": "<p>6.1, currently.</p>",
+        "id": 454930181,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722281937
+    },
+    {
+        "content": "<p>verified users with given specific email domains are granted the file downloader role, and i believe every account should be verified because we're currently only allowing login through shib  through these domains.</p>",
+        "id": 454930636,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722282085
+    },
+    {
+        "content": "<p>A few fixes went in for \"guestbook at request\" in 6.2 and 6.3 but I don't see this one, specifically. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 454930848,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722282159
+    },
+    {
+        "content": "<p>That said, I've never used this feature myself.</p>",
+        "id": 454930972,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722282199
+    },
+    {
+        "content": "<p>yeah, i'm back to the previous default behavior (guestbook at download) and the download is not happening.</p>",
+        "id": 454931219,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722282285
+    },
+    {
+        "content": "<p>this is what i'm seeing in the logs:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2024-07-29T12:47:58.871-0700] [Payara 6.2023.9] [SEVERE] [] [jakarta.enterprise.resource.webcontainer.faces.context] [tid: _ThreadID=109 _ThreadName=http-thread-pool::jk-connector(4)] [timeMillis: 1722282478871] [levelValue: 1000] [[\n  jakarta.ejb.EJBException: Cannot invoke &quot;String.equals(Object)&quot; because &quot;downloadType&quot; is null\n</code></pre></div>",
+        "id": 454932056,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722282572
+    },
+    {
+        "content": "<p>Huh. Which line of which file? Can you tell?</p>",
+        "id": 454932438,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722282703
+    },
+    {
+        "content": "<p>here's a fuller excerpt:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2024-07-29T12:47:58.871-0700] [Payara 6.2023.9] [SEVERE] [] [jakarta.enterprise.resource.webcontainer.faces.context] [tid: _ThreadID=109 _ThreadName=http-thread-pool::jk-connector(4)] [timeMillis: 1722282478871] [levelValue: 1000] [[\n  jakarta.ejb.EJBException: Cannot invoke &quot;String.equals(Object)&quot; because &quot;downloadType&quot; is null\njakarta.ejb.EJBException: Cannot invoke &quot;String.equals(Object)&quot; because &quot;downloadType&quot; is null\n        at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)\n        at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)\n        at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)\n        at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)\n        at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)\n        at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)\n        at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)\n        at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)\n        at jdk.proxy73/jdk.proxy73.$Proxy405.writeGuestbookAndStartBatchDownload(Unknown Source)\n        at edu.harvard.iq.dataverse.__EJB31_Generated__FileDownloadServiceBean__Intf____Bean__.writeGuestbookAndStartBatchDownload(Unknown Source)\n        at edu.harvard.iq.dataverse.FileDownloadHelper.writeGuestbookAndStartDownload(FileDownloadHelper.java:88)\n        at edu.harvard.iq.dataverse.FileDownloadHelper$Proxy$_$$_WeldClientProxy.writeGuestbookAndStartDownload(Unknown Source)\n</code></pre></div>",
+        "id": 454932709,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722282788
+    },
+    {
+        "content": "<p>Ok, so here: <a href=\"https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/FileDownloadHelper.java#L88\">https://github.com/IQSS/dataverse/blob/v6.1/src/main/java/edu/harvard/iq/dataverse/FileDownloadHelper.java#L88</a></p>",
+        "id": 454933301,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722282964
+    },
+    {
+        "content": "<p>ah, yep. i think this the issue reported in <a href=\"https://github.com/IQSS/dataverse/pull/10264\">https://github.com/IQSS/dataverse/pull/10264</a>.</p>",
+        "id": 454933928,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722283133
+    },
+    {
+        "content": "<p>i'd assume the best option would be to upgrade to 6.2+ (probably just 6.3 <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span> ) to address this?</p>",
+        "id": 454934492,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722283252
+    },
+    {
+        "content": "<p>Yeah, the fix makes sense, given what you're seeing.</p>\n<p>And yeah, I'd suggest upgrading to 6.2 then 6.3.</p>",
+        "id": 454934616,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722283283
+    },
+    {
+        "content": "<p>sounds good. i'll get it on the hopper - we were going to do the upgrades after launch, but having guestbooks to represent a clickthrough for terms is a blocker for launch for us.</p>",
+        "id": 454934933,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722283356
+    },
+    {
+        "content": "<p>Sounds good. Sorry for the trouble.</p>",
+        "id": 454935088,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722283399
+    },
+    {
+        "content": "<p>no worries! thanks for your assistance. at least we have a path forward. <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 454935224,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722283435
+    }
+]
