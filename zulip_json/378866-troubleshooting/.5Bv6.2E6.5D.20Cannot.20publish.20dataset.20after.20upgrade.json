@@ -1,0 +1,140 @@
+[
+    {
+        "content": "<p>We recently upgraded <a href=\"https://dataverse.no\">https://dataverse.no</a> from v6.3 to v6.6. After the upgrade we are not able to publish datasets that were created before the upgrade. The error message says \"Your dataset named ... could not be published due to a failure to register, or update the Global Identifier for the dataset or one of the files in it.\" From the logs I only find something similar \"Failed to publicize the identifier doi:10.83125/BILMLY, or to publicize a file in the dataset; notifying the user(s), unlocking the dataset|#]\"</p>\n<p>Datasets that are created after the upgrade works as expected and are published without error. Is there something that should have been done to these datasets during upgrade? Maybe they are missing some new fields? Or could it be something else?</p>",
+        "id": 554117276,
+        "sender_full_name": "Karl Magnus Nilsen",
+        "timestamp": 1762442166
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"986763\">@Karl Magnus Nilsen</span> hi! Nothing comes immediately to mind but I'm asking on our internal Slack.</p>",
+        "id": 554148913,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762449827
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"986763\">@Karl Magnus Nilsen</span> is there any more helpful stacktrace in the Payara log?</p>",
+        "id": 554167310,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1762455423
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"986763\">@Karl Magnus Nilsen</span>  has access to log.  Maybe the reason is that the DataCite metadata is not up-to-date. So, we're currently running a modifyRegistrationMetadata.</p>",
+        "id": 554248632,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762498246
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"986763\">@Karl Magnus Nilsen</span>  . We are having the same problem sometimes with our v6.5 version. In our case, is associated with the ROR in the CVocConf . After removing problematic ROR (writing the name of the institution), we can publish the dataset.</p>",
+        "id": 554289027,
+        "sender_full_name": "Juan",
+        "timestamp": 1762511832
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> . Do you mean you remove the value in the Affiliation metadata field and add a new value? Or is there an issue with the ROR configuration?</p>",
+        "id": 554295618,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762513710
+    },
+    {
+        "content": "<p>I don't investigate the problem yet. But removing the Affiliation value provided by ROR and writing a new value without ROR is working for us. <br>\nIt only fails with some institutions, so we write the name of the institution without ROR in these cases.</p>",
+        "id": 554297653,
+        "sender_full_name": "Juan",
+        "timestamp": 1762514342
+    },
+    {
+        "content": "<p>Thanks! I'll try it out on our datasets that failed to be published.</p>",
+        "id": 554297810,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762514399
+    },
+    {
+        "content": "<p>Adding the affiliation (and author name) manually, not fetching from ROR (or ORCID) didn't help in our case.</p>",
+        "id": 554304641,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762516575
+    },
+    {
+        "content": "<p>I'm sorry, we don't have problems with ORCID, only with some ROR values</p>",
+        "id": 554305033,
+        "sender_full_name": "Juan",
+        "timestamp": 1762516702
+    },
+    {
+        "content": "<p>Can you each please start a new thread at <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> ? Jim isn't in Zulip but I bet he might have some ideas for us.</p>",
+        "id": 554305387,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762516823
+    },
+    {
+        "content": "<p>I've just sent an email to Jim. :-)</p>",
+        "id": 554305703,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762516930
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/.5Bv6.2E6.5D.20Cannot.20publish.20dataset.20after.20upgrade/near/554305387\">said</a>:</p>\n<blockquote>\n<p>start</p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  . Thank you, I will investigate a little more our problem and I will start the thread.</p>",
+        "id": 554310814,
+        "sender_full_name": "Juan",
+        "timestamp": 1762518675
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> if it helps, Jim just posted this in Slack:</p>\n<p>Probably <a href=\"https://github.com/IQSS/dataverse/issues/11941\">#11941</a> - they did not upgrade their ROR config when ROR switched to using v2 as the default and now have a null value cached triggering a bug in creating the DataCite export (<a href=\"https://github.com/IQSS/dataverse/issues/11782\">#11782</a> that missed getting into 6.8). The fix is to update the ROR script to explicitly use v1 (as in the repo) and remove the bad values from the externalvocabularyvalue table (truncating the table is fine).</p>",
+        "id": 554312324,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762519204
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> , I will investigate it.</p>",
+        "id": 554314390,
+        "sender_full_name": "Juan",
+        "timestamp": 1762519871
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  (and Jim). I have updated the ror.js and people.js files, and also the files modified by  <a href=\"https://github.com/IQSS/dataverse/issues/11782\">#11782</a>. <br>\nI checked some ROR that failed before, and now it is working. <br>\nI do not remember where I found the other .js files.</p>",
+        "id": 554666520,
+        "sender_full_name": "Juan",
+        "timestamp": 1762771091
+    },
+    {
+        "content": "<p>We try to turn on granular logging of PID-related issues by running this command in the Docker container:</p>\n<p>asadmin --user=${ADMIN_USER} --passwordfile=${AS_PASSWORD_FILE} set-log-levels edu.harvard.iq.dataverse.pidproviders.AbstractPidProvider=FINE</p>\n<p>but get this error message:</p>\n<p>remote failure: Could not set logger levels for server.<br>\nCommand set-log-levels failed.</p>\n<p>Any idea what is going wrong here? <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span>  <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span></p>",
+        "id": 554837960,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762838569
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651833\">@Philipp Conzett</span> please try using \"edu.harvard.iq.dataverse.pidproviders=FINE\" - this is usually group (package) based.</p>",
+        "id": 554848650,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762845247
+    },
+    {
+        "content": "<p>That way you will also see debugging output from the concrete (non-abstract) PID provider.</p>",
+        "id": 554848849,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1762845364
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ! I'll pass this on.</p>",
+        "id": 554853611,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1762847578
+    },
+    {
+        "content": "<p>The ROR v1 which we switched to to avoid this issue is now deactivated. Do you know how we should proceed with this. I think switcing to v2 on dataverse 6.8 will put us back in the same position of publication failures ?</p>",
+        "id": 568963300,
+        "sender_full_name": "Simon Carroll",
+        "timestamp": 1768897091
+    },
+    {
+        "content": "<p>Have you tried with <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.9\">6.9</a>? At least the above mentioned <a href=\"https://github.com/IQSS/dataverse/issues/11782\">#11782</a> is part of  the 6.9 release.</p>",
+        "id": 568968573,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768898948
+    },
+    {
+        "content": "<p>You can try to pass to your installation the two files changed by <a href=\"https://github.com/IQSS/dataverse/issues/11782\">#11782</a> (edu/harvard/iq/dataverse/export/ExportService.java and edu/harvard/iq/dataverse/pidproviders/doi/XmlMetadataTemplate.java). <br>\nThese files have been modified only by the previous PR from v6.8 to v6.9, so the update of the files should be safe.</p>",
+        "id": 568986785,
+        "sender_full_name": "Juan",
+        "timestamp": 1768904482
+    }
+]

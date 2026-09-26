@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>Hi @Cheng Shi, @Philip Durbin, and team <span aria-label=\"wave\" class=\"emoji emoji-1f44b\" role=\"img\" title=\"wave\">:wave:</span></p>\n<p>Starting this thread to discuss <strong>issue <a href=\"https://github.com/IQSS/dataverse/issues/1073\">#1073</a></strong> (<a href=\"https://github.com/IQSS/dataverse-frontend/issues/1073\">https://github.com/IQSS/dataverse-frontend/issues/1073</a>).</p>\n<p><strong>Context:</strong> While reviewing the file upload flow in <code>UploadedFilesList.tsx</code>, I noticed a couple of <code>TODO</code> comments:</p>\n<p>TypeScript</p>\n<div class=\"codehilite\"><pre><span></span><code>// TODO - Remove the file from the S3 bucket we need an API endpoint for this.\n</code></pre></div>\n<p>Currently, when files are directly uploaded to S3 and a user later clicks \"Remove\" (<code>X</code>) or \"Remove Selected\" from the staging list before saving the dataset, the files are cleared from the frontend form state, but the uploaded objects remain orphaned in the S3 bucket.</p>\n<p><strong>Discussion Points:</strong></p>\n<ol>\n<li>\n<p>Should we introduce a backend endpoint in core Dataverse to explicitly delete/abort uncommitted direct upload items?</p>\n</li>\n<li>\n<p>Or is the intended architecture to rely on S3 lifecycle rules / bucket expiration policies for unreferenced/temp objects?</p>\n</li>\n</ol>\n<p>Would love to hear your thoughts on how we should approach this!</p>",
+        "id": 625046369,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1789668220
+    },
+    {
+        "content": "<p>We just talked about this during the frontend meeting and I wanted to at least point out this API endpoint: <a href=\"https://guides.dataverse.org/en/6.12/api/native-api.html#cleanup-storage-of-a-dataset\">https://guides.dataverse.org/en/6.12/api/native-api.html#cleanup-storage-of-a-dataset</a></p>\n<p>That endpoint is a way to cleanup orphaned files that were uploaded but never attached to a dataset in a database sense.</p>",
+        "id": 626657675,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790264289
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>    Thanks for pointing this out, That makes a lot of sense., Given that <code>api/datasets/{id}/cleanStorage</code> handles sweeping orphaned S3 objects that were never finalized in the database, does the team prefer:, 1. Leaving cleanup entirely to this backend mechanism (and updating/removing the inline TODOs in <code>UploadedFilesList.tsx</code> and <code>FileUploaderPanel.tsx</code> with a reference to this behavior), or, 2. Adding a lightweight, immediate file-level deletion call on the frontend when the user clicks 'Remove' during draft staging?, Happy to adjust the TODO comments or open a PR documenting/handling whichever pattern fits the architecture best!</p>",
+        "id": 626686632,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1790271333
+    },
+    {
+        "content": "<p>Hi! First, I wanted to reproduce the bug myself and I just did, leaving a comment here: <a href=\"https://github.com/IQSS/dataverse-frontend/issues/1073#issuecomment-5820169072\">https://github.com/IQSS/dataverse-frontend/issues/1073#issuecomment-5820169072</a></p>\n<p>I think I like your option 2, that clicking \"remove\" should remove the file from S3. See also my comment where I clicked \"cancel\". That should probably be handled too.</p>",
+        "id": 626705098,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790275848
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  Seeing the LocalStack output makes the issue super clear. Handling both the staged \"Remove\" action and the page-level \"Cancel\" button makes complete sense for Option 2.</p>\n<p>I just left a follow-up comment on issue exploring whether core Dataverse can issue presigned <code>DELETE</code> tokens for direct uploads or if a dedicated backend endpoint would be needed. </p>\n<p>Looking forward to hearing what the team thinks, and I'd love to implement the frontend handling for this once we lock down the backend approach!</p>",
+        "id": 626711951,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1790277687
+    },
+    {
+        "content": "<p>I just read your comment in the issue. I don't know anything about presigned DELETE tokens. For now,  do you want to try to get a delete working in LocalStack? Maybe we'll learn something. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 626713349,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790278013
+    },
+    {
+        "content": "<p>Thanks for the suggestion, <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> </p>\n<p>Currently, my local machine is pretty constrained on disk space and resources, so spinning up the full LocalStack and Dataverse backend Docker containers locally isn't feasible for me right now. </p>\n<p>I'm very comfortable handling the React/TypeScript changes once the target delete mechanism or API pattern is established. In the meantime, I'll continue focusing on frontend bug fixes, hook refactoring, and test coverage across <code>dataverse-frontend</code></p>",
+        "id": 626714967,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1790278409
+    },
+    {
+        "content": "<p>Sure, no problem. <span class=\"user-mention\" data-user-id=\"1035407\">@Parth karalkar</span> was having the same problem. Dataverse is too fat to run on his local machine. <span aria-label=\"piglet\" class=\"emoji emoji-1f437\" role=\"img\" title=\"piglet\">:piglet:</span> </p>\n<p>Good to know that you can still do React/TS changes though! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 626715482,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790278551
+    },
+    {
+        "content": "<p>No, we don't. Can we move that message to its own Zulip topic? Otherwise it's a little buried in this one.</p>",
+        "id": 626718793,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790279405
+    },
+    {
+        "content": "<p>No worries, I deleted the message to keep this thread focused on the issue!</p>",
+        "id": 626719270,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1790279532
+    },
+    {
+        "content": "<p>Oh, no worries. It's a good question! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> Please feel free to start a new topic in <a class=\"stream\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community\">#community</a> or <a class=\"stream\" data-stream-id=\"379673\" href=\"/#narrow/channel/379673-dev\">#dev</a> even though you know the answer. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 626719767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790279678
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> reading this it makes me wonder if JerseyTests would help with this as well. Maybe spinning up an S3 container is fine, but otherwise not having to deploy all of it just to test an isolated API for file storage would be great, wouldn't it?</p>",
+        "id": 626742623,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790287320
+    },
+    {
+        "content": "<p>Well, the SPA only supports S3. So developers need an S3 service to work on the app.</p>",
+        "id": 626898562,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790344845
+    }
+]

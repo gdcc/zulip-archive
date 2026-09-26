@@ -1,0 +1,680 @@
+[
+    {
+        "content": "<p>I'm not sure if it is container related, however it seems that the CorsFilter is not picked up automatically although the <code>@WebFilter(\"/*\")</code> should do that:</p>\n<div class=\"codehilite\"><pre><span></span><code>@WebFilter(&quot;/*&quot;)\npublic class CorsFilter implements Filter\n</code></pre></div>\n<p>Instead I had to manually add to <code>web.xml</code> this:</p>\n<div class=\"codehilite\"><pre><span></span><code>    &lt;filter&gt;\n        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;\n        &lt;filter-class&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-class&gt;\n    &lt;/filter&gt;\n    &lt;filter-mapping&gt;\n        &lt;filter-name&gt;edu.harvard.iq.dataverse.filter.CorsFilter&lt;/filter-name&gt;\n        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;\n    &lt;/filter-mapping&gt;\n</code></pre></div>\n<p>I also checked in the debugger and without the explicit <code>web.xml</code> <code>doFilter()</code> is not get called.</p>",
+        "id": 572110249,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770287401
+    },
+    {
+        "content": "<p>This topic was moved here from <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/CorsFilter.20problem\">#containers &gt; CorsFilter problem</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 572144046,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1770297136
+    },
+    {
+        "content": "<p>As this is not purely container related, I moved this here <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span></p>",
+        "id": 572144170,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297173
+    },
+    {
+        "content": "<p>Are there any API tests for the filter?</p>",
+        "id": 572144281,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297203
+    },
+    {
+        "content": "<p>It would be good to have a reproducer.</p>",
+        "id": 572144339,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297219
+    },
+    {
+        "content": "<p>I just tried calling a DV endpoint from a browser component, but try to come up with a curl.</p>",
+        "id": 572144600,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770297295
+    },
+    {
+        "content": "<p>It would be good to have an API test included in our regular suite, so we can also test this is in CI</p>",
+        "id": 572147051,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770297915
+    },
+    {
+        "content": "<p>Actually, I don't know how to make curl fail with CORS, because it never does as it doesn't care, only browsers do, right? For now I just vibe coded a simple single page app which tries to create a dataset with POST and it does fail for me with stock develop branch DV (without manually adding the filter to webxml):</p>\n<p><a href=\"/user_uploads/53090/CIx9GN60LdG47ANe_sO3NKJ0/cors-tester.html\">cors-tester.html</a></p>\n<p>Just open it in a browser, set the api token and press \"POST JSON\" to see if it fails or not. (It uses the dataset-finch1.json from the DV API guides)</p>",
+        "id": 572199338,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770309598
+    },
+    {
+        "content": "<p>I was suggesting creating an IT test that checks for presence of the headers.</p>",
+        "id": 572220936,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770315823
+    },
+    {
+        "content": "<p>(As you said - anything that's not a browser won't care. But we'd only want to verify the servlet filter is picked up)</p>",
+        "id": 572221063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770315859
+    },
+    {
+        "content": "<p>Ok, I created a CorsIT test checking for CORS headers. </p>\n<p>It turns out that the result is kind of random based on whether the server happens to pick up CorsFilter or not. </p>\n<p>Here's my actual test session: I run the app in docker. When it is started I run the test manually. Then I stop the server with ctrl+c and either start it again with run, or first do an explicit stop. None of these seem to matter, the result seems to be random:</p>\n<p>mvn -Pct docker:stop</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:stop</p>\n<p>mvn -Pct docker:run --&gt; PASS</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; PASS</p>\n<p>ctrl+c</p>\n<p>mvn -Pct docker:run --&gt; FAIL</p>\n<p>I don't know how to proceed from here. One thing is sure: If add the explicit web.xml filter and filter-mapping it works consistently.</p>",
+        "id": 572337995,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770372808
+    },
+    {
+        "content": "<p>This is the test I run:</p>\n<p><a href=\"/user_uploads/53090/yopxGJpaX7jvCNARa9f2Vwei/CorsIT.java\">CorsIT.java</a></p>\n<p>In the <code>docker-compose-dev.yml</code> I set these for <code>dev_dataverse</code> just to see if I get specific headers I configure:</p>\n<div class=\"codehilite\"><pre><span></span><code>      DATAVERSE_CORS_ORIGIN: &quot;*&quot;\n      DATAVERSE_CORS_HEADERS_ALLOW: &quot;Accept,Content-Type,X-Dataverse-key,Authorization,cedar-client-session-id,cedar-debug&quot;\n``\n</code></pre></div>",
+        "id": 572343754,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770374454
+    },
+    {
+        "content": "<p>In your test I see that you are targeting an API endpoint.</p>",
+        "id": 572348983,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376012
+    },
+    {
+        "content": "<p>Yes, /api/dataverses/root/datasets</p>",
+        "id": 572349036,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376028
+    },
+    {
+        "content": "<p>Are we sure the filter actually will correctly work with JAX-RS</p>",
+        "id": 572349045,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376030
+    },
+    {
+        "content": "<p>What happens when hitting JSF or other pure servlets?</p>",
+        "id": 572349165,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376071
+    },
+    {
+        "content": "<p>Yes, sometimes it does, sometimes it doesn't. I don't know what kind of race condition could<br>\n it be.</p>",
+        "id": 572349200,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376081
+    },
+    {
+        "content": "<p>What happens if we hit a 404 in a servlet</p>",
+        "id": 572349336,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376122
+    },
+    {
+        "content": "<p>I don't know about JSF, but I want to access api endpoints from a webapp</p>",
+        "id": 572349358,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376129
+    },
+    {
+        "content": "<p>What url do you suggest to test?</p>",
+        "id": 572349455,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376156
+    },
+    {
+        "content": "<p>Technically, JAX-RS is still a servlet, but it's special. We may be in trouble here due to filter ordering etc.</p>",
+        "id": 572349977,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376331
+    },
+    {
+        "content": "<p>Also, AI tells me there may be a problem with the mixed style of having web.xml registered filters and annotation based. Not sure if this really is a thing, but lets keep it in mind.</p>",
+        "id": 572350118,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376374
+    },
+    {
+        "content": "<p>Yes, I think it definitely affects it, although as I read about it should be still deterministic</p>",
+        "id": 572350271,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376423
+    },
+    {
+        "content": "<p>SwordFilter is the only one configured in web.xml. Maybe removing it from there and adding @WebFilter annotation on the class makes it clear.</p>",
+        "id": 572350550,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376537
+    },
+    {
+        "content": "<p>I try this.</p>",
+        "id": 572350612,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770376556
+    },
+    {
+        "content": "<p>Technically for JAX-RS we should be using @ContainerRequestFilter to be within the consistent filter framework of JAX-RS</p>",
+        "id": 572350922,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376655
+    },
+    {
+        "content": "<p>See ApiBlockingFilter in api.filter package.</p>",
+        "id": 572351025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376692
+    },
+    {
+        "content": "<p>So this may be another culprit, why things my go sideways - the servlet filter and the JAX-RS filter may conflict.</p>",
+        "id": 572351142,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376736
+    },
+    {
+        "content": "<p>At least if both are discovered by annotations scanning.</p>",
+        "id": 572351197,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376754
+    },
+    {
+        "content": "<p>Maybe making the filter explicit in web.xml makes it load before the other or sth</p>",
+        "id": 572351230,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770376771
+    },
+    {
+        "content": "<p>Hmm coming to think about it: any servlet filters will be applied first, then the JAX-RS internal filters will apply. These two don't mix-n-match, they are at different layers. So should be nothing to worry about here.</p>",
+        "id": 572352089,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377067
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> could you please verify something for me...</p>",
+        "id": 572352666,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377254
+    },
+    {
+        "content": "<p>Yes, sure.</p>",
+        "id": 572352714,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770377264
+    },
+    {
+        "content": "<p>Could you run the tests against /api/v1/...</p>",
+        "id": 572352720,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377265
+    },
+    {
+        "content": "<p>I had a look at all the filters we already have and ApiRouter popped up. Asking AI about it gave me this: </p>\n<blockquote>\n<p>The <code>ApiRouter</code> is doing an internal <code>RequestDispatcher.forward(...)</code> from:<br>\n<code>/api/...</code> → <code>/api/v1/...</code> (your JAX‑RS app is mounted at ) <code>@ApplicationPath(\"api/v1\")</code></p>\n<p>That has a big side effect in Servlet-land: a forward is a second dispatch with dispatcher type FORWARD, and many servlet filters only apply to dispatcher type REQUEST unless explicitly configured.</p>\n</blockquote>",
+        "id": 572352907,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377327
+    },
+    {
+        "content": "<p>So let's rule out that the router may mess up our filter chain</p>",
+        "id": 572353160,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377404
+    },
+    {
+        "content": "<p>In the meantime I tested putting @WebFilter onto SwordFilter and removing the web.xml config --&gt; same random test behaviour</p>\n<p>I now try the /api/v1 behaviour</p>",
+        "id": 572354030,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770377694
+    },
+    {
+        "content": "<p>Great to verify that! We doubted it would be related, glad to see it was indeed not.</p>",
+        "id": 572354201,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377759
+    },
+    {
+        "content": "<p>My money is on Router vs Cors, as both affect the same endpoints.</p>",
+        "id": 572354251,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377778
+    },
+    {
+        "content": "<p>Also, you might want to do the testing with the sword filter as well <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> Not sure if the order matters with those two. IMHO filters should avoid being dependent on order. But of course we'd need to take care of types (forward, request)</p>",
+        "id": 572354415,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770377832
+    },
+    {
+        "content": "<p>Yep. So, when /api/dataverses/root/datasets fails /api/v1/dataverses/root/datasets passes the test.</p>",
+        "id": 572355905,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378354
+    },
+    {
+        "content": "<p>Now what? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 572355993,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378378
+    },
+    {
+        "content": "<p>In case of /api/v1 it first reaches CorsFilter then ApiBlockingFilter<br>\nIn case of /api only reaches ApiBlockingFilter</p>\n<p>(doFilter(), I mean)</p>",
+        "id": 572356692,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378602
+    },
+    {
+        "content": "<p>Ha! So Api Router <em>is</em> the culprit</p>",
+        "id": 572356894,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378667
+    },
+    {
+        "content": "<p>But you're somewhat wrong. The chain is:<br>\n/api       -&gt; Router -&gt; forward -&gt; Cors -&gt; ApiBlocking (which breaks at Cors because forward)<br>\n/api/v1 -&gt; Router -&gt; Cors -&gt; ApiBlocking</p>",
+        "id": 572357317,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378809
+    },
+    {
+        "content": "<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>",
+        "id": 572357488,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378865
+    },
+    {
+        "content": "<p>So in case of</p>\n<p>RequestDispatcher dsp = request.getRequestDispatcher(newRequestUri);<br>\ndsp.forward(req, sr1);</p>\n<p>wherever it goes it won't always goes thro CorsFilter, it is not in that filter chain, or sg.</p>",
+        "id": 572357671,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770378923
+    },
+    {
+        "content": "<p>So what we need to do: add both \"FORWARD\" and \"REQUEST\" to CorsFilter:</p>\n<div class=\"codehilite\" data-code-language=\"Java\"><pre><span></span><code><span class=\"nd\">@WebFilter</span><span class=\"p\">(</span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">\"/*\"</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"n\">dispatcherTypes</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">{</span><span class=\"n\">DispatcherType</span><span class=\"p\">.</span><span class=\"na\">REQUEST</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"n\">DispatcherType</span><span class=\"p\">.</span><span class=\"na\">FORWARD</span><span class=\"p\">})</span>\n</code></pre></div>\n<p>We should also look at the types ERROR and INCLUDE later on to avoid breaking CORS when serving error pages etc</p>",
+        "id": 572357680,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378928
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"602497\">Balázs Pataki</span> <a href=\"#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/572357488\">said</a>:</p>\n<blockquote>\n<p>Maybe that's how it should be, but no, in case of /api Cors is not ALWAYS reached.</p>\n</blockquote>\n<p>It goes there, but will not match because of dispatcher type forward!</p>",
+        "id": 572357817,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770378978
+    },
+    {
+        "content": "<p>Ok, I check now adding DispatcherType.FORWARD</p>",
+        "id": 572357922,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379015
+    },
+    {
+        "content": "<p>Please make sure to use the above example, otherwise we'd break REQUEST <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 572358009,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770379042
+    },
+    {
+        "content": "<p>yeah, i copy pasted that :-)</p>",
+        "id": 572358065,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379058
+    },
+    {
+        "content": "<p>Oh yeah, it works consistently now! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>\n<p>And the filter orders are as follows:</p>\n<p>/api<br>\ncors -&gt; router -&gt; cors -&gt; apiblocking</p>\n<p>/api/v1<br>\ncors -&gt; router -&gt; apiblocking</p>",
+        "id": 572359916,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770379568
+    },
+    {
+        "content": "<p>Good morning. <span aria-label=\"coffee\" class=\"emoji emoji-2615\" role=\"img\" title=\"coffee\">:coffee:</span> You've been busy!</p>",
+        "id": 572364466,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770381052
+    },
+    {
+        "content": "<p>Submitted a PR:</p>\n<p><a href=\"https://github.com/IQSS/dataverse/pull/12151\">https://github.com/IQSS/dataverse/pull/12151</a></p>\n<p>Should we add anything else to it, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> ?</p>",
+        "id": 572369841,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770382659
+    },
+    {
+        "content": "<p>Can you test the error pages?</p>",
+        "id": 572370001,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382706
+    },
+    {
+        "content": "<p>And SWORD maybe?</p>",
+        "id": 572370062,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382721
+    },
+    {
+        "content": "<p>You mean to add more URL-s to test in CorsIT, right?</p>",
+        "id": 572370245,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770382774
+    },
+    {
+        "content": "<p>Yeah, lets have more tests in there</p>",
+        "id": 572370295,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382787
+    },
+    {
+        "content": "<p>Might be an @Parameterized one or single ones.</p>",
+        "id": 572370356,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382803
+    },
+    {
+        "content": "<p>Not sure we can make RestAssured hit the other endpoints that easily.</p>",
+        "id": 572370419,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770382824
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> this may be worth another backport to 6.9</p>",
+        "id": 572374168,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770383948
+    },
+    {
+        "content": "<p>I made it ParameterizedTest and now it tests these endpoints</p>\n<p>\"/api/dataverses/root/datasets\",<br>\n\"/api/v1/dataverses/root/datasets\",<br>\n\"/page_doesnt_exist\",<br>\n\"/dvn/api/data-deposit/v1.1/swordv2/collection/dataverse/root\"</p>",
+        "id": 572378744,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1770385227
+    },
+    {
+        "content": "<p>You probably should add CorsIT to the list of tests at <a href=\"https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt\">https://github.com/IQSS/dataverse/blob/develop/tests/integration-tests.txt</a></p>",
+        "id": 572386225,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387007
+    },
+    {
+        "content": "<p>I've always meant to refactor the API tests to properly use Maven Failsafe and JUnit 5 Suites, but didn't find the time so far...</p>",
+        "id": 572386380,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387046
+    },
+    {
+        "content": "<p>I left two comments on the PR</p>",
+        "id": 572387366,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770387295
+    },
+    {
+        "content": "<p>Edit: added another one.</p>",
+        "id": 572390742,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770388131
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> I've marked your PR as a draft for now and added all the necessary labels (put didn't put it on the board yet <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>). Keep them changes coming, I'll be the ambassador on including it in 6.10</p>",
+        "id": 572395435,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1770389319
+    },
+    {
+        "content": "<p>I'd say we can safely put it in the \"Ready for Triage\" column so it comes up on Triage Tuesday. Any objections? Thanks for the PR! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 572398158,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770389974
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I'm reviewing <a href=\"https://github.com/IQSS/dataverse/issues/12151\">#12151</a> and I rebased the branch. I hope you don't mind.</p>",
+        "id": 583351346,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775161492
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I added a note about requirements.txt changes that doc writers will need to know about.</p>",
+        "id": 583351481,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775161523
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> tests are failing on Jenkins. Please see <a href=\"https://github.com/IQSS/dataverse/pull/12151#discussion_r3030000487\">https://github.com/IQSS/dataverse/pull/12151#discussion_r3030000487</a></p>\n<p>Should we enable CORS on the Dataverse instances Jenkins spins up? Can I co-assign you to the PR until we decide how to handle this?</p>",
+        "id": 583351730,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775161594
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I have questions about <a href=\"https://github.com/IQSS/dataverse/issues/12151\">#12151</a> and left reviews for you.</p>",
+        "id": 583359487,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775164003
+    },
+    {
+        "content": "<p>Hello! I am working on Dataverse Ansible to add in the CORS fix to make the CorsIT tests pass.</p>\n<p>I was able to allow CORS from DA's side, but I kept running into this issue when testing:</p>\n<p><code>Time elapsed: 0.011 s &lt;&lt;&lt; FAILURE!\\norg.opentest4j.AssertionFailedError: Unexpected value for header: Access-Control-Allow-Headers ==&gt; expected: &lt;[range, content-type, x-dataverse-key, accept]&gt; but was: &lt;[*]&gt;\\n\\</code></p>\n<p>For now, I'm trying to change the Access Control Allow Headers to those exact strings to make sure the tests pass, but I am of the opinion that the assertions are a bit rigid</p>",
+        "id": 584069839,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775589938
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> you don't permission to change the test in the PR, right? You'd need the author, <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span>, to do that.</p>",
+        "id": 584070003,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775589997
+    },
+    {
+        "content": "<p>Nope, I can't change it myself.</p>",
+        "id": 584070053,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775590019
+    },
+    {
+        "content": "<p>Right. Could you please go ahead and leave a review or a comment on the line you're talking about? So <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> can easily find it.</p>",
+        "id": 584070205,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775590059
+    },
+    {
+        "content": "<p>Done!</p>",
+        "id": 584070708,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1775590245
+    },
+    {
+        "content": "<p><a href=\"https://jenkins.dataverse.org/job/IQSS-Dataverse-Develop-PR/job/PR-12151/16/testReport/\">https://jenkins.dataverse.org/job/IQSS-Dataverse-Develop-PR/job/PR-12151/16/testReport/</a> is passing now! Thanks, <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> and <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span>!</p>",
+        "id": 584443790,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775738765
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is CORS on by default now? I'm confused by these docs: <a href=\"https://github.com/IQSS/dataverse/pull/12151#discussion_r3030369558\">https://github.com/IQSS/dataverse/pull/12151#discussion_r3030369558</a></p>",
+        "id": 584443987,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1775738822
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Hi Phil. I see you've approved the CORSfilter PR which is amazing! I just wanted to add that I would still strongly recommend that the assertions for the CorsIT test be rewritten to support \"*\" and extended headers, before the PR is merged as it makes it very difficult during testing to figure out what exact CORS strings need to be allowed to make the tests pass as giving any additional headers will just fail it.</p>\n<p>It should be just 4-5 lines of code change at max, mostly regexes and it makes life easier for everyone involved at the CORS side.</p>\n<p>Or you could just merge the PR, and I can open a separate issue later on for a minor fix if you would prefer that.</p>\n<p>Thanks!</p>",
+        "id": 585460831,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776181075
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> good point! I did see your \"request changes\" review but I wasn't sure how strongly you feel about it!</p>\n<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> or <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> are you interested in making the changes above?</p>",
+        "id": 585471011,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776183448
+    },
+    {
+        "content": "<p>I think it might be best to go ahead with the PR merge for now. I'll open a minor fix PR later on for the test failures.</p>",
+        "id": 585851791,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776332067
+    },
+    {
+        "content": "<p>I had another look today. Currently, the tests simply expect the default values for the Access-Control-Allow-Headers and Access-Control-Expose-Headers when these settings are not configured.</p>",
+        "id": 585852437,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332255
+    },
+    {
+        "content": "<p>It sounds like for the Jenkins setup, you're setting them both to \"*\"</p>",
+        "id": 585852527,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332284
+    },
+    {
+        "content": "<p>I understand that y'all want to be cautious with these options, as they may have side effects.</p>",
+        "id": 585852602,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332309
+    },
+    {
+        "content": "<p>To test this in a cleaner fashion, we have a few options....</p>",
+        "id": 585852695,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332345
+    },
+    {
+        "content": "<ol>\n<li>\n<p>Environment isolation: deploy a separate test instance just for this test.</p>\n<p>- This may be hard in the current Jenkins setup.<br>\n  - It's easier with containerized tests, but still a lot.<br>\n  - It would still be overhead but at least easily controlled if we'd create these containers with Testcontainers from within the test.<br>\n  - Using a separate environment neatly solves the problem that the filter is initialized only once with the values. Changes need a redeploy.</p>\n</li>\n<li>\n<p>Variation of (1): make it an \"integration test\", not an API End to End test. We already have some of those using Testcontainers. We can use the packaged container to run Dataverse in it. We'd need some more infrastructure though to setup the Dataverse deployment in it.</p>\n</li>\n<li>The cleanest, but most work intense one: make remote JVM settings a reality. Write the setting values to a directory consumed by the MPCONFIG directory source. Create a watcher (for all settings) and propagate events about changes. Implement reload interfaces triggered by the events to actually \"reload\" (whatever that means to something being reloaded).</li>\n</ol>",
+        "id": 585854236,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332868
+    },
+    {
+        "content": "<p>My favorite is (3) as it is the most sustainable effort, not just for CORS tests. It goes well beyond testing, too. The application would have a whole new feature being more \"hot reloadable\".</p>",
+        "id": 585854350,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776332898
+    },
+    {
+        "content": "<p>Maybe we should make the test be less opinionated. The test was written to make sure that the CORS headers are <em>present</em> on each of the different endpoints served by different subsystems.</p>",
+        "id": 585855701,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776333317
+    },
+    {
+        "content": "<p>So instead of asserting the content of the headers, asserting the presence of the headers would be good enough for now.</p>",
+        "id": 585855820,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776333355
+    },
+    {
+        "content": "<p>We can move the content assertions to a different test that is @Disabled for now until we resolve the tech debt I mentioned above.</p>",
+        "id": 585855927,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776333387
+    },
+    {
+        "content": "<p>Hi Oliver. I appreciate the detailed reply! From my side, I am being persistent about this because I just want \"*\" and even lassing additional headers to be considered a valid assertion for the test, pretty much. I am not asking for a rewrite or anything. I dont want to create anya additional load than you already have</p>",
+        "id": 585855930,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776333388
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/585855820\">said</a>:</p>\n<blockquote>\n<p>So</p>\n</blockquote>\n<p>Yes, that is exactly what I meant! Thank you! You put it a lot better than I ever could ;)</p>",
+        "id": 585856042,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776333424
+    },
+    {
+        "content": "<p>I'll change the test now.</p>",
+        "id": 585856169,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776333458
+    },
+    {
+        "content": "<p>Done.</p>",
+        "id": 585859894,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776334551
+    },
+    {
+        "content": "<p>I left a whole bunch of Javadocs on the test to explain</p>",
+        "id": 585859982,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776334576
+    },
+    {
+        "content": "<p>Please let me know how Jenkins is doing <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 585860064,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776334601
+    },
+    {
+        "content": "<p>Tysm! I'll let you know immediately after the build finishes. Could be an hour or so from now.</p>",
+        "id": 585862208,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776335270
+    },
+    {
+        "content": "<p>You folks have been busy! <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> thanks for the commit at <a href=\"https://github.com/IQSS/dataverse/pull/12151/changes/ed07f964cb02bd8cc89e6daa46ff57ecf0fe5c84\">https://github.com/IQSS/dataverse/pull/12151/changes/ed07f964cb02bd8cc89e6daa46ff57ecf0fe5c84</a> . I'm taking a look.</p>\n<p>Unfortunately, from here at home, I can't see the details of the <a href=\"https://jenkins.dataverse.org/job/IQSS-Dataverse-Develop-PR/job/PR-12151/18/display/redirect\">Jenkins test run</a> but all the checks in <a href=\"https://github.com/IQSS/dataverse/issues/12151\">#12151</a> are green, at least, which is a good sign.</p>",
+        "id": 585881223,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776341042
+    },
+    {
+        "content": "<p>I think the commit makes sense to me. Just looking for the presence of headers. Seems fine. And future work is explained in a comment. <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> what do you think?</p>",
+        "id": 585883104,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776341553
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> Jenkins looking good, all tests passing</p>",
+        "id": 585886803,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776342460
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/585883104\">said</a>:</p>\n<blockquote>\n<p>I think the commit makes sense to me. Just looking for the presence of headers. Seems fine. And future work is explained in a comment. <span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> what do you think?</p>\n</blockquote>\n<p>Yep, sounds good to me!</p>",
+        "id": 585886884,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776342481
+    },
+    {
+        "content": "<p>thank you all for your work on this even though it was supposed to be a small change</p>",
+        "id": 585886973,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776342506
+    },
+    {
+        "content": "<p>Thank you <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> for solving this!</p>",
+        "id": 585887731,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1776342712
+    },
+    {
+        "content": "<p>Woohoo! Ship it! <span aria-label=\"ship\" class=\"emoji emoji-1f6a2\" role=\"img\" title=\"ship\">:ship:</span> <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 585892757,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776343905
+    },
+    {
+        "content": "<p>No worries <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span>. It was a small thing to do once the wrapping around the head was done <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 585893064,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776343978
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/379673-dev/topic/CorsFilter.20Servlet.20Filter.20not.20discovered/near/585886803\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> Jenkins looking good, all tests passing</p>\n</blockquote>\n<p>Yes! API tests took 22 minutes: <a href=\"https://jenkins.dataverse.org/job/IQSS-Dataverse-Develop-PR/job/PR-12151/18/testReport/\">https://jenkins.dataverse.org/job/IQSS-Dataverse-Develop-PR/job/PR-12151/18/testReport/</a></p>",
+        "id": 585898495,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776345191
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> do you want to formally remove your \"requested changes\" status? Alternatively, I can click \"dismiss review\":</p>\n<p><img alt=\"Screenshot 2026-04-16 at 9.14.25 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"884x453\" data-original-src=\"/user_uploads/53090/VVu5iVvBCBZh-KXZ8NQB_k95/Screenshot-2026-04-16-at-9.14.25AM.png\" src=\"/user_uploads/thumbnail/53090/VVu5iVvBCBZh-KXZ8NQB_k95/Screenshot-2026-04-16-at-9.14.25AM.png/840x560.webp\"></p>",
+        "id": 585898924,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776345305
+    },
+    {
+        "content": "<p>I did go ahead and move it to \"ready for QA\" column of the <a href=\"https://github.com/orgs/IQSS/projects/34\">project board</a>.</p>",
+        "id": 585899169,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776345366
+    },
+    {
+        "content": "<p>Hi Phil, you can go ahead and dismiss it!</p>",
+        "id": 585903599,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1776346357
+    },
+    {
+        "content": "<p>Done! <a href=\"https://github.com/IQSS/dataverse/pull/12151#event-24571051576\">https://github.com/IQSS/dataverse/pull/12151#event-24571051576</a></p>",
+        "id": 585921050,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1776350281
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>                          _\n                      .-&#39;` `}\n              _./)   /       }        SHIP IT! :-)\n            .&#39;o   \\ |       }\n            &#39;.___.&#39;`.\\    {`\n            /`\\_/  , `.    }\n            \\=&#39; .-&#39;   _`\\  {\n             `&#39;`;/      `,  }\n                _\\       ;  }\n               /__`;-...&#39;--&#39;\n</code></pre></div>",
+        "id": 585923200,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1776350765
+    }
+]

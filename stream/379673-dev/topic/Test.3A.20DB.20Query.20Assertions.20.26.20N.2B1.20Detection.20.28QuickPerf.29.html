@@ -1,0 +1,86 @@
+<html>
+<head><meta charset="utf-8"><title>Test: DB Query Assertions &amp; N+1 Detection (QuickPerf) · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Test.3A.20DB.20Query.20Assertions.20.26.20N.2B1.20Detection.20.28QuickPerf.29.html">Test: DB Query Assertions &amp; N+1 Detection (QuickPerf)</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="626711935"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Test%3A%20DB%20Query%20Assertions%20%26%20N%2B1%20Detection%20%28QuickPerf%29/near/626711935" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Tony Nguyen <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Test.3A.20DB.20Query.20Assertions.20.26.20N.2B1.20Detection.20.28QuickPerf.29.html#626711935">(Sep 24 2026 at 19:21)</a>:</h4>
+<p>Hi all! <span aria-label="wave" class="emoji emoji-1f44b" role="img" title="wave">:wave:</span></p>
+<p>Following up on the open note in the <a href="https://guides.dataverse.org/en/6.12/developers/performance.html#count-database-queries-per-api-test">Developer Performance Guide</a> (<em>"Count Database Queries per API Test: Is it possible?"</em>) and the recent great work on DB query scaling in <a href="https://github.com/IQSS/dataverse/issues/12740">#12740</a> and <a href="https://github.com/IQSS/dataverse/issues/12729">#12729</a>:</p>
+<p>I put together a working POC integrating <strong>QuickPerf (JUnit 5)</strong> into our test suite on my fork:<br>
+<span aria-label="link" class="emoji emoji-1f517" role="img" title="link">:link:</span> <strong>POC PR:</strong> <a href="https://github.com/tuannx/dataverse/pull/3">https://github.com/tuannx/dataverse/pull/3</a></p>
+<h3>QuickPerf vs. Direct <code>datasource-proxy</code> (Trade-offs)</h3>
+<p>Since we already have <code>datasource-proxy 1.11.0</code> in <code>develop</code>, here is a quick look at how the two compare:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Aspect</th>
+<th style="text-align: left;">Direct <code>datasource-proxy</code> (Current)</th>
+<th style="text-align: left;">QuickPerf (POC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Ergonomics</strong></td>
+<td style="text-align: left;">Manual <code>clear()</code>, lambda wrapping, manual asserts</td>
+<td style="text-align: left;">Declarative annotations (e.g. <code>@ExpectMaxSelect(25)</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>N+1 Detection</strong></td>
+<td style="text-align: left;">Runs against 2 dataset sizes (e.g. 50 vs 100 files) to check slope</td>
+<td style="text-align: left;">Catches N+1 on a single dataset via prepared statement parameters</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Failure Diagnostics</strong></td>
+<td style="text-align: left;">Bare assert (<code>expected &lt; 5, was 809</code>); requires manual SQL log inspection</td>
+<td style="text-align: left;">Dumps the exact repeated SQL statements &amp; parameter diff in test output</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Safety Guards</strong></td>
+<td style="text-align: left;">None out of the box</td>
+<td style="text-align: left;">Built-in <code>@ExpectUpdate(0)</code>, wildcard scan checks, batching checks</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dependency &amp; Maintenance</strong></td>
+<td style="text-align: left;">In-tree, zero new dependencies</td>
+<td style="text-align: left;">Adds test-scoped lib. <em>Note:</em> Upstream QuickPerf master has merged <code>datasource-proxy 1.11.0</code>, but a new Maven Central release is still pending (latest published is 1.1.0).</td>
+</tr>
+</tbody>
+</table>
+<h3>Open Question for the Team:</h3>
+<p>Would the core team prefer:</p>
+<ol>
+<li><strong>Adopting QuickPerf</strong> (100% test-scoped) once the release is cut to get declarative annotations and automatic N+1 diagnostics?</li>
+<li>Or <strong>keeping direct <code>datasource-proxy 1.11.0</code></strong> and writing a lightweight internal test utility inspired by QuickPerf's assertion pattern?</li>
+</ol>
+<p>Would love to hear thoughts from <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> , <span class="user-mention" data-user-id="598183">@Oliver Bertuch</span>   and <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> !</p>
+
+
+
+<a name="626713633"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Test%3A%20DB%20Query%20Assertions%20%26%20N%2B1%20Detection%20%28QuickPerf%29/near/626713633" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Test.3A.20DB.20Query.20Assertions.20.26.20N.2B1.20Detection.20.28QuickPerf.29.html#626713633">(Sep 24 2026 at 19:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="598183">@Oliver Bertuch</span> you were interested QuickPerf. Please see above. What do you think?</p>
+
+
+
+<a name="626744119"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Test%3A%20DB%20Query%20Assertions%20%26%20N%2B1%20Detection%20%28QuickPerf%29/near/626744119" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Test.3A.20DB.20Query.20Assertions.20.26.20N.2B1.20Detection.20.28QuickPerf.29.html#626744119">(Sep 24 2026 at 22:14)</a>:</h4>
+<p>I'm happy if <span class="user-mention" data-user-id="1199680">@Tony Nguyen</span> wants to have a go at this! It would be interesting to see and I appreciate someone continuing the work I started (also very happy to see <span class="user-mention" data-user-id="614964">@Eryk Kulikowski</span> just used the framework <span aria-label="smiley cat" class="emoji emoji-1f63a" role="img" title="smiley cat">:smiley_cat:</span> ).</p>
+<p>Some (helpful?) comments:</p>
+<ol>
+<li>I already added an annotation <code>@JpaPerformanceTest</code>. Adding <code>@QuickPerfTest</code> to it is a low hanging fruit, auto-enabling all existing tests to use QuickPerf. (You probably saw how it also triggers wiring up the datasource, Testcontainers, etc)</li>
+<li>As the general performance guide is rather superficial, I created <a href="https://guides.dataverse.org/en/6.12/developers/testing/performance.html">https://guides.dataverse.org/en/6.12/developers/testing/performance.html</a> when writing the test infrastructure back in the day. That would need to be updated that we use Quickperf, how to use it and so on.</li>
+<li>W.r.t. "can we cound SQL queries in API tests": no, at least not with QuickPerf. It runs as part of the JUnit test and for API tests, we reach out over the network to a _different_ JVM, which accesses the DB. QuickPerf has no chance of intercepting that. To get a hold of that data we'd need a Java agent (JProfiler and other do it that way) or use a more complex OpenTelemetry setup. But using QuickPerf would already be a nice addition for our integration performance tests!</li>
+<li>Let me point you to an important aspect of it all: we are neither using Hibernate nor Spring Data. There is no integration with EclipseLink, so QuickPerf cannot give us helpful hints to optimize queries. But it can of course still analyze the JDBC traffic for patterns and fail tests, but we have to think more about the right limits for a test and how to optimize.</li>
+</ol>
+
+
+
+<hr><p>Last updated: Sep 26 2026 at 17:33 UTC</p>
+</html>

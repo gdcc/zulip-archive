@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Hi there. I am having some trouble setting up a Permalink pid provider on a new Dataverse 6.5. I installed dataverse using the Ansible Playbook, which configures a FAKE doi provider and then manually configured an additional perma pid provider as follows:</p>\n<div class=\"codehilite\"><pre><span></span><code># Default set during installation\n-Ddataverse.pid.fake.type=FAKE\n-Ddataverse.pid.fake.label=Fake DOI Provider\n-Ddataverse.pid.fake.authority=10.5072\n-Ddataverse.pid.fake.shoulder=FK2/\n# My permalink provider\n-Ddataverse.pid.perma1.type=perma\n-Ddataverse.pid.perma1.label=PermaLink\n-Ddataverse.pid.perma1.authority=abc1234\n-Ddataverse.pid.perma1.permalink.separator=-\n-Ddataverse.pid.perma1.shoulder=ds-\n-Ddataverse.pid.perma1.permalink.identifier-generation-style=randomString\n-Ddataverse.pid.perma1.permalink.base-url=https://dataverse.abc1234.uni-due.de/\n# I overwrote these settings to make perma1 the default provider, but to offer both.\n-Ddataverse.pid.providers=fake,perma1\n-Ddataverse.pid.default-provider=perma1\n</code></pre></div>\n<p>Then I removed all PID-related settings via the <code>/api/admin/settings</code> API and restarted payara. Both providers show up in the user interface. Using the FAKE provider works, but when I switch to the perma provider I get the following error in <code>server.log</code>:</p>\n<div class=\"codehilite\"><pre><span></span><code>CommandException, when attempting to update the dataset: PID Provider UnmanagedPermaLinkProvider is not configured.\nedu.harvard.iq.dataverse.engine.command.exception.IllegalCommandException: PID Provider UnmanagedPermaLinkProvider is not configured.\n        at edu.harvard.iq.dataverse.engine.command.impl.CreateNewDatasetCommand.handlePid(CreateNewDatasetCommand.java:100)\n        at edu.harvard.iq.dataverse.engine.command.impl.AbstractCreateDatasetCommand.execute(AbstractCreateDatasetCommand.java:134)\n        at edu.harvard.iq.dataverse.engine.command.impl.AbstractCreateDatasetCommand.execute(AbstractCreateDatasetCommand.java:26)\n        at edu.harvard.iq.dataverse.EjbDataverseEngineInner.submit(EjbDataverseEngineInner.java:36)\n        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n        at java.base/java.lang.reflect.Method.invoke(Method.java:569)\n        at org.glassfish.ejb.security.application.EJBSecurityManager.runMethod(EJBSecurityManager.java:588)\n        at org.glassfish.ejb.security.application.EJBSecurityManager.invoke(EJBSecurityManager.java:408)\n[...]\n</code></pre></div>\n<p>Does anyone have an idea what is going wrong here?</p>",
+        "id": 494167248,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1737039423
+    },
+    {
+        "content": "<p>Hmm, does this PR help? <a href=\"https://github.com/IQSS/dataverse/pull/11108/files\">https://github.com/IQSS/dataverse/pull/11108/files</a></p>",
+        "id": 494175863,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737041665
+    },
+    {
+        "content": "<p>Unfortunately not :( I tried the way I posted above, the way shown in the PR, and as a legacy provider with only one provider as per the config page. The first two resulted in the error I posted, the latter (<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#configuring-your-dataverse-installation-for-a-single-permalink-provider\">https://guides.dataverse.org/en/latest/installation/config.html#configuring-your-dataverse-installation-for-a-single-permalink-provider</a>) resulted in payara crashing on startup with an error similar to the one shown <a href=\"https://github.com/IQSS/dataverse/issues/10557\">here</a>.</p>",
+        "id": 494177483,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1737042120
+    },
+    {
+        "content": "<p>It's weird that you're getting <code>UnmanagedPermaLinkProvider</code>. It must be coming from this class: <a href=\"https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/pidproviders/perma/UnmanagedPermaLinkPidProvider.java\">https://github.com/IQSS/dataverse/blob/v6.5/src/main/java/edu/harvard/iq/dataverse/pidproviders/perma/UnmanagedPermaLinkPidProvider.java</a></p>",
+        "id": 494178515,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737042398
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"601943\">@Henning Timm</span> the person who knows the most about this is Jim Myers but he's not in Zulip. Can you please post to <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a> ?</p>",
+        "id": 494178666,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737042448
+    },
+    {
+        "content": "<p>I wrote to the mailing list. Thanks for the help <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin ☃️</span></p>",
+        "id": 494183407,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1737043720
+    },
+    {
+        "content": "<p><a href=\"https://groups.google.com/g/dataverse-community/c/1Ec6iT5OKio/m/MbcKyHbuCgAJ\">https://groups.google.com/g/dataverse-community/c/1Ec6iT5OKio/m/MbcKyHbuCgAJ</a> looks great. Thanks!</p>",
+        "id": 494183575,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737043769
+    },
+    {
+        "content": "<p>I also opened an issue, including a possible mitigation (for new setups): <a href=\"https://github.com/IQSS/dataverse/issues/11165\">https://github.com/IQSS/dataverse/issues/11165</a></p>",
+        "id": 494334556,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1737111487
+    },
+    {
+        "content": "<p>Thanks. So from that issue, it looks like you got a certain config working?</p>",
+        "id": 494366457,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737122183
+    },
+    {
+        "content": "<p>Yes, leaving out the shoulder solved the problem. This is perfectly fine for our setup. Thanks for the help!</p>",
+        "id": 494427664,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1737142803
+    },
+    {
+        "content": "<p>Sure. In <a href=\"https://github.com/IQSS/dataverse/pull/11108/files\">https://github.com/IQSS/dataverse/pull/11108/files</a> I switched from using a shoulder for the FAKE DOI provider to using a separator for the Permalinks provider.</p>",
+        "id": 494428140,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1737142989
+    }
+]

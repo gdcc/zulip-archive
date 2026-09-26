@@ -1,0 +1,146 @@
+[
+    {
+        "content": "<p>Hello, </p>\n<p>We are using Dataverse v 6.6 and trying to do a few uploads, one via automated code. </p>\n<p>The website is responding normally, and I can browse material, but there are a bunch of files that are still \"ingesting\" (converting, I think) and I'm not sure how to tell if a part of Dataverse failed. </p>\n<p>There are no obvious errors in the log, though I haven't seen the message \"Tabular data successfully ingested\" in a while - at the time when things seemed to stop getting converted.  </p>\n<p>What should I check out to see if the system is running as expected and maybe just a little slow?  I suspect the files waiting to be convereted are just sitting there. <br>\nThanks!</p>",
+        "id": 566626624,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767735865
+    },
+    {
+        "content": "<p>One error -- probably doesn't stop other file conversions: </p>\n<p>[2026-01-06T18:36:54.089+0000] [Payara 6.2023.8] [WARNING] [] [edu.harvard.iq.dataverse.ingest.IngestServiceBean] [tid: _ThreadID=534 _ThreadName=orb-thread-pool-1 (pool <a href=\"https://github.com/IQSS/dataverse/issues/1\">#1</a>): worker-4] [timeMillis: 1767724614089] [levelValue: 900] [[<br>\n  Ingest failure (Exception class java.lang.IllegalArgumentException): The header contains a duplicate name: \"Position\" in [&lt;feff&gt;Clone, Sequence, Gene_Name, UniProt, Entrez, Exact_HPA_Match?_(Gene,_UniProt,_or_Synonym), HPA_Gene, HPA_Uniprot, HPA_Gene_Synonym, HPA_Ensembl, HPA_Gene_description, Position, Ch ..... ]</p>\n<p>[2026-01-06T18:36:54.096+0000] [Payara 6.2023.8] [WARNING] [] [edu.harvard.iq.dataverse.ingest.IngestMessageBean] [tid: _ThreadID=534 _ThreadName=orb-thread-pool-1 (pool <a href=\"https://github.com/IQSS/dataverse/issues/1\">#1</a>): worker-4] [timeMillis: 1767724614096] [levelValue: 900] [[<br>\n  Error occurred during ingest job for file id 27292!]]</p>\n<p>BUT -- Could this failure have stopped whatever thread does these conversions?</p>",
+        "id": 566626752,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767735927
+    },
+    {
+        "content": "<p>A few of these: </p>\n<p>[2026-01-06T19:06:21.941+0000] [Payara 6.2023.8] [WARNING] [] [] [tid: _ThreadID=106 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1767726381941] [levelValue: 900] [[<br>\n  Response has already been committed, and further write operations are not permitted. This may result in an IllegalStateException being triggered by the underlying application. To avoid this situation, consider adding a Rule <code>.when(Direction.isInbound().and(Response.isCommitted())).perform(Lifecycle.abort())</code>, or figure out where the response is being incorrectly committed and correct the bug in the offending code.]]</p>",
+        "id": 566627007,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767736054
+    },
+    {
+        "content": "<p>A few of these: </p>\n<p>java.io.IOException: Connection is closed<br>\n        at org.glassfish.grizzly.nio.NIOConnection.assertOpen(NIOConnection.java:420)<br>\n        at org.glassfish.grizzly.http.io.OutputBuffer.write(OutputBuffer.java:613)<br>\n        at org.apache.catalina.connector.OutputBuffer.writeBytes(OutputBuffer.java:340)<br>\n        at org.apache.catalina.connector.OutputBuffer.write(OutputBuffer.java:327)<br>\n        at org.apache.catalina.connector.CoyoteOutputStream.write(CoyoteOutputStream.java:158)<br>\n        at java.base/java.nio.channels.Channels$WritableByteChannelImpl.write(Channels.java:463)<br>\n        at com.sun.faces.application.resource.ResourceHandlerImpl.handleResourceRequest(ResourceHandlerImpl.java:305)<br>\n        at jakarta.faces.application.ResourceHandlerWrapper.handleResourceRequest(ResourceHandlerWrapper.java:166)<br>\n        at org.primefaces.application.resource.PrimeResourceHandler.handleResourceRequest(PrimeResourceHandler.java:87)<br>\n        at jakarta.faces.application.ResourceHandlerWrapper.handleResourceRequest(ResourceHandlerWrapper.java:166)<br>\n        at jakarta.faces.application.ResourceHandlerWrapper.handleResourceRequest(ResourceHandlerWrapper.java:166)<br>\n        at jakarta.faces.application.ResourceHandlerWrapper.handleResourceRequest(ResourceHandlerWrapper.java:166)<br>\n        at jakarta.faces.application.ResourceHandlerWrapper.handleResourceRequest(ResourceHandlerWrapper.java:166)<br>\n        at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:688)<br>\n        at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)<br>\n        at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)<br>\n        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)<br>\n        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)<br>\n        at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:83)<br>\n      ....<br>\nCaused by: java.io.IOException: Connection reset by peer<br>\n        at java.base/sun.nio.ch.FileDispatcherImpl.write0(Native Method)<br>\n        at java.base/sun.nio.ch.SocketDispatcher.write(SocketDispatcher.java:62)<br>\n        at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(IOUtil.java:132)<br>\n        at java.base/sun.nio.ch.IOUtil.write(IOUtil.java:76)<br>\n        at java.base/sun.nio.ch.IOUtil.write(IOUtil.java:53)<br>\n        at java.base/sun.nio.ch.SocketChannelImpl.write(SocketChannelImpl.java:532)<br>\n        at org.glassfish.grizzly.nio.transport.TCPNIOUtils.flushByteBuffer(TCPNIOUtils.java:118)<br>\n        at org.glassfish.grizzly.nio.transport.TCPNIOUtils.writeCompositeBuffer(TCPNIOUtils.java:63)<br>\n        at org.glassfish.grizzly.nio.transport.TCPNIOAsyncQueueWriter.write0(TCPNIOAsyncQueueWriter.java:96)<br>\n        at org.glassfish.grizzly.nio.transport.TCPNIOAsyncQueueWriter.write0(TCPNIOAsyncQueueWriter.java:77)<br>\n        at org.glassfish.grizzly.nio.AbstractNIOAsyncQueueWriter.write(AbstractNIOAsyncQueueWriter.java:211)<br>\n        at org.glassfish.grizzly.nio.AbstractNIOAsyncQueueWriter.write(AbstractNIOAsyncQueueWriter.java:137)<br>\n        at org.glassfish.grizzly.nio.AbstractNIOAsyncQueueWriter.write(AbstractNIOAsyncQueueWriter.java:47)<br>\n        at org.glassfish.grizzly.nio.transport.TCPNIOTransportFilter.handleWrite(TCPNIOTransportFilter.java:106)<br>\n        at org.glassfish.grizzly.filterchain.TransportFilter.handleWrite(TransportFilter.java:148)<br>\n        at org.glassfish.grizzly.filterchain.ExecutorResolver$8.execute(ExecutorResolver.java:81)<br>\n        at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)</p>\n<p>[2026-01-06T20:13:10.947+0000] [Payara 6.2023.8] [WARNING] [faces.application.resource.unable_to_serve] [jakarta.enterprise.resource.webcontainer.faces.application] [tid: _ThreadID=105 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1767730390947] [levelValue: 900] [[<br>\n  JSF1064: Unable to find or serve resource, bs/css/bootstrap.min.css.]]</p>\n<p>Not sure if that's just a client dropping the connection.</p>",
+        "id": 566627234,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767736171
+    },
+    {
+        "content": "<p>I did restart java and it looks like files are being converted.  Perhaps it was just stuck on a large one?  If that's the case, would putting more memory on the system help this?  The CPU's didn't seem taxed, but the 32 GB of memory was being fully used.</p>",
+        "id": 566742549,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767795137
+    },
+    {
+        "content": "<p>Interesting. Do you mean you restarted Payara?</p>",
+        "id": 566744802,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767795770
+    },
+    {
+        "content": "<p>Hi Phil - yes, I restarted Payara to see if that would help</p>",
+        "id": 566747286,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767796417
+    },
+    {
+        "content": "<p>We are doing a migration of material into the system, so it's a little under load though the migration waits for the conversions to happen, but it's really the conversions that appear to be taking most of the time (which does make sense).</p>",
+        "id": 566747599,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767796502
+    },
+    {
+        "content": "<p>Please remind me, have we talked about these docs before? <a href=\"https://guides.dataverse.org/en/6.9/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources\">https://guides.dataverse.org/en/6.9/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources</a></p>",
+        "id": 566748049,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767796628
+    },
+    {
+        "content": "<p>Oh, I don't think we have. I will read through that.   Thank you for sharing that!</p>",
+        "id": 566748379,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767796708
+    },
+    {
+        "content": "<p>Sure, there's also <a href=\"https://github.com/IQSS/dataverse/issues/8954\">#8954</a> where <span class=\"user-mention\" data-user-id=\"698148\">@Victoria Lubitch</span> and <span class=\"user-mention\" data-user-id=\"931958\">@Christian Bischof</span> mention slow ingest of SPSS and Stata files.</p>\n<p>Also, <span class=\"user-mention\" data-user-id=\"651833\">@Philipp Conzett</span> and <span class=\"user-mention\" data-user-id=\"770128\">@Amber Leahey</span> discussed similar issues at <a href=\"https://groups.google.com/g/dataverse-community/c/fVoClEGg4oU/m/kgYSGiQtCwAJ\">https://groups.google.com/g/dataverse-community/c/fVoClEGg4oU/m/kgYSGiQtCwAJ</a></p>",
+        "id": 566748904,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767796870
+    },
+    {
+        "content": "<p>This is super helpful. Thank you.</p>",
+        "id": 566751944,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767797616
+    },
+    {
+        "content": "<p>Sure. At least you know you aren't alone! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 566752034,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767797639
+    },
+    {
+        "content": "<p>As you may know, you can set up rules like \"SPSS files over 500 MB should not be ingested\".</p>",
+        "id": 566752383,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767797723
+    },
+    {
+        "content": "<p>Yes, that is good to know that.  :)    Also good to know that sometimes they just take a while and that the server is fine.  I was worried that something was going on inside of Java that failed, but not bad enough for the server to stop performing.</p>",
+        "id": 566752453,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767797738
+    },
+    {
+        "content": "<p>You could even turn off ingest entirely during your migration. And then selectively ingest files afterward.</p>",
+        "id": 566752549,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767797757
+    },
+    {
+        "content": "<p>Do you have a suggestion for a limit, or would that be 500MB?  How much does 500MB explode out to in memory during a conversion?  I'm not sure how intense the conversion process is.</p>",
+        "id": 566752715,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767797801
+    },
+    {
+        "content": "<p>I don't, sorry. I made that number up.</p>",
+        "id": 566752836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767797835
+    },
+    {
+        "content": "<p>I can imagine it depends on what kind of server resources we have.</p>",
+        "id": 566753179,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767797926
+    },
+    {
+        "content": "<p>These are the limits we have set up for Harvard Dataverse:</p>\n<p><a href=\"/user_uploads/53090/Hvg1u9XPf9RV0vvbd8ii19N_/Screenshot-2026-01-07-at-9.58.52AM.png\">Screenshot 2026-01-07 at 9.58.52 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Hvg1u9XPf9RV0vvbd8ii19N_/Screenshot-2026-01-07-at-9.58.52AM.png\" title=\"Screenshot 2026-01-07 at 9.58.52 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"915x233\" src=\"/user_uploads/thumbnail/53090/Hvg1u9XPf9RV0vvbd8ii19N_/Screenshot-2026-01-07-at-9.58.52AM.png/840x560.webp\"></a></div>",
+        "id": 566753310,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767797958
+    },
+    {
+        "content": "<p>Does that mean that a tabular file will  still be uploaded, but not converted, if greater than 150 MB?</p>",
+        "id": 566754718,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767798319
+    },
+    {
+        "content": "<p>Yes, exactly. And we can always convert it (ingest it) later via API: <a href=\"https://guides.dataverse.org/en/6.9/api/native-api.html#reingest-a-file\">https://guides.dataverse.org/en/6.9/api/native-api.html#reingest-a-file</a></p>",
+        "id": 566755246,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767798446
+    },
+    {
+        "content": "<p>Ahh, okay. I'm begining to understand that \"ingest\" means \"upload and process\" for tabular files, when enabled and of the proper size.  I was thinking \"ingest\" meant the upload part alone and then thought of the conversion separately. (mostly getting stuck in terminology here. :)   This is very helpful - thank you.</p>",
+        "id": 566756012,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1767798666
+    },
+    {
+        "content": "<p>Yeah, we ask questions like \"was the file successfully ingested?\" or \"was there a failure during the ingest process?\". Ingest is only for certain file types like CSV, Excel, Stata, etc. Please see <a href=\"https://guides.dataverse.org/en/6.9/user/tabulardataingest/index.html\">https://guides.dataverse.org/en/6.9/user/tabulardataingest/index.html</a></p>",
+        "id": 566756419,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1767798796
+    }
+]

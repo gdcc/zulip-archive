@@ -1,0 +1,848 @@
+[
+    {
+        "content": "<p>As discussed during yesterday's <a href=\"https://ct.gdcc.io\">Containerization Working Group</a> meeting, there are now containers available for API testing!</p>\n<p>In the past I've usually pointed authors of API client libraries to <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> for testing a live Dataverse installation, but is there interest in using GitHub Actions or similar to spin up Dataverse in a container for API testing?</p>\n<p>Here's the newly published container: <a href=\"https://hub.docker.com/r/gdcc/dataverse\">https://hub.docker.com/r/gdcc/dataverse</a></p>\n<p>Please be advised that the container requires setup! For now we've only documented the <a href=\"https://preview.guides.gdcc.io/en/develop/container/dev-usage.html\">setup for developers</a> (and we plan to <a href=\"https://github.com/IQSS/dataverse/issues/9540\">improve</a> these docs) but as explained in the <a href=\"https://docs.google.com/document/d/14DHDB24Cp_kzpYqhHCKCtnzOw8_WuLOOONyqJHSsaYM/edit\">Dataverse Containerization</a> doc, we have an item under milestone B to document how client library authors can use these containers. Here's what is says for now:</p>\n<p>\"Document limitations: must clone main repo (or at least download the necessary files, similar to dvinstall.zip or download the whole repo as a zip), must run <code>docker-final-setup.sh</code>\"</p>\n<p>Any brave souls out there who want to give this a try? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span>  I'm happy to help!</p>",
+        "id": 353964753,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682699125
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/353964753\">said</a>:</p>\n<p>yes, i'm happy to help test, though it likely won't be for the next few days.</p>",
+        "id": 353981073,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1682701120
+    },
+    {
+        "content": "<p>Happy to test it!</p>",
+        "id": 354020217,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682706422
+    },
+    {
+        "content": "<p>To be honest, I think we might need <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> to explain (again) how to spin up our own containers within GitHub Actions. In the <a href=\"https://docs.google.com/document/d/14DHDB24Cp_kzpYqhHCKCtnzOw8_WuLOOONyqJHSsaYM/edit?usp=sharing\">doc</a>, it's worded like this (under milestone D):</p>\n<p>\"Smoke test within GitHub Actions: deploy and bootstrap, make logs available (Size: 33)\"</p>",
+        "id": 354022670,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682706791
+    },
+    {
+        "content": "<p>\"This smoke test here is about creating a first step to see if the deployment works at all and shall serve as intermediate step towards the full thing in Milestone G.\"</p>",
+        "id": 354022986,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682706830
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598186\">@Don Sizemore</span> <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> have either of you tried running the containers on a dev laptop or whatever? I'm happy to walk you through it. Now that the containers are out there you shouldn't even need Java installed. You will have to clone the main repo, though. That's where the docker compose file is and some config and scripts you'll need.</p>",
+        "id": 354024441,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682707060
+    },
+    {
+        "content": "<p>Maybe this will help? <a href=\"https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/\">https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/</a></p>",
+        "id": 354038959,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682711205
+    },
+    {
+        "content": "<p>Code at <a href=\"https://github.com/open-sauced/open-sauced\">https://github.com/open-sauced/open-sauced</a></p>",
+        "id": 354039038,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682711235
+    },
+    {
+        "content": "<p>I was trying to spin up the container using <code>mvn -Pct clean package</code> but it failed. Got the following error message:</p>\n<p><code>Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5:test (default-test) on project dataverse: There are test failures.</code></p>",
+        "id": 354200363,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682747929
+    },
+    {
+        "content": "<p>Maybe its also due to my MacBook, will try it on an Ubuntu server.</p>",
+        "id": 354200462,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682747951
+    },
+    {
+        "content": "<p>That is very odd as testing is usually deactivated in this profile to speed up things...</p>",
+        "id": 354229323,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753104
+    },
+    {
+        "content": "<p>It's unlikely your MacBook as a cause</p>",
+        "id": 354229428,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753118
+    },
+    {
+        "content": "<p>If you're feeling lucky you could try with compose only</p>",
+        "id": 354229653,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753157
+    },
+    {
+        "content": "<p>The dataverse image is avail from the hub</p>",
+        "id": 354229735,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753169
+    },
+    {
+        "content": "<p>It might be a good idea to just copy the compose file from the IQSS repo and add that to your project... It will fail for now with the Solr things, but you could temporarily copy those over until we have that stuff sorted out</p>",
+        "id": 354230379,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753293
+    },
+    {
+        "content": "<p>Would it help you lot if I create a demo repo someplace?</p>",
+        "id": 354230478,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753311
+    },
+    {
+        "content": "<p>So we have some small playground?</p>",
+        "id": 354230548,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682753323
+    },
+    {
+        "content": "<p>I did checkout the <code>develop</code> branch, maybe this is the cause?</p>",
+        "id": 354265627,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682758727
+    },
+    {
+        "content": "<p>Trying it now with the Dockerhub image</p>",
+        "id": 354265944,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682758774
+    },
+    {
+        "content": "<p>Is it working? Is no news good news? <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 354356460,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682770844
+    },
+    {
+        "content": "<p>Sorry I needed to leave. Tried it now using <code>mvn -Pct docker:run</code> but I ran into the following error:</p>\n<div class=\"codehilite\"><pre><span></span><code> DOCKER&gt; Error occurred during container startup, shutting down...\n[ERROR] DOCKER&gt; I/O Error [Unable to pull &#39;iq/dataverse:5.13&#39; : {&quot;message&quot;:&quot;pull access denied for iq/dataverse, repository does not exist or may require &#39;docker login&#39;: denied: requested access to the resource is denied&quot;} (Not Found: 404)]\n</code></pre></div>\n<p>I have then spun up the Dockerhub image using the <code>unstable</code> tag and mapped ports <code>8080:8080</code> that led me to the Payara page instead of Dataverse. Am I doing something wrong? Also ran the <code>docker-compose-dev.yml</code> which started solr, smtp and postgres succesfully, but that didnt help.</p>",
+        "id": 354450315,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682784263
+    },
+    {
+        "content": "<p>That is VERY strange. I have no idea where that image name would be coming from! I see it written out as gdcc/dataverse:unstable</p>",
+        "id": 354469998,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682787609
+    },
+    {
+        "content": "<p>Just starting up the image itself is not sufficient, you need at least Postgres.</p>",
+        "id": 354470397,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682787672
+    },
+    {
+        "content": "<p>That way the app will at least deploy, also bootstrapping and access will fail without also having Solr tuned, set and ready to go</p>",
+        "id": 354470607,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682787706
+    },
+    {
+        "content": "<p>It's so funny to hear of all these problems of running these containers when at the same time I never see those <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 354471114,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682787781
+    },
+    {
+        "content": "<p>Probably I should just go ahead and create that demo project. Anyone interested to reuse it for some integration thing can grab the code and go for it</p>",
+        "id": 354471641,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1682787867
+    },
+    {
+        "content": "<p>I tried pulling it from the Dockerhub link Phil supplied and it didn’t work - Some manifest was missing. So I checked the tags and unstable was available. Not sure, maybe I am doing something wrong. Either way, Postgres etc. worked using docker-compose.</p>",
+        "id": 354489190,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682791081
+    },
+    {
+        "content": "<p>I started a pull request at <a href=\"https://github.com/gdcc/pyDataverse/pull/158\">https://github.com/gdcc/pyDataverse/pull/158</a> that I hope will help.</p>\n<p>At the very least, you should get a response from <code>/api/info/version</code>. This is what I see: <code>{\"status\":\"OK\",\"data\":{\"version\":\"5.13\",\"build\":null}}</code></p>\n<p>I haven't tried the next steps of actually setting up Dataverse, which involves running <code>docker-final-setup.sh</code> as explained at <a href=\"https://preview.guides.gdcc.io/en/develop/container/dev-usage.html\">https://preview.guides.gdcc.io/en/develop/container/dev-usage.html</a></p>",
+        "id": 354539966,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682800689
+    },
+    {
+        "content": "<p>Starting from a blank Ubuntu 20.0 server both <code>maven</code> steps were succesfully executed. I am also able to retrieve the version:</p>\n<div class=\"codehilite\"><pre><span></span><code>ubuntu@openproject:~/dataverse$ curl &quot;http://localhost:8080/api/info/version&quot;\n{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;version&quot;:&quot;5.13&quot;,&quot;build&quot;:null}}\n</code></pre></div>\n<p>The <code>docker-final-setup.sh</code> also ran smoothly without any errors. Here is the output to inspect the metadatablocks:</p>\n<div class=\"codehilite\"><pre><span></span><code>ubuntu@openproject:~/dataverse$ curl &quot;http://localhost:8080/api/metadatablocks&quot;\n{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[{&quot;id&quot;:1,&quot;displayName&quot;:&quot;Citation Metadata&quot;,&quot;name&quot;:&quot;citation&quot;},{&quot;id&quot;:2,&quot;displayName&quot;:&quot;Geospatial Metadata&quot;,&quot;name&quot;:&quot;geospatial&quot;},{&quot;id&quot;:3,&quot;displayName&quot;:&quot;Social Science and Humanities Metadata&quot;,&quot;name&quot;:&quot;socialscience&quot;},{&quot;id&quot;:4,&quot;displayName&quot;:&quot;Astronomy and Astrophysics Metadata&quot;,&quot;name&quot;:&quot;astrophysics&quot;},{&quot;id&quot;:5,&quot;displayName&quot;:&quot;Life Sciences Metadata&quot;,&quot;name&quot;:&quot;biomedical&quot;},{&quot;id&quot;:6,&quot;displayName&quot;:&quot;Journal Metadata&quot;,&quot;name&quot;:&quot;journal&quot;}]}\n</code></pre></div>\n<p>The one thing that may have caused the error on my machine was running everything not as <code>sudo</code>. Usually I do not need to supply this using Docker on my local machine, but I think this may be a good addition to the docs. Also, is it possible to pass flags to <code>mvn -Pct docker:run</code> such as <code>-d</code> to run it in daemon mode? Here on my server it is running within the session and closing it may shutdown the container.</p>\n<p>I am having problems with the ports at the moment, thats why I am not able to support a working URL, but this has nothing to do with the Dataverse instance but our BWCloud  server - 8080 somehow is always a bit tricky. I have another private server where I will also test it and hopefully can supply a working URL to inspect the UI.</p>",
+        "id": 354618288,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682837105
+    },
+    {
+        "content": "<p>Anyway, looks great so far! Awesome work <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>  <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  and to the Container Working Group <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 354618378,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682837163
+    },
+    {
+        "content": "<p>Tried it on my IONOS server with OS <code>AlmaLinux 8</code> installed using the following Java/Maven setup:</p>\n<div class=\"codehilite\"><pre><span></span><code>Apache Maven 3.5.4 (Red Hat 3.5.4-5)\nMaven home: /usr/share/maven\nJava version: 1.8.0_372, vendor: Red Hat, Inc., runtime: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.372.b07-1.el8_7.x86_64/jre\nDefault locale: en_US, platform encoding: ANSI_X3.4-1968\nOS name: &quot;linux&quot;, version: &quot;4.18.0-425.10.1.el8_7.x86_64&quot;, arch: &quot;amd64&quot;, family: &quot;unix&quot;\n</code></pre></div>\n<p>I got the following error message, can you help me to resolve this?</p>\n<p><a href=\"/user_uploads/53090/xHPkDV6BB_5d-ORZ6aDemKi9/log.log\">log.log</a></p>",
+        "id": 354620981,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682838449
+    },
+    {
+        "content": "<p>Ran <code>yum update</code> again to be sure. Trying again now. It seems that some class has been compiled with a recent version of Java yet the one installed does not supply it (class  file version 55.0 vs 52.0). Its a little sus, but I am no Java expert to fix this rn.</p>",
+        "id": 354621352,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682838690
+    },
+    {
+        "content": "<p>Updated JDK to 11 on CentOS and set <code>JAVA_HOME</code> to point to JDK 11, but that didn't help either. This may be exclusive to CentOS.</p>",
+        "id": 354623033,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682839467
+    },
+    {
+        "content": "<p>Huh. Let me start by pasting the error inline (minus some repeated lines about URLs) formatted a bit for readability:</p>\n<p><code>[ERROR] Failed to execute goal io.github.git-commit-id:git-commit-id-maven-plugin:5.0.0:revision (retrieve-git-details) on project dataverse: Execution retrieve-git-details of goal io.github.git-commit-id:git-commit-id-maven-plugin:5.0.0:revision failed: Unable to load the mojo 'revision' in the plugin 'io.github.git-commit-id:git-commit-id-maven-plugin:5.0.0' due to an API incompatibility: org.codehaus.plexus.component.repository.exception.ComponentLookupException: pl/project13/maven/git/GitCommitIdMojo has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0</code></p>\n<div class=\"codehilite\"><pre><span></span><code>[ERROR] -----------------------------------------------------\n[ERROR] realm =    plugin&gt;io.github.git-commit-id:git-commit-id-maven-plugin:5.0.0\n[ERROR] strategy = org.codehaus.plexus.classworlds.strategy.SelfFirstStrategy\n[ERROR] urls[0] = file:/root/.m2/repository/io/github/git-commit-id/git-commit-id-maven-plugin/5.0.0/git-commit-id-maven-plugin-5.0.0.jar\n(...snip...)\n[ERROR] urls[24] = file:/root/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar\n[ERROR] Number of foreign imports: 1\n[ERROR] import: Entry[import  from realm ClassRealm[project&gt;edu.harvard.iq:dataverse:5.13, parent: ClassRealm[maven.api, parent: null]]]\n[ERROR]\n[ERROR] -----------------------------------------------------\n</code></pre></div>\n<p>Do you think testing this on Rocky would help, since's it's also a RHEL derivative? Maybe it's similar enough to AlmaLinux? We have an issue here about Rocky and Docker: <a href=\"https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/268\">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/issues/268</a></p>",
+        "id": 354672638,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682857155
+    },
+    {
+        "content": "<p>You shouldn't need sudo, by the way. I never need it on my Mac anyway.</p>",
+        "id": 354672875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682857207
+    },
+    {
+        "content": "<p>As an alternative to <code>mvn -Pct docker:run</code> you can run <code>docker-compose -f docker-compose-dev.yml up</code> and yes, you can add <code>-d</code> if you like. Should we add <code>-d</code> to <a href=\"https://github.com/gdcc/pyDataverse/pull/158\">https://github.com/gdcc/pyDataverse/pull/158</a> ?</p>\n<p>Mentioning docker compose is already on our todo list at <a href=\"https://github.com/IQSS/dataverse/issues/9540\">https://github.com/IQSS/dataverse/issues/9540</a></p>",
+        "id": 354673642,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682857420
+    },
+    {
+        "content": "<p>Anyway, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> it seems like you're seeing some success if the \"final setup\" script worked in at least one environment! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> Thanks for testing!</p>",
+        "id": 354673875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682857478
+    },
+    {
+        "content": "<p>Yea, I realized that it didnt make any difference using <code>sudo</code> on my machine. It just doesn't want to work on it unfortunately. </p>\n<p>Regarding the flag, I'd say that if the inclusion of the <code>-d</code> flag within the maven command requires too much development, mentioning the <code>docker compose</code> alternative in the docs would also be nice for those who aren't aware of it.</p>\n<p>Regarding <code>Almalinux</code>,  sure that should help! I suspect that this may not be a complete Docker issue but something with Maven since the error is coming from classes that are compiled for newer versions.</p>",
+        "id": 354860003,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682943275
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> sounds good. So, zooming out a bit, how could these Docker containers be useful for you with pyDataverse or EasyDataverse?</p>\n<p>Would you run the containers on your laptop and point API tests at them?</p>\n<p>Would you want to run this in some sort of CI like GitHub Actions?</p>\n<p>How can we help you reach the next step, whatever that is? <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 354870571,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682946173
+    },
+    {
+        "content": "<p>They'd be very helpful for local and CI testing purposes. Especially, since the new <code>connect</code> functionality depends on the installation itself, its the perfect timing for the containers. The same also applies for pyDataverse.</p>",
+        "id": 354871504,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682946374
+    },
+    {
+        "content": "<p>For the local testing, it would be great if I could get the container running on my machine. Otherwise I can also use my server to point it to, but having it locally would be preferable. For a CI, spinning a Dataverse instance up within a GitHub Action would be the natural step after local testing. Have you already tried to do that? Otherwise we may open up a dummy repo to work on an action.</p>",
+        "id": 354872465,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682946606
+    },
+    {
+        "content": "<p>For the sake of generality, an action with the sole purpose to start a docker instance would be enough. After that any subsequent step in the action can talk to the instance. Thus, other applications could also benefit. What do you think?</p>",
+        "id": 354873238,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682946795
+    },
+    {
+        "content": "<p>Sure. A dummy repo sounds good. What would it do? I guess an MVP would be a shell script that does a curl of /api/info/version <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 354873254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682946799
+    },
+    {
+        "content": "<p>Yes, that would be a start!</p>",
+        "id": 354873403,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682946822
+    },
+    {
+        "content": "<p>How does this look? <a href=\"https://github.com/gdcc/container-test\">https://github.com/gdcc/container-test</a></p>",
+        "id": 354874621,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682947085
+    },
+    {
+        "content": "<p>I just pushed a stub (same as from the pyDataverse PR) for local dev.</p>",
+        "id": 354876516,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682947489
+    },
+    {
+        "content": "<p>And maybe from here we can start hacking on GitHub Actions?</p>",
+        "id": 354876632,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682947520
+    },
+    {
+        "content": "<p>Looks great! Thats a good start :-)</p>",
+        "id": 354882971,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682949326
+    },
+    {
+        "content": "<p>Cool. I made you an admin <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 354909961,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682955778
+    },
+    {
+        "content": "<p>But do either of us know anything about GitHub Actions? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 354941228,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682964224
+    },
+    {
+        "content": "<p>No DevOps expert, but lets give it a try! Found info on this using <code>services</code>. Would try this first.</p>\n<p>Section \"How to Run Services in Containers During a Workflow?\" - <a href=\"https://yonatankra.com/2-ways-to-use-your-docker-image-in-github-actions/\">https://yonatankra.com/2-ways-to-use-your-docker-image-in-github-actions/</a></p>",
+        "id": 354946659,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682965533
+    },
+    {
+        "content": "<p>Seems like a reasonable blog post to follow, sure!</p>",
+        "id": 354947387,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682965704
+    },
+    {
+        "content": "<p>I got the container running within the action! Wanted to get the version, but there needs to be some \"off-time\" to let the instance start before running <code>curl</code>. </p>\n<p><a href=\"/user_uploads/53090/wCWxirmamcneYw9jKAR2q4t-/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/wCWxirmamcneYw9jKAR2q4t-/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/wCWxirmamcneYw9jKAR2q4t-/image.png\"></a></div>",
+        "id": 354958644,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682968610
+    },
+    {
+        "content": "<p>Wow! Already? Go, go, go! <span aria-label=\"rocket\" class=\"emoji emoji-1f680\" role=\"img\" title=\"rocket\">:rocket:</span></p>",
+        "id": 354959260,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682968830
+    },
+    {
+        "content": "<p>I'm watching <a href=\"https://github.com/gdcc/container-test/actions/runs/4854159295/jobs/8651177685\">https://github.com/gdcc/container-test/actions/runs/4854159295/jobs/8651177685</a> live</p>",
+        "id": 354959449,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682968915
+    },
+    {
+        "content": "<p><span aria-label=\"popcorn\" class=\"emoji emoji-1f37f\" role=\"img\" title=\"popcorn\">:popcorn:</span></p>",
+        "id": 354959526,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682968930
+    },
+    {
+        "content": "<p>120 seconds may be a bit much <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 354959776,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682969022
+    },
+    {
+        "content": "<p>Success!!!</p>",
+        "id": 354959812,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682969039
+    },
+    {
+        "content": "<p>{\"status\":\"OK\",\"data\":{\"version\":\"5.13\",\"build\":null}} <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 354959841,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969042
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> great job!</p>",
+        "id": 354959881,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969050
+    },
+    {
+        "content": "<p>Thanks! Didn't expect it to be that simple</p>",
+        "id": 354959912,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682969065
+    },
+    {
+        "content": "<p>expect a raise in your next paycheck</p>",
+        "id": 354959924,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969069
+    },
+    {
+        "content": "<p>So what do we try next? Clone the repo before staring the containers? And run the final setup script after?</p>",
+        "id": 354960101,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969140
+    },
+    {
+        "content": "<p>Or we could download the repo as a zip if that's easier or faster.</p>",
+        "id": 354960210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969175
+    },
+    {
+        "content": "<p>Or download just the files we need.</p>",
+        "id": 354960222,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969181
+    },
+    {
+        "content": "<p>Yes, that would make sense! Maybe then curl the metadatablocks?</p>",
+        "id": 354960307,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682969224
+    },
+    {
+        "content": "<p>You mean curl the metadata blocks at the very end to make sure they were loaded properly? Sure!</p>",
+        "id": 354960565,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682969327
+    },
+    {
+        "content": "<p>Yes, currently trying it :-)</p>",
+        "id": 354967038,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682971411
+    },
+    {
+        "content": "<p><code>./dataverse/scripts/dev/docker-final-setup.sh: 3: set: Illegal option -o pipefail</code></p>\n<p>I receive this error, when running the docker script. Do you know what the error could be? This is the step in the action after the DV repo has been cloned.</p>\n<div class=\"codehilite\"><pre><span></span><code>      - name: Run docker script\n        run: |\n          ./dataverse/scripts/dev/docker-final-setup.sh\n</code></pre></div>",
+        "id": 354967309,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682971517
+    },
+    {
+        "content": "<p>Weird! Could it be line endings? <a href=\"https://stackoverflow.com/questions/35352955/set-illegal-option-on-one-host-but-not-the-other\">https://stackoverflow.com/questions/35352955/set-illegal-option-on-one-host-but-not-the-other</a></p>",
+        "id": 354969972,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682972471
+    },
+    {
+        "content": "<p>Tried it with <code>bash</code> and it finally works!</p>\n<p><a href=\"/user_uploads/53090/sYMZZbZXc4wrEVuxAYCuw0Z7/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/sYMZZbZXc4wrEVuxAYCuw0Z7/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/sYMZZbZXc4wrEVuxAYCuw0Z7/image.png\"></a></div>",
+        "id": 354970442,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682972665
+    },
+    {
+        "content": "<p>Here is the latest run that worked:</p>\n<p><a href=\"https://github.com/gdcc/container-test/actions/runs/4854627884/jobs/8652228977\">https://github.com/gdcc/container-test/actions/runs/4854627884/jobs/8652228977</a></p>",
+        "id": 354970944,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682972848
+    },
+    {
+        "content": "<p>Bundling this into a shareable action now would be the icing on the cake <span aria-label=\"star struck\" class=\"emoji emoji-1f929\" role=\"img\" title=\"star struck\">:star_struck:</span></p>",
+        "id": 354971183,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682972931
+    },
+    {
+        "content": "<p>Fantastic! You make it look easy! Oh, right, that's your branding. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 354971999,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682973235
+    },
+    {
+        "content": "<p>Thanks <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span>️ It were quite a lot of commits though <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 354972482,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682973410
+    },
+    {
+        "content": "<p>Heh. So now what? Put this in EasyDataverse and run a real test or two?</p>",
+        "id": 354972752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682973500
+    },
+    {
+        "content": "<p>Yes, that sounds great!</p>",
+        "id": 354974654,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682974201
+    },
+    {
+        "content": "<p>Will try this the next days. Need to go to sleep now <span aria-label=\"sleeping\" class=\"emoji emoji-1f634\" role=\"img\" title=\"sleeping\">:sleeping:</span></p>",
+        "id": 354974829,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682974254
+    },
+    {
+        "content": "<p>Good night! Thanks again! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 354975666,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682974566
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> thanks for opening <a href=\"https://github.com/gdcc/container-test/pull/1\">https://github.com/gdcc/container-test/pull/1</a></p>",
+        "id": 355010440,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682993410
+    },
+    {
+        "content": "<p>Meanwhile, I've been trying to build on your work, playing around at <a href=\"https://github.com/IQSS/dataverse-sample-data/actions/runs/4856813925/jobs/8656732449\">https://github.com/IQSS/dataverse-sample-data/actions/runs/4856813925/jobs/8656732449</a> (one of many runs) but I'm getting a strange error:</p>\n<p>{'status': 'ERROR', 'message': 'There was an error when trying to add the new file. Temp directory is not configured.'}</p>",
+        "id": 355010545,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682993499
+    },
+    {
+        "content": "<p>Hm this might be something special to the runner. Found that the runner has a dedicated temp that needs to be used:</p>\n<p><a href=\"https://github.com/actions/toolkit/issues/518\">https://github.com/actions/toolkit/issues/518</a><br>\n<a href=\"https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context\">https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context</a></p>",
+        "id": 355024107,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683002128
+    },
+    {
+        "content": "<p>Good Lord! Being a holiday for one day and you guys turn on the heat here!</p>",
+        "id": 355053190,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683012071
+    },
+    {
+        "content": "<p>Glad you enjoy the experience so far <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span></p>",
+        "id": 355053215,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683012081
+    },
+    {
+        "content": "<p>Working hard on improving it further <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 355053235,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683012090
+    },
+    {
+        "content": "<p><span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span><span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span><span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span></p>",
+        "id": 355053827,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683012229
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> solved the \"waiting\" issue. There is an action that pings an endpoint until a certain status code is received.</p>",
+        "id": 355056416,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683012959
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> great! Have you tried uploading a file? Do you get the same \"Temp directory is not configured\" error?</p>",
+        "id": 355113238,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683025594
+    },
+    {
+        "content": "<p>Shiro from the R client is excited, by the way: <a href=\"https://github.com/IQSS/dataverse-client-r/issues/4#issuecomment-1530287863\">https://github.com/IQSS/dataverse-client-r/issues/4#issuecomment-1530287863</a></p>",
+        "id": 355120403,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683027227
+    },
+    {
+        "content": "<p>Not yet, but I saw your message regarding the <code>temp</code> error. I think this may be exclusive to GitHub's runner. Will give it a try and see if I can reproduce the error.</p>",
+        "id": 355149876,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683033869
+    },
+    {
+        "content": "<p>Awesome. Thanks!</p>",
+        "id": 355150919,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683034101
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> might know how to fix it. Maybe we just need to set an environment variable before we run docker compose up.</p>",
+        "id": 355151102,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683034135
+    },
+    {
+        "content": "<p>There is only 1 reason how this error message can be triggered</p>",
+        "id": 355152427,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034388
+    },
+    {
+        "content": "<p>The error is based on <a href=\"https://github.com/poikilotherm/dataverse/blob/1eada8954c2b34f9780d9b877f736527e675fdde/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L846-L846\">this exception</a></p>",
+        "id": 355152601,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034422
+    },
+    {
+        "content": "<p>This condition can only reached via <a href=\"https://github.com/poikilotherm/dataverse/blob/1eada8954c2b34f9780d9b877f736527e675fdde/src/main/java/edu/harvard/iq/dataverse/util/FileUtil.java#L1495-L1495\">this error handling</a>, which means: Dataverse has no write permissions to the directory</p>",
+        "id": 355152884,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034474
+    },
+    {
+        "content": "<p>You need to check where we can write in a runner so the volumes are actually usable</p>",
+        "id": 355153123,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034522
+    },
+    {
+        "content": "<p>Such things are hidden in the container logs... One would need to add a step with <code>if: always()</code> to make sure they get extracted and uploaded as artifacts of a run</p>",
+        "id": 355153569,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034591
+    },
+    {
+        "content": "<p>Maybe even make it distinct artifacts for Postgres, Solr and Dataverse</p>",
+        "id": 355153693,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683034615
+    },
+    {
+        "content": "<p>No write permission! <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 355153916,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683034671
+    },
+    {
+        "content": "<blockquote>\n<p>Note: GitHub Actions must be run by the default Docker user (root). Ensure your Dockerfile does not set the USER instruction, otherwise you will not be able to access GITHUB_WORKSPACE.</p>\n</blockquote>\n<p><a href=\"https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#docker-container-filesystem\">https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#docker-container-filesystem</a></p>",
+        "id": 355158201,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683035551
+    },
+    {
+        "content": "<p>This is for Docker actions. So we may find a way around that in our case</p>",
+        "id": 355158688,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683035657
+    },
+    {
+        "content": "<p>Idea: how about we use a tmpfs mount instead of the volume mapping? This will be ephemeral anyway.</p>",
+        "id": 355158804,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683035687
+    },
+    {
+        "content": "<p>(This might be a problem for some test that checks for the presence of files uploaded in the volume directly. But maybe that's an OK limitation?)</p>",
+        "id": 355159001,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683035730
+    },
+    {
+        "content": "<p>All hacks welcome!</p>",
+        "id": 355160391,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683036048
+    },
+    {
+        "content": "<p>I tried a couple things but they didn't work:</p>\n<ul>\n<li><a href=\"https://github.com/IQSS/dataverse-sample-data/commit/68b2ae9\">https://github.com/IQSS/dataverse-sample-data/commit/68b2ae9</a></li>\n<li><a href=\"https://github.com/IQSS/dataverse-sample-data/commit/827249d\">https://github.com/IQSS/dataverse-sample-data/commit/827249d</a></li>\n</ul>",
+        "id": 355297777,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683078666
+    },
+    {
+        "content": "<p>Hmm, I'd dumping the logs now (server.log). It says,</p>\n<div class=\"codehilite\"><pre><span></span><code>Failed to create filesTempDirectory: /dv/temp\n</code></pre></div>\n\n<p><a href=\"https://github.com/IQSS/dataverse-sample-data/actions/runs/4867550949/jobs/8680232083#step:10:1527\">https://github.com/IQSS/dataverse-sample-data/actions/runs/4867550949/jobs/8680232083#step:10:1527</a></p>\n<p>So maybe I'm not configuring this correctly with MPCONFIG. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 355298867,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683079384
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/B8QrfpSW5r8_HFFogVvq1gnH/no-idea.jpg\">no-idea.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/B8QrfpSW5r8_HFFogVvq1gnH/no-idea.jpg\" title=\"no-idea.jpg\"><img src=\"/user_uploads/53090/B8QrfpSW5r8_HFFogVvq1gnH/no-idea.jpg\"></a></div>",
+        "id": 355302957,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683082148
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> any ideas for me? My most recent commit:</p>\n<ul>\n<li><a href=\"https://github.com/IQSS/dataverse-sample-data/commit/1423b80\">https://github.com/IQSS/dataverse-sample-data/commit/1423b80</a></li>\n</ul>\n<p>I can't seem to change it from <code>/dv/temp</code>.</p>",
+        "id": 355392693,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683110277
+    },
+    {
+        "content": "<p>May I mess around with your <del>PR</del> branch <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> ?</p>",
+        "id": 355393918,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683110612
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> of course!</p>",
+        "id": 355400847,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683112394
+    },
+    {
+        "content": "<p>Please go for it! Thanks!</p>",
+        "id": 355400875,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683112404
+    },
+    {
+        "content": "<p>Here you are <a href=\"https://github.com/IQSS/dataverse-sample-data/actions/runs/4872123218\">https://github.com/IQSS/dataverse-sample-data/actions/runs/4872123218</a></p>",
+        "id": 355433316,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119419
+    },
+    {
+        "content": "<p>I did tweak already a few different other places...</p>",
+        "id": 355433465,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119456
+    },
+    {
+        "content": "<p>Maybe we can copy that to <a href=\"https://github.com/gdcc/container-test\">https://github.com/gdcc/container-test</a> as well</p>",
+        "id": 355433594,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119477
+    },
+    {
+        "content": "<p>Fantastic! Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 355433616,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683119481
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> this might be of interest for you as well. Here's the diff. <a href=\"https://github.com/IQSS/dataverse-sample-data/compare/master...container-test\">https://github.com/IQSS/dataverse-sample-data/compare/master...container-test</a></p>",
+        "id": 355434146,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119578
+    },
+    {
+        "content": "<p>This part seems important:</p>\n<div class=\"codehilite\"><pre><span></span><code>    volumes:\n      - ${RUNNER_TEMP}/app/data:/dv\n</code></pre></div>",
+        "id": 355434190,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683119588
+    },
+    {
+        "content": "<p>Crucial, not just important.</p>",
+        "id": 355434272,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119603
+    },
+    {
+        "content": "<p>So is the container sort of hard coded to use <code>/dv</code>?</p>",
+        "id": 355434527,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683119645
+    },
+    {
+        "content": "<p>OK to be fair: it might also just work with the standard GITHUB_WORKSPACE, but it seems good practice to go for the temp dir that is distinctly documented</p>",
+        "id": 355434628,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119659
+    },
+    {
+        "content": "<p>The other crucial part is probably the initializer container that tweaks the ownership of these folders...</p>",
+        "id": 355434761,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683119691
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I just pointed to your work from this comment <a href=\"https://github.com/IQSS/dataverse-frontend/pull/85#issuecomment-1533030542\">https://github.com/IQSS/dataverse-frontend/pull/85#issuecomment-1533030542</a></p>",
+        "id": 355438471,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683120479
+    },
+    {
+        "content": "<p>Which builds upon work by <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> of course. <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 355451034,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683122121
+    },
+    {
+        "content": "<p>Awesome!! Happy to see its working now  <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span>️</p>",
+        "id": 355451265,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683122169
+    },
+    {
+        "content": "<p>Firing up the EasyDataverse tests now <span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span></p>",
+        "id": 355451311,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683122181
+    },
+    {
+        "content": "<p>Heh. Great!</p>",
+        "id": 355451349,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683122189
+    },
+    {
+        "content": "<p>One of the finalists for the Inkscape 1.3 about screen contest was <span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span> <a href=\"https://inkscape.org/~Yogi_Aris_Vara_W_W/%E2%98%85set-the-world-on-fire\">set the world on fire</a> <span aria-label=\"fire\" class=\"emoji emoji-1f525\" role=\"img\" title=\"fire\">:fire:</span>. Not that I endorse this. And it didn't win.</p>",
+        "id": 355451955,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683122337
+    },
+    {
+        "content": "<p>I just added all this great work to the agenda for tomorrow's Containerization Working Group meeting: <a href=\"https://docs.google.com/document/d/1U3yvg9yG5Wnm_tQkDLf5XyREYyFVoRE4_-UvnxuryVE/edit?usp=sharing\">https://docs.google.com/document/d/1U3yvg9yG5Wnm_tQkDLf5XyREYyFVoRE4_-UvnxuryVE/edit?usp=sharing</a></p>",
+        "id": 355584395,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683140261
+    },
+    {
+        "content": "<p>Haha \"great work\"... for now it's a lot of red tape and bandaids holding together some pieces that fall apart the second you look away...</p>",
+        "id": 355588210,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683141429
+    },
+    {
+        "content": "<p>Sorry to sound pessimistic, but I fear there is a lot of more road to cover before champagne</p>",
+        "id": 355588318,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683141466
+    },
+    {
+        "content": "<p>Lets hope for the best :-)</p>",
+        "id": 355591088,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683142254
+    },
+    {
+        "content": "<p>I'm looking forward to additional German engineering! <span aria-label=\"flag germany\" class=\"emoji emoji-1f1e9-1f1ea\" role=\"img\" title=\"flag germany\">:flag_germany:</span></p>",
+        "id": 355597336,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683144253
+    },
+    {
+        "content": "<p>\"This looks awesome.\" -- <a href=\"https://github.com/IQSS/dataverse-client-r/issues/4#issuecomment-1533597903\">https://github.com/IQSS/dataverse-client-r/issues/4#issuecomment-1533597903</a></p>",
+        "id": 355630816,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683160565
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434527\">said</a>:</p>\n<blockquote>\n<p>So is the container sort of hard coded to use <code>/dv</code>?</p>\n</blockquote>\n<p>I confirmed with <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> today that <code>/dv/</code> is not hard coded. Phew. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 355831580,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683218470
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> so are you thinking you'll wait for the proposed Dataverse GitHub Action ( <a href=\"#narrow/stream/377090-python/topic/Dataverse.20GitHub.20Action\">https://dataverse.zulipchat.com/#narrow/stream/377090-python/topic/Dataverse.20GitHub.20Action</a> ) before using containers for API tests?</p>\n<p>I'm asking because I'm wondering if there's interest from you or others in using config above from sample data more or less as-is, bandaids and all. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 355833390,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683218924
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355831580\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/377090-python/topic/containers.20for.20API.20testing/near/355434527\">said</a>:</p>\n<blockquote>\n<p>So is the container sort of hard coded to use <code>/dv</code>?</p>\n</blockquote>\n<p>I confirmed with <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> today that <code>/dv/</code> is not hard coded. Phew. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>\n</blockquote>\n<p>Of course this is not hard coded, it's simply using a sane default. You can set this stuff via MPCONFiG if you'd want to</p>",
+        "id": 355833770,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683219020
+    },
+    {
+        "content": "<p>That said, usually in the container world people benefit from clear structured paths that are documented, so it's easier to follow</p>",
+        "id": 355833930,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683219065
+    },
+    {
+        "content": "<p>This is because you'll always have this layer of indirectness with the volumes you need to mount</p>",
+        "id": 355834035,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683219088
+    },
+    {
+        "content": "<p>So kind of fixing this by providing sane defaults saves headaches for devops that deploy this stuff</p>",
+        "id": 355834204,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683219128
+    },
+    {
+        "content": "<p>But again, nothing is hard-coded here. Just smoothing the experience</p>",
+        "id": 355834390,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683219167
+    },
+    {
+        "content": "<p>I have added some tests and cleaned up the repo. I think the action is ready to be used for testing pyDataverse  <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span></p>\n<p><a href=\"https://github.com/gdcc/dataverse-action/pull/8\">https://github.com/gdcc/dataverse-action/pull/8</a></p>",
+        "id": 405458587,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1701475964
+    }
+]

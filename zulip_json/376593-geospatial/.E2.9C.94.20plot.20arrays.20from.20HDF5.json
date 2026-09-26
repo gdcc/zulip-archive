@@ -1,0 +1,962 @@
+[
+    {
+        "content": "<p>Do you think its feasible to embed a plotting routine for the given arrays within an HDF5 file? I think that even with a simple visualization this would be very handy to inspect an HDF5 file. Similar to what H5Web does.</p>",
+        "id": 343610637,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1679475552
+    },
+    {
+        "content": "<p>I like to say that anything is possible with code. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span> </p>\n<p>However, I'm a bit concerned about the effort involved.</p>\n<p>Generally speaking, we allow external tools to do dataviz. That was one of our the architectural changes when we did the big rewrite of DVN 3 into Dataverse 4.</p>\n<p>So here I am fretting that perhaps you want this in the core? In Java? Or were you thinking about an external tool making plots from arrays? If it's the latter, sure, especially if it's contributed!</p>\n<p>That said, perhaps it would be faster to get H5Web working? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 343645433,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1679484090
+    },
+    {
+        "content": "<p>Alright, that makes sense. At first I was thinking about core, but you are correct, an external tool is way better and easier to achieve. Since H5Web is a React Library we could build a simple page for that.</p>",
+        "id": 343661446,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1679488018
+    },
+    {
+        "content": "<p>Good news! H5Web is working right out of the box. We can use their example to simply host an instance and supply the files via an URL. They are currently hosting a demo instance to which you can send data, but I am not sure if they are happy when the complete Dataverse community is causing traffic on their server :-D</p>",
+        "id": 345156572,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680014973
+    },
+    {
+        "content": "<p>Hmm! <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> can you please DM me a link? You're right, we should be careful not to overload it. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 345156918,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680015048
+    },
+    {
+        "content": "<p>Here is an example taken from Harvard Dataverse, where we just need to supply the direct URL to the file. That aligns pretty nice with the external tools workflow. Next step would be to write a JSON manifest.</p>\n<p><a href=\"https://h5web.panosc.eu/h5wasm?url=https://dataverse.harvard.edu/api/access/datafile/6938813\">https://h5web.panosc.eu/h5wasm?url=https://dataverse.harvard.edu/api/access/datafile/6938813</a></p>",
+        "id": 345156990,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680015060
+    },
+    {
+        "content": "<p>Awesome! Thanks! I must say, though, the first impression is a little confusing... \"No visualization available for this entity.\"</p>\n<p><a href=\"/user_uploads/53090/r12ucJnXVNA8RnqtmgiWbEp5/Screen-Shot-2023-03-28-at-10.52.36-AM.png\">Screen-Shot-2023-03-28-at-10.52.36-AM.png</a> </p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/r12ucJnXVNA8RnqtmgiWbEp5/Screen-Shot-2023-03-28-at-10.52.36-AM.png\" title=\"Screen-Shot-2023-03-28-at-10.52.36-AM.png\"><img src=\"/user_uploads/53090/r12ucJnXVNA8RnqtmgiWbEp5/Screen-Shot-2023-03-28-at-10.52.36-AM.png\"></a></div><p>But, once you click under \"DATA\" you start seeing good stuff!</p>\n<p><a href=\"/user_uploads/53090/fuR_IAtGGQVT0Yx41mIlMj2U/Screen-Shot-2023-03-28-at-10.54.00-AM.png\">Screen-Shot-2023-03-28-at-10.54.00-AM.png</a> </p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/fuR_IAtGGQVT0Yx41mIlMj2U/Screen-Shot-2023-03-28-at-10.54.00-AM.png\" title=\"Screen-Shot-2023-03-28-at-10.54.00-AM.png\"><img src=\"/user_uploads/53090/fuR_IAtGGQVT0Yx41mIlMj2U/Screen-Shot-2023-03-28-at-10.54.00-AM.png\"></a></div><p><span class=\"user-mention\" data-user-id=\"599446\">@Ana Trisovic</span> check this out!! ^^</p>",
+        "id": 345157833,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680015256
+    },
+    {
+        "content": "<p>Yea, I was also confused at first :-D</p>",
+        "id": 345159091,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680015541
+    },
+    {
+        "content": "<p>I would suggest we take their code and containerize it so that other Dataverse installations can host it themselves to use it for file previews. What do you think?</p>",
+        "id": 345159428,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680015605
+    },
+    {
+        "content": "<p>Oh, I thought we would add it to <a href=\"https://github.com/gdcc/dataverse-previewers\">https://github.com/gdcc/dataverse-previewers</a> instead. Is that a possibility?</p>\n<p>Generally speaking each previewer wraps a javascript library that does something, like show a preview of a PDF.</p>",
+        "id": 345166128,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680016894
+    },
+    {
+        "content": "<p>I dont know if this is possible since this is a React application. Or is it possible to host it there too?</p>",
+        "id": 345179570,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680019732
+    },
+    {
+        "content": "<p>Not sure. I see two paths, possibly not mutually exclusive:</p>\n<ul>\n<li>Try to figure out how to wrap their React app as one of our previewers.</li>\n<li>Ask them if they'd like to be on the list of external tools. We can help them create the JSON manifest for external tools. We'd ask them to host the manifest and instructions on how to load it up as an external tool in Dataverse.</li>\n</ul>\n<p>If this doesn't make sense, lemme know. I'll keep typing or we can do a quick call. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 345181164,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680020125
+    },
+    {
+        "content": "<p>I can build it to HTML, CSS and JS - That should work at the file previewers repository</p>",
+        "id": 345198013,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680024511
+    },
+    {
+        "content": "<p>Great!</p>",
+        "id": 345208044,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680027491
+    },
+    {
+        "content": "<p>Switched to Vite by the way. Definitely superior to create-react-app!</p>",
+        "id": 345244268,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1680038690
+    },
+    {
+        "content": "<p>Heh. Nice.</p>",
+        "id": 345247022,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1680039872
+    },
+    {
+        "content": "<p>Had to fight through some bugs, but I finally managed to provide H5Web as static site! Here you can find an example hosted on my server.:</p>\n<p><a href=\"http://82.165.61.139:3000//?url=https://dataverse.harvard.edu/api/access/datafile/6938813&amp;name=test.hdf5\">http://82.165.61.139:3000//?url=https://dataverse.harvard.edu/api/access/datafile/6938813&amp;name=test.hdf5</a></p>\n<p>You may replace url and name to try try other files.</p>",
+        "id": 349214015,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681420807
+    },
+    {
+        "content": "<p>Amazing! Great work, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> !</p>",
+        "id": 349215731,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681421526
+    },
+    {
+        "content": "<p>I don't know what \"D\" is but it works!</p>\n<p>From <a href=\"http://82.165.61.139:3000//?url=https://dev1.dataverse.org/api/access/datafile/1038&amp;name=ICOADS_R3.0.0_1662-10.nc\">http://82.165.61.139:3000//?url=https://dev1.dataverse.org/api/access/datafile/1038&amp;name=ICOADS_R3.0.0_1662-10.nc</a></p>\n<p><a href=\"/user_uploads/53090/UPczUh1ZBnXh0zWPdwCryIhz/Screenshot-2023-04-13-at-5.34.08-PM.png\">Screenshot-2023-04-13-at-5.34.08-PM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/UPczUh1ZBnXh0zWPdwCryIhz/Screenshot-2023-04-13-at-5.34.08-PM.png\" title=\"Screenshot-2023-04-13-at-5.34.08-PM.png\"><img src=\"/user_uploads/53090/UPczUh1ZBnXh0zWPdwCryIhz/Screenshot-2023-04-13-at-5.34.08-PM.png\"></a></div>",
+        "id": 349216080,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681421675
+    },
+    {
+        "content": "<p>Ah, D is wind direction.</p>",
+        "id": 349217193,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681422168
+    },
+    {
+        "content": "<p>Thanks a lot! Happy to see it is also working for you :-)</p>",
+        "id": 349278726,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681454649
+    },
+    {
+        "content": "<p>I can also change the design of the web-app. The current color scheme looks kinda meh <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span> Maybe adapt it to the Dataverse scheme or something more \"friendly\"?</p>\n<p><a href=\"/user_uploads/53090/n90XU8s1sEi_E693n6M2V-rq/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/n90XU8s1sEi_E693n6M2V-rq/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/n90XU8s1sEi_E693n6M2V-rq/image.png\"></a></div>",
+        "id": 349340921,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681470948
+    },
+    {
+        "content": "<p>Another quick styling :-) </p>\n<p><a href=\"/user_uploads/53090/GIx0D70xHLWL4mIJQ5sXt7Wv/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/GIx0D70xHLWL4mIJQ5sXt7Wv/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/GIx0D70xHLWL4mIJQ5sXt7Wv/image.png\"></a></div>",
+        "id": 349378580,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681477960
+    },
+    {
+        "content": "<p>Also add a Dataverse logo?</p>",
+        "id": 349379770,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681478186
+    },
+    {
+        "content": "<p>Sorry for spamming here, but is it possible to embed the external tool within the \"Preview\" tab?</p>",
+        "id": 349382429,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681478707
+    },
+    {
+        "content": "<p>Ha! Yes, we can definitely embed the tool within the Preview tab. We just make sure \"types\" includes \"preview\": <a href=\"https://guides.dataverse.org/en/5.13/api/external-tools.html#terminology\">https://guides.dataverse.org/en/5.13/api/external-tools.html#terminology</a></p>",
+        "id": 349400177,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681482350
+    },
+    {
+        "content": "<p>As for the design, logos, and etc., I was thinking that it might be nice to add HD5Web to the standard \"previewers\" repo at <a href=\"https://github.com/gdcc/dataverse-previewers\">https://github.com/gdcc/dataverse-previewers</a></p>\n<p>If it helps, here where I added the NcML previewer: <a href=\"https://github.com/gdcc/dataverse-previewers/pull/18\">https://github.com/gdcc/dataverse-previewers/pull/18</a></p>\n<p>It's actually a good example of <code>\"types\":[\"preview\"]</code>.</p>\n<p>If it makes more sense to have a separate, standalone repo for HD5Web, that's fine too. I hope we aren't forking! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Typically, we wrap a nice, existing tool (PDF preview, for example) written in Javascript in our \"previewers\" framework. That said, we don't have to follow this pattern if it's limiting.</p>",
+        "id": 349401898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681482692
+    },
+    {
+        "content": "<p>Perfect! I am really excited to see it working on an installation <img alt=\":dataverse_woman:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44206.png\" title=\"dataverse woman\"></p>",
+        "id": 349404571,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681483304
+    },
+    {
+        "content": "<p>I think we can push it to Dataverse Previewers although the built files are everything but readable. Along this I would add the React source code from which it was built. This way we can can modify it easily.</p>",
+        "id": 349405433,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681483476
+    },
+    {
+        "content": "<p>Afaik the previewers are hosted on a GitHub page?</p>",
+        "id": 349405485,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681483489
+    },
+    {
+        "content": "<p>Yes, exactly. GItHub Pages. For example: <a href=\"https://gdcc.github.io/dataverse-previewers/previewers/betatest/NcmlPreview.html?fileid=6987711&amp;siteUrl=https://dataverse.harvard.edu&amp;datasetid=6987552&amp;datasetversion=1.0&amp;locale=en\">https://gdcc.github.io/dataverse-previewers/previewers/betatest/NcmlPreview.html?fileid=6987711&amp;siteUrl=https://dataverse.harvard.edu&amp;datasetid=6987552&amp;datasetversion=1.0&amp;locale=en</a></p>",
+        "id": 349984716,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681486844
+    },
+    {
+        "content": "<p>Alright, will submit a PR once back home.</p>",
+        "id": 350010476,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681493616
+    },
+    {
+        "content": "<p>Bit off topic, but which app do you use to obtain these nice window screenshots? They look great!</p>",
+        "id": 350010708,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681493669
+    },
+    {
+        "content": "<p>Tested it on <a href=\"http://Github.io\">Github.io</a>, works like a charm. Going to open a PR at GDCC previewers.</p>\n<p><a href=\"https://jr-1991.github.io/?url=https://dataverse.harvard.edu/api/access/datafile/6938813&amp;name=test.hdf5\">https://jr-1991.github.io/?url=https://dataverse.harvard.edu/api/access/datafile/6938813&amp;name=test.hdf5</a></p>",
+        "id": 350050919,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681508414
+    },
+    {
+        "content": "<p>Opened a PR:</p>\n<ul>\n<li><a href=\"https://github.com/gdcc/dataverse-previewers/pull/30\">https://github.com/gdcc/dataverse-previewers/pull/30</a></li>\n</ul>",
+        "id": 350064102,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681514621
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> incredible! Thank you!</p>\n<p>We absolutely should consider maintainability which means the source should go somewhere. Let touch base with Jim Myers, who created and has contributed the most to the previewers repo, if he thinks it's a good fit for HD5Web.</p>",
+        "id": 350174065,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681569575
+    },
+    {
+        "content": "<p>I'm just using the normal \"take a screenshot\" built into Mac.</p>",
+        "id": 350174258,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681569638
+    },
+    {
+        "content": "<p>This is really amazing <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 350190265,
+        "sender_full_name": "Ana Trisovic",
+        "timestamp": 1681576537
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> I just added it as an external tool on my dev1 server but here's how the query parameters are passed:</p>\n<p><a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en</a></p>\n<p>So the question is, can we change hdf5.js a bit to handle <code>fileid=1038</code> and <code>siteUrl=https://dev1.dataverse.org</code> as separate parameters?</p>",
+        "id": 350197964,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681580357
+    },
+    {
+        "content": "<p>By the way, since we have two preview tools for NetCDF files now, you can see how the UI lets you toggle between them: <a href=\"https://dev1.dataverse.org/file.xhtml?fileId=1038&amp;version=2.0\">https://dev1.dataverse.org/file.xhtml?fileId=1038&amp;version=2.0</a></p>",
+        "id": 350198084,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681580411
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> thanks for testing it! Of course, I can change the query parameters to match the default ones. The name parameter is also not that important as it is just a display of the file name within the viewer. The ID will also work. I am currently not at home, will implement it once back and push the update to the PR.</p>",
+        "id": 350208771,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681587512
+    },
+    {
+        "content": "<p>Regarding the source, what do you think about an extra directory which hosts React code and an action that deploys it automatically to the betatest directory? This would open up to other previewers for files. Was thinking about Plotly for the visualisation of tabular data.</p>",
+        "id": 350266490,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681630874
+    },
+    {
+        "content": "<p>Hmm, for the source maybe you could add it to a separate branch and link to it from the PR, just to show how much there is and your idea of where it might go.</p>",
+        "id": 350302986,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681647081
+    },
+    {
+        "content": "<p>Alright, sounds like a plan <span aria-label=\"ok\" class=\"emoji emoji-1f44c\" role=\"img\" title=\"ok\">:ok:</span></p>",
+        "id": 350415161,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681712326
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> I went ahead and put HD5Web on the agenda for today's meeting: <a href=\"https://docs.google.com/document/d/1cZJr0JsASzOTxl70RynWtMjIa5dssCCpKPhyV-Bvx0c/edit?usp=sharing\">https://docs.google.com/document/d/1cZJr0JsASzOTxl70RynWtMjIa5dssCCpKPhyV-Bvx0c/edit?usp=sharing</a></p>",
+        "id": 350494521,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1681733791
+    },
+    {
+        "content": "<p>I've managed to reproduce the error and it seems like, when the Previewers HTML filename is not index it fails to load it. I try to adjust it on the React side, my guess its something within the JS files that expect the index.html and isnt working if any other name is given.</p>",
+        "id": 351226768,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681974166
+    },
+    {
+        "content": "<p>Tried it with a different name, coming from React and still not possible using <code>serve -s .</code>. It Only works, when its called <code>index.html</code> - I may be missing something here. Do you know how to fix this?</p>",
+        "id": 351229775,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1681975076
+    },
+    {
+        "content": "<p>I happen to make it work with a different name locally!</p>",
+        "id": 352599779,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682443580
+    },
+    {
+        "content": "<p>Seems like there was some expectations from react-router</p>",
+        "id": 352599891,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682443622
+    },
+    {
+        "content": "<p>Going to push the new build. <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> can you try it out once its up?</p>",
+        "id": 352599977,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682443647
+    },
+    {
+        "content": "<p>Absolutely!</p>",
+        "id": 352600048,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682443665
+    },
+    {
+        "content": "<p>Its up now <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://zulip-avatars.s3.amazonaws.com/53090/emoji/images/44207.png\" title=\"dataverse man\"></p>",
+        "id": 352603454,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682444619
+    },
+    {
+        "content": "<p>Used this query for testing:</p>\n<p><a href=\"http://localhost:3000/HDF5Preview?siteUrl=https://dataverse.harvard.edu/&amp;fileid=6938813\">http://localhost:3000/HDF5Preview?siteUrl=https://dataverse.harvard.edu/&amp;fileid=6938813</a></p>",
+        "id": 352603630,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682444668
+    },
+    {
+        "content": "<p>Deployed but no preview at <a href=\"https://dev1.dataverse.org/file.xhtml?fileId=1038&amp;version=2.0\">https://dev1.dataverse.org/file.xhtml?fileId=1038&amp;version=2.0</a></p>",
+        "id": 352604923,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445025
+    },
+    {
+        "content": "<p>Do these query parameters look right? <a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en</a></p>",
+        "id": 352605008,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445051
+    },
+    {
+        "content": "<p>I'm happy to change the manifest to line up with what you're expecting.</p>",
+        "id": 352605083,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445071
+    },
+    {
+        "content": "<p><a href=\"https://dev1.dataverse.org/js/hdf5.js\">https://dev1.dataverse.org/js/hdf5.js</a> is a 404</p>",
+        "id": 352605331,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445130
+    },
+    {
+        "content": "<p>Oh thats a pity <span aria-label=\"sad\" class=\"emoji emoji-2639\" role=\"img\" title=\"sad\">:sad:</span></p>",
+        "id": 352605718,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445224
+    },
+    {
+        "content": "<p>I changed it from /js to ./js</p>",
+        "id": 352605728,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445226
+    },
+    {
+        "content": "<p>Console says that apparently it is not able to find the corresponding css and js</p>",
+        "id": 352605865,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445253
+    },
+    {
+        "content": "<p>That's better!</p>\n<p><a href=\"/user_uploads/53090/XBH3Vd9JV2JPCEzk2Pg0m-5s/Screenshot-2023-04-25-at-13-54-25-ICOADS_R3.0.0_1662-10.nc-Root.png\">Screenshot-2023-04-25-at-13-54-25-ICOADS_R3.0.0_1662-10.nc-Root.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/XBH3Vd9JV2JPCEzk2Pg0m-5s/Screenshot-2023-04-25-at-13-54-25-ICOADS_R3.0.0_1662-10.nc-Root.png\" title=\"Screenshot-2023-04-25-at-13-54-25-ICOADS_R3.0.0_1662-10.nc-Root.png\"><img src=\"/user_uploads/53090/XBH3Vd9JV2JPCEzk2Pg0m-5s/Screenshot-2023-04-25-at-13-54-25-ICOADS_R3.0.0_1662-10.nc-Root.png\"></a></div>",
+        "id": 352606041,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445314
+    },
+    {
+        "content": "<p>Niiice! How did you make it work?</p>",
+        "id": 352606077,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445328
+    },
+    {
+        "content": "<p>Ah alright, you changed the path to the js within the HTML?</p>",
+        "id": 352606226,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445364
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>    &lt;script type=&quot;module&quot; crossorigin [-src=&quot;/js/hdf5.js&quot;&gt;&lt;/script&gt;-]{+src=&quot;./js/hdf5.js&quot;&gt;&lt;/script&gt;+}\n    &lt;link type=&quot;text/css&quot; rel=&quot;stylesheet&quot; [-href=&quot;/css/preview.css&quot;-]{+href=&quot;./css/preview.css&quot;+} /&gt;\n    &lt;link rel=&quot;stylesheet&quot; [-href=&quot;/css/hdf5.css&quot;-]{+href=&quot;./css/hdf5.css&quot;+} /&gt;\n</code></pre></div>",
+        "id": 352606250,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445371
+    },
+    {
+        "content": "<p>yeah</p>",
+        "id": 352606298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445387
+    },
+    {
+        "content": "<p>Sometimes its the simple stuff ... <span aria-label=\"laughter tears\" class=\"emoji emoji-1f602\" role=\"img\" title=\"laughter tears\">:laughter_tears:</span></p>",
+        "id": 352606374,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445410
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/1EHEOhSdYEvY2Lm-YJx_mNUj/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/1EHEOhSdYEvY2Lm-YJx_mNUj/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/1EHEOhSdYEvY2Lm-YJx_mNUj/image.png\"></a></div>",
+        "id": 352606526,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445467
+    },
+    {
+        "content": "<p>This change should then work?</p>",
+        "id": 352606621,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445486
+    },
+    {
+        "content": "<p>Yes, exactly.</p>",
+        "id": 352607208,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445685
+    },
+    {
+        "content": "<p>Cool! Will push it now</p>",
+        "id": 352607302,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445715
+    },
+    {
+        "content": "<p>That saved my day <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 352607360,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445723
+    },
+    {
+        "content": "<p>Heh. The last thing is to update the markdown file with curl commands.</p>",
+        "id": 352607517,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445777
+    },
+    {
+        "content": "<p>Alright, currently editing it</p>",
+        "id": 352607866,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682445898
+    },
+    {
+        "content": "<p>Awesome.</p>",
+        "id": 352607963,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445929
+    },
+    {
+        "content": "<p>Oh, and we still need to decide where to put the source code, right?</p>",
+        "id": 352607967,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682445931
+    },
+    {
+        "content": "<p>Yes, I will create another PR that proposes a new dir and action to support React apps built with vite</p>",
+        "id": 352608323,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682446035
+    },
+    {
+        "content": "<p>One question, we were talking about it to be a <code>previewer</code> and an explorer - Is <code>explorer</code> then the right addition to <code>types</code></p>",
+        "id": 352608528,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682446083
+    },
+    {
+        "content": "<p>Ok. I'm also asking Jim about it at <a href=\"https://iqss.slack.com/archives/CVB2SMDFX/p1682446081208379?thread_ts=1682445613.157419&amp;cid=CVB2SMDFX\">https://iqss.slack.com/archives/CVB2SMDFX/p1682446081208379?thread_ts=1682445613.157419&amp;cid=CVB2SMDFX</a> and @mentioned you. Might be faster. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 352608641,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682446121
+    },
+    {
+        "content": "<p>Saw it on Slack <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 352608721,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682446151
+    },
+    {
+        "content": "<p>So great its working now! Been biting my teeth out on this last mile <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 352609130,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1682446263
+    },
+    {
+        "content": "<p>This is how I added the tool, twice because there are two content types. You may need fewer query parameters. And you should probably use the regular toolUrl pattern instead of my local URL: <a href=\"/user_uploads/53090/A3OJFvVKCr-FTEpdqxnzVsz0/tool.txt\">tool.txt</a></p>",
+        "id": 352609660,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1682446431
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> glad I have seen the comment to the NcML previewer. The PR at the previewers needs to be updated with the most recent <a href=\"https://github.com/JR-1991/hdf5-previewer/blob/aafabb86973f1fd0d932f4170dc2d58035aebc02/src/Loader.tsx#L31-L42\">source</a>.</p>",
+        "id": 357075029,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683657998
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> sorry, probably doing too many things at once but what do you mean? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 357075173,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683658046
+    },
+    {
+        "content": "<p>The issue with ncml.js not using the API Token upon fetching. Just saw the comment at your <code>dataverse</code> PR that something is not working.</p>",
+        "id": 357075364,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683658104
+    },
+    {
+        "content": "<p>Haven't synced the H5Web build with the source code yet. There the API-Token header is included.</p>",
+        "id": 357075570,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1683658175
+    },
+    {
+        "content": "<p>If you're saying your previewer works with drafts, great! Someday I'll go fix mine. <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span></p>",
+        "id": 357075933,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683658287
+    },
+    {
+        "content": "<p>Good news! <a href=\"https://github.com/IQSS/dataverse/issues/9480\">#9480</a> is in the sprint!</p>\n<p>At minimum this will involve adding the new H5Web previewer to the list in the Dataverse Guides.</p>\n<p>I'm also happy to test it more, help figure out where to put the source code, etc.</p>",
+        "id": 357616181,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683817214
+    },
+    {
+        "content": "<p>Did you know H5Web works with Nexus files? <a href=\"https://github.com/IQSS/dataverse/issues/7947#issuecomment-1549809295\">https://github.com/IQSS/dataverse/issues/7947#issuecomment-1549809295</a></p>",
+        "id": 358754215,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684248040
+    },
+    {
+        "content": "<p>Just saw the comment on GH - Thats awesome!!</p>",
+        "id": 358768871,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1684250884
+    },
+    {
+        "content": "<p>I also just gave a demo of H5Web at the community call. The map of the US was right side up this time!</p>",
+        "id": 358769917,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684251101
+    },
+    {
+        "content": "<p>Nice! Can you send me the link to the file that has the map? Would love to see it :-)</p>",
+        "id": 358771387,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1684251391
+    },
+    {
+        "content": "<p>Sure it's  <a href=\"http://bi_1985.nc\">bi_1985.nc</a>  (I forget where we got this). Currently at <a href=\"https://dev1.dataverse.org/file.xhtml?fileId=1037&amp;version=2.0\">https://dev1.dataverse.org/file.xhtml?fileId=1037&amp;version=2.0</a></p>",
+        "id": 358772165,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684251559
+    },
+    {
+        "content": "<p>I'm pretty sure it came from <a href=\"https://www.northwestknowledge.net/metdata/data/bi_1985.nc\">https://www.northwestknowledge.net/metdata/data/bi_1985.nc</a></p>",
+        "id": 358772582,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684251639
+    },
+    {
+        "content": "<p>That northwest site is linked from the bottom of our design doc: <a href=\"https://docs.google.com/document/d/1Ax_sMdgx5ROkIBA7-IC4_hySvgXkk6O8qTZLIvWWnqE/edit?usp=sharing\">https://docs.google.com/document/d/1Ax_sMdgx5ROkIBA7-IC4_hySvgXkk6O8qTZLIvWWnqE/edit?usp=sharing</a></p>",
+        "id": 358772953,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684251724
+    },
+    {
+        "content": "<p>Wow this is beautiful! You can even go through the time dimension <span aria-label=\"heart eyes\" class=\"emoji emoji-1f60d\" role=\"img\" title=\"heart eyes\">:heart_eyes:</span></p>",
+        "id": 358773652,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1684251881
+    },
+    {
+        "content": "<p>This would be a perfect demo file for our slides</p>",
+        "id": 358773755,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1684251900
+    },
+    {
+        "content": "<p>orly</p>",
+        "id": 358776243,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684252442
+    },
+    {
+        "content": "<p>How do you go through the time dimension?</p>",
+        "id": 358776644,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684252520
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/7OqtZ7AB2QwwgdO7h-rv49_I/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/7OqtZ7AB2QwwgdO7h-rv49_I/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/7OqtZ7AB2QwwgdO7h-rv49_I/image.png\"></a></div><p>You can use the slider on the left. Very nice!</p>",
+        "id": 358802199,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1684258103
+    },
+    {
+        "content": "<p>I see. I guess I'm on day 161 of 1985. Now I'll go back to the future.</p>",
+        "id": 358806740,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684259170
+    },
+    {
+        "content": "<p>I just made a PR into your PR (and left some comments): <a href=\"https://github.com/gdcc/dataverse-previewers/pull/30#issuecomment-1553653523\">https://github.com/gdcc/dataverse-previewers/pull/30#issuecomment-1553653523</a></p>\n<p>Overall, this is looking good! <span aria-label=\"rocket\" class=\"emoji emoji-1f680\" role=\"img\" title=\"rocket\">:rocket:</span></p>",
+        "id": 359498723,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684444459
+    },
+    {
+        "content": "<p>I just made this PR: add H5Web to guides <a href=\"https://github.com/IQSS/dataverse/issues/9600\">#9600</a></p>",
+        "id": 359668214,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684504413
+    },
+    {
+        "content": "<p>Including a screenshot of the map, right side up <span aria-label=\"happy\" class=\"emoji emoji-1f600\" role=\"img\" title=\"happy\">:happy:</span> </p>\n<p><a href=\"/user_uploads/53090/8pte5619FwxuvSmVMFGxbIBY/Screen-Shot-2023-05-19-at-9.50.41-AM.png\">Screen-Shot-2023-05-19-at-9.50.41-AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/8pte5619FwxuvSmVMFGxbIBY/Screen-Shot-2023-05-19-at-9.50.41-AM.png\" title=\"Screen-Shot-2023-05-19-at-9.50.41-AM.png\"><img src=\"/user_uploads/53090/8pte5619FwxuvSmVMFGxbIBY/Screen-Shot-2023-05-19-at-9.50.41-AM.png\"></a></div>",
+        "id": 359668399,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684504447
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> for the screenshot I manually removed the tool title and the blue box.</p>",
+        "id": 359668554,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684504477
+    },
+    {
+        "content": "<p>The PR is up <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span> </p>\n<p><a href=\"https://github.com/gdcc/dataverse-previewers/pull/35\">https://github.com/gdcc/dataverse-previewers/pull/35</a></p>",
+        "id": 365650941,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1686595618
+    },
+    {
+        "content": "<p>Looks great! I'm a little confused though. Can I go ahead and close the older PR now and say that the newer one is replacing it?</p>",
+        "id": 365653532,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686596311
+    },
+    {
+        "content": "<p>Yes, I left it open though for the case if Jim might not accept the addition of the PR. But we can re-open it anyway if thats the case.</p>",
+        "id": 365654679,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1686596615
+    },
+    {
+        "content": "<p>Ok, I went ahead and closed it. Yes, we can re-open it if necessary.</p>",
+        "id": 365656410,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686597082
+    },
+    {
+        "content": "<p>I did click \"request review\" from Jim.</p>",
+        "id": 365656432,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1686597094
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> did you get a chance to read Jim's feedback? <a href=\"https://github.com/gdcc/dataverse-previewers/pull/35#issuecomment-1593671142\">https://github.com/gdcc/dataverse-previewers/pull/35#issuecomment-1593671142</a></p>",
+        "id": 367945444,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687270847
+    },
+    {
+        "content": "<p>One part of the feedback is pretty straightforward. I think he wants you to move your stuff into the \"betatest\" directory.</p>",
+        "id": 367946273,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687270987
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> <span aria-label=\"wave\" class=\"emoji emoji-1f44b\" role=\"img\" title=\"wave\">:wave:</span> Yes, I saw it and will implement the changes today. Indeed, they look straightforward :-)</p>",
+        "id": 367962932,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687273830
+    },
+    {
+        "content": "<p>No rush, but thanks!</p>",
+        "id": 367966361,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687274450
+    },
+    {
+        "content": "<p>Updated the PR - Now puts everything in <code>betatest</code> as requested by Jim</p>",
+        "id": 368197475,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687345772
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> is it possible to test it at your dev instance?</p>",
+        "id": 368197545,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687345791
+    },
+    {
+        "content": "<p>Yes! I got hit with some paperwork but soon! Thanks!</p>",
+        "id": 368230336,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687352601
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> I need to look closer but <a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1066&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1065&amp;datasetversion=1.0&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1066&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1065&amp;datasetversion=1.0&amp;locale=en</a> isn't working.</p>",
+        "id": 368521444,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687433620
+    },
+    {
+        "content": "<p>It might be a relative vs absolute path thing.</p>",
+        "id": 368521530,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687433640
+    },
+    {
+        "content": "<p>It's trying to pull down <a href=\"https://dev1.dataverse.org/js/hdf5.js\">https://dev1.dataverse.org/js/hdf5.js</a> which probably isn't right.</p>",
+        "id": 368521663,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687433658
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  thanks for testing! Yes, the js and css paths need to be relative in the resulting html. Going to check if this can be taken care of in the build phase.</p>",
+        "id": 368552543,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687439556
+    },
+    {
+        "content": "<p>Thanks so much!</p>",
+        "id": 368552618,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687439573
+    },
+    {
+        "content": "<p>Fixed it <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span> Vite is so nice! Was able to include this in the build file and now it should work</p>",
+        "id": 368558757,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687440707
+    },
+    {
+        "content": "<p>Closer! I pulled but now I get a different error:</p>\n<p><a href=\"/user_uploads/53090/rj6FJ33nnW7lM4HmyUzl6Evd/Screenshot-2023-06-22-at-9.41.57-AM.png\">Screenshot-2023-06-22-at-9.41.57-AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/rj6FJ33nnW7lM4HmyUzl6Evd/Screenshot-2023-06-22-at-9.41.57-AM.png\" title=\"Screenshot-2023-06-22-at-9.41.57-AM.png\"><img src=\"/user_uploads/53090/rj6FJ33nnW7lM4HmyUzl6Evd/Screenshot-2023-06-22-at-9.41.57-AM.png\"></a></div>",
+        "id": 368562856,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687441349
+    },
+    {
+        "content": "<p>Same URL as above if you'd like to try it.</p>",
+        "id": 368563066,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687441383
+    },
+    {
+        "content": "<p>Thanks! Do you use a private dataset or a public one?</p>",
+        "id": 368567469,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687442088
+    },
+    {
+        "content": "<p>Public. Here's the file: <a href=\"https://dev1.dataverse.org/file.xhtml?fileId=1066&amp;version=1.0\">https://dev1.dataverse.org/file.xhtml?fileId=1066&amp;version=1.0</a></p>",
+        "id": 368569553,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687442414
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/zFrzI2pnXNQad8qqKzP_Out3/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/zFrzI2pnXNQad8qqKzP_Out3/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/zFrzI2pnXNQad8qqKzP_Out3/image.png\"></a></div><p>Seems like there is some authorization error. I tested your link, but exchanged <code>siteURL</code> and <code>fileID</code> which point to Harvard's Dataverse. Here everything works fine, will check where the diffs are and hopefully find a solution. </p>\n<p><a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?siteUrl=https://dataverse.harvard.edu/&amp;fileid=6938813\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?siteUrl=https://dataverse.harvard.edu/&amp;fileid=6938813</a></p>",
+        "id": 368573342,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687442971
+    },
+    {
+        "content": "<p>Ah, maybe we saw this before? Or maybe it's just deja vu. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 368574363,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443091
+    },
+    {
+        "content": "<p>Haha yea I have the feeling we've been there already</p>",
+        "id": 368574497,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443110
+    },
+    {
+        "content": "<p>I can download with <code>wget https://dev1.dataverse.org/api/access/datafile/1066</code></p>",
+        "id": 368575208,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443207
+    },
+    {
+        "content": "<p>No auth problems.</p>",
+        "id": 368575243,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443214
+    },
+    {
+        "content": "<p>Maybe the issue is that I pass an empty \"X-Dataverse-key\" header since the URL does not include <code>apiToken</code>. Could that be the source?</p>",
+        "id": 368575332,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443228
+    },
+    {
+        "content": "<p>Huh. Maybe?!?</p>",
+        "id": 368575445,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443243
+    },
+    {
+        "content": "<p>Because that is the novelty compared to the previous builds we've tested</p>",
+        "id": 368575610,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443276
+    },
+    {
+        "content": "<p>Want me to copy <a href=\"https://github.com/JR-1991.keys\">https://github.com/JR-1991.keys</a> into my dev1 server so you can log in?</p>",
+        "id": 368575818,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443309
+    },
+    {
+        "content": "<p>Okay, if you wait fro long enough H5Web returns an error message, that the given file is not a valid HDF5 - Thats quite odd!</p>\n<p><a href=\"/user_uploads/53090/0cugtGbq6eT9zpAqtE9DbX-Y/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/0cugtGbq6eT9zpAqtE9DbX-Y/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/0cugtGbq6eT9zpAqtE9DbX-Y/image.png\"></a></div>",
+        "id": 368577229,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443526
+    },
+    {
+        "content": "<p>Weird. This one is super small but it's still spinning: <a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en</a></p>",
+        "id": 368578075,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443629
+    },
+    {
+        "content": "<p>I get the same error with H5Web's instance</p>\n<p><a href=\"https://h5web.panosc.eu/h5wasm\">https://h5web.panosc.eu/h5wasm</a></p>",
+        "id": 368578381,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443667
+    },
+    {
+        "content": "<p>So maybe it doesn't matter how big the file is... maybe it'll eventually just give that error about not being a valid file.</p>",
+        "id": 368578383,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443668
+    },
+    {
+        "content": "<p>Hey! It DOES work for a draft file!</p>",
+        "id": 368579084,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443770
+    },
+    {
+        "content": "<p>Here, I'll paste the URL and then reset my API token: <a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1073&amp;siteUrl=https://dev1.dataverse.org&amp;apiToken=6c626b0a-7f7f-4f47-816c-34fc44a3c6a9&amp;datasetid=1072&amp;datasetversion=:draft&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1073&amp;siteUrl=https://dev1.dataverse.org&amp;apiToken=6c626b0a-7f7f-4f47-816c-34fc44a3c6a9&amp;datasetid=1072&amp;datasetversion=:draft&amp;locale=en</a></p>",
+        "id": 368579402,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443811
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/376593-geospatial/topic/plot.20arrays.20from.20HDF5/near/368579084\">schrieb</a>:</p>\n<blockquote>\n<p>Hey! It DOES work for a draft file!</p>\n</blockquote>\n<p>Awesome!!!</p>",
+        "id": 368579450,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443817
+    },
+    {
+        "content": "<p>So yeah, maybe try not sending the token if there is no token??</p>",
+        "id": 368579821,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443869
+    },
+    {
+        "content": "<p>Your idea above <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 368580011,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687443898
+    },
+    {
+        "content": "<p>Alright, I'll fix that and push an update</p>",
+        "id": 368580194,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687443922
+    },
+    {
+        "content": "<p>The changes are now online, but it is still not working. This might be a problem related to H5Web itself. If we are not able to resolve it, I will open an issue there</p>",
+        "id": 368583438,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444394
+    },
+    {
+        "content": "<p>Online? I haven't pulled yet. Should I?</p>",
+        "id": 368583936,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444472
+    },
+    {
+        "content": "<p>Ah okay, thought it would be updated automatically. The built files are updated in the PR though</p>",
+        "id": 368584190,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444513
+    },
+    {
+        "content": "<p>Cool, let me go pull. I'm hosting it locally:<br>\n  \"toolUrl\":\"/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html\",</p>",
+        "id": 368584346,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444538
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/VjXSg__2yxcACIDwRc1b_grR/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/VjXSg__2yxcACIDwRc1b_grR/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/VjXSg__2yxcACIDwRc1b_grR/image.png\"></a></div><p>Thats so odd since they claim <code>nc</code> files are working</p>",
+        "id": 368584362,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444541
+    },
+    {
+        "content": "<p><a href=\"https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en\">https://dev1.dataverse.org/dataexplore/dataverse-previewers/previewers/betatest/HDF5Preview.html?fileid=1038&amp;siteUrl=https://dev1.dataverse.org&amp;datasetid=1036&amp;datasetversion=2.0&amp;locale=en</a> looks good! That's the small file, only 120 KB or so</p>",
+        "id": 368584664,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444582
+    },
+    {
+        "content": "<p>Does it work for you? I am stuck in the loading page</p>",
+        "id": 368585047,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444635
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/PzxqIIP4w41HEiS43bs5r2OI/Screenshot-2023-06-22-at-10.37.30-AM.png\">Screenshot-2023-06-22-at-10.37.30-AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/PzxqIIP4w41HEiS43bs5r2OI/Screenshot-2023-06-22-at-10.37.30-AM.png\" title=\"Screenshot-2023-06-22-at-10.37.30-AM.png\"><img src=\"/user_uploads/53090/PzxqIIP4w41HEiS43bs5r2OI/Screenshot-2023-06-22-at-10.37.30-AM.png\"></a></div>",
+        "id": 368585238,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444666
+    },
+    {
+        "content": "<p>Works!</p>",
+        "id": 368585273,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444672
+    },
+    {
+        "content": "<p>Niiice!</p>",
+        "id": 368585727,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444749
+    },
+    {
+        "content": "<p>Ah now it works on my side too <span aria-label=\"raised hands\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"raised hands\">:raised_hands:</span></p>",
+        "id": 368585946,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1687444793
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/HLZH2qm_XPk0RVocpa7fHN3e/Screenshot-2023-06-22-at-10.40.59-AM.png\">Screenshot-2023-06-22-at-10.40.59-AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/HLZH2qm_XPk0RVocpa7fHN3e/Screenshot-2023-06-22-at-10.40.59-AM.png\" title=\"Screenshot-2023-06-22-at-10.40.59-AM.png\"><img src=\"/user_uploads/53090/HLZH2qm_XPk0RVocpa7fHN3e/Screenshot-2023-06-22-at-10.40.59-AM.png\"></a></div>",
+        "id": 368586460,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687444871
+    },
+    {
+        "content": "<p>I just moved <a href=\"https://github.com/IQSS/dataverse/pull/9600\">https://github.com/IQSS/dataverse/pull/9600</a> to \"in review\"... just a doc change to advertise the new previewer.</p>",
+        "id": 368589109,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1687445290
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 384061303,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1691778438
+    },
+    {
+        "content": "<p>H5Web being used in the wild at <a href=\"https://dataverse.harvard.edu/file.xhtml?fileId=13448025&amp;version=1.0\">https://dataverse.harvard.edu/file.xhtml?fileId=13448025&amp;version=1.0</a></p>\n<p><a href=\"/user_uploads/53090/9QZnucE24B03IyOljRdfh_NU/Screenshot-2026-02-11-at-11.45.54AM.png\">Screenshot 2026-02-11 at 11.45.54 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/9QZnucE24B03IyOljRdfh_NU/Screenshot-2026-02-11-at-11.45.54AM.png\" title=\"Screenshot 2026-02-11 at 11.45.54 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1174x795\" src=\"/user_uploads/thumbnail/53090/9QZnucE24B03IyOljRdfh_NU/Screenshot-2026-02-11-at-11.45.54AM.png/840x560.webp\"></a></div>",
+        "id": 573337104,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1770828372
+    }
+]

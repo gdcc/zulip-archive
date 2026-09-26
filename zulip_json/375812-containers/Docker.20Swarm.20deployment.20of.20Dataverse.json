@@ -1,0 +1,722 @@
+[
+    {
+        "content": "<p>Does anyone have deployed a Dataverse swarm stack and if so, is there any documentation on that? I am currently trying to set up a stack and fighting myself through Zulip threads, docs and GitHub/DockerHub repositories ;) I thought I should ask here before diving too deep...</p>",
+        "id": 448544458,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1719910660
+    },
+    {
+        "content": "<p>Dumb question: does Docker Swarm have Kubernetes under the hood these days?</p>",
+        "id": 448589289,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1719921820
+    },
+    {
+        "content": "<p>No, that's two different things. Docker Swarm is more like an extended version of Docker Compose, which scales horizontally :)</p>",
+        "id": 448627254,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1719932247
+    },
+    {
+        "content": "<p>Oh, I see. Well, I obviously don't know much about Docker Swarm, but I'm happy to put it on the agenda for our next meeting ( <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a> ), which you are welcome to join, to see if anyone has any ideas.</p>",
+        "id": 448631711,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1719933078
+    },
+    {
+        "content": "<p>Alright, thanks! I am currently trying to figure out how the Docker Compose configuration of Dataverse works. The Swarm translation is quite straightforward but the devil is in the details...</p>",
+        "id": 448639889,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1719935087
+    },
+    {
+        "content": "<p>Good luck! I did go ahead and add Docker Swarm to the agenda: <a href=\"https://docs.google.com/document/d/1mdziHDJTIZGgI1ks8HFNTkfEfQqfsIRmNh4ufF516pk/edit?usp=sharing\">https://docs.google.com/document/d/1mdziHDJTIZGgI1ks8HFNTkfEfQqfsIRmNh4ufF516pk/edit?usp=sharing</a></p>",
+        "id": 448642284,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1719935728
+    },
+    {
+        "content": "<p>Many thanks :)<br>\nBtw. I am a bit confused about the env-variables. There is <code>DATAVERSE_DB_HOST</code> (and user/password/name etc.) and also <code>POSTGRES_SERVER...</code> etc. Why are there two databases?</p>",
+        "id": 448934497,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720035476
+    },
+    {
+        "content": "<p>There is only one database. You're using container's right. You probably want to use DATAVERSE_DB_HOST like we do here: <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/docker/compose/demo/compose.yml#L13\">https://github.com/IQSS/dataverse/blob/v6.3/docker/compose/demo/compose.yml#L13</a></p>\n<p>Where are you seeing POSTGRES_SERVER?</p>",
+        "id": 448935964,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720036054
+    },
+    {
+        "content": "<p>That was in the sample.env :) OK, I'll continue, thanks ;) Yes, containers!</p>",
+        "id": 448936101,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720036095
+    },
+    {
+        "content": "<p>I just looked at the compose file... that uses different services. There is no  <code>minio</code> for example and the <code>dataverse</code> image is not <code>coronawhy/dataverse:...</code> but <code>gdcc/dataverse</code>. <br>\nI am a bit confused now</p>",
+        "id": 448939182,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720037211
+    },
+    {
+        "content": "<p>Now I see it's from two weeks ago, so I guess that's the state of the art?</p>",
+        "id": 448939267,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720037241
+    },
+    {
+        "content": "<p>Wait, are you following <a href=\"https://guides.dataverse.org/en/6.3/container/\">https://guides.dataverse.org/en/6.3/container/</a> or dataverse-docker which is community led (please see <a href=\"https://guides.dataverse.org/en/6.3/developers/containers.html\">https://guides.dataverse.org/en/6.3/developers/containers.html</a> )?</p>",
+        "id": 448942059,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038093
+    },
+    {
+        "content": "<p>The situation is definitely confusing and we have an issue to address it: Document competing containerization efforts and how to choose <a href=\"https://github.com/IQSS/dataverse/issues/10522\">#10522</a></p>",
+        "id": 448942269,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038146
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598432\">@Slava Tykhonov</span> just told me he's moving dataverse-docker (\"archive in a box\") to the gdcc images, if that helps.</p>",
+        "id": 448943294,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038426
+    },
+    {
+        "content": "<p>ok thanks, i'll try my luck... definitely a tough piece to get working on docker stack compared to the other services i deployed in the past :D</p>",
+        "id": 448943467,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720038480
+    },
+    {
+        "content": "<p>The gdcc images are maintained by core contributors like me and <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span></p>",
+        "id": 448943500,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038482
+    },
+    {
+        "content": "<p>but i see that the number of volumes and file mappings are reduced in the latest compose, which makes things a bit easier</p>",
+        "id": 448943577,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720038508
+    },
+    {
+        "content": "<p>They are somewhat new, the gdcc images. Slava filled a gap with his coronawhy images until the gdcc images were ready.</p>",
+        "id": 448943644,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038530
+    },
+    {
+        "content": "<p>Yeah, the demo compose is intentionally smaller than the dev compose in the root of the repo.</p>",
+        "id": 448943818,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038579
+    },
+    {
+        "content": "<p>We have all that stuff like minio in the dev compose for testing.</p>",
+        "id": 448943955,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038614
+    },
+    {
+        "content": "<p>i see</p>",
+        "id": 448944005,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720038647
+    },
+    {
+        "content": "<p>And sorry, I keep moving your messages around. I can put them back under your original topic if you want: <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/Docker.20Swarm.20deployment.20of.20Dataverse\">#containers &gt; Docker Swarm deployment of Dataverse</a> </p>\n<p>You're still trying to use Docker Swarm? Or are you trying Docker Compose?</p>",
+        "id": 448944169,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720038717
+    },
+    {
+        "content": "<p>No worries, you can move stuff as it fits, I am not so handy with Zulip!</p>",
+        "id": 448948141,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040311
+    },
+    {
+        "content": "<p>Swarm. I think I now got all the services running on different nodes with shared filesystems</p>",
+        "id": 448948184,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040331
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/4_8bMkkXtNMVHiVkPiPH63AT/Screenshot-2024-07-03-at-22.57.26.png\">Screenshot-2024-07-03-at-22.57.26.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/4_8bMkkXtNMVHiVkPiPH63AT/Screenshot-2024-07-03-at-22.57.26.png\" title=\"Screenshot-2024-07-03-at-22.57.26.png\"><img src=\"/user_uploads/53090/4_8bMkkXtNMVHiVkPiPH63AT/Screenshot-2024-07-03-at-22.57.26.png\"></a></div>",
+        "id": 448948223,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040346
+    },
+    {
+        "content": "<p>looks promising... now trying to get the load balancer with SSL termination to talk to Dataverse :)</p>",
+        "id": 448948300,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040381
+    },
+    {
+        "content": "<p>Ah, great. Yeah, hopefully having fewer services to deal with helps. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 448948330,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720040392
+    },
+    {
+        "content": "<p>It's a bit less confusing at least ;)</p>",
+        "id": 448948423,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040410
+    },
+    {
+        "content": "<p>I'll put the messages back under the original topic.</p>",
+        "id": 448948425,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720040411
+    },
+    {
+        "content": "<p>Btw. is an Nginx or so recommended or can I directly use the HTTP connection to dataverse?</p>",
+        "id": 448948513,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040441
+    },
+    {
+        "content": "<p>Well, Dataverse runs on port 8080.</p>",
+        "id": 448948586,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720040472
+    },
+    {
+        "content": "<p>Evening. Lots of chatter here, great. I always would strongly recommend putting Dataverse behind some kind of reverse proxy</p>",
+        "id": 448948667,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040507
+    },
+    {
+        "content": "<p>You can configure Payara to serve on 80 and 443 easily enough but adding an SSL cert to Payara is a nightmare.</p>",
+        "id": 448948676,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720040511
+    },
+    {
+        "content": "<p>In production we (Harvard) front with Apache but you could use nginx or whatever.</p>",
+        "id": 448948767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720040533
+    },
+    {
+        "content": "<p>SSL certi is not a concern, I have an SSL layer termination in front of each service</p>",
+        "id": 448948802,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040550
+    },
+    {
+        "content": "<p>Then you already have a reverse proxy / load balancer in place and are probably good to go</p>",
+        "id": 448948901,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040597
+    },
+    {
+        "content": "<p>I was just wondering if the built-in webserver is \"enough\"</p>",
+        "id": 448948912,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040605
+    },
+    {
+        "content": "<p>alright thanks :)</p>",
+        "id": 448948924,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040608
+    },
+    {
+        "content": "<p>If you can make that ingress handler take care of routing as well, that's even better</p>",
+        "id": 448948960,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040624
+    },
+    {
+        "content": "<p>Yep I do</p>",
+        "id": 448948982,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040631
+    },
+    {
+        "content": "<p>Great. Sound like you're good to got then.</p>",
+        "id": 448949032,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040653
+    },
+    {
+        "content": "<p>I'll report back and share the stack configuration too</p>",
+        "id": 448949096,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040667
+    },
+    {
+        "content": "<p>there are some differences between Swarm and Compose</p>",
+        "id": 448949135,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040686
+    },
+    {
+        "content": "<p>Keep in mind that when you want to use the ip groups feature you need to make your LB/RP send headers with the original addresses and apply some config to make Dataverse accept those</p>",
+        "id": 448949179,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040708
+    },
+    {
+        "content": "<p>yes that will be probably tricky. is that documented somewhere?</p>",
+        "id": 448949231,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040729
+    },
+    {
+        "content": "<p>It should be IIRC at the IP groups page</p>",
+        "id": 448949285,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040749
+    },
+    {
+        "content": "<p>OK thanks</p>",
+        "id": 448949307,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720040754
+    },
+    {
+        "content": "<p>Hmm seems like it's not on that page. Let me dig around the guides</p>",
+        "id": 448950100,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720040918
+    },
+    {
+        "content": "<p>Ah it's in this section: <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#blocking-api-endpoints\">https://guides.dataverse.org/en/latest/installation/config.html#blocking-api-endpoints</a></p>",
+        "id": 448950343,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041014
+    },
+    {
+        "content": "<p>It's this config option: <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#dataverse-useripaddresssourceheader\">https://guides.dataverse.org/en/latest/installation/config.html#dataverse-useripaddresssourceheader</a></p>",
+        "id": 448950476,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041076
+    },
+    {
+        "content": "<p>I'm afraid it's one if those leftover options we did not yet enable to set using MPCOnFIG. We're still working on that. But that's not the case with the coronawhy images, too</p>",
+        "id": 448950652,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041144
+    },
+    {
+        "content": "<p>If you're interested in supporting us to get Dataverse containerization production ready, feel free to join the working group meetings. Deets on <a href=\"https://ct.gdcc.io\">https://ct.gdcc.io</a>. Anything helps, all feedback is appreciated, coordinated PRs are very welcome.</p>",
+        "id": 448950952,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041270
+    },
+    {
+        "content": "<p>Thanks Oliver, I'll check the docs and let's see how far I get. If I can free up some time, I will also help of course!</p>",
+        "id": 448951222,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041398
+    },
+    {
+        "content": "<p>Still fighting with the services, they crash after 3 minutes</p>",
+        "id": 448951272,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041424
+    },
+    {
+        "content": "<p>Which ones?</p>",
+        "id": 448951313,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041446
+    },
+    {
+        "content": "<p>It would be very weird if Solr or Postgres crash after 3 minutes</p>",
+        "id": 448951343,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041462
+    },
+    {
+        "content": "<p>dataverse. Probably some communication problem with the network</p>",
+        "id": 448951354,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041468
+    },
+    {
+        "content": "<p>[Entrypoint] running /opt/payara/scripts/init_3_wait_dataverse_db_host.sh<br>\nOperation timed out</p>",
+        "id": 448951430,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041488
+    },
+    {
+        "content": "<p>Ah!</p>",
+        "id": 448951442,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041494
+    },
+    {
+        "content": "<p>i'll check if the ports and internal DNS is correctly working</p>",
+        "id": 448951449,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041501
+    },
+    {
+        "content": "<p>Yes, that sound like you need to check the networking part</p>",
+        "id": 448951483,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041520
+    },
+    {
+        "content": "<p>That script is a poor man's workaround for our compose file not being able to work with healthchecks yet</p>",
+        "id": 448951570,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041569
+    },
+    {
+        "content": "<p>whatever works ;)</p>",
+        "id": 448951616,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041587
+    },
+    {
+        "content": "<p>forgot to attach the backend network to dataverse, that should be it...</p>",
+        "id": 448951703,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041613
+    },
+    {
+        "content": "<p>(deleted)</p>",
+        "id": 448951714,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041617
+    },
+    {
+        "content": "<p>Oh OK</p>",
+        "id": 448951738,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041624
+    },
+    {
+        "content": "<p>only the one which is shared with the load balancer was attached to the dataverse service</p>",
+        "id": 448951929,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041712
+    },
+    {
+        "content": "<p>ok, i see some success ;)  <code>Boot Command create-system-properties returned with result SUCCESS :</code></p>",
+        "id": 448951942,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041722
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/UKpATqNHdzbTQJXvRJ3ucETf/Screenshot-2024-07-03-at-23.22.18.png\">Screenshot-2024-07-03-at-23.22.18.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/UKpATqNHdzbTQJXvRJ3ucETf/Screenshot-2024-07-03-at-23.22.18.png\" title=\"Screenshot-2024-07-03-at-23.22.18.png\"><img src=\"/user_uploads/53090/UKpATqNHdzbTQJXvRJ3ucETf/Screenshot-2024-07-03-at-23.22.18.png\"></a></div>",
+        "id": 448952011,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041747
+    },
+    {
+        "content": "<p>You need to watch out for sth along the lines of \"application dataverse deployed at /\"</p>",
+        "id": 448952058,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041770
+    },
+    {
+        "content": "<p>Depending on your resources this is usually done after 60 to 120 secs</p>",
+        "id": 448952100,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041793
+    },
+    {
+        "content": "<p>Did you add the bootstrapping thing in your swarm setup?</p>",
+        "id": 448952138,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041815
+    },
+    {
+        "content": "<p>yep</p>",
+        "id": 448952146,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041820
+    },
+    {
+        "content": "<p>looks good :) running</p>",
+        "id": 448952158,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041827
+    },
+    {
+        "content": "<p>Great. Once you see that one succeeding you're good to go</p>",
+        "id": 448952177,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041839
+    },
+    {
+        "content": "<p>so you mean it's still configuring?</p>",
+        "id": 448952263,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041864
+    },
+    {
+        "content": "<p>Yes. The Payara page means the appserver is responding</p>",
+        "id": 448952307,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041892
+    },
+    {
+        "content": "<p>Deploying a large webapp like Dataverse taken some time</p>",
+        "id": 448952338,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041908
+    },
+    {
+        "content": "<p>This is not Django <span aria-label=\"grinning face with smiling eyes\" class=\"emoji emoji-1f601\" role=\"img\" title=\"grinning face with smiling eyes\">:grinning_face_with_smiling_eyes:</span></p>",
+        "id": 448952358,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041919
+    },
+    {
+        "content": "<p>i hope so ;)</p>",
+        "id": 448952404,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041934
+    },
+    {
+        "content": "<p>Usually Java webapps are made to run a lot longer than you take time for starting them... <span aria-label=\"melting face\" class=\"emoji emoji-1fae0\" role=\"img\" title=\"melting face\">:melting_face:</span></p>",
+        "id": 448952487,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720041965
+    },
+    {
+        "content": "<p>i see a bunch of warnings and one error (regarding log4j, which seems to fall back to simple logging)</p>",
+        "id": 448952488,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041968
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/amEb45QbZEyA8Xk6Ml9kNHeJ/Screenshot-2024-07-03-at-23.26.33.png\">Screenshot-2024-07-03-at-23.26.33.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/amEb45QbZEyA8Xk6Ml9kNHeJ/Screenshot-2024-07-03-at-23.26.33.png\" title=\"Screenshot-2024-07-03-at-23.26.33.png\"><img src=\"/user_uploads/53090/amEb45QbZEyA8Xk6Ml9kNHeJ/Screenshot-2024-07-03-at-23.26.33.png\"></a></div>",
+        "id": 448952534,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720041999
+    },
+    {
+        "content": "<p>Most of these errors are expected. Good friends, we don't want to miss them</p>",
+        "id": 448952541,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042005
+    },
+    {
+        "content": "<p>ok, that looks working</p>",
+        "id": 448952544,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042007
+    },
+    {
+        "content": "<p>Yes!</p>",
+        "id": 448952553,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042014
+    },
+    {
+        "content": "<p>The real test now is creating a dataset and uploading a file</p>",
+        "id": 448952588,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042029
+    },
+    {
+        "content": "<p>That's usually a good smoketest</p>",
+        "id": 448952601,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042039
+    },
+    {
+        "content": "<p>Because it also means you configured your storage successfully</p>",
+        "id": 448952617,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042052
+    },
+    {
+        "content": "<p>yep :) i'll try</p>",
+        "id": 448952673,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042079
+    },
+    {
+        "content": "<p>i have not configured the admin port yet though</p>",
+        "id": 448952758,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042103
+    },
+    {
+        "content": "<p>Don't hate us for the messy configuration stuff. We're actively working on improving that. It's a lot... <span aria-label=\"innocent\" class=\"emoji emoji-1f607\" role=\"img\" title=\"innocent\">:innocent:</span></p>",
+        "id": 448952791,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042124
+    },
+    {
+        "content": "<p>Even in classic installations the amount of stuff to configure can be overwhelming</p>",
+        "id": 448952831,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042151
+    },
+    {
+        "content": "<p>The admin port of what? Payara?</p>",
+        "id": 448952863,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042169
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/ox8CkXRc1o6CAEihEP755h2X/Screenshot-2024-07-03-at-23.30.26.png\">Screenshot-2024-07-03-at-23.30.26.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ox8CkXRc1o6CAEihEP755h2X/Screenshot-2024-07-03-at-23.30.26.png\" title=\"Screenshot-2024-07-03-at-23.30.26.png\"><img src=\"/user_uploads/53090/ox8CkXRc1o6CAEihEP755h2X/Screenshot-2024-07-03-at-23.30.26.png\"></a></div>",
+        "id": 448953051,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042234
+    },
+    {
+        "content": "<p>That looks promising!</p>",
+        "id": 448953072,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042249
+    },
+    {
+        "content": "<p>yep, i see the data on the shared filesystem</p>",
+        "id": 448953104,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042263
+    },
+    {
+        "content": "<p>Phew!</p>",
+        "id": 448953134,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042278
+    },
+    {
+        "content": "<p>i thought the admin port for Payara is needed for further configuration</p>",
+        "id": 448953135,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042278
+    },
+    {
+        "content": "<p>sorry, i am a noob with dataverse ;) but I have my right hand for that</p>",
+        "id": 448953155,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042290
+    },
+    {
+        "content": "<p>Nope, you usually don't need to touch that</p>",
+        "id": 448953168,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042294
+    },
+    {
+        "content": "<p>You can use it, but it's annoying and it won't help you with database options</p>",
+        "id": 448953295,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042333
+    },
+    {
+        "content": "<p>alright, thanks so far! i'll clean up the swarm configuration the next days and them publish them in case someone is interested</p>",
+        "id": 448953407,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042373
+    },
+    {
+        "content": "<p>and i'll check the ip header forwarding. i guess currently everyone has the same IP address (the one from the first layer docker instance of the load balancer ;)</p>",
+        "id": 448953532,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042418
+    },
+    {
+        "content": "<p>If you want, feel free to create an issue at IQSS/dataverse and open a PR to include this in the guides. We probably should talk about a good place for it, but it would nice to include it. Give people options</p>",
+        "id": 448953647,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042459
+    },
+    {
+        "content": "<p>Personally I wouldn't go for Swarm and opt for K8s, but it's a valid option if you're OK with  the vendor thing.</p>",
+        "id": 448953750,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042520
+    },
+    {
+        "content": "<p>at some point I might convert all our IT services to K8s but currently we live with that ;) I like it to be honest, it's easy to maintain and I have tons of ansible playbooks to automate things like redeployment, backups and details like certificate management</p>",
+        "id": 448953908,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042598
+    },
+    {
+        "content": "<p>Whatever works for you folks!</p>",
+        "id": 448953971,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042627
+    },
+    {
+        "content": "<p>That's the nice thing about containers. So many options</p>",
+        "id": 448953999,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042645
+    },
+    {
+        "content": "<p>i thought about going all in with K8s but my hope was that some of the students help out. Swarm is quite easy to get started with if you already know Docker :D</p>",
+        "id": 448954005,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042649
+    },
+    {
+        "content": "<p>Indeed.. that might however also be a bad thing ;)</p>",
+        "id": 448954036,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042668
+    },
+    {
+        "content": "<p>the lisp curse... <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 448954110,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042688
+    },
+    {
+        "content": "<p>alright, have to go, thanks again</p>",
+        "id": 448954160,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042716
+    },
+    {
+        "content": "<p>See you around. <span aria-label=\"moon\" class=\"emoji emoji-1f319\" role=\"img\" title=\"moon\">:moon:</span></p>",
+        "id": 448954181,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042729
+    },
+    {
+        "content": "<p>i'll try to join on thursday</p>",
+        "id": 448954188,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042731
+    },
+    {
+        "content": "<p>It's next week!</p>",
+        "id": 448954219,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042739
+    },
+    {
+        "content": "<p>ah ok ;D</p>",
+        "id": 448954264,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042749
+    },
+    {
+        "content": "<p>Tomorrow is a holiday in the US</p>",
+        "id": 448954265,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042749
+    },
+    {
+        "content": "<p>So no meeting until Thursday next week</p>",
+        "id": 448954296,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720042764
+    },
+    {
+        "content": "<p>ah yeah, reminds me i wanted to watch that movie again</p>",
+        "id": 448954314,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720042773
+    }
+]

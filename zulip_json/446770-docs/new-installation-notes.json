@@ -1,0 +1,200 @@
+[
+    {
+        "content": "<p>Hello. I am trying to do an installation of Dataverse from scratch using the official guides. I will note my observations here as I go through the motions.</p>",
+        "id": 626649709,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790262575
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1438x288\" data-original-src=\"/user_uploads/53090/qFmscwQTvGi3XS05s5AdXCJz/image.png\" src=\"/user_uploads/thumbnail/53090/qFmscwQTvGi3XS05s5AdXCJz/image.png/840x560.webp\"></p>\n<p>It appears that this recommendation is outdated: <a href=\"https://guides.dataverse.org/en/latest/installation/prerequisites.html\">https://guides.dataverse.org/en/latest/installation/prerequisites.html</a></p>\n<p>That specific setting does not exist in the domain.xml anymore</p>",
+        "id": 626649974,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790262628
+    },
+    {
+        "content": "<p>It should also be noted for any developers who use tools like mise-en-place (maybe just me?), that the install process does not play well with shims, and the standard dnf java install is highly preferred</p>",
+        "id": 626650420,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790262725
+    },
+    {
+        "content": "<p>The official recommendation is still PSQL 16, which is what I'll be doing to see if I'm hitting any issues</p>",
+        "id": 626651613,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790262958
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1432x376\" data-original-src=\"/user_uploads/53090/8HVq-iBqiEvkb-imbTtfvAba/image.png\" src=\"/user_uploads/thumbnail/53090/8HVq-iBqiEvkb-imbTtfvAba/image.png/840x560.webp\"><br>\nThere's no context behind this statement, I would've skipped it if not for a discussion with Gemini. I only had to change \"scram-sha-256\" to \"md5\"</p>",
+        "id": 626653885,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790263446
+    },
+    {
+        "content": "<p>There is a small mention about the installer using postgres pwd auth, but by default postgres does not use pwd auth. Maybe it would make sense to add a step about creating a password. If the installer truly does require a password, this might confuse every person trying to install the software<br>\nsudo -u postgres psql<br>\nALTER USER postgres WITH PASSWORD 'your_secure_password';<br>\n\\q</p>",
+        "id": 626655064,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790263715
+    },
+    {
+        "content": "<p>This is all great stuff! Thanks, <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span>! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"> </p>\n<p>While you're in there, maybe you can tell us if we still need these lines I'm highlighting:</p>\n<p><img alt=\"Screenshot 2026-09-24 at 11.41.04 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1074x217\" data-original-src=\"/user_uploads/53090/AyrHUYrSKkXGB5lU-p883_-9/Screenshot-2026-09-24-at-11.41.04AM.png\" src=\"/user_uploads/thumbnail/53090/AyrHUYrSKkXGB5lU-p883_-9/Screenshot-2026-09-24-at-11.41.04AM.png/840x560.webp\"></p>\n<p>We just discussed them at standup and put it on the tech hours <a href=\"https://docs.google.com/document/d/1xVD_Xi5OYlJnU1scEDQv5jjEIovu1GZDuilxwpgorpo/edit?usp=sharing\">agenda</a> to ask <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> if we still need them.</p>",
+        "id": 626658867,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790264551
+    },
+    {
+        "content": "<p>I am not entirely sure. We defo need the chown dataverse line, but I'm not sure if we chown the lib back to root. I ran chown dataverse /usr/local/payara7 fully instead of just lib because I was running into some odd permissions issues</p>",
+        "id": 626675128,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790268439
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1489x683\" data-original-src=\"/user_uploads/53090/bsf35XBSQlW8OfxRIeLF743F/image.png\" src=\"/user_uploads/thumbnail/53090/bsf35XBSQlW8OfxRIeLF743F/image.png/840x560.webp\"><br>\nUseradd does not create a password by default. We want to run \"su - solr\" to become the solr user, but it is not possible to log into that user unless you run \"sudo passwd solr\" and set a password beforehand. Or we want to point at \"<code>sudo -u solr -i</code>\"</p>",
+        "id": 626678956,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790269302
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1489x330\" data-original-src=\"/user_uploads/53090/_wouhONA2j1klsw3ER4Lmib4/image.png\" src=\"/user_uploads/thumbnail/53090/_wouhONA2j1klsw3ER4Lmib4/image.png/840x560.webp\"><br>\nAlthough it seems blindingly obvious, there is no mention of needing to download a release previously in the guide within the prereq section. So if I was installing this from scratch, right during the solr step I would think \"Wait, I needed a release downloaded already? Do I download it now? Do I do it as the solr user which I am currently logged into? Or should I exit?\"</p>",
+        "id": 626680665,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790269718
+    },
+    {
+        "content": "<p><a href=\"https://archive.apache.org/dist/solr/solr/9.8.0/solr-9.8.0.tgz\">https://archive.apache.org/dist/solr/solr/9.8.0/solr-9.8.0.tgz</a></p>\n<p>This link for downloading solr seems to be severely throttled, never rising above 200KB/s while I'm on a 3 Gigabit connection according to <a href=\"http://fast.com\">fast.com</a></p>\n<p>That's about 30mins to an hour just to download this file. If at all possible, we might want to look into pointing at high speed mirrors</p>",
+        "id": 626685595,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790271075
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> on Solr. Dataverse only uses certain versions of Solr, and mirrors only mirror the most/more recent major/minor versions. So we use <a href=\"http://archive.apache.org\">archive.apache.org</a>, which is indeed throttled.</p>",
+        "id": 626689669,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1790272063
+    },
+    {
+        "content": "<p>We can build a free bypass using Cloudflare R2 and a SHA file if we need to. But, thanks for the comment! I was just confused if the terminal was frozen.</p>",
+        "id": 626690159,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790272170
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/new-installation-notes/near/626680665\">said</a>:</p>\n<blockquote>\n<p>there is no mention of needing to download a release previously in the guide within the prereq section</p>\n</blockquote>\n<p>Hmm, good point. How about this change?</p>\n<p>OLD: You should already have a “dvinstall.zip” file that you downloaded from <a href=\"https://github.com/IQSS/dataverse/releases\">https://github.com/IQSS/dataverse/releases</a> .</p>\n<p>NEW: Download “dvinstall.zip” from <a href=\"https://github.com/IQSS/dataverse/releases\">https://github.com/IQSS/dataverse/releases</a> .</p>",
+        "id": 626690695,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790272305
+    },
+    {
+        "content": "<p>it should happen before we switch into the solr user, yes? So right before that step would be good?</p>",
+        "id": 626690866,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790272352
+    },
+    {
+        "content": "<p>No strong preference. It's not the end of the world if the solr user unzips dvinstall.zip into /tmp.</p>",
+        "id": 626692072,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790272657
+    },
+    {
+        "content": "<p>I was confused looking at the phrasing here. /etc/security/limits.conf is a readonly file that requires sudo to write to. the solr user is not a sudoer. So does this mean that the init script takes care of this part automatically? Or should I switch from solr to root and switch back to solr? There doesn't appear to be guidance on when to be solr, when not to, or if it even matters. </p>\n<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1489x617\" data-original-src=\"/user_uploads/53090/EKNCGZCi_yXpPGoAHBg4qrlr/image.png\" src=\"/user_uploads/thumbnail/53090/EKNCGZCi_yXpPGoAHBg4qrlr/image.png/840x560.webp\"></p>",
+        "id": 626694678,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790273253
+    },
+    {
+        "content": "<p>I also remember being told or seeing somewhere that sudo/root privileges will not be required to install Dataverse, but at least in my personal experience on Rocky 10, this has not been the case. Two best examples are the useradd command and this limits.conf file. Maybe its worth noting this somewhere in case the person trying to install the software doesn't have sudo privs on the machine? Or maybe it possible to go around these without sudo too? Just something I observed during the process</p>",
+        "id": 626695638,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790273492
+    },
+    {
+        "content": "<p>The nproc stuff was added in <a href=\"https://github.com/IQSS/dataverse/commit/d5df4882be283da11426386ca25c354ce3728203\">https://github.com/IQSS/dataverse/commit/d5df4882be283da11426386ca25c354ce3728203</a> by <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> so let's ask him. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 626698015,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790274100
+    },
+    {
+        "content": "<p>Hmm, maybe under <a href=\"https://guides.dataverse.org/en/6.12/installation/prerequisites.html#linux\">https://guides.dataverse.org/en/6.12/installation/prerequisites.html#linux</a> we can note that root access is required for certain operations such as creating service users.</p>",
+        "id": 626698554,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790274243
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1489x255\" data-original-src=\"/user_uploads/53090/QWJScEJ9-ecRCMCE5CD4VdRf/image.png\" src=\"/user_uploads/thumbnail/53090/QWJScEJ9-ecRCMCE5CD4VdRf/image.png/840x560.webp\"><br>\nThese commands will not be running at this point as it requires solr.service to be running systemd or otherwise. It might make sense to move this section to the part after when solr is already running</p>",
+        "id": 626703130,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790275419
+    },
+    {
+        "content": "<p>Sure, sounds good.</p>",
+        "id": 626705490,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790275933
+    },
+    {
+        "content": "<p>Thanks again for doing this exercise! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 626705558,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790275946
+    },
+    {
+        "content": "<p>What's your overall impression so far? That installing Dataverse is overwhelming??! <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 626705719,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790275986
+    },
+    {
+        "content": "<p>The docs are surprisingly well written. Kudos to the entire team</p>",
+        "id": 626705851,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790276029
+    },
+    {
+        "content": "<p>These are minor friction points that I just wanted to note and put out there. On a normal day, I would just blink past them</p>",
+        "id": 626705927,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790276052
+    },
+    {
+        "content": "<p>Ok, phew. I must admit that I haven't run through them in a LOOONG time. When I need a Dataverse server, I use dataverse-ansible.</p>",
+        "id": 626706184,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790276121
+    },
+    {
+        "content": "<p>Speaks to how good dataverse-ansible has become!</p>",
+        "id": 626706582,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790276239
+    },
+    {
+        "content": "<p>Now nobody has to read that wall of text you're reading! <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 626706840,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790276312
+    },
+    {
+        "content": "<p>The installing R section requires some prereqs that don't appear in the doc and will fail for anyone trying to set up R. I would consider this a mission-critical path as tabular ingest for .R files will not go through without R installed. We have hit this issue before where not having R installed would block all kinds of uploads that included an R file. This may cause the installation to fail silently.<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1415x1655\" data-original-src=\"/user_uploads/53090/J4-8UVyjGQP2sKKYrhGXR540/image.png\" src=\"/user_uploads/thumbnail/53090/J4-8UVyjGQP2sKKYrhGXR540/image.png/840x560.webp\"><br>\nI am going to include some commands that helped me</p>",
+        "id": 626710196,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790277204
+    },
+    {
+        "content": "<p><code>sudo dnf install -y \\\n  gcc \\\n  gcc-c++ \\\n  make \\\n  cmake \\\n  autoconf \\\n  automake \\\n  openssl-devel \\\n  libcurl-devel \\\n  libxml2-devel \\\n  zlib-devel \\\n  bzip2-devel \\\n  xz-devel \\\n  R-core \\\n  R-core-devel</code></p>\n<p>This is the list of prereqs you would require to install the R libraries. Usually on a normal dev system, this would be masked by <code>sudo dnf groupinstall \"Development Tools\"</code></p>",
+        "id": 626710683,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790277329
+    },
+    {
+        "content": "<p>Command to install the packages:<br>\n<code>sudo Rscript -e '\npkgs &lt;- c(\"R2HTML\", \"rjson\", \"DescTools\", \"Rserve\", \"haven\")\ninstall.packages(\n  pkgs, \n  repos = \"https://cloud.r-project.org/\", \n  lib = \"/usr/lib64/R/library\", \n  Ncpus = parallel::detectCores()\n)\n'</code></p>\n<p>Command to test the packages installed:<br>\n<code>Rscript -e '\npkgs &lt;- c(\"R2HTML\", \"rjson\", \"DescTools\", \"Rserve\", \"haven\")\nresults &lt;- sapply(pkgs, require, character.only = TRUE, quietly = TRUE)\nprint(results)\nif (!all(results)) {\n  cat(\"\\nFailed to load:\", names(results)[!results], \"\\n\")\n  quit(status = 1)\n} else {\n  cat(\"\\nAll R packages verified successfully.\\n\")\n}\n'\n</code></p>",
+        "id": 626710878,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790277384
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/new-installation-notes/near/626710196\">said</a>:</p>\n<blockquote>\n<p>mission-critical path as tabular ingest for .R files will not go through without R installed.</p>\n</blockquote>\n<p>Not everyone shares UNC enthusiasm for ingesting .RData files. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> Please see <a href=\"https://github.com/IQSS/dataverse/issues/7249\">#7249</a>. But sure, let's fix the docs for the people who want to keep it working!</p>",
+        "id": 626714387,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790278256
+    }
+]

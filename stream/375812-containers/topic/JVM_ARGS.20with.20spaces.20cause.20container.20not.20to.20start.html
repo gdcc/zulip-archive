@@ -1,0 +1,109 @@
+<html>
+<head><meta charset="utf-8"><title>JVM_ARGS with spaces cause container not to start · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html">JVM_ARGS with spaces cause container not to start</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="625855330"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/625855330" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#625855330">(Sep 21 2026 at 20:57)</a>:</h4>
+<p>Reported here: <a href="https://github.com/IQSS/dataverse/issues/12731">#12731</a></p>
+<p>Any ideas?</p>
+
+
+
+<a name="626713775"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626713775" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626713775">(Sep 24 2026 at 19:28)</a>:</h4>
+<p>Plenty.</p>
+
+
+
+<a name="626713853"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626713853" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626713853">(Sep 24 2026 at 19:28)</a>:</h4>
+<p>Should I respond here or there?</p>
+
+
+
+<a name="626714819"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626714819" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626714819">(Sep 24 2026 at 19:32)</a>:</h4>
+<p>Buh, there, please! I don't think rpoet-jh is here in Zulip.</p>
+
+
+
+<a name="626716396"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626716396" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626716396">(Sep 24 2026 at 19:40)</a>:</h4>
+<p>Done.</p>
+
+
+
+<a name="626716749"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626716749" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626716749">(Sep 24 2026 at 19:41)</a>:</h4>
+<p>For those reading or searching around here, this was the original question:</p>
+<blockquote>
+<p>Start <code>gdcc/dataverse</code> with JVM_ARGS containing a system property that has a space in the value.</p>
+<p>For example:</p>
+<p><code>
+-Ddataverse.pid.providers=fake
+-Ddataverse.pid.default-provider=fake
+-Ddataverse.pid.fake.type=FAKE
+-Ddataverse.pid.fake.label="Fake DOI Provider"
+</code><br>
+* When does this issue occur?</p>
+<p>When using the docker container <code>gdcc/dataverse</code>, if JVM_ARGS contains system properties that have spaces, the container fails to start. I suspect it is the way JVM_ARGS is being interpolated in one of the startup scripts in the <code>gdcc/dataverse</code> container.</p>
+</blockquote>
+<p>Here's my answer:</p>
+<blockquote>
+<ul>
+<li>Please do not use JVM_ARGS with PID provider options. These options are already using MPCONFIG, so you can use any of the methods extensively described in the guides on how to set those (env vars, files, ...). Our Docker Compose files have some examples. That should eliminate any escaping business from 2. for good.</li>
+<li>The reason your quotes don't work are due to the fact how the variable is forwarded to the JVM. By the time the JVM receives the arguments, the quotes are gone - Bash has had them for lunch. So you'd need to escape them as <code>\"</code> if you really want to stick with the JVM_ARGS way.</li>
+</ul>
+</blockquote>
+
+
+
+<a name="626717673"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626717673" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626717673">(Sep 24 2026 at 19:45)</a>:</h4>
+<p>Hmm, in <a href="https://github.com/IQSS/dataverse/issues/12713">#12713</a> I'm still using JVM args, like this:</p>
+<div class="codehilite"><pre><span></span><code>-Ddataverse.pid.dc1.type=datacite
+-Ddataverse.pid.dc1.label=DataCite
+</code></pre></div>
+<p>I was careful not to add a space in the label!</p>
+<p>So we should switch our PID config in our compose files from JVM args to MPConfig, right?</p>
+<p>These:</p>
+<ul>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12/docker/compose/demo/compose.yml#L23">https://github.com/IQSS/dataverse/blob/v6.12/docker/compose/demo/compose.yml#L23</a></li>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12/docker-compose-dev.yml#L57">https://github.com/IQSS/dataverse/blob/v6.12/docker-compose-dev.yml#L57</a></li>
+</ul>
+
+
+
+<a name="626742057"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626742057" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626742057">(Sep 24 2026 at 21:58)</a>:</h4>
+<p>Yes, absolutely switch them.</p>
+
+
+
+<a name="626742095"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626742095" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626742095">(Sep 24 2026 at 21:58)</a>:</h4>
+<p>It might be easier at some point to just use a TOML file.</p>
+
+
+
+<a name="626742196"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626742196" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626742196">(Sep 24 2026 at 21:59)</a>:</h4>
+<p>If someone has any funding left, happy to do an overhaul of the storage subsystem. Make it use MPCONFIG and cleanup tech debt. That is one of the last things we cannot use MPCONFIG with unfortunately.</p>
+
+
+
+<a name="626921760"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/JVM_ARGS%20with%20spaces%20cause%20container%20not%20to%20start/near/626921760" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/JVM_ARGS.20with.20spaces.20cause.20container.20not.20to.20start.html#626921760">(Sep 25 2026 at 15:24)</a>:</h4>
+<p>Apart from the PID label, is there any other JVM arg that might want a space? <span aria-label="thinking" class="emoji emoji-1f914" role="img" title="thinking">:thinking:</span></p>
+
+
+
+<hr><p>Last updated: Sep 26 2026 at 17:33 UTC</p>
+</html>

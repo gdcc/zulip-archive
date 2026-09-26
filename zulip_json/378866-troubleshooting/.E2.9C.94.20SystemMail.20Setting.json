@@ -1,0 +1,200 @@
+[
+    {
+        "content": "<p>UVA has upgraded from V6.2 to V6.5, <br>\nNow we need to get the dataverse.mail.system-email setting set.</p>\n<p>We do not have MicroConfig, so I know I need to add this setting to JVM, but what is the syntax? And where in the domain.xml file should it go?</p>",
+        "id": 503886249,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741293639
+    },
+    {
+        "content": "<p>In domain.xml, it should be put near the other \"dataverse\" lines.</p>",
+        "id": 503886667,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741293825
+    },
+    {
+        "content": "<p>You can probably copy and paste a similar setting and tweak it.</p>",
+        "id": 503886754,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741293850
+    },
+    {
+        "content": "<p>I have this one that I think I can tweak?</p>",
+        "id": 503886786,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741293866
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>\n</code></pre></div>\n\n<p>&lt;jvm-options&gt;-Ddataverse.<strong>bagit</strong>.sourceorg.email=libra@virginia.edu&lt;/jvm-options&gt;</p>",
+        "id": 503886800,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741293872
+    },
+    {
+        "content": "<p>sure, great example</p>",
+        "id": 503886832,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741293885
+    },
+    {
+        "content": "<p>OK, where was this in the release notes?<br>\nI only found out looking at the log file.</p>",
+        "id": 503886900,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741293907
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>% ack system-email doc/release-notes\ndoc/release-notes/6.2-release-notes.md\n81:Once reconfiguration is complete, you should remove legacy, unused config. First, run `asadmin delete-javamail-resource mail/notifyMailSession` as described in the [6.1 guides](https://guides.dataverse.org/en/6.2/installation/installation-main.html#mail-host-configuration-authentication). Then run `curl -X DELETE http://localhost:8080/api/admin/settings/:SystemEmail` as this database setting has been replace with `dataverse.mail.system-email` as described below.\n83:Please note: as there have been problems with email delivered to SPAM folders when the &quot;From&quot; within mail envelope and the mail session configuration didn&#39;t match (#4210), as of this version the sole source for the &quot;From&quot; address is the setting `dataverse.mail.system-email` once you migrate to the new way of configuration.\n347:- dataverse.mail.system-email\n</code></pre></div>",
+        "id": 503887017,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741293958
+    },
+    {
+        "content": "<p>\"Simplified SMTP Configuration\" at <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.2\">https://github.com/IQSS/dataverse/releases/tag/v6.2</a></p>",
+        "id": 503887141,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741293997
+    },
+    {
+        "content": "<p>Oh... I was looking in V6.3,<br>\nthanks.</p>",
+        "id": 503887152,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741294001
+    },
+    {
+        "content": "<p>We're trying to simplify your life. <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 503887176,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741294011
+    },
+    {
+        "content": "<p>I usually only look at the \"Upgrade Instructions\" thinking that's where the \"to do\" things are.</p>\n<p>I should be reading the whole release <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 503887798,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741294265
+    },
+    {
+        "content": "<p>Hmm, that's good feedback. /cc <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span></p>",
+        "id": 503888036,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741294354
+    },
+    {
+        "content": "<p>I agree. Better to have the \"to do\" stuff together under upgrade instructions.</p>",
+        "id": 503888096,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741294380
+    },
+    {
+        "content": "<p>This is a very big change, and we have not had emails working for 3 months (I see now). I am trying to following the guide, but not sure how?</p>\n<p>Do I need to set these as well:<br>\n<a href=\"https://guides.dataverse.org/en/6.2/installation/config.html#dataverse-mail-mta\">https://guides.dataverse.org/en/6.2/installation/config.html#dataverse-mail-mta</a></p>\n<p>Since I did not set up SMTP, only added the :SystemMail DB setting.</p>\n<p>I am not sure what to do.</p>\n<p>So far I have added  dataverse.mail.system-email, and  dataverse.mail.support-email to domain.xml</p>\n<p>Do I need to add the other \".mta\" lines?</p>",
+        "id": 503890396,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741295212
+    },
+    {
+        "content": "<p>Yes, I believe so.</p>",
+        "id": 503890750,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295339
+    },
+    {
+        "content": "<p>Although...</p>",
+        "id": 503890791,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295355
+    },
+    {
+        "content": "<p>In that 6.2 release note we say \"deprecated\" on \"removed\" right?</p>",
+        "id": 503890833,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295376
+    },
+    {
+        "content": "<p>Does the old way still work? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 503890851,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295382
+    },
+    {
+        "content": "<p>As usual, I'll run to <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> who always has a better idea of how to actually run Dataverse than I do. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 503891041,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295452
+    },
+    {
+        "content": "<p>We are at V6.5,</p>\n<p>I clicked \"Support\" link at the top and have not received the email from our Dataverse.</p>\n<p>But notifications work - when creating a dataset and publishing, so I think email is working, just not support-email.</p>",
+        "id": 503891073,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741295465
+    },
+    {
+        "content": "<p>Oh, interesting.</p>",
+        "id": 503891112,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295481
+    },
+    {
+        "content": "<p>I'm glad email is working in general. Phew!</p>",
+        "id": 503891144,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295493
+    },
+    {
+        "content": "<p>Now that I have those two line in JVM, I'll stop/start payara (I need to do that, right).</p>\n<p>And try email again.</p>",
+        "id": 503891275,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741295531
+    },
+    {
+        "content": "<p>yeah, you have to restart</p>",
+        "id": 503891303,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741295543
+    },
+    {
+        "content": "<p>Hello, just getting off a call - Sherry, are you all set?</p>",
+        "id": 503894171,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1741296578
+    },
+    {
+        "content": "<p>OK, now am getting emails from \"Support\" link.</p>\n<p>Am set now.... and more importantly.... the \"depreciated\" message in our log files have stopped:</p>\n<p><code>The :**SystemMail** DB setting has been deprecated, please reconfigure using JVM option dataverse.mail.system-email]]</code></p>",
+        "id": 503894623,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741296722
+    },
+    {
+        "content": "<p>Those only print when it sends an e-mail, but yes it's nice to quiet them down. Are you as big into soccer as baseball?</p>",
+        "id": 503894797,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1741296766
+    },
+    {
+        "content": "<p>Oh.... but I've got 5270 lines in the most recent server.log</p>",
+        "id": 503894936,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741296815
+    },
+    {
+        "content": "<p>I follow soccer, but baseball is my in-person game. I have season tickets to UVA baseball. I go to UVA soccer games when the weather is nice.</p>",
+        "id": 503895099,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741296868
+    },
+    {
+        "content": "<p>Interesting! There is one server I've been meaning to update. I asked about soccer because the reason for shifting DCM by a day got announced today <a href=\"https://goheels.com/news/2025/3/4/general-mexican-and-turkish-mens-soccer-national-teams-to-meet-june-10-at-kenan-stadium\">https://goheels.com/news/2025/3/4/general-mexican-and-turkish-mens-soccer-national-teams-to-meet-june-10-at-kenan-stadium</a></p>",
+        "id": 503895248,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1741296926
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin ☀️</span>  <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"> <br>\nNow off to find reasons for a externaltools.zipPreviewer.displayname warning....</p>\n<p>Might be a new troubleshooting topic tomorrow..... <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 503896133,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741297307
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599826\">Sherry Lake</span> has marked this topic as resolved.</p>",
+        "id": 503896235,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1741297337
+    }
+]

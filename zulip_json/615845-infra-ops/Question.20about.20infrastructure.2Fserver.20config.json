@@ -1,0 +1,116 @@
+[
+    {
+        "content": "<p>Since <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> was so kind as to create this channel .. I'll ask the first (of likely many) question(s)! </p>\n<ul>\n<li>Will start basic .. sysadmins, what does your infrastructure look like? </li>\n<li>Are you in the cloud, or on-prem? </li>\n<li>What OS do you run Dataverse on? </li>\n<li>Do you have a 1) single server for webapp+solr+ext tools or 2) a server for app, server for microservices, solr, external apps, 3) some other config? </li>\n<li>What are your server specs (ie: cpu, ram, etc)</li>\n<li>Do you run external tools locally on the app or services server, or point to the public repo?</li>\n</ul>\n<p>In the spirit of sharing, at ASU we are: </p>\n<ul>\n<li>all in AWS </li>\n<li>running Rocky Linux 8 still </li>\n<li>have a server for web app and a server for SOLR .. but are going to combine soon (w/b m6a.2xlarge - 8CPU/32GRAM) </li>\n<li>we point to repo for some external tools (ie: previewers, data exp) but have some installed locally .. after doing the above will create a \"services\" server to install/run all locally; we actually have a third instance for Globus transfer app but I will combine that with the other services and tools on the \"services\" server</li>\n</ul>\n<p>Any thoughts on running dataverse+solr on the same server? </p>\n<p>I guess that was multiple questions, but hopefully all related.</p>",
+        "id": 608797206,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783445512
+    },
+    {
+        "content": "<p>Harvard Dataverse is in the cloud, on AWS.</p>\n<p>We run on some variant of Red Hat, either RHEL or Rocky.</p>\n<p>We're on multiple servers, described here: <a href=\"https://guides.dataverse.org/en/6.11/installation/prep.html#advanced-installation\">https://guides.dataverse.org/en/6.11/installation/prep.html#advanced-installation</a></p>",
+        "id": 608800654,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783446296
+    },
+    {
+        "content": "<p>Here's a pic:</p>\n<p><img alt=\"3webservers.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"611x686\" data-original-src=\"/user_uploads/53090/5uO8CbQhSSD7EkO4Y_bWETs8/3webservers.png\" src=\"/user_uploads/thumbnail/53090/5uO8CbQhSSD7EkO4Y_bWETs8/3webservers.png/840x560.webp\"></p>",
+        "id": 608800734,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783446309
+    },
+    {
+        "content": "<p>Our specs are described here: <a href=\"https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements\">https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements</a></p>\n<p>Namely:</p>\n<ul>\n<li>two instances for web frontends running Payara fronted by Apache (“m4.4xlarge” with 64 GB RAM and 16 vCPUs)<ul>\n<li>these are sitting behind an AWS ELB load balancer</li>\n</ul>\n</li>\n<li>one instance for the Solr search engine (“m4.2xlarge” with 32 GB RAM and 8 vCPUs)</li>\n<li>one instance for R (“m4.xlarge” instances with 16 GB RAM and 4 vCPUs)</li>\n<li>The PostgreSQL database is served by Amazon RDS.</li>\n</ul>",
+        "id": 608801043,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783446381
+    },
+    {
+        "content": "<p>We point to the public gdcc repo for external tools, like this: <a href=\"https://gdcc.github.io/dataverse-previewers/previewers/v1.5/SpreadsheetPreview.html\">https://gdcc.github.io/dataverse-previewers/previewers/v1.5/SpreadsheetPreview.html</a></p>",
+        "id": 608801331,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783446452
+    },
+    {
+        "content": "<p>Ah yea, I've seen this .. something for us to strive to! <br>\nInteresting, so you are running the database on the instance and not in RDS? </p>\n<p>And, are those 2 (3?) webserver instances permanent or does the LB utilize autoscaling? And on-demand instances, or reserved? We may need to increase our specs.</p>\n<p>And you have SOLR separate .. well maybe we should leave ours as is. Good to know you are using the repo for external tools too.</p>\n<p>Thanks for the response! Would love to know what other orgs are doing. I know a few have mentioned that they have webapp+solr on a single server.</p>",
+        "id": 608803168,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783446904
+    },
+    {
+        "content": "<p>Thanks for moving the other issues into this channel .. some I had not seen and a lot of good answers.</p>",
+        "id": 608803475,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783446974
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/615845-infra-ops/topic/Question.20about.20infrastructure.2Fserver.20config/near/608803168\">said</a>:</p>\n<blockquote>\n<p>Interesting, so you are running the database on the instance and not in RDS?</p>\n</blockquote>\n<p>Oh! Excellent point! That diagram is out of date. We use RDS.</p>",
+        "id": 608803627,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783447001
+    },
+    {
+        "content": "<p>I just edited the message above to include this line from the guides:</p>\n<p>\"The PostgreSQL database is served by Amazon RDS.\"</p>",
+        "id": 608803852,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783447050
+    },
+    {
+        "content": "<p>I would help myself a lot more if I just read through the entire section in the guides.</p>",
+        "id": 608804733,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783447211
+    },
+    {
+        "content": "<p>I mean, it hasn't been updated it a while, but please be my guest! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 608806216,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783447565
+    },
+    {
+        "content": "<p>That whole <a href=\"https://guides.dataverse.org/en/6.11/installation/prep.html#hardware-requirements\">Preparation</a> page is really helpful. As is Jim's <a href=\"https://guides.dataverse.org/en/latest/admin/big-data-administration.html\">scaling tips</a> page.</p>",
+        "id": 608809580,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783448629
+    },
+    {
+        "content": "<p>Does Harvard run community-dev'd applications (ie: metrics, globus transfer, rdm dash, python scripts, etc) .. on a separate server from these, or on the existing web server(s)?</p>",
+        "id": 608810269,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783448856
+    },
+    {
+        "content": "<p>Separate. The servers mentioned above are dedicated to production.</p>",
+        "id": 608810734,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783449004
+    },
+    {
+        "content": "<p>New instance I'm setting up will run on Nomad with containers with configuration/microProfile as part of Nomad Vault.</p>",
+        "id": 609157701,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1783582441
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> did you lads ever run your containers on Fargate and if so, what was the experience?</p>",
+        "id": 609164793,
+        "sender_full_name": "Thomas van Erven",
+        "timestamp": 1783584619
+    },
+    {
+        "content": "<p>If we're using Fargate, I'm not aware of it. <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> would know.</p>",
+        "id": 609196727,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783594419
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"720428\">@Thomas van Erven</span> if you get things running on Fargate I would be very interested as we are moving many of our services for other apps there (ECS). Even if we could just run SOLR there that would be cool.</p>",
+        "id": 609469646,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783693461
+    },
+    {
+        "content": "<p>Actually, thinking more about it .. if we could run SOLR in ECS with the current installation that would be immense. We are running it on a separate instance now, so shouldn't that work? Going to see if I can make that happen. We eventually do want to go to the container installation, but for now that would be helpful.</p>",
+        "id": 609525827,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1783710258
+    }
+]

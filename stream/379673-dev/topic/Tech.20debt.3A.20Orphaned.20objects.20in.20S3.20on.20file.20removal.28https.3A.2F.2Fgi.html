@@ -1,0 +1,114 @@
+<html>
+<head><meta charset="utf-8"><title>Tech debt: Orphaned objects in S3 on file removal(https://gi · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html">Tech debt: Orphaned objects in S3 on file removal(https://gi</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="625046369"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/625046369" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Janvi Kapoor <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#625046369">(Sep 17 2026 at 18:03)</a>:</h4>
+<p>Hi @Cheng Shi, @Philip Durbin, and team <span aria-label="wave" class="emoji emoji-1f44b" role="img" title="wave">:wave:</span></p>
+<p>Starting this thread to discuss <strong>issue <a href="https://github.com/IQSS/dataverse/issues/1073">#1073</a></strong> (<a href="https://github.com/IQSS/dataverse-frontend/issues/1073">https://github.com/IQSS/dataverse-frontend/issues/1073</a>).</p>
+<p><strong>Context:</strong> While reviewing the file upload flow in <code>UploadedFilesList.tsx</code>, I noticed a couple of <code>TODO</code> comments:</p>
+<p>TypeScript</p>
+<div class="codehilite"><pre><span></span><code>// TODO - Remove the file from the S3 bucket we need an API endpoint for this.
+</code></pre></div>
+<p>Currently, when files are directly uploaded to S3 and a user later clicks "Remove" (<code>X</code>) or "Remove Selected" from the staging list before saving the dataset, the files are cleared from the frontend form state, but the uploaded objects remain orphaned in the S3 bucket.</p>
+<p><strong>Discussion Points:</strong></p>
+<ol>
+<li>
+<p>Should we introduce a backend endpoint in core Dataverse to explicitly delete/abort uncommitted direct upload items?</p>
+</li>
+<li>
+<p>Or is the intended architecture to rely on S3 lifecycle rules / bucket expiration policies for unreferenced/temp objects?</p>
+</li>
+</ol>
+<p>Would love to hear your thoughts on how we should approach this!</p>
+
+
+
+<a name="626657675"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626657675" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626657675">(Sep 24 2026 at 15:38)</a>:</h4>
+<p>We just talked about this during the frontend meeting and I wanted to at least point out this API endpoint: <a href="https://guides.dataverse.org/en/6.12/api/native-api.html#cleanup-storage-of-a-dataset">https://guides.dataverse.org/en/6.12/api/native-api.html#cleanup-storage-of-a-dataset</a></p>
+<p>That endpoint is a way to cleanup orphaned files that were uploaded but never attached to a dataset in a database sense.</p>
+
+
+
+<a name="626686632"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626686632" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Janvi Kapoor <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626686632">(Sep 24 2026 at 17:35)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>    Thanks for pointing this out, That makes a lot of sense., Given that <code>api/datasets/{id}/cleanStorage</code> handles sweeping orphaned S3 objects that were never finalized in the database, does the team prefer:, 1. Leaving cleanup entirely to this backend mechanism (and updating/removing the inline TODOs in <code>UploadedFilesList.tsx</code> and <code>FileUploaderPanel.tsx</code> with a reference to this behavior), or, 2. Adding a lightweight, immediate file-level deletion call on the frontend when the user clicks 'Remove' during draft staging?, Happy to adjust the TODO comments or open a PR documenting/handling whichever pattern fits the architecture best!</p>
+
+
+
+<a name="626705098"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626705098" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626705098">(Sep 24 2026 at 18:50)</a>:</h4>
+<p>Hi! First, I wanted to reproduce the bug myself and I just did, leaving a comment here: <a href="https://github.com/IQSS/dataverse-frontend/issues/1073#issuecomment-5820169072">https://github.com/IQSS/dataverse-frontend/issues/1073#issuecomment-5820169072</a></p>
+<p>I think I like your option 2, that clicking "remove" should remove the file from S3. See also my comment where I clicked "cancel". That should probably be handled too.</p>
+
+
+
+<a name="626711951"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626711951" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Janvi Kapoor <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626711951">(Sep 24 2026 at 19:21)</a>:</h4>
+<p>Thanks <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span>  Seeing the LocalStack output makes the issue super clear. Handling both the staged "Remove" action and the page-level "Cancel" button makes complete sense for Option 2.</p>
+<p>I just left a follow-up comment on issue exploring whether core Dataverse can issue presigned <code>DELETE</code> tokens for direct uploads or if a dedicated backend endpoint would be needed. </p>
+<p>Looking forward to hearing what the team thinks, and I'd love to implement the frontend handling for this once we lock down the backend approach!</p>
+
+
+
+<a name="626713349"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626713349" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626713349">(Sep 24 2026 at 19:26)</a>:</h4>
+<p>I just read your comment in the issue. I don't know anything about presigned DELETE tokens. For now,  do you want to try to get a delete working in LocalStack? Maybe we'll learn something. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="626714967"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626714967" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Janvi Kapoor <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626714967">(Sep 24 2026 at 19:33)</a>:</h4>
+<p>Thanks for the suggestion, <span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> </p>
+<p>Currently, my local machine is pretty constrained on disk space and resources, so spinning up the full LocalStack and Dataverse backend Docker containers locally isn't feasible for me right now. </p>
+<p>I'm very comfortable handling the React/TypeScript changes once the target delete mechanism or API pattern is established. In the meantime, I'll continue focusing on frontend bug fixes, hook refactoring, and test coverage across <code>dataverse-frontend</code></p>
+
+
+
+<a name="626715482"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626715482" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626715482">(Sep 24 2026 at 19:35)</a>:</h4>
+<p>Sure, no problem. <span class="user-mention" data-user-id="1035407">@Parth karalkar</span> was having the same problem. Dataverse is too fat to run on his local machine. <span aria-label="piglet" class="emoji emoji-1f437" role="img" title="piglet">:piglet:</span> </p>
+<p>Good to know that you can still do React/TS changes though! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="626718793"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626718793" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626718793">(Sep 24 2026 at 19:50)</a>:</h4>
+<p>No, we don't. Can we move that message to its own Zulip topic? Otherwise it's a little buried in this one.</p>
+
+
+
+<a name="626719270"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626719270" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Janvi Kapoor <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626719270">(Sep 24 2026 at 19:52)</a>:</h4>
+<p>No worries, I deleted the message to keep this thread focused on the issue!</p>
+
+
+
+<a name="626719767"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626719767" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626719767">(Sep 24 2026 at 19:54)</a>:</h4>
+<p>Oh, no worries. It's a good question! <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span> Please feel free to start a new topic in <a class="stream" data-stream-id="375707" href="/#narrow/channel/375707-community">#community</a> or <a class="stream" data-stream-id="379673" href="/#narrow/channel/379673-dev">#dev</a> even though you know the answer. <span aria-label="smile" class="emoji emoji-1f604" role="img" title="smile">:smile:</span></p>
+
+
+
+<a name="626742623"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626742623" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oliver Bertuch <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626742623">(Sep 24 2026 at 22:02)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> reading this it makes me wonder if JerseyTests would help with this as well. Maybe spinning up an S3 container is fine, but otherwise not having to deploy all of it just to test an isolated API for file storage would be great, wouldn't it?</p>
+
+
+
+<a name="626898562"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/Tech%20debt%3A%20Orphaned%20objects%20in%20S3%20on%20file%20removal%28https%3A//gi/near/626898562" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/Tech.20debt.3A.20Orphaned.20objects.20in.20S3.20on.20file.20removal.28https.3A.2F.2Fgi.html#626898562">(Sep 25 2026 at 14:00)</a>:</h4>
+<p>Well, the SPA only supports S3. So developers need an S3 service to work on the app.</p>
+
+
+
+<hr><p>Last updated: Sep 26 2026 at 17:33 UTC</p>
+</html>
