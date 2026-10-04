@@ -1,0 +1,266 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> Anyone <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> </p>\n<p>upgraded to V6.6, but after re-index (index in place), newly created dataset was not showing up in UI. Could get to it via direct link.</p>\n<p>So, did index \"clear\" </p>\n<p><code>curl http://localhost:8080/api/admin/index/clear</code></p>\n<p>and am now doing....</p>\n<p><code>curl http://localhost:8080/api/admin/index</code></p>\n<p>Nothing is showing up in UI:<br>\n<a href=\"http://dataverse.lib.virginia.edu\">http://dataverse.lib.virginia.edu</a></p>\n<p>But of course all data is there:</p>\n<p><a href=\"https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ZNR96G\">https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ZNR96G</a></p>",
+        "id": 521818797,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748889870
+    },
+    {
+        "content": "<p>Indexing individual file is working. And I finally see two unpublished datasets (as dataverseAdmin). But that's all.</p>",
+        "id": 521821304,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748890700
+    },
+    {
+        "content": "<p>Hi Sherry, what shows up in the Payara server.log during re-index? (Have you re-traced your steps through the Solr installation?)</p>",
+        "id": 521824117,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1748891594
+    },
+    {
+        "content": "<p>Hmm, I see four datasets at <a href=\"https://dataverse.lib.virginia.edu/dataverse/uva\">https://dataverse.lib.virginia.edu/dataverse/uva</a> and they're all published.</p>",
+        "id": 521824360,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748891689
+    },
+    {
+        "content": "<p>I agree with Don that seeing server.log will probably help.</p>",
+        "id": 521824568,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748891762
+    },
+    {
+        "content": "<p>We have a local metadata block....</p>\n<p>AND our solr is on another box..... that we MUST put through github and terraform???? or teamcity???<br>\nI didn't do that part....</p>\n<p>I downloaded both solrconfig.xml and schema.xml.</p>\n<p>I ran <a href=\"http://update-fields.sh\">update-fields.sh</a> (command from the installation instructions) on the downloaded schema.xml.</p>\n<p>Then I had to put both solrconfig.xml and schema.xml in version control and over to github... where my sysadmin (Tim), picked up.</p>\n<p>He did all that part in addition to the updated solr version.</p>",
+        "id": 521827516,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748892801
+    },
+    {
+        "content": "<p>Here are the most recent SEVERE errors:</p>\n<blockquote>\n<p>[2025-06-02T19:31:43.545+0000] [Payara 6.2025.2] [SEVERE] [] [jakarta.enterprise.resource.webcontainer.faces.context] [tid: _ThreadID=93 _ThreadName=http-thread-pool::jk-connector(4)] [timeMillis: 1748892703545] [levelValue: 1000] [[</p>\n<p>jakarta.faces.view.facelets.TagAttributeException: /dataset.xhtml @75,75 test=\"#{empty DatasetPage.croissant}\" /dataset.xhtml @75,75 test=\"#{empty DatasetPage.croissant}\": java.lang.NullPointerException: Cannot invoke \"edu.harvard.iq.dataverse.DatasetVersion.isPublished()\" because \"this.workingVersion\" is null</p>\n<p>jakarta.faces.view.facelets.TagAttributeException: /dataset.xhtml @75,75 test=\"#{empty DatasetPage.croissant}\" /dataset.xhtml @75,75 test=\"#{empty DatasetPage.croissant}\": java.lang.NullPointerException: Cannot invoke \"edu.harvard.iq.dataverse.DatasetVersion.isPublished()\" because \"this.workingVersion\" is null</p>\n<p>at com.sun.faces.facelets.tag.TagAttributeImpl.getObject(TagAttributeImpl.java:291)</p>\n<p>at com.sun.faces.facelets.tag.TagAttributeImpl.getBoolean(TagAttributeImpl.java:107)</p>\n<p>at com.sun.faces.facelets.tag.jstl.core.ChooseWhenHandler.isTestTrue(ChooseWhenHandler.java:46)</p>\n<p>at com.sun.faces.facelets.tag.jstl.core.ChooseHandler.apply(ChooseHandler.java:63)</p>\n<p>at jakarta.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:57)</p>\n<p>at jakarta.faces.view.facelets.DelegatingMetaTagHandler.applyNextHandler(DelegatingMetaTagHandler.java:163)</p>\n<p>at com.sun.faces.facelets.tag.faces.ComponentTagHandlerDelegateImpl.apply(ComponentTagHandlerDelegateImpl.java:177)</p>\n<p>at jakarta.faces.view.facelets.DelegatingMetaTagHandler.apply(DelegatingMetaTagHandler.java:139)</p>\n<p>at com.sun.faces.facelets.tag.ui.DefineHandler.applyDefinition(DefineHandler.java:63)</p>\n<p>at com.sun.faces.facelets.tag.ui.CompositionHandler.apply(CompositionHandler.java:161)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFaceletContext$TemplateManager.apply(DefaultFaceletContext.java:358)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFaceletContext.includeDefinition(DefaultFaceletContext.java:329)</p>\n<p>at com.sun.faces.facelets.tag.ui.InsertHandler.apply(InsertHandler.java:69)</p>\n<p>at jakarta.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:57)</p>\n<p>at com.sun.faces.facelets.tag.faces.core.FacetHandler.apply(FacetHandler.java:61)</p>\n<p>at jakarta.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:57)</p>\n<p>at jakarta.faces.view.facelets.DelegatingMetaTagHandler.applyNextHandler(DelegatingMetaTagHandler.java:163)</p>\n<p>at com.sun.faces.facelets.tag.faces.ComponentTagHandlerDelegateImpl.apply(ComponentTagHandlerDelegateImpl.java:177)</p>\n<p>at jakarta.faces.view.facelets.DelegatingMetaTagHandler.apply(DelegatingMetaTagHandler.java:139)</p>\n<p>at jakarta.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:57)</p>\n<p>at com.sun.faces.facelets.tag.faces.core.ViewHandler.apply(ViewHandler.java:172)</p>\n<p>at jakarta.faces.view.facelets.CompositeFaceletHandler.apply(CompositeFaceletHandler.java:57)</p>\n<p>at com.sun.faces.facelets.compiler.NamespaceHandler.apply(NamespaceHandler.java:52)</p>\n<p>at com.sun.faces.facelets.compiler.EncodingHandler.apply(EncodingHandler.java:46)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFacelet.include(DefaultFacelet.java:265)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFacelet.include(DefaultFacelet.java:318)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFacelet.include(DefaultFacelet.java:301)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFaceletContext.includeFacelet(DefaultFaceletContext.java:154)</p>\n<p>at com.sun.faces.facelets.tag.ui.CompositionHandler.apply(CompositionHandler.java:129)</p>\n<p>at com.sun.faces.facelets.compiler.NamespaceHandler.apply(NamespaceHandler.java:52)</p>\n<p>at com.sun.faces.facelets.compiler.EncodingHandler.apply(EncodingHandler.java:46)</p>\n<p>at com.sun.faces.facelets.impl.DefaultFacelet.apply(DefaultFacelet.java:132)</p>\n<p>at com.sun.faces.application.view.FaceletViewHandlingStrategy.buildView(FaceletViewHandlingStrategy.java:331)</p>\n<p>at com.sun.faces.application.view.FaceletViewHandlingStrategy.restoreView(FaceletViewHandlingStrategy.java:252)</p>\n<p>at com.sun.faces.application.view.MultiViewHandler.restoreView(MultiViewHandler.java:126)</p>\n<p>at jakarta.faces.application.ViewHandlerWrapper.restoreView(ViewHandlerWrapper.java:96)</p>\n<p>at jakarta.faces.application.ViewHandlerWrapper.restoreView(ViewHandlerWrapper.java:96)</p>\n<p>at jakarta.faces.application.ViewHandlerWrapper.restoreView(ViewHandlerWrapper.java:96)</p>\n<p>at org.omnifaces.viewhandler.OmniViewHandler.restoreView(OmniViewHandler.java:113)</p>\n<p>at com.sun.faces.lifecycle.RestoreViewPhase.execute(RestoreViewPhase.java:162)</p>\n<p>at com.sun.faces.lifecycle.Phase.doPhase(Phase.java:72)</p>\n<p>at com.sun.faces.lifecycle.RestoreViewPhase.doPhase(RestoreViewPhase.java:96)</p>\n<p>at com.sun.faces.lifecycle.LifecycleImpl.execute(LifecycleImpl.java:131)</p>\n<p>at jakarta.faces.webapp.FacesServlet.executeLifecyle(FacesServlet.java:691)</p>\n<p>at jakarta.faces.webapp.FacesServlet.service(FacesServlet.java:449)</p>\n<p>at org.apache.catalina.core.StandardWrapper.service(StandardWrapper.java:1554)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:331)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)</p>\n<p>at org.glassfish.tyrus.servlet.TyrusServletFilter.doFilter(TyrusServletFilter.java:83)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)</p>\n<p>at org.ocpsoft.rewrite.servlet.RewriteFilter.doFilter(RewriteFilter.java:226)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:253)</p>\n<p>at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:211)</p>\n<p>at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:257)</p>\n<p>at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:166)</p>\n<p>at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)</p>\n<p>at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)</p>\n<p>at com.sun.enterprise.web.WebPipeline.invoke(WebPipeline.java:99)</p>\n<p>at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:158)</p>\n<p>at org.apache.catalina.core.StandardPipeline.doInvoke(StandardPipeline.java:757)</p>\n<p>at org.apache.catalina.core.StandardPipeline.invoke(StandardPipeline.java:577)</p>\n</blockquote>",
+        "id": 521828306,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748893069
+    },
+    {
+        "content": "<p>at org.apache.catalina.connector.CoyoteAdapter.doService(CoyoteAdapter.java:369)</p>\n<p>at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:239)</p>\n<p>at com.sun.enterprise.v3.services.impl.ContainerMapper$HttpHandlerCallable.call(ContainerMapper.java:520)</p>\n<p>at com.sun.enterprise.v3.services.impl.ContainerMapper.service(ContainerMapper.java:217)</p>\n<p>at org.glassfish.grizzly.http.server.HttpHandler.runService(HttpHandler.java:174)</p>\n<p>at org.glassfish.grizzly.http.server.HttpHandler.doHandle(HttpHandler.java:153)</p>\n<p>at org.glassfish.grizzly.http.server.HttpServerFilter.handleRead(HttpServerFilter.java:196)</p>\n<p>at org.glassfish.grizzly.filterchain.ExecutorResolver$9.execute(ExecutorResolver.java:88)</p>\n<p>at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeFilter(DefaultFilterChain.java:246)</p>\n<p>at org.glassfish.grizzly.filterchain.DefaultFilterChain.executeChainPart(DefaultFilterChain.java:178)</p>\n<p>at org.glassfish.grizzly.filterchain.DefaultFilterChain.execute(DefaultFilterChain.java:118)</p>\n<p>at org.glassfish.grizzly.filterchain.DefaultFilterChain.process(DefaultFilterChain.java:96)</p>\n<p>at org.glassfish.grizzly.ProcessorExecutor.execute(ProcessorExecutor.java:51)</p>\n<p>at org.glassfish.grizzly.nio.transport.TCPNIOTransport.fireIOEvent(TCPNIOTransport.java:510)</p>\n<p>at org.glassfish.grizzly.strategies.AbstractIOStrategy.fireIOEvent(AbstractIOStrategy.java:82)</p>\n<p>at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)</p>\n<p>at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)</p>\n<p>at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)</p>\n<p>at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)</p>\n<p>at java.base/java.lang.Thread.run(Thread.java:840)</p>\n<p>Caused by: jakarta.el.ELException: /dataset.xhtml @75,75 test=\"#{empty DatasetPage.croissant}\": java.lang.NullPointerException: Cannot invoke \"edu.harvard.iq.dataverse.DatasetVersion.isPublished()\" because \"this.workingVersion\" is null</p>\n<p>at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:77)</p>\n<p>at com.sun.faces.facelets.tag.TagAttributeImpl.getObject(TagAttributeImpl.java:289)</p>\n<p>... 81 more</p>\n<p>Caused by: jakarta.el.ELException: java.lang.NullPointerException: Cannot invoke \"edu.harvard.iq.dataverse.DatasetVersion.isPublished()\" because \"this.workingVersion\" is null</p>\n<p>at jakarta.el.BeanELResolver.getValue(BeanELResolver.java:351)</p>\n<p>at com.sun.faces.el.DemuxCompositeELResolver._getValue(DemuxCompositeELResolver.java:139)</p>\n<p>at com.sun.faces.el.DemuxCompositeELResolver.getValue(DemuxCompositeELResolver.java:164)</p>\n<p>at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:302)</p>\n<p>at org.glassfish.expressly.parser.AstValue.getValue(AstValue.java:144)</p>\n<p>at org.glassfish.expressly.parser.AstEmpty.getValue(AstEmpty.java:44)</p>\n<p>at org.glassfish.expressly.ValueExpressionImpl.getValue(ValueExpressionImpl.java:138)</p>\n<p>at org.jboss.weld.module.web.el.WeldValueExpression.getValue(WeldValueExpression.java:50)</p>\n<p>at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:73)</p>\n<p>... 82 more</p>\n<p>Caused by: java.lang.NullPointerException: Cannot invoke \"edu.harvard.iq.dataverse.DatasetVersion.isPublished()\" because \"this.workingVersion\" is null</p>\n<p>at edu.harvard.iq.dataverse.DatasetPage.isThisLatestReleasedVersion(DatasetPage.java:5964)</p>\n<p>at edu.harvard.iq.dataverse.DatasetPage.getCroissant(DatasetPage.java:5984)</p>\n<p>at jdk.internal.reflect.GeneratedMethodAccessor1211.invoke(Unknown Source)</p>\n<p>at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</p>\n<p>at java.base/java.lang.reflect.Method.invoke(Method.java:569)</p>\n<p>at jakarta.el.BeanELResolver.getValue(BeanELResolver.java:346)</p>\n<p>... 90 more</p>\n<p>]]</p>\n<div class=\"codehilite\"><pre><span></span><code>\n</code></pre></div>",
+        "id": 521828319,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748893074
+    },
+    {
+        "content": "<p>That Croissant bug will be fixed by PR <a href=\"https://github.com/IQSS/dataverse/issues/11476\">#11476</a> in 6.7</p>",
+        "id": 521830290,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748893751
+    },
+    {
+        "content": "<p>I just ran the index continue... and it said that only \"2\" datasets were to be indexed?</p>\n<p><code>curl http://localhost:8080/api/admin/index/continue</code></p>\n<p>I know that these are rather LARGE datasets - in number of files (over 6,000). These are the only two messages in my log when I ran the above command.</p>\n<p>[2025-06-02T19:42:53.501+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.IndexBatchServiceBean] [tid: _ThreadID=216 _ThreadName=__ejb-thread-pool4] [timeMillis: 1748893373501] [levelValue: 800] [[<br>\n  indexing dataset 1 of 2 (id=81905)]]</p>\n<p>[2025-06-02T19:43:06.510+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.IndexBatchServiceBean] [tid: _ThreadID=216 _ThreadName=__ejb-thread-pool4] [timeMillis: 1748893386510] [levelValue: 800] [[<br>\n  indexing dataset 2 of 2 (id=36552)]]</p>",
+        "id": 521830529,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748893833
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> so that croissant bug isn't the problem?</p>\n<p>I need to look for another error?</p>\n<p>Or Can I just run the index command again?<br>\nThis one: <code>curl http://localhost:8080/api/admin/index</code></p>",
+        "id": 521830665,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748893898
+    },
+    {
+        "content": "<p>Did you upgrade to Solr 9.8.0? That's part of the <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.6\">6.6 release notes</a>.</p>",
+        "id": 521830836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748893948
+    },
+    {
+        "content": "<p>Yes, 9.8.</p>",
+        "id": 521831184,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894099
+    },
+    {
+        "content": "<p>Another large dataset showed up (14,814 files).</p>",
+        "id": 521831250,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894126
+    },
+    {
+        "content": "<p>Ok, so the index is empty to start with. And now you're trying to do the initial indexing?</p>",
+        "id": 521831279,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894138
+    },
+    {
+        "content": "<p>Yes, I ran.<br>\n<code>curl http://localhost:8080/api/admin/index/clear</code></p>\n<p>Then the index command:<br>\n<code>curl http://localhost:8080/api/admin/index</code></p>",
+        "id": 521831430,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894192
+    },
+    {
+        "content": "<p>Reason why I cleared, is because after the upgrade, I created a dataset (draft), but it did not show up in the collection. It was there, I got to it by the URL, but it didn't display in dataset listing.... so I thought the solr index needed re-indexing....</p>",
+        "id": 521831817,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894332
+    },
+    {
+        "content": "<p>I wonder if you should clear the index timestamps... <a href=\"https://guides.dataverse.org/en/6.6/admin/solr-search-index.html#clear-index-timestamps\">https://guides.dataverse.org/en/6.6/admin/solr-search-index.html#clear-index-timestamps</a></p>",
+        "id": 521831956,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894385
+    },
+    {
+        "content": "<p>To be honest, I haven't done this in quite a while.</p>",
+        "id": 521832076,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894413
+    },
+    {
+        "content": "<p>You're saying <code>curl http://localhost:8080/api/admin/index</code> only showed \"indexing dataset 1 of 2\"? That doesn't sound right.</p>",
+        "id": 521832266,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894473
+    },
+    {
+        "content": "<p>The \"continue\" endpoint: <br>\n<code>curl http://localhost:8080/api/admin/index/continue</code></p>",
+        "id": 521832395,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894521
+    },
+    {
+        "content": "<p>Ok, that might make sense.</p>",
+        "id": 521832461,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894533
+    },
+    {
+        "content": "<p>Anything else in server.log after you do <code>/clear</code> and <code>/index</code>?</p>",
+        "id": 521832614,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894589
+    },
+    {
+        "content": "<p>Such as a complaint about a field Solr doesn't know about?</p>",
+        "id": 521832665,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748894608
+    },
+    {
+        "content": "<p>has Tim verified that the updated solrconfig.xml and schema.xml show up in place on the Solr box (and does Terraform or other restart Solr on a conf file update?)</p>",
+        "id": 521832791,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1748894656
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> I'll ask.</p>\n<p>But I can see the solr mount point and checked that the solrconfig.xml there matches (diff) what I downloaded from the V6.6 installation instructions.</p>",
+        "id": 521833167,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894803
+    },
+    {
+        "content": "<p>And the schema.xml there does have my local metadata block fields.</p>",
+        "id": 521833313,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748894870
+    },
+    {
+        "content": "<p>Before I started the \"clear\", Tim restarted the \"core\".... I assume solr.</p>",
+        "id": 521833786,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748895050
+    },
+    {
+        "content": "<p>The problem I was trying to solve was.... a new dataset (created after upgrade) was not showing in the listing.</p>",
+        "id": 521834574,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748895210
+    },
+    {
+        "content": "<p>Right, I think you hit <a href=\"https://github.com/IQSS/dataverse/issues/11442\">#11442</a> which is fixed by <a href=\"https://github.com/IQSS/dataverse/issues/11476\">#11476</a>. If you're seeing this a lot you could disable the Croissant exporter until the fix ships in 6.7.</p>",
+        "id": 521834912,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748895325
+    },
+    {
+        "content": "<p>That new dataset... what if you index it? Does it show up in the listing?</p>",
+        "id": 521835063,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748895374
+    },
+    {
+        "content": "<p>Or you could edit its metadata to force indexing of just that dataset.</p>",
+        "id": 521835143,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748895404
+    },
+    {
+        "content": "<p>Ok, editing that newly creating dataset.... now it shows up - to me - it's draft.</p>\n<p>But I still don't see the other datasets (except the 5 that have appeared \"slowly\").</p>",
+        "id": 521835778,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748895611
+    },
+    {
+        "content": "<p>Ok, so you're having two problems:</p>\n<ul>\n<li>some (or all?) new datasets are not being indexed because of the Croissant bug, fixed in <a href=\"https://github.com/IQSS/dataverse/issues/11476\">#11476</a></li>\n<li>when doing an \"index all\", lots of datasets haven't been indexed yet (we need to see what's going on in server.log to troubleshoot)</li>\n</ul>",
+        "id": 521836144,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748895754
+    },
+    {
+        "content": "<p>Let's just get my dataset listings back:</p>\n<p>Should I remove the timestamps?<br>\n<a href=\"https://guides.dataverse.org/en/6.6/admin/solr-search-index.html#clear-index-timestamps\">https://guides.dataverse.org/en/6.6/admin/solr-search-index.html#clear-index-timestamps</a></p>\n<p>And try to re-run index OR just re-run index?<br>\ncurl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a></p>\n<p>Then I'll see what is in my log file. Nothing happening now in my log file.</p>",
+        "id": 521836842,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748896007
+    },
+    {
+        "content": "<p>I guess I'd suggest</p>\n<p><code>curl http://localhost:8080/api/admin/index/clear</code></p>\n<p>followed by</p>\n<p><code>curl http://localhost:8080/api/admin/index</code></p>",
+        "id": 521837197,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748896128
+    },
+    {
+        "content": "<p>Because you're starting from basically zero anyway (only 5 datasets indexed).</p>",
+        "id": 521837272,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748896158
+    },
+    {
+        "content": "<p>It is taking a long time to clear:<br>\n<code>curl http://localhost:8080/api/admin/index/clear</code></p>\n<blockquote>\n<p>[2025-06-02T20:29:45.734+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.SolrIndexServiceBean] [tid: _ThreadID=75 _ThreadName=http-thread-pool::http-listener-1(3)] [timeMillis: 1748896185734] [levelValue: 800] [[</p>\n<p>attempting to delete all Solr documents before a complete re-index]]</p>\n</blockquote>\n<p>Nothing else in the log... and prompt has not come back.</p>",
+        "id": 521838231,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748896445
+    },
+    {
+        "content": "<p>Ok.... now these.... but is this my \"clear index\" or something else:</p>\n<p>[2025-06-02T20:34:45.686+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.SearchServiceBean] [tid: _ThreadID=92 _ThreadName=http-thread-pool::jk-connector(3)] [timeMillis: 1748896485686] [levelValue: 800] [[</p>\n<p>Search Syntax Error: Error from server at <a href=\"http://dataverse-solr-production.private.production:8080/solr/collection1/select?q=*&amp;sort=dateSort+desc&amp;fl=*%2Cscore&amp;qt=%2Fselect&amp;facet=true&amp;facet.query=*&amp;facet.field=dvObjectType&amp;facet.field=metadata_type_ss&amp;facet.field=datasetType&amp;facet.field=dvCategory&amp;facet.field=metadataSource&amp;facet.field=publicationDate&amp;facet.field=publicationStatus&amp;facet.field=license&amp;facet.field=authorName_ss&amp;facet.field=subject_ss&amp;facet.field=authorAffiliation_ss&amp;facet.field=fileTypeGroupFacet&amp;facet.field=fileTag&amp;facet.field=fileAccess&amp;fq=subtreePaths%3A%22%2F1%2F221%22&amp;fq=authorAffiliation_ss%3A%22UVA+School+of+Architecture%22&amp;fq=authorName_ss%3A%22Wu%2C+Junyi%22&amp;fq=authorName_ss%3A%22Wrobel%2C+Elena%22&amp;fq=authorAffiliation_ss%3A%22Interdisciplinary+Program+in+Archaeology%2C+UVA+Arts+&amp;fq=dvObjectType%3A%28dataverses+OR+datasets%29&amp;fq=%7B%21join+from%3DdefinitionPointDocId+to%3Did+v%3D%24q1%7D&amp;hl=true&amp;hl.snippets=1&amp;hl.requireFieldMatch=true&amp;hl.fragsize=320&amp;hl.simple.pre=%3Cspan+class%3D%22search-term-match%22%3E&amp;hl.simple.post=%3C%2Fspan%3E&amp;hl.fl=resolution.Temporal&amp;hl.fl=3dLightingSetup&amp;hl.fl=distributionDate&amp;hl.fl=discipline&amp;hl.fl=contributorName&amp;hl.fl=coverage.Temporal&amp;hl.fl=datasetContactAffiliation&amp;hl.fl=journalArticleType&amp;hl.fl=datasetLevelErrorNotes&amp;hl.fl=state&amp;hl.fl=otherIdValue&amp;hl.fl=dateOfCollectionEnd&amp;hl.fl=studyAssayOrganism&amp;hl.fl=3dEquipment&amp;hl.fl=seriesName&amp;hl.fl=coverage.Spectral.Bandpass&amp;hl.fl=producerURL&amp;hl.fl=redshiftType&amp;hl.fl=astroFacility&amp;hl.fl=coverage.Depth&amp;hl.fl=3d3DTechnique&amp;hl.fl=authorName&amp;hl.fl=timeMethod&amp;hl.fl=depositor&amp;hl.fl=otherDataAppraisal&amp;hl.fl=coverage.Spectral.Wavelength&amp;hl.fl=CADFormat&amp;hl.fl=actionsToMinimizeLoss&amp;hl.fl=3dAltText&amp;hl.fl=literalQuestion&amp;hl.fl=distributorName&amp;hl.fl=journalVolume&amp;hl.fl=topicClassValue&amp;hl.fl=distributorAbbreviation&amp;hl.fl=publicationRelationType&amp;hl.fl=coverage.Polarization&amp;hl.fl=studyFactorType&amp;hl.fl=coverage.Spectral.CentralWavelength&amp;hl.fl=keywordTermURI&amp;hl.fl=3dWeight&amp;hl.fl=distributor&amp;hl.fl=dsPublicationDate&amp;hl.fl=topicClassification&amp;hl.fl=studyOtherDesignType&amp;hl.fl=externalContrib&amp;hl.fl=series&amp;hl.fl=dateOfDeposit&amp;hl.fl=coverage.Temporal.StartTime&amp;hl.fl=frequencyOfDataCollection&amp;hl.fl=socialScienceNotes&amp;hl.fl=country&amp;hl.fl=forumLink&amp;hl.fl=studyAssayPlatform&amp;hl.fl=interviewInstructions&amp;hl.fl=language&amp;hl.fl=keywordVocabulary&amp;hl.fl=coverage.ObjectCount&amp;hl.fl=objectType&amp;hl.fl=unitOfAnalysis&amp;hl.fl=keyword&amp;hl.fl=relatedMaterial&amp;hl.fl=variableUniverse&amp;hl.fl=targetSampleActualSize&amp;hl.fl=journalIssue&amp;hl.fl=publicationIDNumber&amp;hl.fl=coverage.ObjectDensity&amp;hl.fl=dataCollector&amp;hl.fl=grantNumberAgency&amp;hl.fl=3dExportedFilePolygonCount&amp;hl.fl=name&amp;hl.fl=fabTime&amp;hl.fl=contributorType&amp;hl.fl=notesText&amp;hl.fl=studyDesignType&amp;hl.fl=geographicCoverage&amp;hl.fl=3dWidth&amp;hl.fl=description&amp;hl.fl=resolution.Spatial&amp;hl.fl=title&amp;hl.fl=studyOtherFactorType&amp;hl.fl=3dObjectDimensions&amp;hl.fl=productionDate&amp;hl.fl=otherGeographicCoverage&amp;hl.fl=kindOfData&amp;hl.fl=socialScienceNotesSubject&amp;hl.fl=variableName&amp;hl.fl=studyAssayTechnologyType&amp;hl.fl=producerName&amp;hl.fl=targetSampleSizeFormula&amp;hl.fl=samplingErrorEstimates&amp;hl.fl=datasetContactEmail&amp;hl.fl=targetSampleSize&amp;hl.fl=disciplines&amp;hl.fl=universe&amp;hl.fl=resolution.Redshift&amp;hl.fl=grantNumberValue&amp;hl.fl=grantNumber&amp;hl.fl=cleaningOperations&amp;hl.fl=fileType&amp;hl.fl=dateOfCollectionStart&amp;hl.fl=software&amp;hl.fl=3dUnit&amp;hl.fl=responseRate&amp;hl.fl=geographicBoundingBox&amp;hl.fl=coverage.Redshift.MaximumValue&amp;hl.fl=bigIdea&amp;hl.fl=remixObjects&amp;hl.fl=affiliation_ss&amp;hl.fl=datasetContactName&amp;hl.fl=studyAssayOtherPlatform&amp;hl.fl=gradeLevel&amp;hl.fl=dsDescriptionDate&amp;hl.fl=socialScienceNotesText&amp;hl.fl=producerLogoURL&amp;hl.fl=consumableCost&amp;hl.fl=timePeriodCoveredStart&amp;hl.fl=socialScienceNotesType&amp;hl.fl=publicationIDType&amp;hl.fl=alternativeURL&amp;hl.fl=3dMasterFilePolygonCount&amp;hl.fl=fileTypeDisplay&amp;hl.fl=authorAffiliation&amp;hl.fl=astroType&amp;hl.fl=producerAffiliation&amp;hl.fl=subDiscipline&amp;hl.fl=subtitle&amp;hl.fl=authorIdentifierScheme&amp;hl.fl=softwareVersion&amp;hl.fl=coverage.SkyFraction&amp;hl.fl=city&amp;hl.fl=dsDescriptionValue&amp;hl.fl=characteristicOfSources&amp;hl.fl=coverage.Temporal.StopTime&amp;hl.fl=studyAssayOtherOrganism&amp;hl.fl=alternativeTitle&amp;hl.fl=topicClassVocabURI&amp;hl.fl=journalVolumeIssue&amp;hl.fl=externalAgency&amp;hl.fl=distributorURL&amp;hl.fl=reusableCost&amp;hl.fl=externalIdValue&amp;hl.fl=coverage.Spatial&amp;hl.fl=journalPubDate&amp;hl.fl=distributorAffiliation&amp;hl.fl=assemTime&amp;hl.fl=fileNameWithoutExtension&amp;hl.fl=sampleLearningGoals&amp;hl.fl=topicClassVocab&amp;hl.fl=originOfSources&amp;hl.fl=resolution.Spectral&amp;hl.fl=fabEquipment&amp;hl.fl=variableNotes&amp;hl.fl=westLongitude&amp;hl.fl=dsPersistentId&amp;hl.fl=contentStandards&amp;hl.fl=3dHeight&amp;hl.fl=dsDescription&amp;hl.fl=astroObject&amp;hl.fl=coverage.Spectral.MinimumWavelength&amp;hl.fl=variableLabel&amp;hl.fl=timePeriodCovered&amp;hl.fl=studyAssayOtherTechnologyType&amp;hl.fl=subject&amp;hl.fl=studyAssayOtherMeasurmentType&amp;hl.fl=accessToSources&amp;hl.fl=controlOperations&amp;hl.fl=samplingProcedure&amp;hl.fl=otherReferences&amp;hl.fl=coverage.Redshift.MinimumValue&amp;hl.fl=eastLongitude&amp;hl.fl=producerAbbreviation&amp;hl.fl=publication&amp;hl.fl=postQuestion&amp;hl.fl=fileTags&amp;hl.fl=dataSources&amp;hl.fl=distributorLogoURL&amp;hl.fl=filePersistentId&amp;hl.fl=otherIdAgency&amp;hl.fl=author&amp;hl.fl=publicationCitation&amp;hl.fl=productionPlace&amp;hl.fl=weighting&amp;hl.fl=softwareName&amp;hl.fl=3dExportedFileFormat&amp;hl.fl=producer&amp;hl.fl=publicationURL&amp;hl.fl=keywordValue&amp;hl.fl=3dHandling&amp;hl.fl=otherUseObject&amp;hl.fl=keywordVocabularyURI&amp;hl.fl=contributor&amp;hl.fl=northLatitude&amp;hl.fl=collectorTraining&amp;hl.fl=studyAssayCellType&amp;hl.fl=coverage.RedshiftValue&amp;hl.fl=3dMaterialComposition&amp;hl.fl=timePeriodCoveredEnd&amp;hl.fl=southLatitude&amp;hl.fl=dataCollectionSituation&amp;hl.fl=otherId&amp;hl.fl=dateOfCollection&amp;hl.fl=collectionMode&amp;hl.fl=deviationsFromSampleDesign&amp;hl.fl=coverage.Spectral.MaximumWavelength&amp;hl.fl=3dLength&amp;hl.fl=authorIdentifier&amp;hl.fl=relatedDatasets&amp;hl.fl=datasetContact&amp;hl.fl=researchInstrument&amp;hl.fl=astroInstrument&amp;hl.fl=seriesInformation&amp;hl.fl=studyAssayMeasurementType&amp;hl.fl=geographicUnit&amp;q1=discoverableBy%3A%28group_public+OR+group_builtIn%2Fall-users%29&amp;start=0&amp;rows=10&amp;wt=javabin&amp;version=2\">http://dataverse-solr-production.private.production:8080/solr/collection1/select?q=*&amp;sort=dateSort+desc&amp;fl=*%2Cscore&amp;qt=%2Fselect&amp;facet=true&amp;facet.query=*&amp;facet.field=dvObjectType&amp;facet.field=metadata_type_ss&amp;facet.field=datasetType&amp;facet.field=dvCategory&amp;facet.field=metadataSource&amp;facet.field=publicationDate&amp;facet.field=publicationStatus&amp;facet.field=license&amp;facet.field=authorName_ss&amp;facet.field=subject_ss&amp;facet.field=authorAffiliation_ss&amp;facet.field=fileTypeGroupFacet&amp;facet.field=fileTag&amp;facet.field=fileAccess&amp;fq=subtreePaths%3A%22%2F1%2F221%22&amp;fq=authorAffiliation_ss%3A%22UVA+School+of+Architecture%22&amp;fq=authorName_ss%3A%22Wu%2C+Junyi%22&amp;fq=authorName_ss%3A%22Wrobel%2C+Elena%22&amp;fq=authorAffiliation_ss%3A%22Interdisciplinary+Program+in+Archaeology%2C+UVA+Arts+&amp;fq=dvObjectType%3A%28dataverses+OR+datasets%29&amp;fq=%7B%21join+from%3DdefinitionPointDocId+to%3Did+v%3D%24q1%7D&amp;hl=true&amp;hl.snippets=1&amp;hl.requireFieldMatch=true&amp;hl.fragsize=320&amp;hl.simple.pre=%3Cspan+class%3D%22search-term-match%22%3E&amp;hl.simple.post=%3C%2Fspan%3E&amp;hl.fl=resolution.Temporal&amp;hl.fl=3dLightingSetup&amp;hl.fl=distributionDate&amp;hl.fl=discipline&amp;hl.fl=contributorName&amp;hl.fl=coverage.Temporal&amp;hl.fl=datasetContactAffiliation&amp;hl.fl=journalArticleType&amp;hl.fl=datasetLevelErrorNotes&amp;hl.fl=state&amp;hl.fl=otherIdValue&amp;hl.fl=dateOfCollectionEnd&amp;hl.fl=studyAssayOrganism&amp;hl.fl=3dEquipment&amp;hl.fl=seriesName&amp;hl.fl=coverage.Spectral.Bandpass&amp;hl.fl=producerURL&amp;hl.fl=redshiftType&amp;hl.fl=astroFacility&amp;hl.fl=coverage.Depth&amp;hl.fl=3d3DTechnique&amp;hl.fl=authorName&amp;hl.fl=timeMethod&amp;hl.fl=depositor&amp;hl.fl=otherDataAppraisal&amp;hl.fl=coverage.Spectral.Wavelength&amp;hl.fl=CADFormat&amp;hl.fl=actionsToMinimizeLoss&amp;hl.fl=3dAltText&amp;hl.fl=literalQuestion&amp;hl.fl=distributorName&amp;hl.fl=journalVolume&amp;hl.fl=topicClassValue&amp;hl.fl=distributorAbbreviation&amp;hl.fl=publicationRelationType&amp;hl.fl=coverage.Polarization&amp;hl.fl=studyFactorType&amp;hl.fl=coverage.Spectral.CentralWavelength&amp;hl.fl=keywordTermURI&amp;hl.fl=3dWeight&amp;hl.fl=distributor&amp;hl.fl=dsPublicationDate&amp;hl.fl=topicClassification&amp;hl.fl=studyOtherDesignType&amp;hl.fl=externalContrib&amp;hl.fl=series&amp;hl.fl=dateOfDeposit&amp;hl.fl=coverage.Temporal.StartTime&amp;hl.fl=frequencyOfDataCollection&amp;hl.fl=socialScienceNotes&amp;hl.fl=country&amp;hl.fl=forumLink&amp;hl.fl=studyAssayPlatform&amp;hl.fl=interviewInstructions&amp;hl.fl=language&amp;hl.fl=keywordVocabulary&amp;hl.fl=coverage.ObjectCount&amp;hl.fl=objectType&amp;hl.fl=unitOfAnalysis&amp;hl.fl=keyword&amp;hl.fl=relatedMaterial&amp;hl.fl=variableUniverse&amp;hl.fl=targetSampleActualSize&amp;hl.fl=journalIssue&amp;hl.fl=publicationIDNumber&amp;hl.fl=coverage.ObjectDensity&amp;hl.fl=dataCollector&amp;hl.fl=grantNumberAgency&amp;hl.fl=3dExportedFilePolygonCount&amp;hl.fl=name&amp;hl.fl=fabTime&amp;hl.fl=contributorType&amp;hl.fl=notesText&amp;hl.fl=studyDesignType&amp;hl.fl=geographicCoverage&amp;hl.fl=3dWidth&amp;hl.fl=description&amp;hl.fl=resolution.Spatial&amp;hl.fl=title&amp;hl.fl=studyOtherFactorType&amp;hl.fl=3dObjectDimensions&amp;hl.fl=productionDate&amp;hl.fl=otherGeographicCoverage&amp;hl.fl=kindOfData&amp;hl.fl=socialScienceNotesSubject&amp;hl.fl=variableName&amp;hl.fl=studyAssayTechnologyType&amp;hl.fl=producerName&amp;hl.fl=targetSampleSizeFormula&amp;hl.fl=samplingErrorEstimates&amp;hl.fl=datasetContactEmail&amp;hl.fl=targetSampleSize&amp;hl.fl=disciplines&amp;hl.fl=universe&amp;hl.fl=resolution.Redshift&amp;hl.fl=grantNumberValue&amp;hl.fl=grantNumber&amp;hl.fl=cleaningOperations&amp;hl.fl=fileType&amp;hl.fl=dateOfCollectionStart&amp;hl.fl=software&amp;hl.fl=3dUnit&amp;hl.fl=responseRate&amp;hl.fl=geographicBoundingBox&amp;hl.fl=coverage.Redshift.MaximumValue&amp;hl.fl=bigIdea&amp;hl.fl=remixObjects&amp;hl.fl=affiliation_ss&amp;hl.fl=datasetContactName&amp;hl.fl=studyAssayOtherPlatform&amp;hl.fl=gradeLevel&amp;hl.fl=dsDescriptionDate&amp;hl.fl=socialScienceNotesText&amp;hl.fl=producerLogoURL&amp;hl.fl=consumableCost&amp;hl.fl=timePeriodCoveredStart&amp;hl.fl=socialScienceNotesType&amp;hl.fl=publicationIDType&amp;hl.fl=alternativeURL&amp;hl.fl=3dMasterFilePolygonCount&amp;hl.fl=fileTypeDisplay&amp;hl.fl=authorAffiliation&amp;hl.fl=astroType&amp;hl.fl=producerAffiliation&amp;hl.fl=subDiscipline&amp;hl.fl=subtitle&amp;hl.fl=authorIdentifierScheme&amp;hl.fl=softwareVersion&amp;hl.fl=coverage.SkyFraction&amp;hl.fl=city&amp;hl.fl=dsDescriptionValue&amp;hl.fl=characteristicOfSources&amp;hl.fl=coverage.Temporal.StopTime&amp;hl.fl=studyAssayOtherOrganism&amp;hl.fl=alternativeTitle&amp;hl.fl=topicClassVocabURI&amp;hl.fl=journalVolumeIssue&amp;hl.fl=externalAgency&amp;hl.fl=distributorURL&amp;hl.fl=reusableCost&amp;hl.fl=externalIdValue&amp;hl.fl=coverage.Spatial&amp;hl.fl=journalPubDate&amp;hl.fl=distributorAffiliation&amp;hl.fl=assemTime&amp;hl.fl=fileNameWithoutExtension&amp;hl.fl=sampleLearningGoals&amp;hl.fl=topicClassVocab&amp;hl.fl=originOfSources&amp;hl.fl=resolution.Spectral&amp;hl.fl=fabEquipment&amp;hl.fl=variableNotes&amp;hl.fl=westLongitude&amp;hl.fl=dsPersistentId&amp;hl.fl=contentStandards&amp;hl.fl=3dHeight&amp;hl.fl=dsDescription&amp;hl.fl=astroObject&amp;hl.fl=coverage.Spectral.MinimumWavelength&amp;hl.fl=variableLabel&amp;hl.fl=timePeriodCovered&amp;hl.fl=studyAssayOtherTechnologyType&amp;hl.fl=subject&amp;hl.fl=studyAssayOtherMeasurmentType&amp;hl.fl=accessToSources&amp;hl.fl=controlOperations&amp;hl.fl=samplingProcedure&amp;hl.fl=otherReferences&amp;hl.fl=coverage.Redshift.MinimumValue&amp;hl.fl=eastLongitude&amp;hl.fl=producerAbbreviation&amp;hl.fl=publication&amp;hl.fl=postQuestion&amp;hl.fl=fileTags&amp;hl.fl=dataSources&amp;hl.fl=distributorLogoURL&amp;hl.fl=filePersistentId&amp;hl.fl=otherIdAgency&amp;hl.fl=author&amp;hl.fl=publicationCitation&amp;hl.fl=productionPlace&amp;hl.fl=weighting&amp;hl.fl=softwareName&amp;hl.fl=3dExportedFileFormat&amp;hl.fl=producer&amp;hl.fl=publicationURL&amp;hl.fl=keywordValue&amp;hl.fl=3dHandling&amp;hl.fl=otherUseObject&amp;hl.fl=keywordVocabularyURI&amp;hl.fl=contributor&amp;hl.fl=northLatitude&amp;hl.fl=collectorTraining&amp;hl.fl=studyAssayCellType&amp;hl.fl=coverage.RedshiftValue&amp;hl.fl=3dMaterialComposition&amp;hl.fl=timePeriodCoveredEnd&amp;hl.fl=southLatitude&amp;hl.fl=dataCollectionSituation&amp;hl.fl=otherId&amp;hl.fl=dateOfCollection&amp;hl.fl=collectionMode&amp;hl.fl=deviationsFromSampleDesign&amp;hl.fl=coverage.Spectral.MaximumWavelength&amp;hl.fl=3dLength&amp;hl.fl=authorIdentifier&amp;hl.fl=relatedDatasets&amp;hl.fl=datasetContact&amp;hl.fl=researchInstrument&amp;hl.fl=astroInstrument&amp;hl.fl=seriesInformation&amp;hl.fl=studyAssayMeasurementType&amp;hl.fl=geographicUnit&amp;q1=discoverableBy%3A%28group_public+OR+group_builtIn%2Fall-users%29&amp;start=0&amp;rows=10&amp;wt=javabin&amp;version=2</a>: org.apache.solr.search.SyntaxError: Cannot parse 'authorAffiliation_ss:\"Interdisciplinary Program in Archaeology, UVA Arts ': Lexical error at line 1, column 74.  Encountered: &lt;EOF&gt; after prefix \"\\\"Interdisciplinary Program in Archaeology, UVA Arts \" (in lexical state 3)]]</p>",
+        "id": 521838451,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748896544
+    },
+    {
+        "content": "<p>Things are back......</p>\n<p>I think one LARGE dataset got stuck.<br>\nThis last one came through the log 20 min. ago, which was the end of indexing after the upgrade (<strong>only took 4 hours!!!!).</strong></p>\n<p>[2025-06-02T20:44:31.092+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.IndexBatchServiceBean] [tid: _ThreadID=228 _ThreadName=__ejb-thread-pool16] [timeMillis: 1748897071092] [levelValue: 800] [[<br>\n  indexing dataset 835 of 835 (id=36552)]]</p>\n<p>[2025-06-02T20:44:47.659+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.IndexBatchServiceBean] [tid: _ThreadID=228 _ThreadName=__ejb-thread-pool16] [timeMillis: 1748897087659] [levelValue: 800] [[<br>\n  done iterating through all datasets]]</p>\n<p>[2025-06-02T20:44:47.659+0000] [Payara 6.2025.2] [INFO] [] [edu.harvard.iq.dataverse.search.IndexBatchServiceBean] [tid: _ThreadID=228 _ThreadName=__ejb-thread-pool16] [timeMillis: 1748897087659] [levelValue: 800] [[<br>\n  index all took 8056724 milliseconds]]</p>",
+        "id": 521843796,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748898331
+    },
+    {
+        "content": "<p>(deleted)</p>",
+        "id": 521858240,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748904676
+    },
+    {
+        "content": "<p>we are back!</p>\n<p>I would like to suggest that an index clear be recommended before a re index - in the installation notes. </p>\n<p>The reindex was “quick” after clearing the index  versus just reindexing in place. An hour compared to 4+ hours. </p>\n<p>Thanks for the advice.</p>",
+        "id": 521858392,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1748904754
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span> I'm glad you're back! Good job.</p>",
+        "id": 521858431,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748904784
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599826\">Sherry Lake</span> has marked this topic as resolved.</p>",
+        "id": 522141563,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1748961245
+    }
+]

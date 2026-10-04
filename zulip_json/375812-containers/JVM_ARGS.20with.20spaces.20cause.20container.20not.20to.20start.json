@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Reported here: <a href=\"https://github.com/IQSS/dataverse/issues/12731\">#12731</a></p>\n<p>Any ideas?</p>",
+        "id": 625855330,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790024228
+    },
+    {
+        "content": "<p>Plenty.</p>",
+        "id": 626713775,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790278110
+    },
+    {
+        "content": "<p>Should I respond here or there?</p>",
+        "id": 626713853,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790278127
+    },
+    {
+        "content": "<p>Buh, there, please! I don't think rpoet-jh is here in Zulip.</p>",
+        "id": 626714819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790278370
+    },
+    {
+        "content": "<p>Done.</p>",
+        "id": 626716396,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790278808
+    },
+    {
+        "content": "<p>For those reading or searching around here, this was the original question:</p>\n<blockquote>\n<p>Start <code>gdcc/dataverse</code> with JVM_ARGS containing a system property that has a space in the value.</p>\n<p>For example:</p>\n<p><code>\n-Ddataverse.pid.providers=fake\n-Ddataverse.pid.default-provider=fake\n-Ddataverse.pid.fake.type=FAKE\n-Ddataverse.pid.fake.label=\"Fake DOI Provider\"\n</code><br>\n* When does this issue occur?</p>\n<p>When using the docker container <code>gdcc/dataverse</code>, if JVM_ARGS contains system properties that have spaces, the container fails to start. I suspect it is the way JVM_ARGS is being interpolated in one of the startup scripts in the <code>gdcc/dataverse</code> container.</p>\n</blockquote>\n<p>Here's my answer:</p>\n<blockquote>\n<ul>\n<li>Please do not use JVM_ARGS with PID provider options. These options are already using MPCONFIG, so you can use any of the methods extensively described in the guides on how to set those (env vars, files, ...). Our Docker Compose files have some examples. That should eliminate any escaping business from 2. for good.</li>\n<li>The reason your quotes don't work are due to the fact how the variable is forwarded to the JVM. By the time the JVM receives the arguments, the quotes are gone - Bash has had them for lunch. So you'd need to escape them as <code>\\\"</code> if you really want to stick with the JVM_ARGS way.</li>\n</ul>\n</blockquote>",
+        "id": 626716749,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790278903
+    },
+    {
+        "content": "<p>Hmm, in <a href=\"https://github.com/IQSS/dataverse/issues/12713\">#12713</a> I'm still using JVM args, like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>-Ddataverse.pid.dc1.type=datacite\n-Ddataverse.pid.dc1.label=DataCite\n</code></pre></div>\n<p>I was careful not to add a space in the label!</p>\n<p>So we should switch our PID config in our compose files from JVM args to MPConfig, right?</p>\n<p>These:</p>\n<ul>\n<li><a href=\"https://github.com/IQSS/dataverse/blob/v6.12/docker/compose/demo/compose.yml#L23\">https://github.com/IQSS/dataverse/blob/v6.12/docker/compose/demo/compose.yml#L23</a></li>\n<li><a href=\"https://github.com/IQSS/dataverse/blob/v6.12/docker-compose-dev.yml#L57\">https://github.com/IQSS/dataverse/blob/v6.12/docker-compose-dev.yml#L57</a></li>\n</ul>",
+        "id": 626717673,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790279114
+    },
+    {
+        "content": "<p>Yes, absolutely switch them.</p>",
+        "id": 626742057,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790287092
+    },
+    {
+        "content": "<p>It might be easier at some point to just use a TOML file.</p>",
+        "id": 626742095,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790287113
+    },
+    {
+        "content": "<p>If someone has any funding left, happy to do an overhaul of the storage subsystem. Make it use MPCONFIG and cleanup tech debt. That is one of the last things we cannot use MPCONFIG with unfortunately.</p>",
+        "id": 626742196,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790287168
+    },
+    {
+        "content": "<p>Apart from the PID label, is there any other JVM arg that might want a space? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 626921760,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790349842
+    }
+]

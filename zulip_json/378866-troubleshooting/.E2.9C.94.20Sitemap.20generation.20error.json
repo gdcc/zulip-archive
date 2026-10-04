@@ -1,0 +1,158 @@
+[
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>[2023-11-27T10:29:56.712-0400] [Payara 5.2022.3] [WARNING] [] [edu.harvard.iq.dataverse.sitemap.SiteMapUtil] [tid: _ThreadID=211 _ThreadName=__ejb-thread-pool7] [timeMillis: 1701095396712] [levelValue: 900] [[\n  Unable to update sitemap! Exception caught while checking XML staged file (/var/opt/payara5/glassfish/domains/domain1/docroot/sitemap/sitemap.xml.staged ) against XML schema: schema_reference.4: Failed to read schema document &#39;https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd&#39;, because 1) could not find the document; 2) the document could not be read; 3) the root element of the document is not &lt;xsd:schema&gt;.]]\n</code></pre></div>\n<p>Not sure exactly why the schema doc can't be found or how to get around this error.</p>",
+        "id": 404424858,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701095638
+    },
+    {
+        "content": "<p>Hey, Brian. It's been a while. Anything interesting in <code>/var/opt/payara5/glassfish/domains/domain1/docroot/sitemap/sitemap.xml.staged</code>?</p>",
+        "id": 404425071,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701095695
+    },
+    {
+        "content": "<p><a href=\"https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\">https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd</a> seems to be up. Downloadable.</p>",
+        "id": 404425323,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701095772
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/v088pHSkcAtr07ZOsY_p0jrL/sitemap.xml.staged\">sitemap.xml.staged</a></p>",
+        "id": 404425405,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701095801
+    },
+    {
+        "content": "<p>(Hey Phil! :)</p>",
+        "id": 404425452,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701095818
+    },
+    {
+        "content": "<p>Seems pretty straight-forward.</p>",
+        "id": 404425700,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701095887
+    },
+    {
+        "content": "<p>Your file looks fine.</p>",
+        "id": 404425724,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701095894
+    },
+    {
+        "content": "<p>Was it possibly a transient error?</p>",
+        "id": 404425772,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701095914
+    },
+    {
+        "content": "<p>I've done it 3 times. The 3rd time just now gives the same error.</p>",
+        "id": 404425917,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701095966
+    },
+    {
+        "content": "<p>I'm also able to just grab the schema doc while on the host:</p>\n<div class=\"codehilite\"><pre><span></span><code>&gt; curl https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\n&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;xsd:schema xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;\n            targetNamespace=&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;\n            xmlns=&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;\n            elementFormDefault=&quot;qualified&quot;&gt;\n  &lt;xsd:annotation&gt;\n    &lt;xsd:documentation&gt;\n      XML Schema for Sitemap files.\n      Last Modifed 2008-03-26\n    &lt;/xsd:documentation&gt;\n  &lt;/xsd:annotation&gt;\n[SNIP]\n</code></pre></div>",
+        "id": 404426370,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701096113
+    },
+    {
+        "content": "<p>Can we verify the XML against the XSD? Maybe with a command line tool?</p>",
+        "id": 404426560,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701096175
+    },
+    {
+        "content": "<p>i've installed xmllint. never used it before though...</p>\n<div class=\"codehilite\"><pre><span></span><code>&gt; xmllint --valid sitemap.xml\nsitemap.xml:2: validity error : Validation failed: no DTD found !\nwww.sitemaps.org/schemas/sitemap/0.9&quot; xmlns:xhtml=&quot;http://www.w3.org/1999/xhtml&quot;\n</code></pre></div>",
+        "id": 404427393,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701096461
+    },
+    {
+        "content": "<p>ah. got some hints from another post</p>\n<div class=\"codehilite\"><pre><span></span><code>&gt; xmllint --noout --schema https://www.sitemaps.org/schemas/sitemap/0.9 sitemap.xml\nwarning: failed to load external entity &quot;https://www.sitemaps.org/schemas/sitemap/0.9&quot;\nSchemas parser error : Failed to locate the main schema resource at &#39;https://www.sitemaps.org/schemas/sitemap/0.9&#39;.\nWXS schema https://www.sitemaps.org/schemas/sitemap/0.9 failed to compile\n</code></pre></div>",
+        "id": 404428012,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701096668
+    },
+    {
+        "content": "<p>I get \"sitemap.xml.staged validates\" when I run this:</p>\n<div class=\"codehilite\"><pre><span></span><code>xmllint --schema sitemap.xsd sitemap.xml.staged\n</code></pre></div>\n<p>See also <a href=\"https://stackoverflow.com/questions/42809088/how-to-validate-a-xml-file-with-xsd-through-xmllint\">https://stackoverflow.com/questions/42809088/how-to-validate-a-xml-file-with-xsd-through-xmllint</a></p>",
+        "id": 404428048,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701096683
+    },
+    {
+        "content": "<p>What if you move sitemap.xml.staged aside? Does that help?</p>",
+        "id": 404428619,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701096856
+    },
+    {
+        "content": "<p>No, that doesn't change anything, unfortunately. I <em>can</em> get it to validate when i download the schema locally, like you've done. but remote just doesn't work.</p>",
+        "id": 404430305,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701097297
+    },
+    {
+        "content": "<p>I inserted your sitemap manually into SiteMapUtil.java but it's fine.</p>",
+        "id": 404432355,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701097876
+    },
+    {
+        "content": "<p>Not sure what's going on.</p>",
+        "id": 404432365,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701097882
+    },
+    {
+        "content": "<p>I'm not sure why you're seeing this: <code>schema_reference.4: Failed to read schema document 'https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd', because 1) could not find the document; 2) the document could not be read; 3) the root element of the document is not &lt;xsd:schema&gt;.</code></p>",
+        "id": 404432438,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701097914
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"670488\">@Brian Cassidy</span> please feel free to create a GitHub issue. I'm out of ideas. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 404432912,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701098061
+    },
+    {
+        "content": "<p>No easy way to turn off validation, eh? :)</p>",
+        "id": 404434727,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701098603
+    },
+    {
+        "content": "<p>I've put this in <a href=\"https://github.com/IQSS/dataverse/issues/10143\">https://github.com/IQSS/dataverse/issues/10143</a> and renamed my sitemap file for now. I'll have to revisit this later. Thanks for your help debugging things, <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span></p>",
+        "id": 404436176,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701098994
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"670488\">Brian Cassidy</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/Sitemap.20generation.20error/near/404434727\">said</a>:</p>\n<blockquote>\n<p>No easy way to turn off validation, eh? :)</p>\n</blockquote>\n<p>Nope.</p>",
+        "id": 404436723,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701099145
+    },
+    {
+        "content": "<p>Thanks for creating that issue.</p>",
+        "id": 404436789,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701099169
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> Thank you. All good now. :)</p>",
+        "id": 404442910,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1701101029
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"670488\">Brian Cassidy</span> has marked this topic as resolved.</p>",
+        "id": 404442929,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1701101032
+    }
+]

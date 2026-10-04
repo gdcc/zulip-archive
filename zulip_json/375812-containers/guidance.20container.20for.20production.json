@@ -1,0 +1,170 @@
+[
+    {
+        "content": "<p>Hi all,<br>\nI’m looking for <strong>guidance on the <em>recommended starting point</em> for a production deployment of Dataverse using containers</strong>.</p>\n<p>I’m intentionally <em>not</em> asking to debug my current setup — I’d rather understand <strong>how people who run Dataverse in production with Docker usually start</strong>.<br>\n<strong>Current context (already done):</strong></p>\n<ul>\n<li>Ubuntu 24.04 server  </li>\n<li>Docker installed (official Docker packages)  </li>\n<li>Managed PostgreSQL database (external, not containerized)  </li>\n<li>S3-compatible object storage (DigitalOcean Spaces)  </li>\n<li>DataCite account active and credentials validated  </li>\n<li>Firewall allows <strong>only HTTPS</strong>  <ul>\n<li>Payara, Solr, DB ports not exposed    </li>\n</ul>\n</li>\n<li>TLS certificates installed and configured via <strong>Nginx</strong> (reverse proxy)</li>\n</ul>\n<p><strong>What I’m trying to understand:</strong></p>\n<ol>\n<li>\n<p>For production with containers:  </p>\n<ul>\n<li>Is the <strong>official containers demo compose</strong> a valid starting point?    </li>\n<li>Or is it better to <strong>build a compose file from scratch</strong> for production?</li>\n</ul>\n</li>\n<li>\n<p>If starting from the demo:  </p>\n<ul>\n<li>Which parts are meant <em>only</em> for demo/testing?    </li>\n<li>What must be changed or removed for production?</li>\n</ul>\n</li>\n<li>\n<p>From a Dataverse perspective:  </p>\n<ul>\n<li>What is the <strong>recommended order of setup</strong>?    <ul>\n<li>Dataverse initialization?      </li>\n<li>Root dataverse creation?      </li>\n<li>Storage + DOI validation?</li>\n</ul>\n</li>\n</ul>\n</li>\n<li>\n<p>Are there any <strong>“known good” reference setups</strong> (even informal) that the community considers production-ready with Docker?  </p>\n</li>\n</ol>\n<p>I’m comfortable with infrastructure and security, but I’m still learning the <strong>Dataverse-specific production patterns</strong>, and I’d really appreciate guidance on the <em>right way to start</em> rather than trial-and-error.</p>\n<p>Thanks in advance for any pointers.</p>\n<p>— Mauricio</p>",
+        "id": 568310560,
+        "sender_full_name": "Andres Mauricio Heredia",
+        "timestamp": 1768510746
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"976479\">@Andres Mauricio Heredia</span> hi! We had a meeting just today! (See <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/meetings/with/568192340\">#containers &gt; meetings</a>). Maybe you can join the next one! Meanwhile, we can try to answer you here. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 568311529,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768511072
+    },
+    {
+        "content": "<p>The dev persona is what we use in development. This explains how to set up a demo persona, which is more secure than the default dev persona: <a href=\"https://guides.dataverse.org/en/6.9/container/running/demo.html#creating-and-running-a-demo-persona\">https://guides.dataverse.org/en/6.9/container/running/demo.html#creating-and-running-a-demo-persona</a></p>",
+        "id": 568311693,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768511138
+    },
+    {
+        "content": "<p>Does that help?</p>",
+        "id": 568311819,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768511181
+    },
+    {
+        "content": "<p>Hi Philip, thanks — yes, that does help <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span></p>\n<p>What I’m trying to validate is <em>the correct production path</em>, because what I’m seeing is this:</p>\n<ul>\n<li>When I run the <strong>demo persona as-is</strong>, without changing anything, everything works.  </li>\n<li>\n<p>As soon as I start making what I would expect to be “production changes”:  </p>\n<ul>\n<li>moving the database outside the containers,    </li>\n<li>switching file storage from filesystem to S3 (DigitalOcean Spaces),    </li>\n<li>configuring DataCite,    </li>\n</ul>\n<p>Dataverse stops working properly (sometimes it only reaches Payara, other times Dataverse starts but nothing initializes).  </p>\n</li>\n</ul>\n<p>So my question is more about <strong>process than configuration</strong>:</p>\n<ul>\n<li>\n<p>Is the recommended approach to:  </p>\n<ol>\n<li>run the demo persona first and <em>then</em> gradually replace components (DB, storage, DOI), validating each step?    </li>\n</ol>\n</li>\n<li>\n<p>Or should production be approached as:<br>\n  2) starting from scratch with all production configurations defined up front, and expecting Dataverse to initialize correctly from that state?</p>\n</li>\n</ul>\n<p>I’m comfortable adjusting configs, but I’m missing the <strong>mental model</strong> of how the Dataverse team expects the transition from demo → production-with-containers to happen.</p>\n<p>Any guidance from people who’ve done this in production would be really valuable.</p>",
+        "id": 568313352,
+        "sender_full_name": "Andres Mauricio Heredia",
+        "timestamp": 1768511917
+    },
+    {
+        "content": "<p>I see. I would suggest starting from a working config and then making changes one by one, such as switching to S3.</p>",
+        "id": 568326468,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768518042
+    },
+    {
+        "content": "<p>after several days of debugging I want to share a clear finding and ask for guidance / confirmation.</p>\n<p><strong>Observed behavior</strong></p>\n<ul>\n<li>Using the official container demo (<code>gdcc/dataverse</code> + <code>gdcc/configbaker</code>) with <strong>Dataverse 6.9</strong>, the instance can start, metadata blocks are loaded, but <strong>the root dataverse is never created</strong>.  </li>\n<li>\n<p>The <code>bootstrap.sh</code> script skips execution as soon as metadata blocks exist:<br>\n<code>BLOCK_COUNT=$(curl ... /api/metadatablocks) if [[ $BLOCK_COUNT -gt 0 ]]; then   echo \"Your instance has been bootstrapped already, skipping.\"   exit 0 fi</code></p>\n</li>\n<li>\n<p>Once this happens, the system is left in an inconsistent state:  </p>\n<ul>\n<li>metadata blocks exist    </li>\n<li><code>dataverse</code> table is empty    </li>\n<li>root dataverse does not exist    </li>\n<li>Native API cannot create root (<code>POST /api/dataverses/:root</code> fails, <code>POST /api/dataverses</code> returns Bad API key or validation errors)</li>\n</ul>\n</li>\n</ul>\n<p><strong>Important comparison</strong></p>\n<ul>\n<li>I tested <strong>Dataverse 6.5 + configbaker</strong>: demo bootstrap works correctly.  </li>\n<li>If I <strong>do not delete the data directory</strong>, and then upgrade containers to <strong>6.9</strong>, the demo continues to work.  </li>\n<li>If I start <strong>fresh</strong> with 6.9 (empty data dir), bootstrap does not create root anymore.  </li>\n</ul>\n<p>This strongly suggests a <strong>bootstrap regression between 6.5 → 6.9</strong>, likely related to:</p>\n<ul>\n<li>builtin users API key handling  </li>\n<li>bootstrap skip condition based solely on metadata blocks</li>\n</ul>\n<p><strong>Impact</strong></p>\n<ul>\n<li>It is currently impossible (at least for me) to produce a clean, reproducible Dataverse 6.9 container-based deployment starting from an empty volume.  </li>\n<li>Manual SQL/API workarounds are unsafe because root dataverse creation is not a simple single-table insert.</li>\n</ul>\n<p><strong>Questions to the community</strong></p>\n<ol>\n<li>Is the container demo currently considered <strong>non-functional for fresh installs</strong> on 6.9?  </li>\n<li>Is there an <strong>officially supported way</strong> to bootstrap root in containers for recent versions?  </li>\n<li>Is this a known regression / issue already tracked somewhere?  </li>\n<li>For production, should Docker users assume <strong>classic install only</strong>, even if containers are provided?</li>\n</ol>\n<p>Any confirmation, guidance, or pointer to the correct workflow would be greatly appreciated.</p>\n<p>Thanks in advance.</p>",
+        "id": 568374334,
+        "sender_full_name": "Andres Mauricio Heredia",
+        "timestamp": 1768549787
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"976479\">Andres Mauricio Heredia</span> <a href=\"#narrow/channel/375812-containers/topic/guidance.20container.20for.20production/near/568374334\">said</a>:</p>\n<blockquote>\n<ul>\n<li>with <strong>Dataverse 6.9</strong>, the instance can start, metadata blocks are loaded, but <strong>the root dataverse is never created</strong>.</li>\n</ul>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> does this sound like what <span class=\"user-mention\" data-user-id=\"601920\">@Akio Sone</span> was telling us in the containerization working group meeting <a href=\"https://harvard.zoom.us/rec/share/kLPnMLpDfyBhh0EJEvfhpZsZgjBHPHk5R7imlPRF7tYaNyTr0DOh8vHROnFO45R-.Vy2heZDG1ZjCS9Ky\">yesterday</a>? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> </p>\n<p><span class=\"user-mention\" data-user-id=\"601920\">@Akio Sone</span> were you seeing the same symptoms? No root collection created?</p>",
+        "id": 568418948,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768565143
+    },
+    {
+        "content": "<p>This morning I just checked out DV, built the 6.9 base image and then DV and it started all right with Root collection, and everything. But this is with a totally fresh instance and in \"dev\" only, not production.</p>",
+        "id": 568419527,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1768565383
+    },
+    {
+        "content": "<p>And I deleted all my gdcc/* docker images, so these were all built fresh</p>",
+        "id": 568419964,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1768565542
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> phew! Thanks for testing! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 568420277,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768565655
+    },
+    {
+        "content": "<p>But how can we reproduce what <span class=\"user-mention\" data-user-id=\"976479\">@Andres Mauricio Heredia</span> is seeing? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 568420412,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768565700
+    },
+    {
+        "content": "<p>Not sure what's going on here. Also I'm a bit reluctant here because the description above sounds influenced by an LLM, which may foster doing things the wrong way.</p>",
+        "id": 568422459,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566392
+    },
+    {
+        "content": "<p>I'm not 100% sure what <span class=\"user-mention\" data-user-id=\"601920\">@Akio Sone</span> problems were exactly <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span> As far as I understood, he (has?) had a build problem when checking out the 6.9 code and building the images, not a problem with bootstrapping. So I'd cautiously vote for \"not related\".</p>",
+        "id": 568422724,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566499
+    },
+    {
+        "content": "<p>I would suggest to make sure to start from clean: remove all gdcc and other containers and images built/started by docker compose and start with a fresh clone of the repo so that previous attempts don't  \"infect\" the experiment.</p>",
+        "id": 568423073,
+        "sender_full_name": "Balázs Pataki",
+        "timestamp": 1768566615
+    },
+    {
+        "content": "<p>Wait a sec here - I may have an idea!</p>",
+        "id": 568423159,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566649
+    },
+    {
+        "content": "<p>He says this is about bootstrapping, so configbaker related.</p>",
+        "id": 568423215,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566666
+    },
+    {
+        "content": "<p>IIRC somewhere around 6.5 we started \"real\" tags.</p>",
+        "id": 568423264,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566681
+    },
+    {
+        "content": "<p>So he may be using the <code>unstable</code> tag from before!</p>",
+        "id": 568423303,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566692
+    },
+    {
+        "content": "<p>If <span class=\"user-mention\" data-user-id=\"976479\">@Andres Mauricio Heredia</span> kept those around for any 6.9 experiments, that would be my educated guess where any kind of trouble may come from.</p>",
+        "id": 568423491,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566742
+    },
+    {
+        "content": "<p>I may be wrong, but my non-LLM advice: first pin down these versions in both DV <em>and</em> Bootstrapping, try again and see what happens.</p>",
+        "id": 568423640,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566791
+    },
+    {
+        "content": "<p>So basically what <span class=\"user-mention\" data-user-id=\"602497\">@Balázs Pataki</span> said, but in more controlled manner than \"delete all images\". <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> Hat tip for jumpstarting my brain! <span aria-label=\"coin\" class=\"emoji emoji-1fa99\" role=\"img\" title=\"coin\">:coin:</span> <span aria-label=\"top hat\" class=\"emoji emoji-1f3a9\" role=\"img\" title=\"top hat\">:top_hat:</span>  <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 568424068,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768566926
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"601920\">@Akio Sone</span> so! Please try deleting local gdcc images to get a clean test of 6.9. Thanks!</p>",
+        "id": 568440628,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768571954
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"976479\">@Andres Mauricio Heredia</span> please keep the questions coming! We love the feedback! Again, I'm sorry we could talk to you live yesterday during the meeting!</p>",
+        "id": 568440727,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768571984
+    },
+    {
+        "content": "<p>I encountered the reported issue as follows:</p>\n<ol>\n<li>clone Dataverse as a new repository</li>\n<li>check out the tag v6.9 as a new branch (commit id: e2021d3a80;tagged to the master branch, not develop branch)</li>\n<li>build/run the container</li>\n<li>\n<p>Dataverse sub-containers were running but Dataverse (web page) seemed not working<br>\nsymptoms: Docker log (server.log) showed that an old version of Payara was still running and<br>\nthat the health check (hitting the health-check API endpoint) was continuously failing<br>\nDon Sizemore told me that version 6.9 requires a new version of Payara server due to some recent change made by Jim</p>\n</li>\n<li>\n<p>check out the develop branch (commit id: 96e96f4763; 2025-12-22;)</p>\n</li>\n<li>build/run the container </li>\n<li>This time it was working with a new version of Payara server</li>\n</ol>\n<p>When a new version of Dataverse is released, I set up a fresh repository for each version. <br>\nSo I suspected some of the commits between the day when the tag was created and 2025-12-22 fixed the above issue although I did not dig in which commit(s) solved the issue.</p>",
+        "id": 568467779,
+        "sender_full_name": "Akio Sone",
+        "timestamp": 1768579066
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"601920\">@Akio Sone</span> that makes sense but our suggestion is to delete any gdcc containers from Docker and try the above again.</p>",
+        "id": 568473288,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768580600
+    },
+    {
+        "content": "<p>Hi to everyone, thanks for the interest on this call for help, I couldn't do it with containers, so I made it in the tradicional installation way, and now we are in production, and we are figuring on the dataverse installations map. Thanks Again.</p>",
+        "id": 570401611,
+        "sender_full_name": "Andres Mauricio Heredia",
+        "timestamp": 1769540811
+    },
+    {
+        "content": "<p>No worries! The traditional way is fine! Is there any feedback you'd like to give about containers? Anything we can improve?</p>",
+        "id": 570401852,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1769540900
+    }
+]

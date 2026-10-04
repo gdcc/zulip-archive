@@ -1,0 +1,44 @@
+[
+    {
+        "content": "<p>The JSP UI was customizable; we had options to configure custom homepage, footer, header and css. <br>\nIt is possible to fork the repo and build your own version of the SPA, but a more modular approach would be preferable. </p>\n<p>Could we have a Plugin architecture, where we have modules (ESM for instance) that are dynamically loaded, possibly even from a remote source (like CDN)?</p>\n<p>For instance; we could then have a Footer or HomePage plugin build from its own project (with vite,react,etc.) and have it loaded via some configuration in the SPA. </p>\n<p>Note that once we have the Plugin architecture in place we could use it for more that just the obvious 'branding' customizations.</p>",
+        "id": 535256267,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755675872
+    },
+    {
+        "content": "<p>As a test, I created a project for our DANS footer. The Github repo is here: <a href=\"https://github.com/PaulBoon/dataverse-dans-footer-plugin\">https://github.com/PaulBoon/dataverse-dans-footer-plugin</a> .</p>\n<p>I just copied our html code and made it into jsx. <br>\nIf you build it and copy that js file into a plugin dir in the root of the SPA dataverse-frontend project, you can load it from there inside the SPA's Footer.tsx file. <br>\nI also added that file in the release assets: <a href=\"https://github.com/PaulBoon/dataverse-dans-footer-plugin/releases/download/v0.1.0/dansfooterplugin.js\">https://github.com/PaulBoon/dataverse-dans-footer-plugin/releases/download/v0.1.0/dansfooterplugin.js</a><br>\nSomehow I cannot get remote loading to work, possibly CORS, or otherwise unsave for the import. <br>\nIf you drop it in a plugin folder, it will work. <br>\nChange the Footer.tsx of the dataverse-frontend project to this: </p>\n<div class=\"codehilite\"><pre><span></span><code>import { useTranslation } from &#39;react-i18next&#39;\nimport { Container, Row, Col } from &#39;@iqss/dataverse-design-system&#39;\nimport dataverseProjectLogo from &#39;@/assets/dataverse-project-logo.svg&#39;\nimport { DataverseInfoRepository } from &#39;../../../info/domain/repositories/DataverseInfoRepository&#39;\nimport { useDataverseVersion } from &#39;./useDataverseVersion&#39;\nimport styles from &#39;./Footer.module.scss&#39;\n\nimport React, { useState, useEffect } from &quot;react&quot;;\ntype PluginComponent = React.ComponentType&lt;{ message: string }&gt;;\n\ninterface FooterProps {\n  dataverseInfoRepository: DataverseInfoRepository\n}\n\nexport function Footer({ dataverseInfoRepository }: FooterProps) {\n  const { t } = useTranslation(&#39;footer&#39;)\n  const { dataverseVersion } = useDataverseVersion(dataverseInfoRepository)\n  const currentYear = new Date().getFullYear().toString()\n\n  const [Plugin, setPlugin] = useState&lt;PluginComponent | null&gt;(null);\n\n  useEffect(() =&gt; {\n    (async () =&gt; {\n      const module = await import(&quot;/plugins/dansfooterplugin.js&quot;);\n      //const module = await import(&quot;https://github.com/PaulBoon/dataverse-dans-footer-plugin/releases/download/v0.1.0/dansfooterplugin.js&quot;);\n      //const module = await import(&quot;https://paulboon.github.io/dataverse-dans-footer-plugin/dansfooterplugin.js&quot;);\n      setPlugin(() =&gt; module.default);\n    })();\n  }, []);\n\n  return (\n    &lt;footer className={styles.container}&gt;\n      &lt;Container&gt;\n         {Plugin ? &lt;Plugin message=&quot;Hello from host app!&quot; /&gt; : &lt;p&gt;Loading plugin...&lt;/p&gt;}\n        &lt;Row&gt;\n          &lt;Col sm={8}&gt;\n            &lt;em className={styles.copyright}&gt;\n              {t(&#39;copyright&#39;, { year: currentYear })}\n              &lt;a\n                href=&quot;https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy&quot;\n                rel=&quot;noreferrer&quot;\n                target=&quot;_blank&quot;&gt;\n                {t(&#39;privacyPolicy&#39;)}\n              &lt;/a&gt;\n            &lt;/em&gt;\n          &lt;/Col&gt;\n          &lt;Col sm={4}&gt;\n            &lt;div className={styles[&#39;powered-by-container&#39;]}&gt;\n              &lt;span className={styles[&#39;powered-by-text&#39;]}&gt;{t(&#39;poweredBy&#39;)}&lt;/span&gt;\n              &lt;a\n                href=&quot;https://dataverse.org/&quot;\n                title=&quot;The Dataverse Project&quot;\n                target=&quot;_blank&quot;\n                rel=&quot;noreferrer&quot;&gt;\n                &lt;img\n                  src={dataverseProjectLogo}\n                  width=&quot;118&quot;\n                  height=&quot;40&quot;\n                  alt=&quot;The Dataverse Project logo&quot;\n                /&gt;\n              &lt;/a&gt;\n              &lt;span className={styles.version}&gt;{dataverseVersion}&lt;/span&gt;\n            &lt;/div&gt;\n          &lt;/Col&gt;\n        &lt;/Row&gt;\n      &lt;/Container&gt;\n    &lt;/footer&gt;\n  )\n}\n</code></pre></div>\n<p>There are some problems with layout and other style stuff so it needs futher CSS tweaking. <br>\nThe main issue is the actual path to the file used in the import call, which it is now hardcoded, that should be made configurable, or the app should scan this location for plugin files.</p>",
+        "id": 535525278,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755788904
+    },
+    {
+        "content": "<p>Interesting. So remote loading doesn't work but local loading does?</p>",
+        "id": 535527805,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755789741
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  I could not get that remote loading working, but even when it was only with local loading this plugin modularity would be nice. It is similar to having a Java app that picks up jar files in a plugin directory. You have to use some interface (plugin contract) and the app must have this loading mechanism. The main thing is that it provides extensibility/customization without rebuilding or changing the application (core) code.</p>",
+        "id": 535633940,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755849481
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Sorry, but it seems to only work in dev mode, so I am having trouble to get it imported at run time from my plugins directory instead of loading it from a compiled in assets dir. <br>\nNeed to put some more time in this, hopefully with some help from people with React/Vite knowledge.</p>",
+        "id": 536031018,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1756130249
+    },
+    {
+        "content": "<p>Ok, I have it working by placing that plugin directory inside the 'public' folder, then it also ends up in the 'dist'. When deployed you can replace the js file in that plugin dir with another implementation of that interface/type and it should work. The only thing now is that, when building it, you would need some default implementation that does nothing.</p>",
+        "id": 536036633,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1756131822
+    },
+    {
+        "content": "<p>We're adding a config file. Please see <a class=\"message-link\" href=\"/#narrow/channel/410361-ui-dev/topic/SPA.20installation.20guide/near/553383449\">#ui-dev &gt; SPA installation guide @ 💬</a></p>",
+        "id": 553383510,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762177280
+    }
+]

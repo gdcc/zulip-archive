@@ -1,0 +1,170 @@
+[
+    {
+        "content": "<p>Hi there .. I am seeing errors in the logs of both our QA and Prod dataverse installations that look like this:</p>\n<p>Search Syntax Error: Error from server at &lt;server URL&gt;/solr/collection1: sort param field can't be found: dateSort']]<br>\nSearch Syntax Error: Error from server at &lt;server URL&gt;/solr/collection1: undefined field: \"datasetType\"]]</p>\n<p>I assume I messed up the schema during one of the recent updates .. they were a little tricky because we don't have solr running on the same server as dataverse, so I had to list the schema on the app server, copy it to the solr server, and then run the update fields script after copying the new schema from the iqss github</p>\n<p>however it seemed to go okay anyway (didn't get any errors) .. any ideas on the best way to fix? <br>\nlooking at <a href=\"https://guides.dataverse.org/en/latest/admin/metadatacustomization.html\">this</a> .. should i just copy the schema.xml again and re-run the update fields script? I don't want to make it worse</p>",
+        "id": 477513320,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729194364
+    },
+    {
+        "content": "<p><code>datasetType</code> is definitely new as of 6.4</p>",
+        "id": 477517738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729196265
+    },
+    {
+        "content": "<p>For the block, maybe we should move to <a class=\"stream-topic\" data-stream-id=\"378866\" href=\"/#narrow/channel/378866-troubleshooting/topic/delete.20custom.20metadata.20block\">#troubleshooting &gt; delete custom metadata block</a></p>",
+        "id": 477517955,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729196361
+    },
+    {
+        "content": "<p>In order to keep this topic focused on Solr, I mean.</p>",
+        "id": 477517994,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729196384
+    },
+    {
+        "content": "<p>ah sorry i always do that</p>",
+        "id": 477519136,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729196868
+    },
+    {
+        "content": "<p>i thought it was related <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 477519312,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729196936
+    },
+    {
+        "content": "<p>i deleted that question</p>",
+        "id": 477519715,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729197109
+    },
+    {
+        "content": "<p>So if it helps, that script is grabbing fields from <a href=\"http://localhost:8080/api/admin/index/solr/schema\">http://localhost:8080/api/admin/index/solr/schema</a></p>",
+        "id": 477520816,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197560
+    },
+    {
+        "content": "<p>You don't have to use the script if it's giving you trouble.</p>",
+        "id": 477520861,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197577
+    },
+    {
+        "content": "<p>But you do need to make sure Solr has the fields your installation expects.</p>",
+        "id": 477520918,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197602
+    },
+    {
+        "content": "<p><code>dateSort</code> should be super old. I'm not sure why you don't have that one.</p>",
+        "id": 477520980,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197623
+    },
+    {
+        "content": "<p>Do you have a lot of custom metadata blocks? Or experimental blocks?</p>",
+        "id": 477521138,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197719
+    },
+    {
+        "content": "<p>Basically, anything that isn't already in the schema.xml we ship?</p>",
+        "id": 477521194,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729197736
+    },
+    {
+        "content": "<p>we don't have any .. other than accidentally adding the computational one .. the datasetType error is on our QA site that we have updated to v6.4, and the dateSort one is on our production which is still at v6.3 ..</p>",
+        "id": 477521779,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729197991
+    },
+    {
+        "content": "<p>Well, dateSort is old. You can grab that line from <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/conf/solr/schema.xml\">https://github.com/IQSS/dataverse/blob/v6.3/conf/solr/schema.xml</a></p>",
+        "id": 477522081,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729198148
+    },
+    {
+        "content": "<p>if I run 'curl \"<a href=\"http://localhost:8080/api/admin/index/solr/schema\">http://localhost:8080/api/admin/index/solr/schema</a>\"' .. the only fields it returns are the ones within the &lt;!-- SCHEMA-FIELDS::BEGIN --&gt;&lt;!-- SCHEMA-FIELDS::END --&gt; section .. so i've messed something up</p>",
+        "id": 477523701,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729198905
+    },
+    {
+        "content": "<p>No, that's right.</p>",
+        "id": 477523806,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729198942
+    },
+    {
+        "content": "<p>That \"schema\" endpoint is only for the dynamic fields. The ones that come from the database.</p>",
+        "id": 477523848,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729198968
+    },
+    {
+        "content": "<p>From metadata blocks, that is.</p>",
+        "id": 477523874,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729198982
+    },
+    {
+        "content": "<p>I hope I haven't confused you more. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 477523916,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1729199002
+    },
+    {
+        "content": "<p>ah okay</p>",
+        "id": 477523919,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729199003
+    },
+    {
+        "content": "<p>so where is it finding \"dateSort\"?</p>",
+        "id": 477524028,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729199049
+    },
+    {
+        "content": "<p>i see it was added for 4.0</p>",
+        "id": 477524120,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729199107
+    },
+    {
+        "content": "<p>it is defined in my schema.xml</p>",
+        "id": 477524560,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729199328
+    },
+    {
+        "content": "<p>i have the most current one .. same as <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/conf/solr/schema.xml\">https://github.com/IQSS/dataverse/blob/v6.3/conf/solr/schema.xml</a></p>",
+        "id": 477526246,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729200206
+    },
+    {
+        "content": "<p>i figured out the issue with the QA site .. the errors were occurring when I was upgrading and haven't occurred since so I think was just a timing thing</p>",
+        "id": 477532077,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729203263
+    },
+    {
+        "content": "<p>for prod i will go through the steps again to update the schema tonight and then do a full index</p>",
+        "id": 477532366,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1729203394
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> has marked this topic as resolved.</p>",
+        "id": 478141206,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1729541400
+    }
+]

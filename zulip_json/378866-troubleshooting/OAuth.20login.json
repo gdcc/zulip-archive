@@ -1,0 +1,200 @@
+[
+    {
+        "content": "<p>Good afternoon. I set up an OAuth identity provider to work with my Dataverse installation (rctsai). It was working but now whan I try to login with RCTSAI dataverse presents a login form '<a href=\"https://dados.ipb.pt//oauth2/firstLogin.xhtml\">https://dados.ipb.pt//oauth2/firstLogin.xhtml</a>', even  thugh is nt the first login? What can I do to fix this? Thanks in advance</p>",
+        "id": 397691146,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1697801994
+    },
+    {
+        "content": "<p>Huh. Was is working ok for a long time? For weeks or months?</p>",
+        "id": 397695906,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697803590
+    },
+    {
+        "content": "<p>Sometimes, sadly, the Identity Provider (IdP) will change their <code>entityId</code>. This makes Dataverse think it's a new IdP.</p>",
+        "id": 397696298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1697803716
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/397696298\">said</a>:</p>\n<blockquote>\n<p>Sometimes, sadly, the Identity Provider (IdP) will change their <code>entityId</code>. This makes Dataverse think it's a new IdP.</p>\n</blockquote>\n<p>I contacted the Identity Provider (IdP) and they assured me that the 'entityId' did not change. How can I check what user's fields are matched  with the response of the Identity Provider in order to identify users?  It seems that dataverse does not recognize already registered users because user's fields do not match IdP returned data .<br>\nThanks in advance.</p>",
+        "id": 399332271,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698681648
+    },
+    {
+        "content": "<p>Well, the logic seems to be in OAuth2LoginBackingBean.java</p>",
+        "id": 399334351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698682207
+    },
+    {
+        "content": "<p>You might need to add more logging statements and recompile Dataverse. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 399334396,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698682228
+    },
+    {
+        "content": "<p>What version of Dataverse are you on?</p>",
+        "id": 399334474,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698682255
+    },
+    {
+        "content": "<p>For 6.0, here is the logic to login an existing user or prompt to create a new user: <a href=\"https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137\">https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>",
+        "id": 399334632,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698682322
+    },
+    {
+        "content": "<p>I am in Dataverse v. 5.12.1 build 1122-cf90431. What do you suggest in order to quickly let users get in in the dataverse system<br>\n?</p>",
+        "id": 399335460,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698682595
+    },
+    {
+        "content": "<p>Ok, it's the same. Hasn't changed: <a href=\"https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137\">https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>",
+        "id": 399336477,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698682939
+    },
+    {
+        "content": "<p>I'm suggesting adding more lines like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>logger.log(Level.INFO, &quot;debugging line here&quot;);\n</code></pre></div>",
+        "id": 399336686,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698683018
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399336477\">said</a>:</p>\n<blockquote>\n<p>Ok, it's the same. Hasn't changed: <a href=\"https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137\">https://github.com/IQSS/dataverse/blob/v5.12.1/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/OAuth2LoginBackingBean.java#L116-L137</a></p>\n</blockquote>\n<p>Is it possible to quickly disable signups?</p>",
+        "id": 399336688,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698683019
+    },
+    {
+        "content": "<p>Hmm, I'm not sure. I don't believe so.</p>",
+        "id": 399336838,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698683066
+    },
+    {
+        "content": "<p>Is there anything helpful or interesting in server.log?</p>",
+        "id": 399337070,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698683146
+    },
+    {
+        "content": "<p>In server.log I see the warning message <br>\n\" [WARNING] [] [edu.harvard.iq.dataverse.util.BundleUtil] [tid: _ThreadID=75 _ThreadName=http-thread-pool::http-listener-1(3)] [tim&gt;<br>\n  Could not find key \"authenticationProvider.name.rctsaai\" in bundle file: ]]\", can this be the problem? How can I fix it?</p>",
+        "id": 399341061,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698684539
+    },
+    {
+        "content": "<p>Interesting. You could edit src/main/java/propertyFiles/Bundle.properties but I doubt it will fix your problem, unfortunately.</p>",
+        "id": 399348064,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698687044
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> actually, could you please go ahead and open up a support ticket by emailing <a href=\"mailto:support@dataverse.org\">support@dataverse.org</a> ? And please let me know the ticket number.</p>",
+        "id": 399348159,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698687084
+    },
+    {
+        "content": "<p>Maybe you sent <span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> into the wrong rabbit hole...</p>",
+        "id": 399683986,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698829218
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> which OAuth provider exactly are you using? If this is from your institution, did you mean OIDC?</p>",
+        "id": 399684122,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698829268
+    },
+    {
+        "content": "<p>Please note that remote users are identified by some persistent identificator</p>",
+        "id": 399684239,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698829306
+    },
+    {
+        "content": "<p>In case of OIDC, this is the \"sub\" attribute of the providers auth response.</p>",
+        "id": 399684384,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698829338
+    },
+    {
+        "content": "<p>I'm not sure right now what it is in case of OAuth2, would need to look into the code for that. And I would need to know which provider you're using exactly</p>",
+        "id": 399684553,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698829393
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399684122\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"660626\">Adília Isabel Domingues da Cruz Alves</span> which OAuth provider exactly are you using? If this is from your institution, did you mean OIDC?</p>\n</blockquote>\n<p>Our OAuth provider is FCCN (not our institution),  We are using rctsaai.</p>",
+        "id": 399896854,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698919569
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> hi, did you email support yet? It would be good to track this. If you did, I can't find the ticket number.</p>",
+        "id": 399915676,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698925034
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> did you add a custom OAuth2 provider for that? Or did you use one of the existing implementations?</p>",
+        "id": 399926690,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1698928780
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399926690\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"660626\">Adília Isabel Domingues da Cruz Alves</span> did you add a custom OAuth2 provider for that? Or did you use one of the existing implementations?</p>\n</blockquote>\n<p>I used the curl command 'curl -X POST -H 'Content-type: application/json' --upload-file rctsaai.json <a href=\"http://localhost:8080/api/admin/authenticationProviders\">http://localhost:8080/api/admin/authenticationProviders</a>' with the rctsaai.json that our OAuth provider sent us.</p>",
+        "id": 399970411,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698939815
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399915676\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"660626\">Adília Isabel Domingues da Cruz Alves</span> hi, did you email support yet? It would be good to track this. If you did, I can't find the ticket number.</p>\n</blockquote>\n<p>Hello Philip. I just emailed support. The tracking system ID of my message is <a href=\"https://github.com/IQSS/dataverse/issues/351508\">#351508</a>.<br>\nThank you very much for your support.</p>",
+        "id": 399971216,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1698940051
+    },
+    {
+        "content": "<p>Thanks, I see it at <a href=\"https://help.hmdc.harvard.edu/Ticket/Display.html?id=351508\">https://help.hmdc.harvard.edu/Ticket/Display.html?id=351508</a></p>",
+        "id": 399975479,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698941146
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"660626\">@Adília Isabel Domingues da Cruz Alves</span> did we meet in Braga? And in IRC or Matrix a while back? I think so. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 399975761,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1698941204
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/399975761\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"660626\">Adília Isabel Domingues da Cruz Alves</span> did we meet in Braga? And in IRC or Matrix a while back? I think so. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>\n</blockquote>\n<p>Hello Philip. Yes we meet in Braga :-) and in Matrix :-). How are you? :-)</p>",
+        "id": 400146650,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1699022324
+    },
+    {
+        "content": "<p>Good. My daughter just rowed in a famous race in Boston, the Head of the Charles. She's on the far right in this pic: <a href=\"https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/\">https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/</a></p>",
+        "id": 400147922,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1699022774
+    },
+    {
+        "content": "<p>her \"game face\", so serious <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 400147954,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1699022789
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/OAuth.20login/near/400147922\">said</a>:</p>\n<blockquote>\n<p>Good. My daughter just rowed in a famous race in Boston, the Head of the Charles. She's on the far right in this pic: <a href=\"https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/\">https://www.flickr.com/photos/136251156@N05/52449562353/in/album-72177720303110555/</a></p>\n</blockquote>\n<p>She is still focused. Well done! Congratulations :-).</p>",
+        "id": 400150634,
+        "sender_full_name": "Adília Isabel Domingues da Cruz Alves",
+        "timestamp": 1699023692
+    }
+]

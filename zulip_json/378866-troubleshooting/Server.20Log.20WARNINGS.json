@@ -1,0 +1,38 @@
+[
+    {
+        "content": "<p>I sent the following to the Dataverse Google group. One WARNING is about the zippreviewer, which I think Jim can help with. But the other is an \"offending code\" warning.<br>\n<a href=\"https://groups.google.com/g/dataverse-community/c/Sewgonwd_HM\">https://groups.google.com/g/dataverse-community/c/Sewgonwd_HM</a><br>\n====================</p>\n<p>We are getting this error in our server.log:</p>\n<blockquote>\n<p>[2025-03-07T13:59:43.727+0000] [Payara 6.2024.6] [WARNING] [] [edu.harvard.iq.dataverse.util.BundleUtil] [tid: _ThreadID=88 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1741355983727] [levelValue: 900] [[<br>\n  Could not find key \"externaltools.zipPreviewer.displayname\" in bundle file: ]]</p>\n</blockquote>\n<p>We do have zipPreviewer installed as an external previewer. I looked at the <a href=\"http://Bundle.properties\">Bundle.properties</a> file and see this line for Data Curation Tool:<br>\n<strong>external</strong>tools.dct.displayname=Data Curation Tool</p>\n<p>Do I need to add a similar one for zipPreviewer? To get rid of the warnings?</p>\n<p>We are also getting LOTS of these warnings causing our server.log file to rollover many times a day - so we have about 10 or so server log files for a day. Here's that Warning:</p>\n<blockquote>\n<p>[2025-03-07T14:21:47.495+0000] [Payara 6.2024.6] [WARNING] [] [] [tid: _ThreadID=88 _ThreadName=http-thread-pool::jk-connector(2)] [timeMillis: 1741357307495] [levelValue: 900] [[<br>\n  Response has already been committed, and further write operations are not permitted. This may result in an IllegalStateException being triggered by the underlying application. To avoid this situation, consider adding a Rule <code>.when(Direction.isInbound().and(Response.isCommitted())).perform(Lifecycle.abort())</code>, or figure out where the response is being incorrectly committed and correct the bug in the offending code.]]</p>\n</blockquote>",
+        "id": 504112500,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741358850
+    },
+    {
+        "content": "<p>Thanks for posting on the google group as well! It looks like Jim already replied and I agree with his take.</p>",
+        "id": 504114285,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741359349
+    },
+    {
+        "content": "<p>Fixed the zipPreviewer warning by adding this line to our <a href=\"http://Bundle.properties\">Bundle.properties</a> file:<br>\n<code>externaltools.zipPreviewer.displayname=Zip Previewer</code></p>",
+        "id": 504124062,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741361896
+    },
+    {
+        "content": "<p>Great. I wonder... do we document this somewhere? If not, we probably should!</p>",
+        "id": 504124846,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741362101
+    },
+    {
+        "content": "<p>I couldn't find it documented. Plus this was the only Previewer that is giving WARNINGS. I have other preveiwers installed, but only a warning  for zipPreviewer was in the log file. I'm not sure why this one previewer needed a bundle property? <span aria-label=\"shrug\" class=\"emoji emoji-1f937\" role=\"img\" title=\"shrug\">:shrug:</span> </p>\n<p>Maybe it just needs to be added to the core <a href=\"http://Bundle.properties\">Bundle.properties</a> file. There is an #externaltools section in that file that comes with definitions for the Data Curation Tool:</p>\n<blockquote>\n<p>#externaltools<br>\nexternaltools.dct.displayname=Data Curation Tool<br>\nexternaltools.dct.description=Data Curation Tool for curation of variables<br>\nexternaltools.explorer.displayname=Data Explorer<br>\nexternaltools.explorer.description=The Data Explorer provides a GUI which lists the variables in a tabular data file allowing searching, charting and cross tabulation analysis.</p>\n</blockquote>",
+        "id": 504127534,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1741362804
+    },
+    {
+        "content": "<p>Right, it's a bit messy. I wonder if we should remove <code>externaltools.dct.displayname=Data Curation Tool</code> and the rest and treat all tools the same way. That is, if you add a tool, you have to edit <code>Bundle.properties</code>.</p>",
+        "id": 504129069,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1741363257
+    }
+]

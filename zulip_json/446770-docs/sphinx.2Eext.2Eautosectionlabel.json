@@ -1,0 +1,20 @@
+[
+    {
+        "content": "<p>In the meeting today we went over how to add a ref manually. I mentioned that there's an extension to automate it: <a href=\"https://www.sphinx-doc.org/en/master/usage/extensions/autosectionlabel.html\">https://www.sphinx-doc.org/en/master/usage/extensions/autosectionlabel.html</a></p>\n<p>Technically, the thing you link to is called a label. We add them above a header like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>.. _account-log-in-options:\n\nAccount Log In Options\n~~~~~~~~~~~~~~~~~~~~~~\n</code></pre></div>\n<p>I had a quick play with sphinx.ext.autosectionlabel but there's a downside. We won't be able to use the same heading twice on the same page. For example, at <a href=\"https://guides.dataverse.org/en/6.8/admin/integrations.html\">https://guides.dataverse.org/en/6.8/admin/integrations.html</a> we have Open OnDemand under both \"getting data in\" and \"analysis and computation\".</p>\n<p><a href=\"https://docs.openedx.org/en/open-release-palm.master/documentors/decisions/0004-no-auto-section-label.html\">https://docs.openedx.org/en/open-release-palm.master/documentors/decisions/0004-no-auto-section-label.html</a> mentions the problem above and says it's hard to debug.</p>\n<p>I dunno, maybe we could try sphinx.ext.autosectionlabel on a smaller Sphinx site like the one at <a href=\"https://github.com/IQSS/dataverse-hub\">https://github.com/IQSS/dataverse-hub</a> first to see if we even like it. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 541701264,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758902221
+    },
+    {
+        "content": "<p>This is the change I made locally to test the extension:</p>\n<div class=\"codehilite\"><pre><span></span><code>diff --git a/doc/sphinx-guides/source/conf.py b/doc/sphinx-guides/source/conf.py\nindex abf6ba7379..af64cd5ecb 100755\n--- a/doc/sphinx-guides/source/conf.py\n+++ b/doc/sphinx-guides/source/conf.py\n@@ -47,6 +47,7 @@ extensions = [\n     &#39;myst_parser&#39;,\n     &#39;sphinx_tabs.tabs&#39;,\n     &#39;sphinx_substitution_extensions&#39;,\n+    &#39;sphinx.ext.autosectionlabel&#39;,\n ]\n\n # Add any paths that contain templates here, relative to this directory.\n@@ -442,3 +443,5 @@ rst_prolog = &quot;&quot;&quot;\n .. |version| replace:: %s\n .. |nextVersion| replace:: %s\n &quot;&quot;&quot; % (version, &quot;%s.%s&quot; % semver.Version.parse(version, optional_minor_and_patch=True).bump_minor().to_tuple()[0:2] )\n+\n+autosectionlabel_prefix_document = True\n\\ No newline at end of file\n</code></pre></div>",
+        "id": 541720570,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758909733
+    },
+    {
+        "content": "<p>This is what the \"two headings on the same page\" error looks like:</p>\n<p><code>/Users/pdurbin/github/iqss/guides.dataverse.org/doc/sphinx-guides/source/admin/integrations.rst:232:duplicate label admin/integrations:open ondemand, other instance in /Users/pdurbin/github/iqss/guides.dataverse.org/doc/sphinx-guides/source/admin/integrations.rst</code></p>",
+        "id": 541720688,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1758909788
+    }
+]

@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>Hi, we are migrating e-cienciaDatos from Dataverse v5.10.1 to v6.4 and we get a null pointer exception in the languages Field.<br>\nIt works in v5.10.1, but fails in v6.4</p>\n<p>The database <em>:Languages</em> setting entry is filled.<br>\ndvndb=&gt; select  * from setting where name =':Languages';<br>\n   name    |                                                content                                                 | id | lang  <br>\n------------+--------------------------------------------------------------------------------------------------------+----+------<br>\n:Languages | [{\"locale\":\"es\",\"title\":\"Spanish\"},{\"locale\":\"en\",\"title\":\"English\"},{\"locale\":\"fr\",\"title\":\"French\"}] | 40 |  </p>\n<p>The <em>dataverse.lang .directory</em> value in <em>domain.xml</em> file is set<br>\ngrep dataverse.lang $PAYARA/glassfish/domains/domain1/config/domain.xml<br>\n       &lt;jvm-options&gt;-Ddataverse.lang.directory=/usr/local/dataverseLang&lt;/jvm-options&gt;</p>\n<p>The log trace is long, but we have checked that the Dataverse.initLocale method is called and all languages are read:<br>\nThe server.log trace shows: <br>\n[2024-11-18T11:05:40.772+0100] [Payara 6.2024.10] [WARNING] [AS-EJB-00056] [jakarta.enterprise.ejb.container] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340772] [levelValue: 900] [[<br>\n A system exception occurred during an invocation on EJB DatasetFieldServiceBean, method: public java.lang.String edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(java.lang.String,java.lang.String)]]<br>\n[2024-11-18T11:05:40.773+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.ejb.container] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340773] [levelValue: 900] [[<br>\n<br>\njakarta.ejb.EJBException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)<br>\n       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)<br>\n       at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>\n       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n  [.................]</p>\n<p>at java.base/java.lang.Thread.run(Thread.java:840)<br>\nCaused by: java.lang.NullPointerException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>\n       at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>\n       at java.base/java.lang.reflect.Method.invoke(Method.java:569)<br>\n  [.................]</p>\n<p>... 96 more<br>\n]]<br>\n[2024-11-18T11:05:40.775+0100] [Payara 6.2024.10] [SEVERE] [] [jakarta.enterprise.resource.webcontainer.faces.application] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340775] [levelValue: 1000] [[<br>\n Error Rendering View[/dataverse.xhtml]<br>\njakarta.el.ELException: /search-include-fragment.xhtml @390,208 value=\"#{DatasetPage.getFieldLanguage(cvocConf.get(SearchIncludeFragment.getFieldTypeId(friendlyNames.get(0))).getString('languages'))}\": jakarta.ejb.EJBException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:77)<br>\n       at com.sun.faces.renderkit.html_basic.HtmlResponseWriter.getAttributeValue(HtmlResponseWriter.java:1137)<br>\n       at com.sun.faces.renderkit.html_basic.HtmlResponseWriter.flushAttributes(HtmlResponseWriter.java:1097)</p>\n<p>[.................]</p>\n<p>at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy.run0(WorkerThreadIOStrategy.java:83)<br>\n       at org.glassfish.grizzly.strategies.WorkerThreadIOStrategy$WorkerThreadRunnable.run(WorkerThreadIOStrategy.java:101)<br>\n       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.doWork(AbstractThreadPool.java:535)<br>\n       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>\n       at java.base/java.lang.Thread.run(Thread.java:840)<br>\nCaused by: jakarta.el.ELException: jakarta.ejb.EJBException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at jakarta.el.ELUtil.invokeMethod(ELUtil.java:221)<br>\n  [.................]<br>\n       at com.sun.faces.facelets.el.TagValueExpression.getValue(TagValueExpression.java:73)<br>\n       ... 80 more<br>\nCaused by: jakarta.ejb.EJBException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.processSystemException(EJBContainerTransactionManager.java:723)<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.completeNewTx(EJBContainerTransactionManager.java:652)<br>\n       at com.sun.ejb.containers.EJBContainerTransactionManager.postInvokeTx(EJBContainerTransactionManager.java:482)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvokeTx(BaseContainer.java:4601)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2134)<br>\n       at com.sun.ejb.containers.BaseContainer.postInvoke(BaseContainer.java:2104)<br>\n       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:220)<br>\n       at com.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>\n       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>\n       at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)<br>\n       ... 87 more<br>\nCaused by: java.lang.NullPointerException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n  [.................]<br>\n       at com.sun.ejb.containers.EJBLocalObjectInvocationHandler.invoke(EJBLocalObjectInvocationHandler.java:212)<br>\n       ... 96 more<br>\n]]<br>\n[2024-11-18T11:05:40.783+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.web.core] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340783] [levelValue: 900] [[<br>\n Servlet.service() for servlet Faces Servlet threw exception<br>\njava.lang.NullPointerException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at edu.harvard.iq.dataverse.DatasetFieldServiceBean.getFieldLanguage(DatasetFieldServiceBean.java:856)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n  [.................]<br>\n90)<br>\n       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n  [.................]<br>\n       at org.glassfish.grizzly.threadpool.AbstractThreadPool$Worker.run(AbstractThreadPool.java:515)<br>\n       at java.base/java.lang.Thread.run(Thread.java:840)<br>\n]]<br>\n[2024-11-18T11:05:40.784+0100] [Payara 6.2024.10] [WARNING] [] [jakarta.enterprise.web] [tid: _ThreadID=198 _ThreadName=http-thread-pool::http-listener-1(2)] [timeMillis: 1731924340784] [levelValue: 900] [[<br>\n StandardWrapperValve[default]: Servlet.service() for servlet default threw exception<br>\njava.lang.NullPointerException: Cannot invoke \"String.split(String)\" because \"languages\" is null<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)<br>\n       at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)<br>\n  [.................]<br>\ncom.sun.ejb.containers.EJBLocalObjectInvocationHandlerDelegate.invoke(EJBLocalObjectInvocationHandlerDelegate.java:90)<br>\n       at jdk.proxy74/jdk.proxy74.$Proxy373.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.__EJB31_Generated__DatasetFieldServiceBean__Intf____Bean__.getFieldLanguage(Unknown Source)<br>\n       at edu.harvard.iq.dataverse.DatasetPage.getFieldLanguage(DatasetPage.java:6207)<br>\n  [.................]<br>\n       at java.base/java.lang.Thread.run(Thread.java:840)<br>\n]]</p>\n<p>Do you know where could be the problem?</p>\n<p>Thanks</p>\n<p>Juan</p>",
+        "id": 482984757,
+        "sender_full_name": "Juan",
+        "timestamp": 1731926125
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"663397\">@Juan</span> yikes, thanks for letting us know. I see <code>cvocConf.get</code> in there. As an experiment, have you tried disabling the external controlled vocabulary feature?</p>",
+        "id": 483028534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731938062
+    },
+    {
+        "content": "<p>Thanks <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> . I will try it.</p>",
+        "id": 483028852,
+        "sender_full_name": "Juan",
+        "timestamp": 1731938148
+    },
+    {
+        "content": "<p>I didn't have the \":CVocConf\" entry in the database settings:</p>\n<p>dvndb=&gt; select * from setting where name like '%CVocConf%';<br>\nname | content | id | lang  <br>\n------+---------+----+------<br>\n(0 rows)</p>\n<p>I think that the external vocabulary is disabled.</p>",
+        "id": 483033302,
+        "sender_full_name": "Juan",
+        "timestamp": 1731939283
+    },
+    {
+        "content": "<p>Thanks. Interesting. I wonder why it appears in the stacktrace.</p>",
+        "id": 483034767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731939667
+    },
+    {
+        "content": "<p>According to <a href=\"https://metrics.dataverse.org\">https://metrics.dataverse.org</a> eight installations have upgraded to 6.4 but I don't know if any of them are using multiple languages.</p>",
+        "id": 483035059,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731939740
+    },
+    {
+        "content": "<p>We aren't at Harvard Dataverse. Just English.</p>",
+        "id": 483035107,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731939753
+    },
+    {
+        "content": "<p>You might want to email <a href=\"https://groups.google.com/g/dataverse-community\">https://groups.google.com/g/dataverse-community</a></p>",
+        "id": 483035249,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731939776
+    },
+    {
+        "content": "<p>Thank you, I will send the e-mail.</p>",
+        "id": 483044520,
+        "sender_full_name": "Juan",
+        "timestamp": 1731941985
+    },
+    {
+        "content": "<p>Thanks for posting <a href=\"https://groups.google.com/g/dataverse-community/c/pCMSLdiYR_0/m/aDsXzWXgCAAJ\">https://groups.google.com/g/dataverse-community/c/pCMSLdiYR_0/m/aDsXzWXgCAAJ</a></p>\n<p>It looks like <span class=\"user-mention\" data-user-id=\"698155\">@Mireia Alcala</span> replied already.</p>",
+        "id": 483075841,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731949513
+    },
+    {
+        "content": "<p>You are right, I will start with the Alfredo recommendation at first. Thanks.</p>",
+        "id": 483207251,
+        "sender_full_name": "Juan",
+        "timestamp": 1732005262
+    },
+    {
+        "content": "<p>At the end, the problem was that we were using a wrong Payara version. The help here and on the Google group was, as always, perfect.</p>",
+        "id": 483229998,
+        "sender_full_name": "Juan",
+        "timestamp": 1732012387
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"663397\">Juan</span> has marked this topic as resolved.</p>",
+        "id": 483230077,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1732012410
+    }
+]
