@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>Hi everyone,</p>\n<p>I ran systematic tests on pyDataverse 0.4.0beta1 (commit 1fb1ac6) using Python 3.14.7 on Windows against <a href=\"http://demo.dataverse.org\">demo.dataverse.org</a>. Here is a summary of what I tested and the observations and errors I ran into:</p>\n<p>Environment:</p>\n<ul>\n<li>OS: Windows</li>\n<li>Python Version: 3.14.7 (venv)</li>\n<li>Target Server: <a href=\"http://demo.dataverse.org\">demo.dataverse.org</a></li>\n</ul>\n<p>Successful Operations:</p>\n<ul>\n<li>Authentication &amp; User Info: Successfully connected via NativeApi and retrieved user details (get_user).</li>\n<li>Dataset Lifecycle: Created a draft dataset, fetched dataset details by DOI, retrieved persistent URLs and lock info, generated a private review URL, and fetched dataset versions/batch datasets.</li>\n<li>Metadata &amp; Exporters: Listed all available export formats and successfully exported draft metadata by explicitly specifying version=':draft'.</li>\n<li>Collection Browsing: Crawled root collection contents using crawl_collection.</li>\n</ul>\n<p>Observations, Warnings &amp; Errors Noticed:</p>\n<ol>\n<li>\n<p>Pydantic V2 Deprecation Warning:</p>\n<ul>\n<li>\n<p>Issue: Calling .json() on response objects triggered a deprecation warning:<br>\n   PydanticDeprecatedSince20: The json method is deprecated; use model_dump_json instead.</p>\n</li>\n<li>\n<p>Note: Might need updating internally to align with Pydantic v2 standards.</p>\n</li>\n</ul>\n</li>\n<li>\n<p>Draft Dataset Export (HTTP 400):</p>\n<ul>\n<li>\n<p>Issue: Calling get_dataset_export() on an unreleased/draft dataset without passing a version parameter resulted in:<br>\n   HTTP 400 - Unable to look up dataset based on version. Try :latest-published or :draft.</p>\n</li>\n<li>\n<p>Note: Works fine when version=':draft' is passed explicitly.</p>\n</li>\n</ul>\n</li>\n<li>\n<p>Strict Pydantic Validation on Metadata Edit:</p>\n<ul>\n<li>Issue: Using edit_dataset_metadata raised strict validation errors when expected payload structures (like missing fields) weren't explicitly matched.</li>\n</ul>\n</li>\n<li>\n<p>Dataset Publication Rule (HTTP 409):</p>\n<ul>\n<li>\n<p>Issue: Attempting to publish a draft dataset via publish_dataset() returned:<br>\n   HTTP 409 - Dataset must have a valid license or Custom Terms Of Use configured before it can be published.</p>\n</li>\n<li>\n<p>Note: Standard server-side validation rule, but noted for workflow testing.</p>\n</li>\n</ul>\n</li>\n</ol>",
+        "id": 623131075,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1789042952
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1198139\">Janvi Kapoor</span> <a href=\"#narrow/channel/377090-python/topic/pyDataverse.200.2E4.2E0beta1.20Testing.20Results.20.26.20Observations/near/623131075\">said</a>:</p>\n<blockquote>\n<p>Note: Might need updating internally to align with Pydantic v2 standards.</p>\n</blockquote>\n<p>For this one, observation 1, what do you suggest?</p>",
+        "id": 623134756,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789043740
+    },
+    {
+        "content": "<p>Also, thanks for taking a look!</p>",
+        "id": 623134783,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789043749
+    },
+    {
+        "content": "<p>Hi  <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> </p>\n<p>For Observation 1, since pyDataverse is using Pydantic v2, the older <code>.json()</code> method on models is deprecated in favor of <code>.model_dump_json()</code>. </p>\n<p>My suggestion would be to check the internal source code where <code>.json()</code> is being called on model instances and replace it with <code>.model_dump_json()</code> to fully align with Pydantic v2 standards and clear out those deprecation warnings. <br>\nShould I continue testing other methods like this, or should I change direction? Since the documentation is quite large, could you please point me to a specific module or file and let me know what exact operations you want me to focus on next?</p>",
+        "id": 623135831,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1789043999
+    },
+    {
+        "content": "<p>Wow, that was fast. Sorry, I have meetings all morning. More soon! Thanks again!</p>",
+        "id": 623141120,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789045111
+    },
+    {
+        "content": "<p>Hi everyone,</p>\n<p>While running edge-case and stress tests on pyDataverse 0.4.0beta1, I ran into one specific behavior in the collection crawler that might need a pre-flight validation check:</p>\n<ol>\n<li>\n<p>Crawler Hang / Timeout on Invalid Filter Parameter:</p>\n<ul>\n<li>Issue: When calling <code>crawl_collection(\":root\", filter_by=\"invalid_filter_type\")</code>, the utility hangs indefinitely or causes an async network timeout instead of raising an immediate client-side validation error (like a <code>ValueError</code>).</li>\n<li>Suggestion: Adding a quick input validation check for allowed filter types before initiating the async crawl process would prevent unnecessary network hangups.</li>\n</ul>\n</li>\n</ol>\n<p>Other standard validation checks (like Pydantic literal validation for <code>QueryOptions</code> and HTTP status mappings for invalid IDs/tokens) are behaving as expected.</p>\n<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>   Let me know if this helps or if there are other specific workflows you'd like me to test next!</p>",
+        "id": 623238045,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1789066205
+    },
+    {
+        "content": "<p>Hi, sorry, I'm all over the place today. Interviewing candidates for our open QA position (<a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/IQSS.20is.20hiring.20a.20Senior.20QA.20and.20Production.20Support.20Manager/with/609461080\">#community &gt; IQSS is hiring a Senior QA and Production Support Manager</a>). Trying to get the 6.12 release out (<a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/Release.206.2E12.20Timeline/with/622630487\">#community &gt; Release 6.12 Timeline</a>).</p>",
+        "id": 623238324,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789066284
+    },
+    {
+        "content": "<p>All this feedback on pyDataverse is valuable but I'd like <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> and Max (the maintainers) to take a look as well.</p>\n<p>If it's ok with you, we can slow down on the pyDataverse feedback until we hear from them and switch over to frontend development (<a class=\"stream\" data-stream-id=\"410361\" href=\"/#narrow/channel/410361-ui-dev\">#ui-dev</a> is a good place for that). Thanks for the frontend PR! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 623238884,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789066430
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  Please don't apologize at all—totally understand you're busy with interviews and the 6.12 release. </p>\n<p>No need to reply to me here! I'll keep dropping my pyDataverse test notes whenever I have them so Jan Range and Max can check them out whenever they're free. </p>\n<p>And sounds good, I'll switch my focus back to frontend development in the meantime. Good luck with the interviews and release! <span aria-label=\"rocket\" class=\"emoji emoji-1f680\" role=\"img\" title=\"rocket\">:rocket:</span></p>",
+        "id": 623240059,
+        "sender_full_name": "Janvi Kapoor",
+        "timestamp": 1789066713
+    },
+    {
+        "content": "<p>Thanks! Yes, we'll circle back to this feedback!</p>",
+        "id": 623241089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1789066885
+    }
+]

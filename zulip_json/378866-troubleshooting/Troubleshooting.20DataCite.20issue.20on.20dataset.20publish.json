@@ -1,0 +1,218 @@
+[
+    {
+        "content": "<p>I'm unable to publish a dataset, so I checked the serer log and I see:</p>\n<div class=\"codehilite\"><pre><span></span><code>[2023-12-13T13:21:23.029-0400] [Payara 5.2022.3] [WARNING] [] [edu.harvard.iq.dataverse.engine.command.impl.FinalizeDatasetPublicationCommand] [tid: _ThreadID=213 _ThreadName=__ejb-thread-pool9] [timeMillis: 1702488083029] [levelValue: 900] [[\n  Failed to reserve the identifier doi:10.25545/4UPJ00; notifying the user(s), unlocking the dataset]]\n</code></pre></div>\n<p>Is there any way to get a little more detail about that?</p>\n<p>[FYI: DV ver 5.14]</p>",
+        "id": 407792836,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702494299
+    },
+    {
+        "content": "<p>Weird. Is the dataset locked?</p>",
+        "id": 407793091,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702494437
+    },
+    {
+        "content": "<p>...how can i tell? :)</p>",
+        "id": 407793584,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702494657
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/5.14/api/native-api.html#manage-locks-on-a-specific-dataset\">https://guides.dataverse.org/en/5.14/api/native-api.html#manage-locks-on-a-specific-dataset</a></p>",
+        "id": 407793864,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702494774
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:[]}\n</code></pre></div>",
+        "id": 407794307,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702494991
+    },
+    {
+        "content": "<p>Ok, so I guess \"unlocking the dataset\" was true. Hmm.</p>",
+        "id": 407795256,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702495465
+    },
+    {
+        "content": "<p>Do other datasets publish ok?</p>",
+        "id": 407795268,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702495472
+    },
+    {
+        "content": "<p>Not sure. We don't publish a whole lot. I see there was a dataset published successfully on Oct 12th.</p>",
+        "id": 407795821,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702495735
+    },
+    {
+        "content": "<p>What if you try again? Same thing?</p>",
+        "id": 407795892,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702495777
+    },
+    {
+        "content": "<p>yea -- i tried it twice before coming here.</p>",
+        "id": 407796696,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702496112
+    },
+    {
+        "content": "<p>bah</p>",
+        "id": 407797594,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702496478
+    },
+    {
+        "content": "<p>Let's look at <a href=\"https://status.datacite.org\">https://status.datacite.org</a></p>",
+        "id": 407797670,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702496511
+    },
+    {
+        "content": "<p>All green.</p>",
+        "id": 407797691,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702496521
+    },
+    {
+        "content": "<p>Can you please try <a href=\"https://guides.dataverse.org/en/5.14/api/native-api.html#get-info-on-a-pid\">https://guides.dataverse.org/en/5.14/api/native-api.html#get-info-on-a-pid</a> on that DOI?</p>",
+        "id": 407799641,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702497305
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;id&quot;:&quot;10.25545/4upj00&quot;,&quot;state&quot;:&quot;draft&quot;}}⏎\n</code></pre></div>",
+        "id": 407800438,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702497611
+    },
+    {
+        "content": "<p>Ok, the two states on the DataCite side are \"draft\" and \"findable\". Your DOI is in draft. From Dataverse's perspective that means the DOI is already reserved.</p>",
+        "id": 407802504,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702498426
+    },
+    {
+        "content": "<p>So we should tell Dataverse the DOI is already reserved/registered on the DataCite side.</p>",
+        "id": 407802597,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702498459
+    },
+    {
+        "content": "<p>Unfortunately, this will require some database hacking. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 407802623,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702498473
+    },
+    {
+        "content": "<p>Let's use <a href=\"https://guides.dataverse.org/en/5.14/schemaspy/tables/dvobject.html\">https://guides.dataverse.org/en/5.14/schemaspy/tables/dvobject.html</a> for reference.</p>",
+        "id": 407802681,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702498509
+    },
+    {
+        "content": "<p>On the <code>dvobject</code> table there is a column called <code>identifierregistered</code>. It's a boolean. For that dataset, can you please try flipping it from false to true?</p>",
+        "id": 407802752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702498552
+    },
+    {
+        "content": "<p>Sure. One min...</p>",
+        "id": 407802919,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702498637
+    },
+    {
+        "content": "<p>Alright. Done. Re-try the publish?</p>",
+        "id": 407803653,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702498959
+    },
+    {
+        "content": "<p>Yes, please try again.</p>",
+        "id": 407803893,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702499079
+    },
+    {
+        "content": "<p>success!</p>",
+        "id": 407805221,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702499614
+    },
+    {
+        "content": "<p>I'm still curious how things got out of sync there, but, glad it's live!</p>",
+        "id": 407805953,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702499959
+    },
+    {
+        "content": "<p><span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 407805983,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702499974
+    },
+    {
+        "content": "<p>Yeah, I'm not sure either.</p>",
+        "id": 407806005,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702499985
+    },
+    {
+        "content": "<p>Do you think we should have an API for the dvobject thing?</p>",
+        "id": 407806298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702500116
+    },
+    {
+        "content": "<p>Doesn't really seem like it's something a person should <em>have</em> to look at on a regular basis.</p>",
+        "id": 407806997,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702500408
+    },
+    {
+        "content": "<p>Definitely.</p>",
+        "id": 407807064,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702500441
+    },
+    {
+        "content": "<p>Hey from <a href=\"https://dataverse.lib.unb.ca/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi%3A10.25545/4UPJ00\">https://dataverse.lib.unb.ca/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi%3A10.25545/4UPJ00</a> I'm seeing a createTime of \"2023-06-06T16:11:30Z\".</p>\n<p>Do you happen to know what version of Dataverse you were running back then?</p>",
+        "id": 407807120,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702500472
+    },
+    {
+        "content": "<p>v5.12.1</p>",
+        "id": 407807975,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702500834
+    },
+    {
+        "content": "<p>i did the 5.13 and 5.14 upgrades in september</p>",
+        "id": 407808086,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702500866
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> was wondering.</p>",
+        "id": 407810068,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702501531
+    },
+    {
+        "content": "<p>He's the one who suggested the fix, by the way. <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 407810851,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702501820
+    },
+    {
+        "content": "<p>Thanks, all :)</p>",
+        "id": 407823703,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1702507616
+    }
+]

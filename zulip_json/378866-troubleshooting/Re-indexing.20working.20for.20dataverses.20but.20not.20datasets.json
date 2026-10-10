@@ -1,0 +1,176 @@
+[
+    {
+        "content": "<p>I'm seeing a curious issue where dataverses appear in the search results but datasets do not.  Datasets can be accessed through the links in Notifications, but they don't show up in the search at all.  This first appeared when I was making changes to <a href=\"http://citation.properties\">citation.properties</a> and <a href=\"http://geospatial.properties\">geospatial.properties</a>.</p>\n<p>I've tried all of the commands on the <a href=\"https://guides.dataverse.org/en/latest/admin/solr-search-index.html\">Solr Search Index</a> page with no success.  The commands appear to be successful, but still no datasets appear in the UI.</p>\n<p>For example, if I try to re-index a single dataset (curl <a href=\"http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000\">http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000</a>), I see the result:</p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Reindexed dataset perma:DV/ZWIP4O&quot;,&quot;id&quot;:5,&quot;persistentId&quot;:&quot;perma:DV/ZWIP4O&quot;,&quot;versions&quot;:[{&quot;semanticVersion&quot;:&quot;1.0&quot;,&quot;id&quot;:1}]}}\n</code></pre></div>\n<p>If I clear the search index (curl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a>) the dataverses disappear except for the root, but when I index again (curl <a href=\"http://localhost:8080/api/admin/index\">http://localhost:8080/api/admin/index</a>), only the dataverses reappear.  The datasets do not.  And yes, they are published!</p>\n<div class=\"codehilite\"><pre><span></span><code>{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;availablePartitionIds&quot;:[0],&quot;args&quot;:{&quot;numPartitions&quot;:1,&quot;partitionIdToProcess&quot;:0},&quot;message&quot;:&quot;indexAllOrSubset has begun of 4 dataverses and 1 datasets.&quot;}}\n</code></pre></div>\n<p>The result for the Async Reindex shows the correct number of dataverses and dataset(s).</p>\n<p>I am using podman with containers.  Any advice is appreciated.</p>",
+        "id": 614788854,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785942762
+    },
+    {
+        "content": "<p>Do you see any errors in the logs from the main Dataverse container?</p>",
+        "id": 614793152,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785943944
+    },
+    {
+        "content": "<p>(For a non-Docker installation, I'm talking about server.log: <a href=\"https://guides.dataverse.org/en/6.11/admin/troubleshooting.html#finding-the-payara-log-file\">https://guides.dataverse.org/en/6.11/admin/troubleshooting.html#finding-the-payara-log-file</a> )</p>",
+        "id": 614793310,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785943981
+    },
+    {
+        "content": "<p>I don't see any errors, actually.   Here is a copy of the file, attached.<br>\n<a href=\"/user_uploads/53090/ihmMZPbt_bXtfS5p8WnEd-rt/dataverse_datacore_server.log\">dataverse_datacore_server.log</a></p>",
+        "id": 614834131,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785956198
+    },
+    {
+        "content": "<p>Wow, almost nothing in that log. No noise about timers and whatnot? Has the instance been up for a while?</p>\n<p>The noise I'm talking about looks like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2026-08-05T18:50:01.004+0000|INFO|Payara 7.2026.2|edu.harvard.iq.dataverse.timer.DataverseTimerServiceBean|_ThreadID=288;_ThreadName=__ejb-thread-pool12;_TimeMillis=1785955801004;_LevelValue=800;|\n  HarvesterService: checking timer 1|#]\n\n[#|2026-08-05T18:50:01.004+0000|INFO|Payara 7.2026.2|edu.harvard.iq.dataverse.timer.DataverseTimerServiceBean|_ThreadID=288;_ThreadName=__ejb-thread-pool12;_TimeMillis=1785955801004;_LevelValue=800;|\n  HarvesterService: checking timer 2|#]\n</code></pre></div>",
+        "id": 614834487,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785956318
+    },
+    {
+        "content": "<p>No, because I keep stopping the containers and spinning them up again, trying different things.  So the instance hasn't been up long.</p>",
+        "id": 614835028,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785956504
+    },
+    {
+        "content": "<p>I think we should verify that logging is working. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 614835582,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785956706
+    },
+    {
+        "content": "<p>That would explain it!  <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 614835658,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785956732
+    },
+    {
+        "content": "<p>You're doing something like this?</p>\n<div class=\"codehilite\"><pre><span></span><code>docker logs -f dataverse\n</code></pre></div>\n<p>(For me, in dev, it's dev_dataverse.)</p>",
+        "id": 614835706,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785956750
+    },
+    {
+        "content": "<p>What if you go to <a href=\"http://localhost:8080/api/dataverses/doesNotExist\">http://localhost:8080/api/dataverses/doesNotExist</a></p>\n<p>In the logs, I see this:</p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2026-08-05T19:07:22.961+0000|WARNING|Payara 7.2026.2|edu.harvard.iq.dataverse.DataverseServiceBean|_ThreadID=148;_ThreadName=http-thread-pool::http-listener-1(4);_TimeMillis=1785956842961;_LevelValue=900;|\n  Unable to find a single dataverse using alias &quot;doesNotExist&quot;: jakarta.persistence.NoResultException: getSingleResult() did not retrieve any entities.|#]\n</code></pre></div>\n<p>Can you get something like that to show up in the logs?</p>",
+        "id": 614836078,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785956887
+    },
+    {
+        "content": "<p>When I run <code>podman logs -f dataverse</code> I see something like you describe.  The previous log was from /appserver/glassfish/domains/domain1/logs/server.log</p>",
+        "id": 614836554,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785957069
+    },
+    {
+        "content": "<p>Ah, makes sense. We definitely want the live log.</p>\n<p>Now! Can you please try reindexing a dataset? The command should be something like </p>\n<div class=\"codehilite\"><pre><span></span><code>curl http://localhost:8080/api/admin/index/dataset?persistentId=doi:10.5072/FK2/AAA000\n</code></pre></div>\n<p>From <a href=\"https://guides.dataverse.org/en/6.11/admin/solr-search-index.html#reindexing-datasets\">https://guides.dataverse.org/en/6.11/admin/solr-search-index.html#reindexing-datasets</a></p>",
+        "id": 614836879,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785957197
+    },
+    {
+        "content": "<p>Here are the results from the live log, showing the \"page not found\" warning on down.</p>\n<p><a href=\"/user_uploads/53090/azyxSYsSROjDYlKLgBZOvS19/live_log.txt\">live_log.txt</a></p>\n<p>\"methodology\" is one of the fields from the custom metadata .tsv file that I added.</p>",
+        "id": 614837606,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785957434
+    },
+    {
+        "content": "<p>Yeah, it's the one that's preventing indexing.</p>\n<p>As you say: <code>unknown field 'methodology'</code></p>",
+        "id": 614838077,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785957599
+    },
+    {
+        "content": "<p>You made a brand new tsv file, right?</p>",
+        "id": 614838269,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785957656
+    },
+    {
+        "content": "<p>foobar.tsv instead of citation.tsv I mean</p>",
+        "id": 614838480,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785957747
+    },
+    {
+        "content": "<p>Yes, according to these instructions:  <a href=\"https://guides.dataverse.org/en/latest/admin/metadatacustomization.html#metadata-block-setup\">Metadata Block Setup</a></p>\n<p>Looks like the  \"Updating the Solr Schema\" step was the one that was failing.  Possibly I was running it in the wrong container.</p>",
+        "id": 614839336,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785958102
+    },
+    {
+        "content": "<p>Gotcha. If it helps, I wrote up some container-specific instructions here: <a href=\"https://guides.dataverse.org/en/6.11/container/running/demo.html#additional-metadata-blocks\">https://guides.dataverse.org/en/6.11/container/running/demo.html#additional-metadata-blocks</a></p>",
+        "id": 614839893,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785958328
+    },
+    {
+        "content": "<p>Sorry this is so hard and weird, by the way! It's just the way it's always been! <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 614839994,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785958370
+    },
+    {
+        "content": "<p><span aria-label=\"joy\" class=\"emoji emoji-1f602\" role=\"img\" title=\"joy\">:joy:</span></p>",
+        "id": 614840093,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785958414
+    },
+    {
+        "content": "<p>Shall I create a pull request on GitHub for a podman-specific command to update the Solr schema?  The equivalent of </p>\n<blockquote>\n<p>curl <a href=\"http://localhost:8080/api/admin/index/solr/schema\">http://localhost:8080/api/admin/index/solr/schema</a> | docker run -i --rm -v ./docker-dev-volumes/solr/data:/var/solr gdcc/configbaker:unstable <a href=\"http://update-fields.sh\">update-fields.sh</a> /var/solr/data/collection1/conf/schema.xml</p>\n</blockquote>\n<p>Also, I am unable to find the schema.xml file.</p>",
+        "id": 614846026,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785960678
+    },
+    {
+        "content": "<p>Hmm, yes, let's figure out how to document podman commands. I'd like to suggest we talk more in <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/podman.20instead.20of.20docker/with/613232834\">#containers &gt; podman instead of docker</a> and tomorrow's container meeting! See <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/meetings/with/614768628\">#containers &gt; meetings</a></p>",
+        "id": 614846872,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785960966
+    },
+    {
+        "content": "<p>As for the schema.xml file, it's got to be in there somewhere! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 614846989,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785961001
+    },
+    {
+        "content": "<p>Oh, right! Instead of docker-dev-volumes/solr you probably have data/solr?</p>",
+        "id": 614847427,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785961184
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>docker-compose-dev.yml\n81:      - ./docker-dev-volumes/app/data:/dv\n112:      - ./docker-dev-volumes/app/data:/dv\n\ndocker/compose/demo/compose.yml\n42:      - ./data/app/data:/dv\n75:      - ./data/app/data:/dv\n</code></pre></div>",
+        "id": 614847588,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785961250
+    },
+    {
+        "content": "<p>Ah yes, it's in data/solr/conf/conf .  Thank you!</p>",
+        "id": 614850918,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1785962543
+    },
+    {
+        "content": "<p>Great! Sure!</p>\n<p>Since this is under <a href=\"https://guides.dataverse.org/en/6.11/container/running/demo.html\">https://guides.dataverse.org/en/6.11/container/running/demo.html</a> (demo stuff rather than dev stuff ), I should have used \"data/solr\", obviously.</p>\n<p>If you feel like making a PR, please go ahead! But for now, please keep it as \"docker\" instead of \"podman\" if you do. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 614852113,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1785963046
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> as discussed we created this issue today:</p>\n<p>In container guide, solr updates, change docker-dev-volumes to data <a href=\"https://github.com/IQSS/dataverse/issues/12588\">#12588</a></p>\n<p>Are you interested in making a PR? If not, I can or add \"good first issue\" label on it.</p>",
+        "id": 615041493,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786038138
+    },
+    {
+        "content": "<p>Nevermind! It's much quicker for me to fix.</p>\n<p>I just made PR <a href=\"https://github.com/IQSS/dataverse/issues/12589\">#12589</a> and I'd appreciate a review!</p>",
+        "id": 615043852,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786038726
+    }
+]

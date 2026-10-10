@@ -1,0 +1,119 @@
+<html>
+<head><meta charset="utf-8"><title>experimental-pr-split-integration-tests · dev · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/index.html">dev</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html">experimental-pr-split-integration-tests</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="629250174"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629250174" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629250174">(Oct 05 2026 at 13:47)</a>:</h4>
+<p>I wanted to collect some thoughts on this PR: <a href="https://github.com/uncch-rdmc/dataverse/pull/99">https://github.com/uncch-rdmc/dataverse/pull/99</a></p>
+
+
+
+<a name="629250266"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629250266" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629250266">(Oct 05 2026 at 13:47)</a>:</h4>
+<p>It builds on top of the work in: <a href="https://github.com/IQSS/dataverse/pull/12783">https://github.com/IQSS/dataverse/pull/12783</a></p>
+
+
+
+<a name="629250628"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629250628" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629250628">(Oct 05 2026 at 13:48)</a>:</h4>
+<p>What does this PR do?</p>
+<p>It splits the current integration tests into 3 groups that take about the same time to run.</p>
+<p>This PR causes 6 GitHub Action runners to run concurrently at the same time, but it pushes down the entire process from PR to test results in about 20-25 minutes flat.</p>
+<p>Build Containers ──┬── JSF Tests (chromium) ~ 20 mins<br>
+                   ├── JSF Tests (firefox) ~ 23 mins<br>
+                   ├── JSF Tests (webkit) ~ 21 mins<br>
+                   └── Integration Tests (Group 1) ~ 18 mins<br>
+                   └── Integration Tests (Group 2) ~ 18 mins<br>
+                   └── Integration Tests (Group 3) ~ 18 mins</p>
+<p>So overall this is a very major improvement for development speed.</p>
+<p>So, what's the catch? Well, GitHub Free Organizations (like IQSS) have a concurrency limit of 20 runners for the WHOLE org. So this means at max 3 PRs can be processed every 20 minutes for all repos within the org. I linked some numbers onto the PR.</p>
+
+
+
+<a name="629252460"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629252460" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629252460">(Oct 05 2026 at 13:54)</a>:</h4>
+<p>Does "each on its own runner with a fresh Dataverse" mean you're spinning up three instances of Dataverse?</p>
+
+
+
+<a name="629253550"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629253550" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629253550">(Oct 05 2026 at 13:58)</a>:</h4>
+<p>that's right</p>
+
+
+
+<a name="629253651"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629253651" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629253651">(Oct 05 2026 at 13:58)</a>:</h4>
+<p>actually in this PR, six instances</p>
+
+
+
+<a name="629254315"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629254315" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629254315">(Oct 05 2026 at 14:00)</a>:</h4>
+<p>Sounds like a good way to get more work done more quickly! <span aria-label="tada" class="emoji emoji-1f389" role="img" title="tada">:tada:</span></p>
+
+
+
+<a name="629262158"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629262158" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629262158">(Oct 05 2026 at 14:25)</a>:</h4>
+<p>If we want to make this experimental PR happen without causing traffic bottlenecks for other developers, we might have to create a separate testing org with a GitHub Teams subscription. That's why I wanted to just start the conversation on how this might look. I don't want to pay GitHub any money.</p>
+
+
+
+<a name="629263844"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629263844" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629263844">(Oct 05 2026 at 14:30)</a>:</h4>
+<p>Do you have a sense of how close we are to maxing out our limits? I'm not even very aware of them. <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="629265024"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629265024" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629265024">(Oct 05 2026 at 14:33)</a>:</h4>
+<p><img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="1568x388" data-original-src="/user_uploads/53090/bkAMrZWRplNj9GQtPXDdY3La/image.png" src="/user_uploads/thumbnail/53090/bkAMrZWRplNj9GQtPXDdY3La/image.png/840x560.webp"><br>
+So P99 is essentially worst case, P90 is the average experience. I modeled based on past week's usage, but release times might be more hectic</p>
+<p>Right now for P90 we're nowhere near the limits. After 12783 is merged, P90 goes to 53 seconds, and P99 goes to 6 minutes, but this is completely acceptable, since the tests finish 50% faster and the runners get released fast, so overall it is a win no matter what.</p>
+<p>With the experimental PR, P90 goes to 3 min and P99 goes to 10 mins. Realistically, this means we would erase any savings that we got with the optimization, and create more overhead. Especially during releases.</p>
+
+
+
+<a name="629266089"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629266089" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629266089">(Oct 05 2026 at 14:37)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="1034135">Ash Manda</span> <a href="#narrow/channel/379673-dev/topic/experimental-pr-split-integration-tests/near/629265024">said</a>:</p>
+<blockquote>
+<p>Right now for P90 we're nowhere near the limits.</p>
+</blockquote>
+<p>I'm glad to hear this! <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="629266796"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629266796" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629266796">(Oct 05 2026 at 14:40)</a>:</h4>
+<p>If I'm able to find a safe way to run the Integration Tests and JSF tests on the same instance in parallel, we would kill two birds with one shot</p>
+
+
+
+<a name="629314938"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629314938" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Don Sizemore <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629314938">(Oct 05 2026 at 17:28)</a>:</h4>
+<p><span class="user-mention" data-user-id="598112">@Philip Durbin 🚀</span> and <span class="user-mention" data-user-id="1034135">@Ash Manda</span> : I'm clearing Jenkins from the docs (and code comments) as we convert to containerized GitHub Actions. What say y'all about</p>
+<div class="codehilite"><pre><span></span><code>./src/test/java/edu/harvard/iq/dataverse/api/UsersIT.java:    // This test is disabled because it is only compatible with the containerized development environment and would cause the Jenkins job to fail.
+./src/test/java/edu/harvard/iq/dataverse/api/FilesIT.java:    // This test is disabled because it is only compatible with the containerized development environment and would cause the Jenkins job to fail.
+</code></pre></div>
+<p>?</p>
+
+
+
+<a name="629335338"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/379673-dev/topic/experimental-pr-split-integration-tests/near/629335338" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/379673-dev/topic/experimental-pr-split-integration-tests.html#629335338">(Oct 05 2026 at 18:44)</a>:</h4>
+<p><span class="user-mention" data-user-id="626369">@Don Sizemore</span> please don't mess with those lines. I'm messing with them (enabling the disabled tests!) in this PR: support SPA dev - <a href="https://github.com/IQSS/dataverse/issues/12746">#12746</a></p>
+<p>Please see also <a class="stream-topic" data-stream-id="375812" href="/#narrow/channel/375812-containers/topic/support.20SPA.20dev.20.2312746/with/628784841">#containers &gt; support SPA dev #12746</a></p>
+
+
+
+<hr><p>Last updated: Oct 10 2026 at 18:09 UTC</p>
+</html>

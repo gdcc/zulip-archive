@@ -1,0 +1,134 @@
+[
+    {
+        "content": "<p>Hello all,</p>\n<p>Does anyone know if there is a way to exclude some results when doing a search query? <br>\nI got this example from a user:</p>\n<p><a href=\"https://archaeology.datastations.nl/dataverse/root?q=&amp;fq0=dansSpatialCoverageText_ss%3A%22West+Betuwe%22&amp;types=dataverses%3Adatasets%3Afiles&amp;sort=dateSort&amp;order=desc\">https://archaeology.datastations.nl/dataverse/root?q=&amp;fq0=dansSpatialCoverageText_ss%3A%22West+Betuwe%22&amp;types=dataverses%3Adatasets%3Afiles&amp;sort=dateSort&amp;order=desc</a></p>\n<p>Where we would like to exclude all datasets that have 'Portable Antiquities of the Netherlands' as author name. Is this somehow possible? I don't think the boolean 'NOT' will work here?</p>\n<p>Laura</p>",
+        "id": 509708427,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743602944
+    },
+    {
+        "content": "<p>Please try it with double quotes rather than single quotes, like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>NOT &quot;Portable Antiquities of the Netherlands&quot;\n</code></pre></div>",
+        "id": 509709401,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743603166
+    },
+    {
+        "content": "<p>This is known as a phrase: <a href=\"https://solr.apache.org/guide/solr/9_7/query-guide/standard-query-parser.html#specifying-terms-for-the-standard-query-parser\">https://solr.apache.org/guide/solr/9_7/query-guide/standard-query-parser.html#specifying-terms-for-the-standard-query-parser</a></p>",
+        "id": 509710087,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743603316
+    },
+    {
+        "content": "<p>Thanks for the hint Phil.<br>\nI am not an expert at all with search queries. <br>\nI tried this in the Advanced Search UI:<br>\n<a href=\"/user_uploads/53090/X95Ee3kCw6oKKOIozPwcAv3U/Screenshot-2025-04-02-at-16.34.48.png\">Screenshot 2025-04-02 at 16.34.48.png</a><br>\n<a href=\"/user_uploads/53090/RpDWVeg_AvdfNgK3TdD0S9Tz/Screenshot-2025-04-02-at-16.35.08.png\">Screenshot 2025-04-02 at 16.35.08.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/X95Ee3kCw6oKKOIozPwcAv3U/Screenshot-2025-04-02-at-16.34.48.png\" title=\"Screenshot 2025-04-02 at 16.34.48.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1448x210\" src=\"/user_uploads/thumbnail/53090/X95Ee3kCw6oKKOIozPwcAv3U/Screenshot-2025-04-02-at-16.34.48.png/840x560.webp\"></a></div><div class=\"message_inline_image\"><a href=\"/user_uploads/53090/RpDWVeg_AvdfNgK3TdD0S9Tz/Screenshot-2025-04-02-at-16.35.08.png\" title=\"Screenshot 2025-04-02 at 16.35.08.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1616x108\" src=\"/user_uploads/thumbnail/53090/RpDWVeg_AvdfNgK3TdD0S9Tz/Screenshot-2025-04-02-at-16.35.08.png/840x560.webp\"></a></div><p>This results in <a href=\"https://archaeology.datastations.nl/dataverse/root/?q=%28authorName%3A%22Portable+Antiquities+of+the+Netherlands%22+AND+dansSpatialCoverageText%3AWest%2BBetuwe%29\">https://archaeology.datastations.nl/dataverse/root/?q=%28authorName%3A%22Portable+Antiquities+of+the+Netherlands%22+AND+dansSpatialCoverageText%3AWest%2BBetuwe%29</a></p>\n<p>It ignores the 'NOT'. Probably a dumb question, but where do I place the 'NOT' in my query?</p>",
+        "id": 509716325,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743604767
+    },
+    {
+        "content": "<p>Hmm, I see you have spatial coverage in there as well. Let's focus on one field first. Walk before we run. <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 509716882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743604908
+    },
+    {
+        "content": "<p>You're right that the Advanced Search page eats the NOT. <img alt=\":doh:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/343009b9.png\" title=\"doh\"></p>",
+        "id": 509717018,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743604932
+    },
+    {
+        "content": "<p>What if you type this directly in the search box?</p>\n<div class=\"codehilite\"><pre><span></span><code>NOT authorName:&quot;Portable Antiquities of the Netherlands&quot;\n</code></pre></div>",
+        "id": 509717062,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743604946
+    },
+    {
+        "content": "<p>Yes, that is working.</p>",
+        "id": 509717830,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743605127
+    },
+    {
+        "content": "<p>But yeah, the user would like to filter on another metadata field as well.<br>\nWe have a custom field called 'dansSpatialCoverageText'.</p>",
+        "id": 509718191,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743605199
+    },
+    {
+        "content": "<p>When you say it isn't working, can you please be more specific?</p>\n<p>The default sort is \"relevance\" and if I flip it to \"newest\" I see datasets that don't seem to have that search phrase. So it feels like it's working. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 509718751,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743605316
+    },
+    {
+        "content": "<p>Ah, I tried this in the search box, and I think this gives the result I needed:<br>\nNOT authorName:\"Portable Antiquities of the Netherlands\" AND dansSpatialCoverageText:\"West Betuwe\"</p>",
+        "id": 509719012,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743605375
+    },
+    {
+        "content": "<p><span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 509719109,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743605396
+    },
+    {
+        "content": "<p>Thanks for pointing me in the right direction!</p>",
+        "id": 509721450,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743605922
+    },
+    {
+        "content": "<p>Sure. And please feel free to create an issue about the Advanced Search page gobbling up that NOT. <span aria-label=\"hamburger\" class=\"emoji emoji-1f354\" role=\"img\" title=\"hamburger\">:hamburger:</span></p>",
+        "id": 509721916,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743606034
+    },
+    {
+        "content": "<p>It looks like the new front end doesn't have an Advanced Search page yet: <a href=\"https://beta.dataverse.org/spa/\">https://beta.dataverse.org/spa/</a></p>",
+        "id": 509722353,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743606123
+    },
+    {
+        "content": "<p>Ok Round 2 :)</p>\n<p>I am trying to recreate this search with the search API: <br>\n<a href=\"https://archaeology.datastations.nl/dataverse/root?q=&amp;fq0=dansSpatialCoverageText_ss%3A%22West+Betuwe%22&amp;fq1=authorName_ss%3A%22Portable+Antiquities+of+the+Netherlands%22&amp;types=datasets&amp;page=1&amp;sort=dateSort&amp;order=desc\">https://archaeology.datastations.nl/dataverse/root?q=&amp;fq0=dansSpatialCoverageText_ss%3A%22West+Betuwe%22&amp;fq1=authorName_ss%3A%22Portable+Antiquities+of+the+Netherlands%22&amp;types=datasets&amp;page=1&amp;sort=dateSort&amp;order=desc</a><br>\nThis link gives us 2403 results.</p>\n<p>I have tried this with the search API: <a href=\"https://archaeology.datastations.nl/api/search?&amp;sort=dateSort&amp;order=desc&amp;q=fq0=dansSpatialCoverageText_ss:%22West%20Betuwe%22&amp;fq1=authorName_ss:%22Portable+Antiquities+of+the+Netherlands%22&amp;type=dataset\">https://archaeology.datastations.nl/api/search?&amp;sort=dateSort&amp;order=desc&amp;q=fq0=dansSpatialCoverageText_ss:%22West%20Betuwe%22&amp;fq1=authorName_ss:%22Portable+Antiquities+of+the+Netherlands%22&amp;type=dataset</a><br>\nBut it seems to ignore the fq1=authorName_ss:%22Portable+Antiquities+of+the+Netherlands%22 part. </p>\n<p>What am I missing here?</p>",
+        "id": 509870109,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743667456
+    },
+    {
+        "content": "<p>BTW: I was puzzled first by the fact that to filter in the API on datasets only, you have to use type=dataset, instead of 'types=datasets'. As you can see in the examples above.</p>",
+        "id": 509870523,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743667572
+    },
+    {
+        "content": "<p>Here you go, 2403: <a href=\"https://archaeology.datastations.nl/api/search?&amp;sort=dateSort&amp;order=desc&amp;q=*&amp;fq=dansSpatialCoverageText_ss:%22West%20Betuwe%22&amp;fq=authorName_ss:%22Portable+Antiquities+of+the+Netherlands%22&amp;type=dataset\">https://archaeology.datastations.nl/api/search?&amp;sort=dateSort&amp;order=desc&amp;q=*&amp;fq=dansSpatialCoverageText_ss:%22West%20Betuwe%22&amp;fq=authorName_ss:%22Portable+Antiquities+of+the+Netherlands%22&amp;type=dataset</a></p>",
+        "id": 509954252,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743689808
+    },
+    {
+        "content": "<p>I changed <code>q=</code> to <code>q=*&amp;</code> an <code>fq0</code> and <code>fq1</code> to just <code>fq</code>.</p>",
+        "id": 509954607,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743689881
+    },
+    {
+        "content": "<p>The <code>&amp;</code> is just to separate query parameters.</p>",
+        "id": 509954740,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743689903
+    },
+    {
+        "content": "<p>Thanks for your magic! So the fq does not need numbering at all.. <br>\nI see now that I got confused comparing the query from the UI with the API query.</p>",
+        "id": 509963362,
+        "sender_full_name": "Laura Huis in 't Veld",
+        "timestamp": 1743691955
+    },
+    {
+        "content": "<p>Interestingly, the SPA does it a third, different way with <code>fqs</code>: <a href=\"https://beta.dataverse.org/spa/collections?fqs=publicationDate%3A2024%2CauthorName_ss%3ADurbin%252C%2520Philip\">https://beta.dataverse.org/spa/collections?fqs=publicationDate%3A2024%2CauthorName_ss%3ADurbin%252C%2520Philip</a> <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"> </p>\n<p>I'm not saying it's wrong but I didn't realize until just now it's different than how the API works. It might be nice to line up with with the API so people can more easily copy and paste between the API and SPA. /cc <span class=\"user-mention\" data-user-id=\"598447\">@Ellen K</span> <span class=\"user-mention\" data-user-id=\"751566\">@Cheng Shi</span> <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span></p>",
+        "id": 509964090,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1743692141
+    }
+]

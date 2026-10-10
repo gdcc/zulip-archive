@@ -1,0 +1,122 @@
+[
+    {
+        "content": "<p>Hi everyone!</p>\n<p>I’m Amandha, a software engineer at FIU working on a research project called EnviStor. One of our goals is to publish datasets via Dataverse, and I’ve recently become responsible for managing our Dataverse server.</p>\n<p>I’ve been learning a lot on the fly — working with an existing Payara setup, reading the documentation, and trying to understand upgrade procedures, configuration files, etc. While I’m making progress, I don’t yet feel confident handling the server on my own and would really appreciate any guidance or tips from those with more experience.</p>\n<p>Are there any good resources (guides, checklists, best practices, etc.) focused more on the <em>system administration/configuration side</em> of Dataverse? I saw there are some training resources for end users, but nothing focused on managing Payara, deployment processes, or troubleshooting in production environments.</p>\n<p>Also, if anyone here has experience upgrading Dataverse between versions (we’re going from 6.0 to 6.7), I’d love to hear how you handled it, especially any lessons learned or things to watch out for.</p>\n<p>Thanks in advance! I’m excited to learn and contribute as I go. <span aria-label=\"blush\" class=\"emoji emoji-1f60a\" role=\"img\" title=\"blush\">:blush:</span></p>",
+        "id": 530422856,
+        "sender_full_name": "Amandha Wingert Barok",
+        "timestamp": 1753300699
+    },
+    {
+        "content": "<p>Welcome! Do you have some sort of staging server to experiment on? If not, I'd suggest running Dataverse on your laptop (or a server) using Docker. <a href=\"https://guides.dataverse.org/en/6.7/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.7/container/running/demo.html#quickstart</a> is the place to start but because of a little issue (<a href=\"https://github.com/IQSS/dataverse/issues/11661\">#11661</a>) we're fixing, there's currently an extra step, changing \"latest\" to \"6.7-noble\" like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>% diff compose.yml.orig compose.yml\n8c8\n&lt;     image: gdcc/dataverse:latest\n---\n&gt;     image: gdcc/dataverse:6.7-noble\n</code></pre></div>\n<p>This would allow you to experiment with Dataverse configuration and get familiar with running Dataverse in a throwaway environment.</p>",
+        "id": 530424082,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753301049
+    },
+    {
+        "content": "<p>Yes! We do have a dev server (<code>dataversedev.fiu.edu</code>) where I’ve been testing things like version upgrades and web styling before touching production.</p>",
+        "id": 530425542,
+        "sender_full_name": "Amandha Wingert Barok",
+        "timestamp": 1753301589
+    },
+    {
+        "content": "<p>Ah, that's great.</p>",
+        "id": 530425773,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753301701
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651907\">@Don Richards</span> for upgrading, do you think <span class=\"user-mention\" data-user-id=\"940523\">@Amandha Wingert Barok</span> should try the scripts you added in <a href=\"https://github.com/gdcc/dataverse-recipes/pull/14\">https://github.com/gdcc/dataverse-recipes/pull/14</a> ? (I know you're adding more in <a href=\"https://github.com/gdcc/dataverse-recipes/pull/25\">https://github.com/gdcc/dataverse-recipes/pull/25</a> )</p>",
+        "id": 530425984,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753301793
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"940523\">@Amandha Wingert Barok</span> there's a somewhat recent thread about upgrading at <a href=\"https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ\">https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ</a> you might want to look through.</p>",
+        "id": 530426387,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753301957
+    },
+    {
+        "content": "<p>Generally speaking, upgrading is a pain in the butt, I'm afraid. <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 530426429,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753301976
+    },
+    {
+        "content": "<p>As we say at <a href=\"https://guides.dataverse.org/en/6.7/installation/upgrading.html\">https://guides.dataverse.org/en/6.7/installation/upgrading.html</a> the official way to upgrade is to step through each and every release.</p>\n<p>But that said, we have a clever community that has come up with some unsupported shortcuts. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> </p>\n<p>/me looks at <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span></p>",
+        "id": 530426586,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753302045
+    },
+    {
+        "content": "<p>It might come down to your tolerance for risk, I guess. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 530426652,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753302075
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades/near/530426387\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"940523\">Amandha Wingert Barok</span> there's a somewhat recent thread about upgrading at <a href=\"https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ\">https://groups.google.com/g/dataverse-community/c/PppxdDwSO98/m/j6HxnJPkDQAJ</a> you might want to look through.</p>\n</blockquote>\n<p>Shoot, I'm realizing that no one replied to that last message by <span class=\"user-mention\" data-user-id=\"737390\">@Bethany Seeger</span>. <img alt=\":doh:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/343009b9.png\" title=\"doh\"> How's the upgrade going, Bethany? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 530427152,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753302289
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"940523\">@Amandha Wingert Barok</span> in terms of deployment process, we assume that you (or your predecessor) have installed Dataverse at some point by following the Installation Guide. Then, for deploying new releases, you should look to the release notes for the next version. Since you're on 6.0 you'd look for \"upgrade instructions\" in the release notes for the next version, which is 6.1: <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.1\">https://github.com/IQSS/dataverse/releases/tag/v6.1</a></p>",
+        "id": 530427556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753302463
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> we have a dev server that our devops engineer was able to use <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>'s scripts to upgrade from 5.14 to 6.6.  We are still testing out the upgraded system. Looks very promising!</p>",
+        "id": 530428663,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1753302915
+    },
+    {
+        "content": "<p>orly</p>",
+        "id": 530431150,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753304018
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375707-community/topic/Best.20Practices.20for.20Dataverse.20Server.20Management.20.26.20Upgrades/near/530427556\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"940523\">Amandha Wingert Barok</span> in terms of deployment process, we assume that you (or your predecessor) have installed Dataverse at some point by following the Installation Guide. Then, for deploying new releases, you should look to the release notes for the next version. Since you're on 6.0 you'd look for \"upgrade instructions\" in the release notes for the next version, which is 6.1: <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.1\">https://github.com/IQSS/dataverse/releases/tag/v6.1</a></p>\n</blockquote>\n<p>Thank you for the tips! Should I update version per version? For example, 6.0 to 6.1, then 6.1 to 6.2 and so on instead of jumping from 6.0 to 6.7?</p>",
+        "id": 530570673,
+        "sender_full_name": "Amandha Wingert Barok",
+        "timestamp": 1753365575
+    },
+    {
+        "content": "<p>Yes, that's the supported way, the recommended way. It's the way we do it for Harvard Dataverse. (We always upgrade shortly after each release.)</p>",
+        "id": 530570941,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753365632
+    },
+    {
+        "content": "<p>Ok! I will make sure to be aware as soon as the release is available. Do we receive any kind of notification for each new version?</p>",
+        "id": 530571346,
+        "sender_full_name": "Amandha Wingert Barok",
+        "timestamp": 1753365728
+    },
+    {
+        "content": "<p>There are announcements here, on the Google Group and you can have Github send you a notification for a new release.</p>",
+        "id": 530571489,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1753365767
+    },
+    {
+        "content": "<p>Plus the blog. See <a href=\"https://guides.dataverse.org/en/6.7/developers/making-releases.html#announce-the-release-on-the-dataverse-blog\">https://guides.dataverse.org/en/6.7/developers/making-releases.html#announce-the-release-on-the-dataverse-blog</a> and the entries below for where we announce, most recently handled in <a href=\"https://github.com/IQSS/dataverse-pm/issues/379\">https://github.com/IQSS/dataverse-pm/issues/379</a></p>",
+        "id": 530571844,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1753365876
+    },
+    {
+        "content": "<p>Thank you, Oliver and Philip!</p>",
+        "id": 530571982,
+        "sender_full_name": "Amandha Wingert Barok",
+        "timestamp": 1753365909
+    },
+    {
+        "content": "<p>I'm currently trying to polish the upgrade script for 6.6 now. And I'm starting on 6.7 ASAP since we need to update it anyways.</p>",
+        "id": 530594047,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1753372127
+    }
+]

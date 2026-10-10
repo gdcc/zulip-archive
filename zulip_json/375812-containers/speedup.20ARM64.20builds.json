@@ -1,0 +1,218 @@
+[
+    {
+        "content": "<p>The ARM64 builds using QEMU on AMD64 Github Runners are a pain...</p>",
+        "id": 432721267,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846363
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> how about we use an AWS T4g or M6g machine as a remote builder?</p>",
+        "id": 432721346,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846390
+    },
+    {
+        "content": "<p>(Not as a Github runner!)</p>",
+        "id": 432721367,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846396
+    },
+    {
+        "content": "<p>If you look at <a href=\"https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/blob/2f605efb9ac22614bce7cc4b9acf718ba2d66b3b/ec2/ec2-create-instance.sh#L213C1-L213C315\">https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/blob/2f605efb9ac22614bce7cc4b9acf718ba2d66b3b/ec2/ec2-create-instance.sh#L213C1-L213C315</a> you can see how we spin up images:</p>\n<p><code>INSTANCE_ID=$(aws $PROFILE ec2 run-instances --image-id $AMI_ID --security-groups $AWS_SG $TAGARG --count 1 --instance-type $SIZE --key-name $KEY_NAME --query 'Instances[0].InstanceId' --block-device-mappings '[ { \"DeviceName\": \"/dev/sda1\", \"Ebs\": { \"DeleteOnTermination\": true, \"VolumeSize\": 20 } } ]' | tr -d \\\")</code></p>",
+        "id": 432722113,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712846556
+    },
+    {
+        "content": "<p>I see!</p>",
+        "id": 432722171,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846572
+    },
+    {
+        "content": "<p>So maybe you could give us an AMI id, etc.</p>",
+        "id": 432722179,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712846574
+    },
+    {
+        "content": "<p>It looks like you folks already gave me an AWS access back in the day...</p>",
+        "id": 432722232,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846589
+    },
+    {
+        "content": "<p>oh dear!</p>",
+        "id": 432722267,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712846598
+    },
+    {
+        "content": "<p>The account is in the name of one Matthew Dunlap...</p>",
+        "id": 432722555,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846669
+    },
+    {
+        "content": "<p>Does that seem right????</p>",
+        "id": 432722577,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712846676
+    },
+    {
+        "content": "<p>Hmm, we should update that. Thanks.</p>",
+        "id": 432722756,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712846725
+    },
+    {
+        "content": "<p>OK I created <a href=\"https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#InstanceDetails:instanceId=i-0d27e1b1fc1c0a8db\">https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#InstanceDetails:instanceId=i-0d27e1b1fc1c0a8db</a>. Named it \"github-docker-buildx-arm64\"</p>",
+        "id": 432732308,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712849269
+    },
+    {
+        "content": "<p>I'm heading out now, will play with it tomorrow morning <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 432732434,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712849296
+    },
+    {
+        "content": "<p>Wow this is really hacky... I need to manually give DMP a buildx instance configuration to make it pick up the remote builder...</p>",
+        "id": 432835950,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712902575
+    },
+    {
+        "content": "<p>I probably need to develop another extension for the plugin to push nodes config from the outside...</p>",
+        "id": 432836127,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712902724
+    },
+    {
+        "content": "<p>It takes about 500 MB of RAM peak when the base image starts the Payara instance. Almost 2 CPU cores are used</p>",
+        "id": 432837191,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903255
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/swKfCEF7wiVG5-CLgcKOWQ0e/image.png\"></a></div>",
+        "id": 432837587,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903465
+    },
+    {
+        "content": "<p>Someone definitely needs to explain to me how the AWS flavor says t4g.micro has 1 GB of RAM and it ends up with 815 MB</p>",
+        "id": 432837961,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903682
+    },
+    {
+        "content": "<p>Oh wow it looks like we can even scale up one more and get a machine for free till 2024-12-31: <a href=\"https://aws.amazon.com/ec2/faqs//#t4g-instances\">https://aws.amazon.com/ec2/faqs//#t4g-instances</a></p>",
+        "id": 432838430,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903952
+    },
+    {
+        "content": "<p>I can definitely say that this is MUCH faster</p>",
+        "id": 432838469,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903985
+    },
+    {
+        "content": "<p>Let me try inject this into a CI config</p>",
+        "id": 432838480,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712903995
+    },
+    {
+        "content": "<p>Seems like we can cut the runtime to at least half:<br>\n<a href=\"/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/N4KAKYcVcnRE6k5PJc_h83q8/image.png\"></a></div>",
+        "id": 432858520,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712911194
+    },
+    {
+        "content": "<p>(Both v6.2 and develop do not have the injected builder config because the feature branch isn't merged and obviously for the tag this will never happen. But for scheduled rebuilds I don't care about build time in the middle of the night. This is important for pushes to develop only. v6.0 and v6.1 base image builds are skipped on purpose)</p>",
+        "id": 432860272,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712911820
+    },
+    {
+        "content": "<p>I changed the setup on purpose to hit the builder with 3 jobs at once...</p>",
+        "id": 432869118,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915325
+    },
+    {
+        "content": "<p>That made it go cry for resources and two of three jobs failed (OOM killed the processes). So let's see what happens if we double the RAM</p>",
+        "id": 432869189,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712915357
+    },
+    {
+        "content": "<p>With a t4g.small this works perfect for 3 parallel jobs!</p>",
+        "id": 432877371,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712918723
+    },
+    {
+        "content": "<p>We can still use the QEMU variant when doing scheduled builds (because we don't need to care about buildtime on sunday nights), but there is a chance multiple PRs come in at the same time and require the builder</p>",
+        "id": 432877503,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712918788
+    },
+    {
+        "content": "<p>Twice as fast? Great! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 432883868,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712921551
+    },
+    {
+        "content": "<p>Even a bit more than twice <span aria-label=\"smile cat\" class=\"emoji emoji-1f638\" role=\"img\" title=\"smile cat\">:smile_cat:</span></p>",
+        "id": 432883987,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712921582
+    },
+    {
+        "content": "<p>TODO for the runner: add a cronjob that on every day stops the builder process and deletes the volumes (docker volume prune -a), as we don't have much space on the disk</p>",
+        "id": 432916503,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712932219
+    },
+    {
+        "content": "<p><a href=\"https://github.blog/2024-04-26-github-actions-arm64-and-the-future-of-automotive-software-development/\">https://github.blog/2024-04-26-github-actions-arm64-and-the-future-of-automotive-software-development/</a> seems related at least. I didn't really did into the details.</p>",
+        "id": 436046279,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714397518
+    },
+    {
+        "content": "<p>It's going on and on about how they now provide ARM based runners and GPU enabled runners in lots of industry/sales buzzwords.</p>",
+        "id": 436050038,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1714398336
+    },
+    {
+        "content": "<p>That was my sense too. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 436050122,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714398360
+    },
+    {
+        "content": "<p>It's kind of non-related to us if we're not willing to make the pipeline a lot more complex to ship the images built on ARM64 and glue them together manually</p>",
+        "id": 436050328,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1714398397
+    },
+    {
+        "content": "<p>It would be an awesome feature to have a sidecar runner available that you can interact with from a job</p>",
+        "id": 436050462,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1714398432
+    },
+    {
+        "content": "<p>Right. Sounds like we should stay the course. Sorry for the noise!</p>",
+        "id": 436050489,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714398440
+    }
+]

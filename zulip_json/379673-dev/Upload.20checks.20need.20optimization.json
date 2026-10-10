@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>We are not handling uploads very clever, are we? For example instead of looking at the Content Length header, we transfer the whole file and then take a look at it. Depending on the file size, that's a long turnaround time... <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 542496082,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759325478
+    },
+    {
+        "content": "<p>Which system are you talking about? JSF? The SPA? dvwebloader? DVUploader? python-DVUploader?</p>",
+        "id": 542497946,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1759325925
+    },
+    {
+        "content": "<p>Backend API endpoint.</p>",
+        "id": 542498022,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759325945
+    },
+    {
+        "content": "<p><a href=\"https://github.com/poikilotherm/dataverse/blob/f79a02b4ad33f4febba96ddc41278011f42a87b1/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/CreateNewDataFilesCommand.java#L191-L200\">https://github.com/poikilotherm/dataverse/blob/f79a02b4ad33f4febba96ddc41278011f42a87b1/src/main/java/edu/harvard/iq/dataverse/engine/command/impl/CreateNewDataFilesCommand.java#L191-L200</a></p>",
+        "id": 542498132,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759325974
+    },
+    {
+        "content": "<p>Ah, you mean for limiting the size?</p>",
+        "id": 542498246,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1759326001
+    },
+    {
+        "content": "<p>Aye</p>",
+        "id": 542498278,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759326006
+    },
+    {
+        "content": "<p>Hmm, I think you're right about that code but maybe I'm missing something. <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> can you please comment?</p>",
+        "id": 542498447,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1759326053
+    },
+    {
+        "content": "<p>We don't even need to have a fancy JAX-RS ContainerFilter in place. I assume we could just access the HTTP headers via the DataverseRequest.</p>",
+        "id": 542498772,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759326124
+    },
+    {
+        "content": "<p>Although I'm not sure this would actually stop transfering the data. A filter may be necessary to interrupt the process early.</p>",
+        "id": 542498998,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759326179
+    },
+    {
+        "content": "<p>Yes, this is a problem with the native (\"non-direct\") upload API. One of numerous problems with it. *)</p>\n<p>Addressing it would not be as easy as checking some HTTP header though. With large uploads in particular, there is likely not going to be any such header advertising the total size of the byte stream. The client is more likely to use chunked encoding for the transfer, where the size header is supplied for each buffer-worth (\"chunk\") of bytes instead. <br>\nWhat we can do is stop and reject the transfer the moment it reaches the file size limit (or goes over the storage quota); which would still be much better than allowing a giant, potentially filesystem-flooding upload to complete before rejecting it. <br>\nFrom what I understand, we would need to implement our own input streaming (as opposed to using the <a href=\"http://jakarta.ws.rs\">jakarta.ws.rs</a> and icefaces implementations we are using in the API and jsf UI respectively). </p>\n<p>*) I dislike the native/basic upload API (<code>/api/datasets/{id}/add</code>) enough that I am considering disabling it on the IQSS prod. instance, now that we have direct upload enabled on all storage volumes.</p>",
+        "id": 542571289,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759348217
+    },
+    {
+        "content": "<p>With the current implementation, we have no chunked upload support either. The multipart/form-data thing is single file in one go only...</p>",
+        "id": 542660084,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759385141
+    },
+    {
+        "content": "<p>For chunked uploads we'd need to implement custom handling anyway. There are a few \"vendor standards\" (Google, AWS, <a href=\"http://tus.io\">tus.io</a>), but not one single concise thing. It boils down to have three additional endpoints: one to initialise a chunked upload, one to upload the chunks themselves and a status check.</p>",
+        "id": 542660164,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759385182
+    },
+    {
+        "content": "<p>I suppose these days a lot of development in the HTTP world focuses on streaming. HTTP/3 (QUIC) removes the \"chunked encoding\" altogether and replaces it with stream support. The application doesn't need to deal with the details, this is handled by the stack for you. You just send a \"normal\" PUT/POST and QUIC takes care of splitting this into streams. Obviously, we can't use that - Payara is at HTTP/2 only. Using something like <a href=\"http://tus.io\">tus.io</a> would give us compatibility with HTTP 1.1 and is at least an open standard (even an active draft with the IETF to become a \"real\" standard).</p>",
+        "id": 542661963,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759386246
+    },
+    {
+        "content": "<blockquote>\n<p>With the current implementation, we have no chunked upload support either. The multipart/form-data thing is single file in one go only...</p>\n</blockquote>\n<p>Are you referring to the API, or the JSF/IceFaces upload?</p>",
+        "id": 542741616,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759411632
+    },
+    {
+        "content": "<p>IceFaces takes me back <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 542741789,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1759411687
+    },
+    {
+        "content": "<p>Yeah. Ice, prime, same stuff. You know what I meant. :)</p>",
+        "id": 542741943,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759411731
+    },
+    {
+        "content": "<p>If the /add API only supports multipart/form-data (does it really? hmm)... That would mean that it is in fact possible to check the total size header and reject the call early on if it's too large. We would need to reimplement how it's handled (i.e., I'm pretty sure that in the current implementation the API method is only called once the transfer is complete; we'll need to intercept that call earlier). <br>\nBut, rather than making this API support true streaming/chunked encoding, I would rather deprecate it effectively. I really believe we need to replace or supplement it with an equivalent of the direct upload we are already using for S3; that would allow to stream uploads more efficiently and, most importantly, allow multiple file uploads, using /addFiles (again, similarly to the direct-to-S3 uploads).</p>",
+        "id": 542745355,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759412610
+    },
+    {
+        "content": "<p>If the JSF upload uses chunks, it's a Primefaces custom thing and protocol. I'm only talking about the /api/datasets/ID/add endpoint.</p>",
+        "id": 542765344,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759417322
+    },
+    {
+        "content": "<p>I don't think it's necessary to have an endpoint that allows multiple files at once. But I'd like to see chunked or streamed/multiplexed uploads without S3 being an option, thus making it resumable and faster due to parallel uploads.</p>\n<p>The client side would need to implement such a chunked protocol anyway, no problem to make the client iterate over files. (Potentially uploading multiple files in parallel, but within their own \"chunk upload session\".) </p>\n<p>The <a href=\"http://tus.io\">tus.io</a> stuff looks very interesting, I could totally see it using that and not need to rely on out of band uploads. After all, exposing an S3 server on the net is not without risks.</p>",
+        "id": 542766439,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1759417592
+    },
+    {
+        "content": "<p>When I'm talking about multi-file uploads, again, I'm referring to the model already used for the direct-to-S3 uploads. <br>\nYou are still uploading one file at a time. You also request the upload authorization for each file, one at a time. Note that you must supply the file size when requesting this pre-signed upload url. So it is very easy to reject an upload request based on size early on, before any bytes are transferred.<br>\nBut, you can then use one /addFiles call to _finalize_ multiple file uploads to add the datafiles to the dataset, once the physical file transfers have been completed. This is extremely important; because updating the version after every upload (like the /add API does) can become very expensive as the number of files in the dataset grows. <br>\nI absolutely want to be able to do something like this for non-S3 uploads.</p>",
+        "id": 542776520,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759420132
+    },
+    {
+        "content": "<p>In the spirit of useful incremental improvements, it would be great to start with re-working the \"classic\" upload API (/add), just so that it can check multipart/form-data headers and reject an over-the-limit uploads without accepting the entire upload first.</p>",
+        "id": 543599868,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1759862505
+    }
+]

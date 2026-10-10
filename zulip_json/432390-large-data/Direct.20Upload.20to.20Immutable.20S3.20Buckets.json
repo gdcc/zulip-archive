@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>Hi folks, hope this is the right place to ask (and happy to relay elsewhere). We're testing Dataverse with direct uploads to a CloudianS3 bucket with immutability enabled, which in their implementation requires that the Content-MD5 header is sent when PUTing an object to the backend. My understanding is that the presigned URL would need to include Content-MD5 as one of the signed headers and incorporate that into its signature, in addition to the client separately sending that header in the direct PUT request. I don't think that's possible without the UI prompting the user or otherwise calculating the MD5 before submitting the Dataverse API request that generates the presigned URL. But I just wanted to throw it out there in case anyone else had run into this specific issue! Any thoughts would be appreciated.</p>",
+        "id": 545402904,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760633798
+    },
+    {
+        "content": "<p>Hmm. Could you please open an issue about this at <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a> ?</p>",
+        "id": 545417095,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760637781
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Will do! I'll file that later today.</p>",
+        "id": 545418591,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760638281
+    },
+    {
+        "content": "<p>Ok, submitted —&gt; <a href=\"https://github.com/IQSS/dataverse/issues/11901\">https://github.com/IQSS/dataverse/issues/11901</a> Hope that's clear. This is not a big ask for us, as we're going to use a workaround, but given that it touches on data integrity I think it's useful for you (us?) all to ponder even if it doesn't make it into Dataverse.</p>",
+        "id": 545434870,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760644422
+    },
+    {
+        "content": "<p>As for our workaround(s):</p>\n<ol>\n<li>For integrity checking, it looks like we're going to have to do something out of band with the ComputeChecksum bucket-side feature. I.e. we'll upload without checksums, compute checksums on the bucket, then compare that with our metadata in Dataverse before publishing.</li>\n<li>For immutability, in our case it's possible to disable ObjectLock in the application bucket but enable it in our replicated bucket. That gets us the security protections we want. There aren't a lot of downsides, either—if we need to failover to the replicated bucket, it's possible in a pinch to temporarily disable ObjectLock.</li>\n</ol>",
+        "id": 545435146,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760644555
+    },
+    {
+        "content": "<p>Looks great. Thanks! Have you looked at <a href=\"https://guides.dataverse.org/en/6.8/developers/s3-direct-upload-api.html\">https://guides.dataverse.org/en/6.8/developers/s3-direct-upload-api.html</a></p>\n<p>You'll find md5Hash in there.</p>",
+        "id": 545435464,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760644688
+    },
+    {
+        "content": "<p>We have, but unless I'm mistaken that doesn't solve this problem. We're not able to upload files at all to S3 buckets with ObjectLock enabled b/c the Content-MD5 header needs to be submitted at upload time. That's true whether it goes through Dataverse (direct-upload=false) or from the client (direct-upload=true, in which case the pre-signed URL would also need to contain the header+value). Does that make sense?</p>",
+        "id": 545435983,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760644906
+    },
+    {
+        "content": "<p>It brings up a related question — how are folks verifying file integrity when using S3 backends? Is that all out-of-band? If we're not validating checksums on submission, then the obvious answer would be to audit buckets by comparing metadata in Dataverse with the results of a ComputeChecksum job on the bucket.</p>",
+        "id": 545436146,
+        "sender_full_name": "Daniel C Schmidt",
+        "timestamp": 1760644989
+    },
+    {
+        "content": "<p>Hmm, I see what you mean, I think. That md5Hash I mentioned is what you tell Dataverse the md5 is for the file. But Dataverse is just trusting you on that, right?</p>",
+        "id": 545438481,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760646086
+    },
+    {
+        "content": "<p>Anyway, I think Jim is on his way to the <a href=\"https://en.wikipedia.org/wiki/Head_of_the_Charles_Regatta\">Head of the Charles</a> but he'll probably see your issue and get back to you next week. He implemented most of this. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 545438775,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1760646211
+    }
+]

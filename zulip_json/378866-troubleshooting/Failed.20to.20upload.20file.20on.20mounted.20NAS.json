@@ -1,0 +1,56 @@
+[
+    {
+        "content": "<p>Hi There,,<br>\nWe have a new installation using version 6.6 , and we need to use our NAS as our storage . We have mounted it to : say /home/dataverse_file_nas ,, but when i try to upload via web application, the files appeared after i uploaded it, but when i try to save, i got : <code>Failed to save the file, storage id file://197c54bcb31-57a5d045ce55 (/home/dataverse_file_nas /20.5xxxxxx/xxxxxxx</code></p>\n<p>in the mount directory, the folder named persistent identifier was created, and file appeared there with md5 name as usual but with 0 bytes. But, again, the file failed to save, and not appeared in dataset's files section.</p>\n<p>can anybody help me? i tried to create, edit, copy, and delete file manually using dataverse service user on the server, there's no issue, dataverse user have enough permission to the directories .</p>",
+        "id": 526572206,
+        "sender_full_name": "Ayu Widi",
+        "timestamp": 1751364424
+    },
+    {
+        "content": "<p>Hmm, is SELinux enabled? It is preventing the saving of files on your NAS?</p>",
+        "id": 526573138,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1751364719
+    },
+    {
+        "content": "<p>i disabled the SELinux , and <code>sestatus</code>shows me <code>SELinux status:                 disabled</code> but the upload is still failed</p>",
+        "id": 526577854,
+        "sender_full_name": "Ayu Widi",
+        "timestamp": 1751366388
+    },
+    {
+        "content": "<p>Can you double check what user your Payara server is running with?</p>",
+        "id": 526588459,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1751370052
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Failed.20to.20upload.20file.20on.20mounted.20NAS/near/526588459\">said</a>:</p>\n<blockquote>\n<p>Can you double check what user your Payara server is running with?</p>\n</blockquote>\n<p>ps -ef result show this :</p>\n<p><code>dataver+    2340       1  2 Jul01 ?        00:20:06 /usr/lib/jvm/java-17-openjdk                                                                                                             -17.0.15.0.6-3.el9.x86_64/bin/java -cp /usr/local/payara6/glassfish/domains/doma                                                                                                             in1/lib/ext/*:/usr/local/payara6/glassfish/modules/glassfish.jar -XX:+UnlockDiag</code></p>",
+        "id": 526712653,
+        "sender_full_name": "Ayu Widi",
+        "timestamp": 1751426223
+    },
+    {
+        "content": "<p>this is what i get after upload via web app : </p>\n<div class=\"codehilite\"><pre><span></span><code># ls -lth\ntotal 1.5K\n-rwxr-xr-x 0 dataverse dataverse  0 Jul  2 10:20 197c926b1d5-6e93970258d0\n</code></pre></div>\n<p>if i try to edit the file with vim , it says permission denied :<br>\n<code>\"197c926b1d5-6e93970258d0\" [Permission Denied]</code></p>",
+        "id": 526713002,
+        "sender_full_name": "Ayu Widi",
+        "timestamp": 1751426528
+    },
+    {
+        "content": "<p>Can you double check it's not SELinux causing you trouble? <a href=\"https://access.redhat.com/articles/2191331\">https://access.redhat.com/articles/2191331</a></p>",
+        "id": 526993006,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1751548189
+    },
+    {
+        "content": "<p>Also, you're mounting the filesystem from a NAS. What are you using? NFS? SMB? iSCSI + FS? Something else?</p>",
+        "id": 526993196,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1751548245
+    },
+    {
+        "content": "<p>we tried many settings but no result. Our case was using CIFS. Now we move to NFS and everything's running well.</p>",
+        "id": 531987664,
+        "sender_full_name": "Ayu Widi",
+        "timestamp": 1753941753
+    }
+]
