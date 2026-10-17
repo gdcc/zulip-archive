@@ -1,0 +1,290 @@
+[
+    {
+        "content": "<p>hi there .. this is <em>somewhat urgen</em>t in that .. new datasets have the new Term UI field and if we add anything to that field, fixes later to migrate the data will wipe out newly entered data. </p>\n<p>So .. after upgrading to Dataverse v6.3 (and v6.4) we noticed that we have some datasets where the Term URI is appearing in the controlled vacab URL field .. I know there were instructions in the v6.3 upgrade to migrate that data to the correct field .. however, when upgrading to v6.3, when running the supplied query to find records affected it did not find any (and still does not), so I assumed there was nothing to move (my bad) .. is there a way to fix this?</p>",
+        "id": 485686106,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733164545
+    },
+    {
+        "content": "<p>trying to figure out why the query didn't find anything as most of our datasets have keywords and URIs included</p>",
+        "id": 485691063,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733166357
+    },
+    {
+        "content": "<p>I can see the keywords in the datasetfieldvalue field if I search on a specific keyword value .. and i can see mulitple URIs if I search for anything like 'http%'</p>",
+        "id": 485692945,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733166994
+    },
+    {
+        "content": "<p>.. and the query <br>\n'SELECT value FROM datasetfieldvalue dfv<br>\nINNER JOIN datasetfield df ON <a href=\"http://df.id\">df.id</a> = dfv.datasetfield_id<br>\nWHERE df.datasetfieldtype_id = (SELECT id FROM datasetfieldtype WHERE name = 'keywordValue');'  <br>\n.. <br>\nfinds 357 rows of keywords</p>",
+        "id": 485694555,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733167574
+    },
+    {
+        "content": "<p>.. and they query <br>\n'SELECT value FROM datasetfieldvalue dfv INNER JOIN datasetfield df ON <a href=\"http://df.id\">df.id</a> = dfv.datasetfield_id WHERE value ILIKE 'http%';'</p>\n<p>.. finds 628 rows</p>",
+        "id": 485694655,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733167616
+    },
+    {
+        "content": "<p>... it's just the 2 where clauses together don't find anything</p>",
+        "id": 485694936,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733167722
+    },
+    {
+        "content": "<p>Any help that I could get in this matter is greatly appreciated <span aria-label=\"face with spiral eyes\" class=\"emoji emoji-1f635-200d-1f4ab\" role=\"img\" title=\"face with spiral eyes\">:face_with_spiral_eyes:</span></p>",
+        "id": 485700848,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733170222
+    },
+    {
+        "content": "<p>Note: I also ran the query to migrate the fields in our QA site and nothing was updated.</p>",
+        "id": 485723546,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733180693
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"598843\">@Deirdre Kirmis</span> ,<br>\nI'm pinging <span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> who contributed on the addition of the field and might help you :)</p>",
+        "id": 485782645,
+        "sender_full_name": "Dimitri Szabo",
+        "timestamp": 1733213896
+    },
+    {
+        "content": "<p>Thank you!</p>",
+        "id": 485878616,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733238848
+    },
+    {
+        "content": "<p>Hey <span class=\"user-mention\" data-user-id=\"598843\">@Deirdre Kirmis</span>, I'm not sure I understand well what is happening to you.</p>\n<div class=\"codehilite\" data-code-language=\"SQL\"><pre><span></span><code><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldvalue</span><span class=\"w\"> </span><span class=\"n\">dfv</span>\n<span class=\"k\">INNER</span><span class=\"w\"> </span><span class=\"k\">JOIN</span><span class=\"w\"> </span><span class=\"n\">datasetfield</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"w\"> </span><span class=\"k\">ON</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"n\">dfv</span><span class=\"p\">.</span><span class=\"n\">datasetfield_id</span>\n<span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">datasetfieldtype_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldtype</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">name</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'keywordValue'</span><span class=\"p\">)</span>\n<span class=\"k\">AND</span><span class=\"w\"> </span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"k\">ILIKE</span><span class=\"w\"> </span><span class=\"s1\">'http%'</span><span class=\"p\">;</span>\n</code></pre></div>\n<p>This query finds the <code>value</code> for the <code>keywordValue</code> when the  <code>value</code> starts with <code>http</code> so if you get nothing it means you have no url in this field.</p>",
+        "id": 485883713,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733240049
+    },
+    {
+        "content": "<p>But you are saying that you urls are maybe in a controlled vocabulary URL field, do you have a customized <code>citation.tsv</code> ?</p>",
+        "id": 485884014,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733240141
+    },
+    {
+        "content": "<p>Are you talking about <code>keywordVocabularyURI</code> ?</p>",
+        "id": 485884351,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733240228
+    },
+    {
+        "content": "<p>Can you show me one example ? one dataset with the metadata that are not like you want. (dataset json export for example)</p>",
+        "id": 485885306,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733240457
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485686106\">said</a>:</p>\n<blockquote>\n<p>hi there .. this is <em>somewhat urgen</em>t in that .. new datasets have the new Term UI field and if we add anything to that field, fixes later to migrate the data will wipe out newly entered data.</p>\n</blockquote>\n<p>Unless you apply a manual <code>delete</code> in database, Dataverse mechanism does not delete data</p>",
+        "id": 485885854,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733240580
+    },
+    {
+        "content": "<p>Thanks for your response! The problem is that, all the values that are currently in the \"Controlled Vocabulary URL\" field should be in the \"Term URI\" field. When we originally were entering them, we were putting them into the \"Vocabulary URL\" field. <br>\n<a href=\"/user_uploads/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg\">cv-dataverse.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg\" title=\"cv-dataverse.jpg\"><img data-original-dimensions=\"785x131\" src=\"/user_uploads/thumbnail/53090/5nPPNk-HLEoBc5OBnQ8iF-D2/cv-dataverse.jpg/840x560.webp\"></a></div>",
+        "id": 485894049,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733242487
+    },
+    {
+        "content": "<p>when we upgraded and the new fields appeared, the value that we were putting in the \"vocabulary url\" field appeared in the \"Controlled Vocabulary field\"</p>",
+        "id": 485894164,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733242521
+    },
+    {
+        "content": "<p>we do not have a custom citation.tsv</p>",
+        "id": 485894357,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733242565
+    },
+    {
+        "content": "<p>we don't have any custom metadata blocks, other than we added the \"computational workflow\" metadata block accidentally when we upgraded to v6.3</p>",
+        "id": 485894881,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733242706
+    },
+    {
+        "content": "<p>I see now why I was confused ! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> <br>\nFirst, I didn't know the default label for <code>keywordVocabularyURI</code> was <code>Controlled Vocabulary URL</code> (I'm french) <br>\n2nd, We assumed for a lot of reason that the Term field could contain either a text value or the term Uri.</p>\n<p>I guess you undestand that <code>keywordVocabularyURI</code> is the URL for the vocabulary (MeSH -&gt; <a href=\"http://id.nlm.nih.gov/mesh/D004493\">http://id.nlm.nih.gov/mesh/D004493</a> or <a href=\"https://www.ncbi.nlm.nih.gov/mesh\">https://www.ncbi.nlm.nih.gov/mesh</a>) <br>\nand <code>keywordTermURI</code> is the URL for the term (Physical education and training -&gt; <a href=\"http://id.nlm.nih.gov/mesh/D010806\">http://id.nlm.nih.gov/mesh/D010806</a>)</p>\n<p>In your case, if you used in the past <code>keywordVocabularyURI</code> as a way to add the <code>keywordTermURI</code> you can adjust the sql queries like this :</p>\n<div class=\"codehilite\" data-code-language=\"SQL\"><pre><span></span><code><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldvalue</span><span class=\"w\"> </span><span class=\"n\">dfv</span>\n<span class=\"k\">INNER</span><span class=\"w\"> </span><span class=\"k\">JOIN</span><span class=\"w\"> </span><span class=\"n\">datasetfield</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"w\"> </span><span class=\"k\">ON</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"n\">dfv</span><span class=\"p\">.</span><span class=\"n\">datasetfield_id</span>\n<span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">datasetfieldtype_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldtype</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">name</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'keywordVocabularyURI'</span><span class=\"p\">)</span>\n<span class=\"k\">AND</span><span class=\"w\"> </span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"k\">ILIKE</span><span class=\"w\"> </span><span class=\"s1\">'http%'</span><span class=\"p\">;</span>\n</code></pre></div>\n<div class=\"codehilite\" data-code-language=\"SQL\"><pre><span></span><code><span class=\"k\">UPDATE</span><span class=\"w\"> </span><span class=\"n\">datasetfield</span><span class=\"w\"> </span><span class=\"n\">df</span>\n<span class=\"k\">SET</span><span class=\"w\"> </span><span class=\"n\">datasetfieldtype_id</span><span class=\"w\">  </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldtype</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">name</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'keywordTermURI'</span><span class=\"p\">)</span>\n<span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldvalue</span><span class=\"w\"> </span><span class=\"n\">dfv</span>\n<span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">dfv</span><span class=\"p\">.</span><span class=\"n\">datasetfield_id</span><span class=\"w\">  </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">id</span>\n<span class=\"k\">AND</span><span class=\"w\"> </span><span class=\"n\">df</span><span class=\"p\">.</span><span class=\"n\">datasetfieldtype_id</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"k\">SELECT</span><span class=\"w\"> </span><span class=\"n\">id</span><span class=\"w\"> </span><span class=\"k\">FROM</span><span class=\"w\"> </span><span class=\"n\">datasetfieldtype</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">name</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s1\">'keywordVocabularyURI'</span><span class=\"p\">)</span>\n<span class=\"k\">AND</span><span class=\"w\"> </span><span class=\"n\">dfv</span><span class=\"p\">.</span><span class=\"n\">value</span><span class=\"w\"> </span><span class=\"k\">ILIKE</span><span class=\"w\"> </span><span class=\"s1\">'http%'</span><span class=\"p\">;</span>\n</code></pre></div>\n<p>This will transfert all url from <code>keywordVocabularyURI</code> value to <code>keywordTermURI</code> which is empty because it's new.<br>\nThis is not what you want to do if <code>keywordVocabularyURI</code> contains correct URLs for the vocabulary.</p>",
+        "id": 485899407,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733243854
+    },
+    {
+        "content": "<p>Sorry I was just about to post the json .. i'll post it anyway just in case ..</p>\n<p>.. this looks like what we need! Thank you! I'm sorry I'm not familiar enough with the tables to know exactly where we needed to change that, but I did see the \"keywordVocabularyURI\" field and was wondering about it .. <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>\n<p>So, it seems we were adding the Term URI when that should have been Controlled Vocabulary URL? (keywordVocabularyURI)?</p>",
+        "id": 485901182,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244303
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/I-dHqR32x7FiYLoL2tsSUEXE/VXJNBO_export.json\">VXJNBO_export.json</a></p>",
+        "id": 485901312,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244347
+    },
+    {
+        "content": "<p>so, I ran that query in our QA site, and it changed the dataset field names so that now I have 2 \"Term URI\" fields .. this is for records that already had something in the Term URI field<br>\n<a href=\"/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg\">migrated-cv-dataverse.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg\" title=\"migrated-cv-dataverse.jpg\"><img data-original-dimensions=\"1063x298\" src=\"/user_uploads/thumbnail/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg/840x560.webp\"></a></div>",
+        "id": 485902464,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244656
+    },
+    {
+        "content": "<p>for records where that field was empty .. it did it correctly<br>\n<a href=\"/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg\">migrated-cv2-dataverse.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg\" title=\"migrated-cv2-dataverse.jpg\"><img data-original-dimensions=\"1100x210\" src=\"/user_uploads/thumbnail/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg/840x560.webp\"></a></div>",
+        "id": 485902941,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244766
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485902464\">said</a>:</p>\n<blockquote>\n<p>so, I ran that query in our QA site, and it changed the dataset field names so that now I have 2 \"Term URI\" fields .. this is for records that already had something in the Term URI field<br>\n<a href=\"/user_uploads/53090/bAHki_uXuLdGQRJDDsZAXYUR/migrated-cv-dataverse.jpg\">migrated-cv-dataverse.jpg</a></p>\n</blockquote>\n<p>this one is weird</p>",
+        "id": 485903028,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733244790
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485902941\">said</a>:</p>\n<blockquote>\n<p>for records where that field was empty .. it did it correctly<br>\n<a href=\"/user_uploads/53090/83P4IcGA5mwsE5798hOd_yP1/migrated-cv2-dataverse.jpg\">migrated-cv2-dataverse.jpg</a></p>\n</blockquote>\n<p>this one worked but this is the case where you didn't want it :D</p>",
+        "id": 485903106,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733244811
+    },
+    {
+        "content": "<p>oh yea, that was just a test .. i may have put the wrong URL .. but it was in the controlled vocab field .. now is in the term uri field</p>",
+        "id": 485903304,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244863
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485901182\">said</a>:</p>\n<blockquote>\n<p>So, it seems we were adding the Term URI when that should have been Controlled Vocabulary URL? (keywordVocabularyURI)?</p>\n</blockquote>\n<p>Yes but you only had 1 field so you did your best :p <code>keywordTermURI</code> is by far more important.</p>",
+        "id": 485903355,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733244881
+    },
+    {
+        "content": "<p>in production, we likely don't have anything in the Term URI fields .. so since the first query in the instructions didn't find anything, we should be okay?</p>",
+        "id": 485903520,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733244930
+    },
+    {
+        "content": "<p>oh nm .. i see now it just kept what was there and added another one .. that is fine .. I think we are good! Thank you!!!</p>",
+        "id": 485905499,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733245441
+    },
+    {
+        "content": "<p>Queries are only here to help you to move url in the correct field if you want it, feel free to not use it.</p>",
+        "id": 485919930,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733249535
+    },
+    {
+        "content": "<p>I don't undertand why you have 5 fields, maybe the cache (need to restart payara) or you altered the data. But I don't think the queries I gave you can do that.</p>",
+        "id": 485920272,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733249646
+    },
+    {
+        "content": "<p>all we really need to do at this point is move whatever is in the \"Controlled Vocabulary URL\" field to the \"Term URI\" field .. we were apparently using the \"Vocabulary URL\" field for that. </p>\n<p>Will the second query above that you added do that? (I tried it on QA and it seemed to do so successfully, although it added the second Term URI field to the dataset that already had one). We will make sure we don't have anything in that field.</p>",
+        "id": 485922346,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733250342
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346\">said</a>:</p>\n<blockquote>\n<p>Will the second query above that you added do that?</p>\n</blockquote>\n<p>Yes</p>",
+        "id": 486045511,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733304031
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346\">said</a>:</p>\n<blockquote>\n<p>We will make sure we don't have anything in that field.</p>\n</blockquote>\n<p>As the field is created by <code>curl http://localhost:8080/api/admin/datasetfield/load -H \"Content-type: text/tab-separated-values\" -X POST --upload-file citation.tsv</code> while upgrading to v6.3, it will be empty. No worries.</p>",
+        "id": 486045736,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733304114
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598843\">Deirdre Kirmis</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485922346\">said</a>:</p>\n<blockquote>\n<p>although it added the second Term URI field to the dataset that already had one</p>\n</blockquote>\n<p>I don't see how the sql query could do that, as it is a replacement of a field type, not an addition of a field value.<br>\nSomething else did that. Please, restart payara, and do run some other tests, because fixing this afterward it really complicated in term of SQL.</p>",
+        "id": 486046666,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733304397
+    },
+    {
+        "content": "<p>Running the query resolved the issue on our production site. Thank you!! <br>\nAs for QA, I restarted payara but the double Term URI field is still there. This is a site that had already been upgraded to v6.3 and someone had added a record that included data in the Term URI field. When I ran the query, it moved the value of \"Controlled Vocabulary URL\" to a new \"Term URI\" field but kept the existing value in that field, so that now there are two Term URIs.</p>",
+        "id": 486117594,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733325740
+    },
+    {
+        "content": "<p>we clear that site of all datasets once a month, so it doesn't matter to us that it is like that, unless it will cause an issue with the DB later for some reason</p>",
+        "id": 486118302,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1733325930
+    },
+    {
+        "content": "<p>Good news :)</p>",
+        "id": 486125422,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1733327757
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"649905\">luddaniel</span> has marked this topic as resolved.</p>",
+        "id": 486125480,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1733327764
+    },
+    {
+        "content": "<p>I'm just looking at the DV 6.3 upgrade instructions and see them SQL queries. Was there a particular reason why we didn't add a Flyway migration for this? (maybe an afterMigrate style one, potentially using Java for it to make it configurable to be applied)</p>",
+        "id": 520077393,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1748013518
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as unresolved.</p>",
+        "id": 520078175,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1748013769
+    },
+    {
+        "content": "<p>It looks like it came from this PR:</p>\n<p>Add keywordTermURI metadata in keyword block <a href=\"https://github.com/IQSS/dataverse/issues/10371\">#10371</a></p>",
+        "id": 520078210,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748013781
+    },
+    {
+        "content": "<p>From <span class=\"user-mention\" data-user-id=\"709277\">@Steven Ferey</span> I see \"Yes absolutely, I delete the script and update the PR description\" at <a href=\"https://github.com/IQSS/dataverse/pull/10371#discussion_r1577941808\">https://github.com/IQSS/dataverse/pull/10371#discussion_r1577941808</a></p>\n<p>I'm not sure why. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 520078869,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748013976
+    },
+    {
+        "content": "<p>Hello, The two topics are different: </p>\n<p>-&gt; The SQL script mentioned by <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  has been deleted because the modification to this metadata has been reverted: <a href=\"https://github.com/IQSS/dataverse/pull/10371/commits/9f728453eff6041a3becee2a093fb3479af2d317\">https://github.com/IQSS/dataverse/pull/10371/commits/9f728453eff6041a3becee2a093fb3479af2d317</a> </p>\n<p>-&gt; The SQL queries mentioned by <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> , and present in the update instructions, are current, and the update is optional. The select query allows the Dataverse administrator to evaluate the data in question. The administrator can then decide whether to migrate these values ​​from the keywordValue metadata to the new keywordTermURI metadata, depending on the proposed pattern.</p>",
+        "id": 520464158,
+        "sender_full_name": "Steven Ferey",
+        "timestamp": 1748268845
+    },
+    {
+        "content": "<p>In addition, the reason of this topic was that a specific Dataverse intance was using <code>keywordVocabularyURI</code> to store a Term URI (new <code>keywordTermURI</code>) that for many instances is in <code>keywordValue</code> (default case is covered by <a href=\"https://github.com/IQSS/dataverse/releases/tag/v6.3#upgrade-instructions-6-3\">https://github.com/IQSS/dataverse/releases/tag/v6.3#upgrade-instructions-6-3</a>. </p>\n<p>You can now see why a flyway script was avoided, it may not match the administrator's wishes.</p>\n<p><span class=\"user-mention silent\" data-user-id=\"649905\">luddaniel</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Term.20URI.20in.20the.20Controlled.20Vocab.20URL.20field/near/485899407\">said</a>:</p>\n<blockquote>\n<div class=\"codehilite\"><pre><span></span><code>```sql\nUPDATE datasetfield df\nSET datasetfieldtype_id  = (SELECT id FROM datasetfieldtype WHERE name = &#39;keywordTermURI&#39;)\nFROM datasetfieldvalue dfv\nWHERE dfv.datasetfield_id  = df.id\nAND df.datasetfieldtype_id = (SELECT id FROM datasetfieldtype WHERE name = &#39;keywordVocabularyURI&#39;)\nAND dfv.value ILIKE &#39;http%&#39;;\n</code></pre></div>\n<p>This will transfert all url from <code>keywordVocabularyURI</code> value to <code>keywordTermURI</code> which is empty because it's new.<br>\nThis is not what you want to do if <code>keywordVocabularyURI</code> contains correct URLs for the vocabulary.</p>\n</blockquote>",
+        "id": 520467683,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1748269700
+    },
+    {
+        "content": "<p>Thanks! <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> is this making sense, that it's optional?</p>",
+        "id": 520668080,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748352216
+    },
+    {
+        "content": "<p>Uhm yeah sure. I'll still add a migration to the extra migrations that can be switched on/off and will tell you if there are any such elements.</p>",
+        "id": 520671907,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1748353226
+    }
+]

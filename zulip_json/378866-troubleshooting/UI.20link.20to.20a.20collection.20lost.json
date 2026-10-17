@@ -1,0 +1,200 @@
+[
+    {
+        "content": "<p>This happened while I was consolidating the s3 buckets for <a href=\"http://test.dataverse.ucla.edu\">test.dataverse.ucla.edu</a>.</p>\n<p>The collection for geospatial gets a 500 and I can't seem to find a way to fix it.<br>\n<a href=\"https://test.dataverse.ucla.edu/dataverse/geospatial\">https://test.dataverse.ucla.edu/dataverse/geospatial</a></p>\n<p>Sort of remaking the collection,  is there any way to fix a broken connection link.</p>\n<p>The alias exists:<br>\ndvndb=# SELECT alias FROM dataverse WHERE alias = 'geospatial';<br>\n   alias</p>\n<hr>\n<p>geospatial<br>\n(1 row)</p>\n<p>ELECT <a href=\"http://d.id\">d.id</a>, d.alias, o.dtype, o.owner_id<br>\ndvndb-# FROM dataverse d, dvobject o<br>\ndvndb-# WHERE <a href=\"http://d.id\">d.id</a> = <a href=\"http://o.id\">o.id</a> AND d.alias = 'geospatial';<br>\n  id  |   alias    |   dtype   | owner_id<br>\n------+------------+-----------+----------<br>\n 4949 | geospatial | Dataverse |        1<br>\n(1 row)</p>\n<p>If this wasn't the test system I guess one fix would be to recreate the dataset.</p>",
+        "id": 590547111,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1776971275
+    },
+    {
+        "content": "<p>It seems that it is still physically there.   I can view with the api:<br>\n**</p>\n<p>curl \"<a href=\"https://test.dataverse.ucla.edu/api/dataverses/geospatial\">https://test.dataverse.ucla.edu/api/dataverses/geospatial</a>\"</p>\n<p>{\"status\":\"OK\",\"data\":{\"id\":4949,\"alias\":\"geospatial\",\"name\":\"Geospatial\",\"affiliation\":\"University of California, Los Angeles\",\"dataverseContacts\":[{\"displayOrder\":0,\"contactEmail\":\"datascience@ucla.edu\"}],\"permissionRoot\":false,\"dataverseType\":\"LABORATORY\",\"ownerId\":1,\"creationDate\":\"2019-02-25T19:45:16Z\",\"theme\":{\"id\":1,\"linkColor\":\"428BCA\",\"textColor\":\"888888\",\"backgroundColor\":\"FFFFFF\"},\"storageDriverLabel\":\"test-dataverse-oregon\"}}(base)<br>\n**</p>",
+        "id": 590768478,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777052285
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653479\">@jamie jamison</span> thanks for also cross-posting to <a href=\"https://groups.google.com/g/dataverse-community/c/4AdxU1w1M1w/m/YMQtL-qFAQAJ\">https://groups.google.com/g/dataverse-community/c/4AdxU1w1M1w/m/YMQtL-qFAQAJ</a></p>",
+        "id": 591398052,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777386034
+    },
+    {
+        "content": "<p>I'm glad that <a href=\"https://test.dataverse.ucla.edu/api/dataverses/geospatial\">https://test.dataverse.ucla.edu/api/dataverses/geospatial</a> returns JSON cleanly.</p>",
+        "id": 591398108,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777386047
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"653479\">@jamie jamison</span> can you please go to <a href=\"https://test.dataverse.ucla.edu/dataverse/geospatial\">https://test.dataverse.ucla.edu/dataverse/geospatial</a> and grab the stacktrace from server.log? You can either paste it here or email it to <a href=\"mailto:support@dataverse.org\">support@dataverse.org</a></p>",
+        "id": 591398324,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777386091
+    },
+    {
+        "content": "<p>I'm attaching a test file - it's too long to past here<br>\n<a href=\"/user_uploads/53090/LgQph07_YoonNDnfrvoq_G8c/server-log.txt\">server-log.txt</a><br>\n~<br>\n~</p>",
+        "id": 591445314,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777397811
+    },
+    {
+        "content": "<p>Interesting. <code>java.io.IOException: ERROR: S3AccessIO - You must create and configure a bucket before creating datasets</code></p>",
+        "id": 591446979,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398291
+    },
+    {
+        "content": "<p><code>at edu.harvard.iq.dataverse.dataaccess.S3AccessIO.&lt;init&gt;(S3AccessIO.java:114)</code> which for you is <a href=\"https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L114\">https://github.com/IQSS/dataverse/blob/v5.14/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L114</a></p>",
+        "id": 591447270,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398372
+    },
+    {
+        "content": "<p>But the bucket is already there.  I merged the old lariac (geospatial) bucket  into the all-purpose test bucket,  s3   test.dataverse.orgegon.</p>\n<p>I must have missed a step.  Everything with the merge worked on production</p>",
+        "id": 591447460,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398425
+    },
+    {
+        "content": "<p>gotcha</p>",
+        "id": 591447648,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398456
+    },
+    {
+        "content": "<p>well, one of these is true:</p>\n<p><code>if (bucketName == null || !s3.doesBucketExistV2(bucketName))</code></p>",
+        "id": 591447694,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398470
+    },
+    {
+        "content": "<p>Or can it be changed in postgres?  I've gotten lots of practice with the database. One of you guys pointed me to a site that has all the tables.</p>",
+        "id": 591447930,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398533
+    },
+    {
+        "content": "<p>sorry for the bad typing, I'm doing this in a meeting</p>",
+        "id": 591447986,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398547
+    },
+    {
+        "content": "<p>ha, no worries</p>",
+        "id": 591448014,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398554
+    },
+    {
+        "content": "<p>SchemaSpy. I'm glad you enjoy it! For your version: <a href=\"https://guides.dataverse.org/en/5.14/schemaspy/index.html\">https://guides.dataverse.org/en/5.14/schemaspy/index.html</a></p>",
+        "id": 591448143,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398591
+    },
+    {
+        "content": "<p>helps with troubleshooting</p>",
+        "id": 591448253,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398620
+    },
+    {
+        "content": "<p>Other collections are fine?</p>",
+        "id": 591448308,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398637
+    },
+    {
+        "content": "<p>yes, only the geospatial.  I made an empty geospatial2 to try and see what's different</p>",
+        "id": 591448418,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398671
+    },
+    {
+        "content": "<p>In postgres can you please compare <code>storagedriver</code> under this table? <a href=\"https://guides.dataverse.org/en/5.14/schemaspy/tables/dataverse.html\">https://guides.dataverse.org/en/5.14/schemaspy/tables/dataverse.html</a></p>",
+        "id": 591448667,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777398741
+    },
+    {
+        "content": "<p>ok, may have to wait till meeting is done</p>",
+        "id": 591448823,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777398776
+    },
+    {
+        "content": "<p>dvndb=# SELECT id, alias, name, storagedriver<br>\nFROM dataverse<br>\nWHERE alias IN ('geospatial', 'geospatial2');<br>\n  id  |    alias    |      name       | storagedriver<br>\n------+-------------+-----------------+---------------<br>\n 4949 | geospatial  | Geospatial      | s3<br>\n 5669 | geospatial2 | Geospatial Test | s3<br>\n(2 rows)</p>",
+        "id": 591471413,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777405875
+    },
+    {
+        "content": "<p>still not working, I'm trying to find all the jvm options that mention s3 <br>\n &lt;system-property name=\"dataverse.db.port\" value=\"5432\"&gt;&lt;/system-property&gt;<br>\n      &lt;system-property name=\"dataverse.files.storage-drivers\" value=\"s3\"&gt;&lt;/system-property&gt;<br>\n      &lt;system-property name=\"dataverse.files.dataverse-test-oregon.type\" value=\"s3\"&gt;&lt;/system-property&gt;<br>\n      &lt;system-property name=\"dataverse.files.dataverse-test-oregon.bucket\" value=\"dataverse-test-oregon\"&gt;&lt;/system-property&gt;<br>\n      &lt;system-property name=\"dataverse.files.dataverse-test-oregon.region\" value=\"us-west-2\"&gt;&lt;/system-property&gt;<br>\n      &lt;system-property name=\"dataverse.files.dataverse-test-oregon.download-redirect\" value=\"true\"&gt;&lt;/system-property&gt;</p>\n<p>&lt;jvm-options&gt;-Ddataverse.files.s3.url-expiration-minutes=120&lt;/jvm-options&gt;</p>\n<div class=\"codehilite\"><pre><span></span><code>    &lt;jvm-options&gt;-Ddataverse.files.s3.bucket-name=dataverse-test-oregon&lt;/jvm-options&gt;\n\n    &lt;jvm-options&gt;-Ddataverse.files.storage-driver-id=s3&lt;/jvm-options&gt;\n\n&lt;jvm-options&gt;-Ddataverse.files.s3.type=s3&lt;/jvm-options&gt;\n</code></pre></div>\n\n<p>&lt;jvm-options&gt;-Ddataverse.files.s3.region=us-west-2&lt;/jvm-options&gt;<br>\n        &lt;jvm-options&gt;-Ddataverse.files.s3.label=dataverse-test-oregon&lt;/jvm-options&gt;</p>",
+        "id": 591471606,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777405935
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/YvTi66E2GrXY8DkuXu-4U_AP/server-log2.txt\">server-log2.txt</a></p>",
+        "id": 591471703,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777405950
+    },
+    {
+        "content": "<p>Fortunately it's the test system</p>",
+        "id": 591472101,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777406077
+    },
+    {
+        "content": "<p>4 messages were moved here from <a class=\"stream-topic\" data-stream-id=\"378866\" href=\"/#narrow/channel/378866-troubleshooting/topic/dvndb.3D.23.20SELECT.20id.2C.20alias.2C.20name.2C.20storagedriver.20FROM.20dataverse\">#troubleshooting &gt; dvndb=# SELECT id, alias, name, storagedriver FROM dataverse</a> by <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span>.</p>",
+        "id": 591473300,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1777406484
+    },
+    {
+        "content": "<p>The stacktrace is similar, thanks.</p>",
+        "id": 591474042,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777406738
+    },
+    {
+        "content": "<p>This probably isn't worth taking too much of your time.  Though I would like to know how I broke it , if that was the case and if so how to fix.</p>",
+        "id": 591478751,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777408368
+    },
+    {
+        "content": "<p>Sure. You said everything is ok in production, right?</p>",
+        "id": 591479424,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777408614
+    },
+    {
+        "content": "<p>Yes, production is ok, other than being behind in 5.14</p>",
+        "id": 591479559,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777408670
+    },
+    {
+        "content": "<p>phew</p>",
+        "id": 591479850,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777408762
+    },
+    {
+        "content": "<p>Time to rebuild the test server based on the latest in production. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 591479900,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777408778
+    },
+    {
+        "content": "<p>I'd rather do that.  Tim is working on an ansible script to install dataverse and update the database</p>",
+        "id": 591480295,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777408904
+    },
+    {
+        "content": "<p>Just as an experiment, I'm copying over metadata from collection geospatial (the broken one) to geospatial2.</p>",
+        "id": 591654969,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1777419871
+    }
+]

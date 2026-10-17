@@ -1,0 +1,26 @@
+[
+    {
+        "content": "<p>I recently encountered a recurring issue when running the Docker demo. I was able to run version 6.2 without any problems, but when I tried to update to 6.6, I started getting a 404 response from Dataverse.<br>\nI tried several of the tips you shared here, including increasing the timeout to 10, but none of them resolved the issue. I also removed all containers and re-downloaded the original docker compose‧yml file, but the problem persisted.<br>\nThe only log line I found in the configbaker logs was:<br>\n<code>Checking the http://dataverse:8080/api/info/version ... curl: (6) Could not resolve host: dataverse</code><br>\nI also asked ClaudeAI for help and described the issue. After a bit of back and forth, it suggested that the problem might be related to the order in which the Docker services are started.<br>\nSo I tried the following steps:</p>\n<div class=\"codehilite\" data-code-language=\"SQL\"><pre><span></span><code><span class=\"n\">docker</span><span class=\"w\"> </span><span class=\"n\">compose</span><span class=\"w\"> </span><span class=\"n\">up</span><span class=\"w\"> </span><span class=\"o\">-</span><span class=\"n\">d</span><span class=\"w\"> </span><span class=\"n\">postgres</span><span class=\"w\"> </span><span class=\"n\">solr</span><span class=\"w\"> </span><span class=\"n\">smtp</span><span class=\"w\"> </span><span class=\"n\">dv_initializer</span><span class=\"w\"> </span><span class=\"n\">solr_initializer</span>\n<span class=\"n\">sleep</span><span class=\"w\"> </span><span class=\"mi\">10</span>\n<span class=\"n\">docker</span><span class=\"w\"> </span><span class=\"n\">compose</span><span class=\"w\"> </span><span class=\"n\">up</span><span class=\"w\"> </span><span class=\"o\">-</span><span class=\"n\">d</span><span class=\"w\"> </span><span class=\"n\">dataverse</span>\n<span class=\"o\">#</span><span class=\"w\"> </span><span class=\"n\">look</span><span class=\"w\"> </span><span class=\"k\">at</span><span class=\"w\"> </span><span class=\"n\">the</span><span class=\"w\"> </span><span class=\"n\">logs</span><span class=\"w\"> </span><span class=\"k\">until</span><span class=\"w\"> </span><span class=\"n\">everything</span><span class=\"w\"> </span><span class=\"n\">has</span><span class=\"w\"> </span><span class=\"n\">finished</span><span class=\"w\"> </span><span class=\"n\">booting</span><span class=\"w\"> </span><span class=\"n\">up</span>\n<span class=\"n\">docker</span><span class=\"w\"> </span><span class=\"n\">compose</span><span class=\"w\"> </span><span class=\"n\">up</span><span class=\"w\"> </span><span class=\"o\">-</span><span class=\"n\">d</span><span class=\"w\"> </span><span class=\"n\">bootstrap</span><span class=\"w\"> </span><span class=\"n\">register</span><span class=\"o\">-</span><span class=\"n\">previewers</span><span class=\"w\"> </span><span class=\"n\">previewers</span><span class=\"o\">-</span><span class=\"n\">provider</span>\n</code></pre></div>\n<p>Apparently, the issue was indeed related to the service start order. I'm not sure what changes could be made to the setup to prevent this, but if anyone else encounters the same error, these steps might help.</p>",
+        "id": 520597134,
+        "sender_full_name": "Gwenaël Doux",
+        "timestamp": 1748330638
+    },
+    {
+        "content": "<p>Hmm, we did add <code>service_completed_successfully</code> over in the frontend repo: <a href=\"https://github.com/IQSS/dataverse-frontend/pull/180\">https://github.com/IQSS/dataverse-frontend/pull/180</a></p>",
+        "id": 520667090,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748351958
+    },
+    {
+        "content": "<p>I'm not sure if it would help or not. You're welcome to try!</p>",
+        "id": 520667130,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748351969
+    },
+    {
+        "content": "<p><code>Could not resolve host: dataverse</code> sounds like it's not on the same network. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 520667196,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1748351993
+    }
+]

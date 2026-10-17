@@ -1,0 +1,158 @@
+[
+    {
+        "content": "<p>My OIDC profile endpoint returns this:</p>\n<p>{\"id\":\"b94e083c-8ee8-4177-af13-cf87ceab00d2\",\"username\":\"john\",\"email\":\"john@gmail.com\"}</p>\n<p>But dataverse says this error:</p>\n<p>edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2Exception: Error getting the user info record from OpenID.<br>\n    at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserInfo(OIDCAuthProvider.java:316)<br>\n    at edu.harvard.iq.dataverse.authorization.providers.oauth2.oidc.OIDCAuthProvider.getUserRecord(OIDCAuthProvider.java:227)<br>\n    at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean.exchangeCodeForToken(OAuth2LoginBackingBean.java:103)<br>\n    at edu.harvard.iq.dataverse.authorization.providers.oauth2.OAuth2LoginBackingBean$Proxy$_$$_WeldSubclass.exchangeCodeForToken(Unknown Source)</p>",
+        "id": 426560448,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710428279
+    },
+    {
+        "content": "<p>Maybe I should explain more. I have already created the user 'john' in my OIDC. I press the 'Login by OpenID' in dataverse and it redirects me to my OIDC properly. I login there and redirected me to dataverse. By looking at logs, I noticed that dataverse can exchange the auth code with OIDC and gets the access token; then, it tries to call the profile endpoint to get user profile. At this point, I get the above error message in dataverser.</p>",
+        "id": 426577596,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710432863
+    },
+    {
+        "content": "<p>Can you find the line number on GitHub?</p>",
+        "id": 426577959,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710432971
+    },
+    {
+        "content": "<p>I think the following method is throwing the exception, but I am not sure.</p>\n<p>Optional&lt;UserInfo&gt; getUserInfo(BearerAccessToken accessToken) throws IOException, OAuth2Exception {<br>\n        // Retrieve data<br>\n        HTTPResponse response = new UserInfoRequest(this.idpMetadata.getUserInfoEndpointURI(), accessToken)<br>\n                                        .toHTTPRequest()<br>\n                                        .send();</p>\n<div class=\"codehilite\"><pre><span></span><code>    // Parse/Extract\n    try {\n        UserInfoResponse infoResponse = UserInfoResponse.parse(response);\n\n        // If error --&gt; oauth2 ex\n        if (! infoResponse.indicatesSuccess() ) {\n            ErrorObject error = infoResponse.toErrorResponse().getErrorObject();\n            throw new OAuth2Exception(error.getHTTPStatusCode(),\n                                      error.getDescription(),\n                                      BundleUtil.getStringFromBundle(&quot;auth.providers.exception.userinfo&quot;, Arrays.asList(this.getTitle())));\n        }\n\n        // Success --&gt; return info\n        return Optional.of(infoResponse.toSuccessResponse().getUserInfo());\n\n    } catch (ParseException ex) {\n        throw new OAuth2Exception(-1, ex.getMessage(), BundleUtil.getStringFromBundle(&quot;auth.providers.exception.userinfo&quot;, Arrays.asList(this.getTitle())));\n    }\n}\n</code></pre></div>",
+        "id": 426578236,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710433069
+    },
+    {
+        "content": "<p>dataverse/src/main/java/edu/harvard/iq/dataverse/authorization/providers/oauth2/oidc/OIDCAuthProvider.java</p>",
+        "id": 426578351,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710433092
+    },
+    {
+        "content": "<p>Yeah, auth.providers.exception.userinfo=Error getting the user info record from {0}.</p>",
+        "id": 426583117,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710434507
+    },
+    {
+        "content": "<p>From <code>Bundle.properties</code></p>",
+        "id": 426583132,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710434512
+    },
+    {
+        "content": "<p>Are you comfortable recompiling and adding some debugging lines?</p>",
+        "id": 426583337,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710434570
+    },
+    {
+        "content": "<p>Unfortunately, I am not a Java developer.</p>",
+        "id": 426695947,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710491892
+    },
+    {
+        "content": "<p>I found the root of the issue. My profile endpoint was returning a different structure than what was expected by dataverse (when calling profile endpoint).</p>",
+        "id": 426705469,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710495446
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"698782\">Mohsen Jafari</span> has marked this topic as resolved.</p>",
+        "id": 426705486,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1710495449
+    },
+    {
+        "content": "<p>Interesting. So you changed the structure of what your profile endpoint was emitting? Should we add some more documentation to the Dataverse guides?</p>",
+        "id": 426730612,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710504713
+    },
+    {
+        "content": "<p>You know, I have experienced the following stuff when integrating my OIDC with dataverse:</p>\n<ol>\n<li>It seems to me that dataverse/payara cache the discovery document for some time (.well-known/openid-configuration), as when I restarted Payara then it started to use my new discovery document. I didn't know it and just by try and error found it.</li>\n<li>I was not sure what data structure did dataverse expect from my profile endpoint. So, I looked at the source code and provided the minimum data. If I knew what data should have been returned by profile endpoint then it would have been much time-saving for me :)</li>\n<li>Another very helpful thing that I thought about was that, if I could set a flag for debugging (e.g., using environment variables or something else) and more logs appeared in the console then troubleshooting would have been much easier, but I am not sure if this is the correct approach or not.</li>\n<li>I was not sure at all where I will see the Login by OpenID button (after setting the related jvm options). It would be much better to have some information in dataverse documentation that says exactly such info.</li>\n</ol>\n<p>PS: I have used Standard installation approach.</p>",
+        "id": 426733900,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710505894
+    },
+    {
+        "content": "<p>Sounds like we should document all of this. Are you interested in creating an issue? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 426736168,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710506724
+    },
+    {
+        "content": "<p>Yes. Where should I create the issue?</p>",
+        "id": 427384669,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710750326
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"698782\">@Mohsen Jafari</span> <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a> please</p>",
+        "id": 427670483,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710847507
+    },
+    {
+        "content": "<p>I see you opened this, thanks: Add more information about the OpenID button <a href=\"https://github.com/IQSS/dataverse/issues/10392\">#10392</a></p>",
+        "id": 427912146,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710936360
+    },
+    {
+        "content": "<p>And OIDC profile endpoint <a href=\"https://github.com/IQSS/dataverse/issues/10393\">#10393</a></p>",
+        "id": 427912391,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710936435
+    },
+    {
+        "content": "<p>sure</p>",
+        "id": 427912640,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710936517
+    },
+    {
+        "content": "<p>And</p>\n<ul>\n<li>Caching the result of .well-known/openid-configuration <a href=\"https://github.com/IQSS/dataverse/issues/10394\">#10394</a> </li>\n<li>Debug flag <a href=\"https://github.com/IQSS/dataverse/issues/10395\">#10395</a></li>\n</ul>",
+        "id": 427912671,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710936530
+    },
+    {
+        "content": "<p>for debug flag, you mean just OIDC, right?</p>",
+        "id": 427912696,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710936540
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/.E2.9C.94.20Error.20getting.20the.20user.20info.20record.20from.20OpenID.2E/near/427912696\">said</a>:</p>\n<blockquote>\n<p>for debug flag, you mean just OIDC, right?</p>\n</blockquote>\n<p>I think, in general, having a boolean flag in order to have more/verbose information about what have happened (logs) would be really helpful, either regarding OIDC or anything else. For example, if verbose_flag = true, then we see more detailed information about what have happened. As an example, there were some situations where I really needed more information in the dataverse logs to fix the issue but without such a flag I had to pull the codebase put some logs and recompile and so on...<br>\nHowever, I think such a decision may really depend on your development/security strategies. I just shared my basic-level idea :)</p>",
+        "id": 427913456,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1710936842
+    },
+    {
+        "content": "<p>Makes sense. Sometimes we'll suggest increasing the logging level here or there: <a href=\"https://guides.dataverse.org/en/6.1/admin/troubleshooting.html#increasing-payara-logging\">https://guides.dataverse.org/en/6.1/admin/troubleshooting.html#increasing-payara-logging</a></p>",
+        "id": 427920826,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710939313
+    },
+    {
+        "content": "<p>Are you interested in creating a pull request for any of these issues?</p>",
+        "id": 427920871,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1710939327
+    },
+    {
+        "content": "<p>Sorry, but not at the moment.</p>",
+        "id": 429319248,
+        "sender_full_name": "Mohsen Jafari",
+        "timestamp": 1711356594
+    },
+    {
+        "content": "<p>No worries!</p>",
+        "id": 429482955,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1711390952
+    }
+]
