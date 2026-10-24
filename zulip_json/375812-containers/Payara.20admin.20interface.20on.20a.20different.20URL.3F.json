@@ -1,0 +1,248 @@
+[
+    {
+        "content": "<p>I am now running Dataverse in a Docker Swarm and it works nicely. I'd like to make the Payara admin interface available on a different URL, so let's say that Dataverse is running under <a href=\"https://dataverse.ourinstitute.org\">https://dataverse.ourinstitute.org</a>, the admin interface should have <a href=\"https://manage.dataverse.ourinstitute.org\">https://manage.dataverse.ourinstitute.org</a>. I do this quite often since I can manage and restrict the access via the load balancer without having additional ports open. Payara exposes port 4848 but when I configure the loadbalancer HAProxy to redirect to that port, I get an infinite loop of redirections. Maybe Payara uses the Site URL to and is confused by the admin interface URL?<br>\nThe message in the browser is (depending on which I use, but the error is the same): Load cannot follow more than 20 redirections. In Chrome it's \"redirected you too many times\". <br>\nI am still investigating, maybe the misconfiguration is on the load balancer side but I thought I'll ask too.</p>",
+        "id": 449241241,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720165318
+    },
+    {
+        "content": "<p>IIRC this is a restriction of the Payara Admin App (which knows nothing about Dataverse configuration) and their auto forwarding to the application URL.</p>",
+        "id": 449348635,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720196222
+    },
+    {
+        "content": "<p>Try hitting that directly and it should work</p>",
+        "id": 449348763,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720196245
+    },
+    {
+        "content": "<p>What do you mean exactly? I have no success yet ;) Clearly it's an issue with Payara, the HAProxy configuration is fine. S which URL should I \"hit directly\"?</p>",
+        "id": 449800520,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720425327
+    },
+    {
+        "content": "<p>I don't have much to add. Yes, this should have nothing to do with Dataverse. You could try asking on their forum: <a href=\"https://forum.payara.fish\">https://forum.payara.fish</a></p>",
+        "id": 449870696,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720445544
+    },
+    {
+        "content": "<p>I'Ve been using it this morning with our Caddy config (/conf/proxy) and it worked without any quirks. Took me where I wanted, no redirects going awry</p>",
+        "id": 449871302,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445700
+    },
+    {
+        "content": "<p>Hm this is very weird. I just spent another hour on debugging but cannot make it work. I also assume it's a Payara thing, so I'll try there.</p>\n<p><a href=\"/user_uploads/53090/h50NByhw3ZfIaa9W2OxZ_6x8/Screenshot-2024-07-10-at-07.41.56.png\">Screenshot-2024-07-10-at-07.41.56.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/h50NByhw3ZfIaa9W2OxZ_6x8/Screenshot-2024-07-10-at-07.41.56.png\" title=\"Screenshot-2024-07-10-at-07.41.56.png\"><img src=\"/user_uploads/53090/h50NByhw3ZfIaa9W2OxZ_6x8/Screenshot-2024-07-10-at-07.41.56.png\"></a></div>",
+        "id": 450349473,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720590202
+    },
+    {
+        "content": "<p>I have no redirects whatsoever in my config of HAProxy. It's really just: use 8080 if \"<a href=\"http://dataverse.institute.org\">dataverse.institute.org</a>\" or 4848 if \"<a href=\"http://admin.dataverse.institute.org\">admin.dataverse.institute.org</a>\", just like I do with tons of other services</p>",
+        "id": 450349559,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720590269
+    },
+    {
+        "content": "<p>The problem is that also HAProxy shows an HTTP 302 for the Payara service on port 4848</p>",
+        "id": 450375789,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720598349
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/5W21o9r7iqAMmbEflu7olANU/Screenshot-2024-07-10-at-09.59.30.png\">Screenshot-2024-07-10-at-09.59.30.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/5W21o9r7iqAMmbEflu7olANU/Screenshot-2024-07-10-at-09.59.30.png\" title=\"Screenshot-2024-07-10-at-09.59.30.png\"><img src=\"/user_uploads/53090/5W21o9r7iqAMmbEflu7olANU/Screenshot-2024-07-10-at-09.59.30.png\"></a></div>",
+        "id": 450375911,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720598378
+    },
+    {
+        "content": "<p>The service in the first row is the HTTP on port 8080, which works fine and the one below is Payara on port 4848 which does the 302 thing<br>\nSo maybe my docker configuration is not correct?</p>",
+        "id": 450376071,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720598414
+    },
+    {
+        "content": "<p>That's in my docker config:</p>\n<div class=\"codehilite\"><pre><span></span><code>    environment:\n      _CT_DATAVERSE_SITEURL: &quot;https://dataverse.institute.org\n      DATAVERSE_DB_HOST: postgres\n      DATAVERSE_DB_PASSWORD: secret\n      DATAVERSE_DB_USER: dataverse\n      DATAVERSE_FEATURE_API_BEARER_AUTH: &quot;1&quot;\n      DATAVERSE_MAIL_SYSTEM_EMAIL: “mail…”\n      DATAVERSE_MAIL_MTA_HOST: &quot;smtp&quot;\n      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1\n        -Ddataverse.files.file1.type=file\n        -Ddataverse.files.file1.label=Filesystem\n        -Ddataverse.files.file1.directory=/store\n        -Ddataverse.pid.providers=fake\n        -Ddataverse.pid.default-provider=fake\n        -Ddataverse.pid.fake.type=FAKE\n        -Ddataverse.pid.fake.label=FakeDOIProvider\n        -Ddataverse.pid.fake.authority=10.5072\n        -Ddataverse.pid.fake.shoulder=FK2/\n</code></pre></div>",
+        "id": 450377182,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720598620
+    },
+    {
+        "content": "<p>The _CT_ thing is old news with the recent upgrade to Payara 6.2024.6. If you're using recent images, you can omit these prefixes</p>",
+        "id": 450379502,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599195
+    },
+    {
+        "content": "<p>ok i'll take that out!</p>",
+        "id": 450379598,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720599229
+    },
+    {
+        "content": "<p>Aside from that  - these configuration options are not in any way related to the Payara Admin Console.</p>",
+        "id": 450379732,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599271
+    },
+    {
+        "content": "<p>yes that's what i also understood</p>",
+        "id": 450379767,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720599288
+    },
+    {
+        "content": "<p>That is an entirely separate application that comes with the appserver</p>",
+        "id": 450379774,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599290
+    },
+    {
+        "content": "<p>So there is nothing we can configure, at least I'm not aware of any config options</p>",
+        "id": 450379825,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599308
+    },
+    {
+        "content": "<p>i am really clueless</p>",
+        "id": 450379901,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720599334
+    },
+    {
+        "content": "<p>If you want to cross-check with a different image, you can use the Payara upstream images. There's no Dataverse inside, but that doesn't matter for getting these reverse proxies to work</p>",
+        "id": 450379959,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599356
+    },
+    {
+        "content": "<p>I'd say go create a log of all the HTTP communication and let's take a look at that</p>",
+        "id": 450380128,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599410
+    },
+    {
+        "content": "<p>it must be some tiny mistake which i overlook ;)</p>",
+        "id": 450380474,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720599494
+    },
+    {
+        "content": "<p>Or: just ignore this for now. Typically you will not interact with the Payara Console at all, so you might as well skip this part and turn to more interesting stuff in setting up Dataverse</p>",
+        "id": 450380487,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720599498
+    },
+    {
+        "content": "<p>the open data management wants access to that, so unfortunately I need a solution <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span>  I don't see any output from the dataverse container when I try to connect to the admin interface and nor do I see any logs in the load balancer, so I start to think that the provider is messing up something with the DNS of the subdomain</p>",
+        "id": 450384214,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720600585
+    },
+    {
+        "content": "<p>i'll report back once this mystery is solved</p>",
+        "id": 450384304,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720600612
+    },
+    {
+        "content": "<p>it has to be something with Payara (sorry for the noise here)... if I only change the port from 4848 to 8080 in the admin backend of my load balancer, i get the usual dataverse instance, so everything is working on that backend<br>\nI now also put the log level to debug and i can see 302 redirects</p>",
+        "id": 450388367,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720601941
+    },
+    {
+        "content": "<p>Please note that the default password for the admin user of the Payara Console is \"admin\". I have a PR in the works that will allow easy changes of this password at boot time of the container.</p>",
+        "id": 450388514,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720601989
+    },
+    {
+        "content": "<p>Yep, that's why i am worried <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 450388639,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720602010
+    },
+    {
+        "content": "<p>I will now try to figure out how the <code>gdcc/dataverse:alpha</code> image is built to understand why Payara might not work</p>",
+        "id": 450388946,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720602074
+    },
+    {
+        "content": "<p>i mean, it's definitely suspicious that port 8080 works flawlessly and 4848 does an HTTP 302  redirect loop (and both on the very same container)</p>",
+        "id": 450389788,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720602265
+    },
+    {
+        "content": "<p>Hmm, so I might have a clue. Maybe Payara \"guesses\" the URL by taking the given domain from the HTTP request and then makes an \"HTTP\" call behind the scene, which again triggers my HTTPS \"redirect\" from the load balancer</p>",
+        "id": 450391425,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720602815
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> are you using SSL termination outside of the container world or do you offer the certificate directly?</p>",
+        "id": 450391591,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720602862
+    },
+    {
+        "content": "<p>I opened a thread here: <a href=\"https://forum.payara.fish/t/payara-behind-haproxy-with-ssl-termination-endless-redirect-302-loop/877\">https://forum.payara.fish/t/payara-behind-haproxy-with-ssl-termination-endless-redirect-302-loop/877</a></p>",
+        "id": 450395247,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720603735
+    },
+    {
+        "content": "<p>My SSL termination happens in my K8s Ingress Controller (NGINX based)</p>",
+        "id": 450405757,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606689
+    },
+    {
+        "content": "<p>So not outside the container world, but also not doing SSL termination at the Payara end</p>",
+        "id": 450405837,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606722
+    },
+    {
+        "content": "<p>Yes, this guesswork is something I do remember - it somehow sends you some strange redirect. If you take a look at the redirection destination it sends you to, you can manipulate that URL to fit your needs and hit it directly</p>",
+        "id": 450406038,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606786
+    },
+    {
+        "content": "<p>That should start working then</p>",
+        "id": 450406056,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606791
+    },
+    {
+        "content": "<p>In your reverse proxy you could add a rewrite rule to catch the empty path and send people to the right endpoint on your own</p>",
+        "id": 450406216,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606825
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"733331\">Tamas Gal</span> <a href=\"#narrow/stream/375812-containers/topic/Payara.20admin.20interface.20on.20a.20different.20URL.3F/near/450388639\">said</a>:</p>\n<blockquote>\n<p>Yep, that's why i am worried <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>\n</blockquote>\n<p>Here's the PR to watch: <a href=\"https://github.com/IQSS/dataverse/pull/10672\">https://github.com/IQSS/dataverse/pull/10672</a></p>",
+        "id": 450406433,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720606876
+    },
+    {
+        "content": "<p>OK thanks for that. I'm already investigating but apparently the URL is imply <code>/</code></p>",
+        "id": 450420917,
+        "sender_full_name": "Tamas Gal",
+        "timestamp": 1720610799
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"733331\">@Tamas Gal</span> thanks for posting on the Payara forum. And please don't worry about a little noise here. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 450456147,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720618886
+    }
+]

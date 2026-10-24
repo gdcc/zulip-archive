@@ -1,0 +1,116 @@
+[
+    {
+        "content": "<p>Hello everyone, today I was informed that my Dataverse was down. This image shows the error message when I tried to access Dataverse</p>\n<p><a href=\"/user_uploads/53090/3mVGprsFxCOIecbC8-I6W5fu/imagen_2024-07-03_165236903.png\">imagen_2024-07-03_165236903.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/3mVGprsFxCOIecbC8-I6W5fu/imagen_2024-07-03_165236903.png\" title=\"imagen_2024-07-03_165236903.png\"><img src=\"/user_uploads/53090/3mVGprsFxCOIecbC8-I6W5fu/imagen_2024-07-03_165236903.png\"></a></div><p>After a while, Dataverse was up. I took a look at the logs while Postgres was restarting. This is the <a href=\"/user_uploads/53090/SnAYXzT14Bn2dqax3Wu5XNBJ/server.log\">server.log</a></p>\n<p>I think it is about connection pool. Someone know What can I do? Or What I need to check?</p>",
+        "id": 448958956,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720044659
+    },
+    {
+        "content": "<p>I have the same issue after updating postgres packages in my (Debian) system. So far I have restarted the server to get it running again. So I would be interested in this as well ;)</p>",
+        "id": 449846079,
+        "sender_full_name": "Henning Timm",
+        "timestamp": 1720439600
+    },
+    {
+        "content": "<p>Have you tried some of these? <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#advanced-database-settings\">https://guides.dataverse.org/en/latest/installation/config.html#advanced-database-settings</a> There are also links to more docs by Payara.</p>",
+        "id": 449855151,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720441969
+    },
+    {
+        "content": "<p>In general, yes, I've found that if PostgreSQL goes down I need to restart Payara to re-establish the connection.</p>\n<p>I do like the sound of \"allow server to reconnect in case of failure\" in the link from Oliver above.</p>",
+        "id": 449871222,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720445672
+    },
+    {
+        "content": "<p>Yes, that's the one I'd try first</p>",
+        "id": 449871583,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720445769
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> and <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>, thanks for the response. I will check the documentation that Oliver has shared. If I get it, I will let you know.</p>",
+        "id": 449967338,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720467977
+    },
+    {
+        "content": "<p>Good luck!</p>",
+        "id": 449967741,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720468155
+    },
+    {
+        "content": "<p>I have configured the next property <strong>&lt;system-property name=\"dataverse.db.is-connection-validation-required\" value=\"true\"&gt;&lt;/system-property&gt;</strong>, in my domain.xml file, I was restarting Payara and got the next error:</p>\n<div class=\"codehilite\"><pre><span></span><code>RAR5114 : Error allocating connection : [Error in allocating a connection. Cause: Cannot invoke &quot;String.toLowerCase(java.util.Locale)&quot; because the return value of &quot;com.sun.gjc.common.DataSourceSpec.getDetail(int)&quot; is null]]]\n\n[2024-07-08T15:53:18.454-0500] [Payara 6.2023.8] [GRAVE] [] [javax.enterprise.system.tools.deployment.common] [tid: _ThreadID=32 _ThreadName=RunLevelControllerThread-1720471969883] [timeMillis: 1720471998454] [levelValue: 1000] [[\n  Exception while invoking class org.glassfish.ejb.startup.EjbApplication start method\njakarta.ejb.EJBException: jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator\n    at com.sun.ejb.containers.AbstractSingletonContainer$SingletonContextFactory.create(AbstractSingletonContainer.java:745)\n    at com.sun.ejb.containers.AbstractSingletonContainer.instantiateSingletonInstance(AbstractSingletonContainer.java:477)\n    at org.glassfish.ejb.startup.SingletonLifeCycleManager.initializeSingleton(SingletonLifeCycleManager.java:219)\n    at org.glassfish.ejb.startup.SingletonLifeCycleManager.initializeSingleton(SingletonLifeCycleManager.java:180)\n    at org.glassfish.ejb.startup.SingletonLifeCycleManager.doStartup(SingletonLifeCycleManager.java:159)\n    at org.glassfish.ejb.startup.EjbApplication.start(EjbApplication.java:171)\n    at org.glassfish.internal.data.EngineRef.start(EngineRef.java:123)\n    at org.glassfish.internal.data.ModuleInfo.start(ModuleInfo.java:292)\n    at org.glassfish.internal.data.ApplicationInfo.start(ApplicationInfo.java:361)\n    at com.sun.enterprise.v3.server.ApplicationLifecycle.initialize(ApplicationLifecycle.java:633)\n    at com.sun.enterprise.v3.server.ApplicationLoaderService.postConstruct(ApplicationLoaderService.java:346)\n    at org.jvnet.hk2.internal.ClazzCreator.postConstructMe(ClazzCreator.java:303)\n    at org.jvnet.hk2.internal.ClazzCreator.create(ClazzCreator.java:351)\n    at org.jvnet.hk2.internal.SystemDescriptor.create(SystemDescriptor.java:466)\n    at org.glassfish.hk2.runlevel.internal.AsyncRunLevelContext.findOrCreate(AsyncRunLevelContext.java:281)\n    at org.glassfish.hk2.runlevel.RunLevelContext.findOrCreate(RunLevelContext.java:65)\n    at org.jvnet.hk2.internal.Utilities.createService(Utilities.java:2103)\n    at org.jvnet.hk2.internal.ServiceHandleImpl.getService(ServiceHandleImpl.java:93)\n    at org.jvnet.hk2.internal.ServiceHandleImpl.getService(ServiceHandleImpl.java:67)\n    at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$QueueRunner.oneJob(CurrentTaskFuture.java:1213)\n    at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$QueueRunner.run(CurrentTaskFuture.java:1144)\n    at org.glassfish.hk2.runlevel.internal.CurrentTaskFuture$UpOneLevel.run(CurrentTaskFuture.java:762)\n    at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n    at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\n    at java.base/java.lang.Thread.run(Thread.java:840)\nCaused by: jakarta.ejb.CreateException: Initialization failed for Singleton StartupFlywayMigrator\n    at com.sun.ejb.containers.AbstractSingletonContainer.createSingletonEJB(AbstractSingletonContainer.java:598)\n    at com.sun.ejb.containers.AbstractSingletonContainer$SingletonContextFactory.create(AbstractSingletonContainer.java:743)\n    ... 24 more\nCaused by: org.flywaydb.core.internal.exception.FlywaySqlException: Unable to obtain connection from database: Error in allocating a connection. Cause: Cannot invoke &quot;String.toLowerCase(java.util.Locale)&quot; because the return value of &quot;com.sun.gjc.common.DataSourceSpec.getDetail(int)&quot; is null\n</code></pre></div>\n<p>This is my domain.xml file configuration.<br>\n<a href=\"/user_uploads/53090/_Wo1-KK945-mS4RWwgyUpo-B/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/_Wo1-KK945-mS4RWwgyUpo-B/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/_Wo1-KK945-mS4RWwgyUpo-B/image.png\"></a></div>",
+        "id": 449982436,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720472896
+    },
+    {
+        "content": "<p>Is that the way to set the property, or should I set it as a JVM option?</p>",
+        "id": 449982632,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720472942
+    },
+    {
+        "content": "<p>You will need to define the method how to validate, too, I think. There is no default selection.</p>",
+        "id": 449983264,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720473084
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> do you mean this <strong>dataverse.db.connection-validation-method</strong> property?</p>",
+        "id": 449983778,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720473197
+    },
+    {
+        "content": "<p>Can you try with custom validation and set the class to  org.glassfish.api.jdbc.validation.PostgresConnectionValidation?</p>",
+        "id": 449985736,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720474031
+    },
+    {
+        "content": "<p>I'm curious if that works...</p>",
+        "id": 449985743,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720474040
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I have configured my domain.xml file as follows:<br>\n<a href=\"/user_uploads/53090/B-Ff_dh6hIl4pVJHjesxFmyr/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/B-Ff_dh6hIl4pVJHjesxFmyr/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/B-Ff_dh6hIl4pVJHjesxFmyr/image.png\"></a></div><p>First, I restarted Payara, and it loaded correctly, and then I restarted Postgresql, to validate that everything is ok, and it works. So, thank you very much for helping me.</p>",
+        "id": 449991421,
+        "sender_full_name": "Santiago Florez",
+        "timestamp": 1720476048
+    },
+    {
+        "content": "<p>Well it's not what I asked, but glad it seems to work for you!</p>",
+        "id": 449991584,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720476096
+    },
+    {
+        "content": "<p>Please let us know if your problems reappear</p>",
+        "id": 449991608,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720476107
+    },
+    {
+        "content": "<p>In case it's smooth sailin' from now on, we might include these things in the docs as useful tips</p>",
+        "id": 449991682,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720476132
+    },
+    {
+        "content": "<p>Docs, docs, docs.</p>",
+        "id": 450161711,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720528977
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> has marked this topic as resolved.</p>",
+        "id": 450631831,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1720680160
+    }
+]

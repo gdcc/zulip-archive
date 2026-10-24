@@ -1,0 +1,116 @@
+[
+    {
+        "content": "<p>I'm having trouble with the Solr 9 upgrade (<a href=\"https://github.com/IQSS/dataverse/issues/9260\">#9260</a>). As I mentioned in standup. Some of our custom Dataverse fields (45 of them) are showing up in <a href=\"http://localhost:8983/solr/collection1/schema/fields\">http://localhost:8983/solr/collection1/schema/fields</a> but some aren't such as <code>fileTypeGroupFacet</code>.</p>",
+        "id": 385238420,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692115074
+    },
+    {
+        "content": "<p>If I push what I have so far, would someone else like to try? I asked in standup but no one had heard of this problem.</p>",
+        "id": 385238700,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692115123
+    },
+    {
+        "content": "<p>Yes please push. Can't look right now, but maybe later</p>",
+        "id": 385238833,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692115155
+    },
+    {
+        "content": "<p>Ok, I just pushed to <a href=\"https://github.com/IQSS/dataverse/tree/9260-solr9\">https://github.com/IQSS/dataverse/tree/9260-solr9</a></p>",
+        "id": 385241913,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692115716
+    },
+    {
+        "content": "<p>I also set up a test runner at <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/workflows/solr9.yml\">https://github.com/pdurbin/dataverse-api-test-runner/actions/workflows/solr9.yml</a></p>",
+        "id": 385244898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692116297
+    },
+    {
+        "content": "<p>I kicked off a run but it's the first one so it might not get very far: <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5869283955\">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5869283955</a></p>",
+        "id": 385245028,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692116332
+    },
+    {
+        "content": "<p>We probably need to push the develop image once... An update ye olde branches</p>",
+        "id": 385246972,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692116732
+    },
+    {
+        "content": "<p>Never fear, in that solr9 workflow I'm building the base and app images.</p>",
+        "id": 385258909,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692121242
+    },
+    {
+        "content": "<p>It's showing the same errors I'm seeing on my laptop. I guess that's somewhat reassuring, in a weird way.</p>",
+        "id": 385259150,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692121333
+    },
+    {
+        "content": "<p>Lots of SearchIT failures, for example.</p>",
+        "id": 385259202,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692121354
+    },
+    {
+        "content": "<p>Less blocked. Making progress.</p>",
+        "id": 385283850,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692132642
+    },
+    {
+        "content": "<p>Adding this was key: <code>&lt;schemaFactory class=\"ClassicIndexSchemaFactory\"/&gt;</code></p>",
+        "id": 385283896,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692132670
+    },
+    {
+        "content": "<p>I should mention (again) that I do have XSLTs for solrconfig.xml.</p>",
+        "id": 385294367,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692138425
+    },
+    {
+        "content": "<p>The current error is \"possible analysis error\" <a href=\"https://github.com/IQSS/dataverse/commit/df0046961851ef8a1d0a511382f9c01a4703b41e\">https://github.com/IQSS/dataverse/commit/df0046961851ef8a1d0a511382f9c01a4703b41e</a></p>",
+        "id": 385296390,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692139298
+    },
+    {
+        "content": "<p>Ok, I gave up the approach I was taking in <a href=\"https://github.com/IQSS/dataverse/tree/9260-solr9\">https://github.com/IQSS/dataverse/tree/9260-solr9</a> where I tried to start from vanilla config files from Solr 9.3.0. All sort of problems.</p>",
+        "id": 385484873,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692198745
+    },
+    {
+        "content": "<p>I just created a new branch and <a href=\"https://github.com/IQSS/dataverse/pull/9787\">https://github.com/IQSS/dataverse/pull/9787</a> with a different approach: simply copy over our 8.11.1 config files as is.</p>",
+        "id": 385484985,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692198783
+    },
+    {
+        "content": "<p>The main change that was needed was here: <a href=\"https://github.com/IQSS/dataverse/pull/9787/commits/10cb29440f52a19d745e9bae300580d7b6bf6402\">https://github.com/IQSS/dataverse/pull/9787/commits/10cb29440f52a19d745e9bae300580d7b6bf6402</a></p>",
+        "id": 385485058,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692198812
+    },
+    {
+        "content": "<p>\"fix XSLTResponseWriter namespace and enable scripting module\"</p>",
+        "id": 385485106,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692198828
+    },
+    {
+        "content": "<p>SearchIT passed for me locally. I just switched the branch on my runner and fired off the full API test suite: <a href=\"https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5880587423\">https://github.com/pdurbin/dataverse-api-test-runner/actions/runs/5880587423</a></p>",
+        "id": 385485244,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692198867
+    }
+]
