@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928391\">@Sjaak Derksen</span> let's discuss here - doing this the SLOPI way (I'll leave it to <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> to explain SLOPI) is much better for future reference.</p>\n<p><span class=\"user-mention\" data-user-id=\"928391\">@Sjaak Derksen</span> pointed me to <a href=\"https://github.com/gdcc/exporter-dcat3/actions/runs/21062443230/job/60571742458#step:7:854\">https://github.com/gdcc/exporter-dcat3/actions/runs/21062443230/job/60571742458#step:7:854</a>, where the releasing fails because he is trying to use a JDK 11 but targeting Java 17 (as instructed to the compiler).</p>",
+        "id": 568415174,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768563881
+    },
+    {
+        "content": "<p>Looking at the <a href=\"https://github.com/gdcc/exporter-dcat3/blob/70c1e18e6d44a4bdc0839bbdfea1e5917d6c37d8/pom.xml#L189\">DCAT3 POM</a>, that's an easy fix. Just drop the <code>&lt;release&gt;17&lt;/release&gt;</code> line and add a property <code>jdk.version=17</code>, so the compiler plugin get's correct config and the CI job knows the right JDK version as well.</p>",
+        "id": 568416384,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768564281
+    },
+    {
+        "content": "<p>But there's more here!</p>",
+        "id": 568416411,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768564295
+    },
+    {
+        "content": "<p>And this makes me wonder if we shouldn't put some useful things in the <a href=\"https://github.com/gdcc/dataverse-exporters/blob/main/pom.xml\">exporters-parent</a> so much of this stuff is prompty autoconfigured for plugin developers.</p>",
+        "id": 568416541,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768564345
+    },
+    {
+        "content": "<p>Also: lot's of interesting stuff <span class=\"user-mention\" data-user-id=\"928391\">@Sjaak Derksen</span> added here! Much I didn't know!</p>",
+        "id": 568416589,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768564366
+    },
+    {
+        "content": "<p>I also suggest we add a Maven profile activating on JDK23+ that adds the <code>&lt;proc&gt;full&lt;/proc&gt;</code> bit. It's not available before that release and will topple any build using JDK 17-22:</p>\n<div class=\"codehilite\" data-code-language=\"XML\"><pre><span></span><code><span class=\"nt\">&lt;profiles&gt;</span>\n<span class=\"w\">    </span><span class=\"nt\">&lt;profile&gt;</span>\n<span class=\"w\">      </span><span class=\"nt\">&lt;id&gt;</span>jdk23+<span class=\"nt\">&lt;/id&gt;</span>\n<span class=\"w\">      </span><span class=\"nt\">&lt;activation&gt;</span>\n<span class=\"w\">        </span><span class=\"nt\">&lt;jdk&gt;</span>[23,)<span class=\"nt\">&lt;/jdk&gt;</span>\n<span class=\"w\">      </span><span class=\"nt\">&lt;/activation&gt;</span>\n<span class=\"w\">      </span><span class=\"nt\">&lt;build&gt;</span>\n<span class=\"w\">        </span><span class=\"nt\">&lt;plugins&gt;</span>\n<span class=\"w\">          </span><span class=\"nt\">&lt;plugin&gt;</span>\n<span class=\"w\">            </span><span class=\"nt\">&lt;groupId&gt;</span>org.apache.maven.plugins<span class=\"nt\">&lt;/groupId&gt;</span>\n<span class=\"w\">            </span><span class=\"nt\">&lt;artifactId&gt;</span>maven-compiler-plugin<span class=\"nt\">&lt;/artifactId&gt;</span>\n<span class=\"w\">            </span><span class=\"nt\">&lt;configuration&gt;</span>\n<span class=\"w\">              </span><span class=\"nt\">&lt;proc&gt;</span>full<span class=\"nt\">&lt;/proc&gt;</span>\n<span class=\"w\">            </span><span class=\"nt\">&lt;/configuration&gt;</span>\n<span class=\"w\">          </span><span class=\"nt\">&lt;/plugin&gt;</span>\n<span class=\"w\">        </span><span class=\"nt\">&lt;/plugins&gt;</span>\n<span class=\"w\">      </span><span class=\"nt\">&lt;/build&gt;</span>\n<span class=\"w\">    </span><span class=\"nt\">&lt;/profile&gt;</span>\n<span class=\"w\">  </span><span class=\"nt\">&lt;/profiles&gt;</span>\n</code></pre></div>\n<p>Again something that could just sit in the exporter parent!</p>",
+        "id": 568416760,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768564422
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/379673-dev/topic/exporters.20and.20parents/near/568415174\">said</a>:</p>\n<blockquote>\n<p>let's discuss here - doing this the SLOPI way</p>\n</blockquote>\n<p>Here's my canonical writeup of SLOPI: <a href=\"https://blog.greptilian.com/2020/01/25/slopi-communication/\">https://blog.greptilian.com/2020/01/25/slopi-communication/</a> (Searchable Linkable Open Public Indexed (SLOPI) Communication or Why open source projects should avoid Slack)</p>",
+        "id": 568419840,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768565496
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I'm having a little trouble following what change you want to make, but I trust you. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 568420199,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1768565629
+    },
+    {
+        "content": "<p>I think <code>-proc</code> is required from java 23 and onwards but it was available as optional earlier. Now: i need the annotation processor - so <code>-proc:full</code> - for the @AutoService annotation. That generates the SPI entry in src/main/resources</p>",
+        "id": 568440498,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768571923
+    },
+    {
+        "content": "<p>For JDK 17 I got this error message when \"just having it\", so I suspect CI will fail with this, too: <code>Fatal error compiling: error: invalid flag: -proc:full</code>.</p>\n<p>Looking at the allowed values via <code>javac --help</code> (for 17.0.9-tem): <code>only,none</code>. In JDK23 they changed the former default \"full\" to \"none\", which is why the allowed values then became <code>only,none,full</code>. (I do understand why you want full proc <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> )</p>\n<div class=\"codehilite\"><pre><span></span><code>$ sdk use java 17.0.9-tem &amp;&amp; javac --help | grep &#39;\\-proc:&#39;\nUsing java version 17.0.9-tem in this shell.\n  -proc:{none,only}\n\n$ sdk use java 21.0.7-tem &amp;&amp; javac --help | grep &#39;\\-proc:&#39;\nUsing java version 21.0.7-tem in this shell.\n  -proc:{none,only,full}\n\n$ sdk use java 23.0.2-tem &amp;&amp; javac --help | grep &#39;\\-proc:&#39;\nUsing java version 23.0.2-tem in this shell.\n  -proc:{none,only,full}\n\n$sdk use java 25.0.1-tem &amp;&amp; javac --help | grep &#39;\\-proc:&#39;\nUsing java version 25.0.1-tem in this shell.\n  -proc:{none,only,full}\n</code></pre></div>",
+        "id": 568440968,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768572044
+    },
+    {
+        "content": "<p>Using the Maven profile, activated when a newer javac (23+) is in action will just make it work for all. At least that's what I hope to see <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 568441281,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768572134
+    },
+    {
+        "content": "<p>I added some more testing above. Maybe we should even activate the profile for Java 21+, so we have it going forward from this previous TLS, which may be around on quite some dev machines. (Also: I suspect this will be helpful for Dataverse core when moving to Jakarta EE 11)</p>",
+        "id": 568442492,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768572493
+    },
+    {
+        "content": "<ul>\n<li>\n<p>Use <strong><code>-proc:only</code></strong> when you:</p>\n<ul>\n<li>split <strong>code generation</strong> and <strong>compilation</strong> into distinct build steps,</li>\n<li>want to inspect or cache generated sources/resources before compiling,</li>\n<li>run processors that produce artifacts consumed by other tools. <a href=\"https://learn.microsoft.com/en-us/power-platform/admin/wp-security-cds\">[learn.microsoft.com]</a></li>\n</ul>\n</li>\n<li>\n<p>Use <strong><code>-proc:full</code></strong> when you:</p>\n<ul>\n<li>want the classic <strong>process‑then‑compile</strong> pipeline in one go,</li>\n<li>need processors’ outputs to be compiled immediately,</li>\n<li>aim to preserve pre‑JDK‑23 behavior explicitly. <a href=\"https://learn.microsoft.com/en-us/power-platform/admin/wp-security-cds\">[learn.microsoft.com]</a></li>\n</ul>\n</li>\n</ul>",
+        "id": 568450605,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768574595
+    },
+    {
+        "content": "<p>it is strange.. I added the processor path block to control which annotation processor to trigger. I checked. It looks like I can remove the complete setting. I do have some background in annotation processing <span aria-label=\"slight smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"slight smile\">:slight_smile:</span> .. but never experienced issues with this flag.</p>",
+        "id": 568450998,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768574696
+    },
+    {
+        "content": "<p>anyway... lets see if this works.</p>",
+        "id": 568451041,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768574708
+    },
+    {
+        "content": "<p>don't believe the flag <code>-proc:full</code> is to blame.. removed it and still the same issue.</p>",
+        "id": 568453459,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768575388
+    },
+    {
+        "content": "<p>move on the change the jdk setting</p>",
+        "id": 568453807,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768575478
+    },
+    {
+        "content": "<p>Okay. succesful this time: </p>\n<div class=\"codehilite\"><pre><span></span><code>[INFO] Waiting until Deployment 2b2d06e1-ab7b-4c8b-9bbb-948556f99df3 is validated\n\n[](https://github.com/gdcc/exporter-dcat3/actions/runs/21070944017/job/60600209816#step:7:3647)[INFO] Deployment 2b2d06e1-ab7b-4c8b-9bbb-948556f99df3 has been validated. To finish publishing visit https://central.sonatype.com/publishing/deployments\n</code></pre></div>\n<p>I guess that I can't finish it (it does not accept my github credentials)</p>",
+        "id": 568456773,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768576255
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928391\">@Sjaak Derksen</span> you're getting me wrong. I am not arguing about removing the flag at all! I'm just saying it will break compiling with a JDK 17 javac, while it's a must on JDK23+ javac. The way to work  around this problem is highlighted above. Just trying to make everybody, independent of their installed JDK (well not &lt;17), able to compile!</p>",
+        "id": 568474769,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1768581032
+    },
+    {
+        "content": "<p>no worries.. the flag does not seem to add anything if you also explicitly specify the maven coordinates of the used annotation processor. So it is not your comment as such, I think that we should not over-specify configuration and neither code. Fit for purpose is the keyword here <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 568475208,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768581137
+    },
+    {
+        "content": "<p>the property though did fix the issue.</p>",
+        "id": 568475343,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1768581176
+    }
+]

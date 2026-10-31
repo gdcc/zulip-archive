@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599841\">Jan Range</span> <a href=\"#narrow/stream/377090-python/topic/Dataverse.20filesystem-like.20extension/near/433749793\">said</a>:</p>\n<blockquote>\n<p>I receive the following message every time I try to add a remote file:</p>\n<p><code>{\"status\":\"ERROR\",\"message\":\"Dataset store configuration does not allow provided storageIdentifier.\"}</code></p>\n<p>The storage identifier follows the base URL scheme but does not match.</p>\n</blockquote>\n<p>Did you find the proper configuration to make it work ?<br>\nI have the same error.<br>\nThanks</p>",
+        "id": 435216372,
+        "sender_full_name": "uclr17",
+        "timestamp": 1713971995
+    },
+    {
+        "content": "<p>Not yet, unfortunately.  Shall we open a new topic to talk about the issue?</p>",
+        "id": 435216776,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1713972069
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> I moved this message to a new topic.</p>\n<p><span class=\"user-mention\" data-user-id=\"712615\">@uclr17</span> are you using pyDataverse?</p>",
+        "id": 435218520,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713972551
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> thank you for your feedback</p>\n<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> i am not using pyDataverse, i use an http client (insomnia).<br>\nThe generated client code for Curl is:</p>\n<div class=\"codehilite\"><pre><span></span><code>curl --request POST \\\n--url &#39;http://localhost:8080/api/datasets/:persistentId/add?persistentId=perma%3A10.5072LRU%2FFSJ3BJ&#39; \\\n--header &#39;Content-Type: multipart/form-data&#39; \\\n--header &#39;User-Agent: insomnia/8.6.1&#39; \\\n--header &#39;X-Dataverse-key: XXXXX&#39; \\\n--form &#39;jsonData={&quot;description&quot;:&quot;My description cat.&quot;,&quot;storageIdentifier&quot;:&quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,&quot;checksumType&quot;:&quot;MD5&quot;,&quot;md5Hash&quot;:&quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,&quot;label&quot;:&quot;testlogo.png&quot;,&quot;fileName&quot;:&quot;testlogo.png&quot;,&quot;mimeType&quot;:&quot;image/png&quot;}&#39;\n</code></pre></div>\n<p>My config in my docker compose (i follow this doc to run my local dataverse <a href=\"https://guides.dataverse.org/en/latest/container/running/demo.html\">https://guides.dataverse.org/en/latest/container/running/demo.html</a> ):</p>\n<div class=\"codehilite\"><pre><span></span><code>JVM_ARGS: -Ddataverse.files.storage-driver-id=file\n-Ddataverse.files.file.type=file\n-Ddataverse.files.file.label=Filesystem\n-Ddataverse.files.file.directory=${STORAGE_DIR}/store\n-Ddataverse.files.trsa.type=remote\n-Ddataverse.files.trsa.label=RemoteTest\n-Ddataverse.files.trsa.base-url=https://qdr.syr.edu\n-Ddataverse.files.trsa.base-store=file\n-Ddataverse.files.trsa.download-redirect=true\n-Ddataverse.files.trsa.public=true\n-Ddataverse.files.trsa.ingestsizelimit=0\n</code></pre></div>\n<p>The error message seems to come from the DataAccess.uploadToDatasetAllowed method:<br>\n<a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L357\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L357</a><br>\ncalled in addFileToDataset method:<br>\n<a href=\"https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L2500\">https://github.com/IQSS/dataverse/blob/develop/src/main/java/edu/harvard/iq/dataverse/api/Datasets.java#L2500</a></p>\n<p>I tried all the storage services in my collection, the error message is the same.<br>\nNo error message in dataverse logs, only info message:</p>\n<div class=\"codehilite\"><pre><span></span><code>dataverse           | [#|2024-04-25T07:38:09.854+0000|INFO|Payara 6.2023.8||_ThreadID=99;_ThreadName=http-thread-pool::http-listener-1(4);_TimeMillis=1714030689854;_LevelValue=800;|\ndataverse           |   jsonData: {&quot;description&quot;:&quot;My description cat.&quot;,&quot;storageIdentifier&quot;:&quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,&quot;checksumType&quot;:&quot;MD5&quot;,&quot;md5Hash&quot;:&quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,&quot;label&quot;:&quot;testlogo.png&quot;,&quot;fileName&quot;:&quot;testlogo.png&quot;,&quot;mimeType&quot;:&quot;image/png&quot;}|#]\n</code></pre></div>\n<p>Thank you for the help.</p>",
+        "id": 435335280,
+        "sender_full_name": "uclr17",
+        "timestamp": 1714032672
+    },
+    {
+        "content": "<p>I am unsure, but according to the documentation, the <code>storageIdentifier</code> URL should start with the <code>base-url</code> specified within the JVM Args. I tried that, but still received the same error message. Is this the intended way of doing that, <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> ?</p>",
+        "id": 435354761,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1714039453
+    },
+    {
+        "content": "<p>I follow the JVM options and JSON input in this test class:<br>\n<a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L48\">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L48</a><br>\n<a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L58\">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java#L58</a></p>",
+        "id": 435364330,
+        "sender_full_name": "uclr17",
+        "timestamp": 1714043188
+    },
+    {
+        "content": "<p>Ok, type=remote. Hmm.</p>\n<p><span class=\"user-mention\" data-user-id=\"712615\">@uclr17</span> can you please point me to the section of the API Guide you are using? Is it <a href=\"https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type\">https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type</a> ?</p>",
+        "id": 435373382,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714046569
+    },
+    {
+        "content": "<p>I am using 4 sources of documentation:<br>\n<a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api\">https://guides.dataverse.org/en/latest/api/native-api.html#add-remote-file-api</a><br>\n<a href=\"https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type\">https://guides.dataverse.org/en/6.2/developers/big-data-support.html#trusted-remote-storage-with-the-remote-store-type</a><br>\n<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage\">https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage</a><br>\n<a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java\">https://github.com/IQSS/dataverse/blob/v6.2/src/test/java/edu/harvard/iq/dataverse/api/RemoteStoreIT.java</a></p>",
+        "id": 435381072,
+        "sender_full_name": "uclr17",
+        "timestamp": 1714049143
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> to make it work, you need to add the JVM_ARGS:<br>\n<code>-Ddataverse.files.trsa.upload-out-of-band=true</code><br>\nand in the collection where your dataset will be updated, edit the storage to select the remote store (RemoteTest with my config).</p>\n<p>Final config:</p>\n<div class=\"codehilite\"><pre><span></span><code>JVM_ARGS: -Ddataverse.files.storage-driver-id=file1\n  -Ddataverse.files.file1.type=file\n  -Ddataverse.files.file1.label=Filesystem\n  -Ddataverse.files.file1.directory=${STORAGE_DIR}/store\n  -Ddataverse.files.trsa.type=remote\n  -Ddataverse.files.trsa.label=RemoteTest\n  -Ddataverse.files.trsa.base-url=https://qdr.syr.edu\n  -Ddataverse.files.trsa.base-store=file1\n  -Ddataverse.files.trsa.download-redirect=true\n  -Ddataverse.files.trsa.public=true\n  -Ddataverse.files.trsa.ingestsizelimit=0\n  -Ddataverse.files.trsa.upload-out-of-band=true\n</code></pre></div>\n<p>You don't need to add <code>-Ddataverse.files.trsa.upload-out-of-band=true</code> and select the remote store for the collection if you create with the native API a new dataset with \"files\" metadatas:<br>\n<a href=\"https://guides.dataverse.org/en/latest/api/native-api.html#submit-dataset\">https://guides.dataverse.org/en/latest/api/native-api.html#submit-dataset</a></p>\n<div class=\"codehilite\"><pre><span></span><code>    &quot;metadataBlocks&quot;: {\n       ...\n    },\n    &quot;files&quot;: [\n      {\n        &quot;label&quot;: &quot;cb47471c-42bd-4ad6-8268-04a0109b2b85.png&quot;,\n        &quot;restricted&quot;: false,\n        &quot;dataFile&quot;: {\n          &quot;filename&quot;: &quot;cb47471c-42bd-4ad6-8268-04a0109b2b85.png&quot;,\n          &quot;contentType&quot;: &quot;image/png&quot;,\n          &quot;friendlyType&quot;: &quot;PNG Image&quot;,\n          &quot;storageIdentifier&quot;: &quot;trsa://themes/custom/qdr/images/CoreTrustSeal-logo-transparent.png&quot;,\n          &quot;md5&quot;: &quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;,\n          &quot;checksum&quot;: {\n            &quot;type&quot;: &quot;MD5&quot;,\n            &quot;value&quot;: &quot;509ef88afa907eaf2c17c1c8d8fde77e&quot;\n          },\n          &quot;tabularData&quot;: false\n        }\n      }\n    ],\n</code></pre></div>",
+        "id": 435595956,
+        "sender_full_name": "uclr17",
+        "timestamp": 1714141126
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"712615\">@uclr17</span> you got it working? That's great!</p>",
+        "id": 435603828,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714143713
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"712615\">@uclr17</span> that is great to hear! Thanks for sharing, will try to replicate it with my instance <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 435613869,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1714147014
+    },
+    {
+        "content": "<p>Do we need more docs?</p>",
+        "id": 435614578,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714147208
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> yes, it works after some debugging sessions to understand the DataAccess.uploadToDatasetAllowed method.</p>\n<p><code>upload-out-of-band</code>option is for s3 storage type: <br>\n<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage\">https://guides.dataverse.org/en/latest/installation/config.html#second-configure-your-dataverse-installation-to-use-s3-storage</a> <br>\nnot for remote storage type: <br>\n<a href=\"https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage\">https://guides.dataverse.org/en/latest/installation/config.html#trusted-remote-storage</a><br>\nthis option is used in StorageIO.isDirectUploadEnabled method called there: <br>\n<a href=\"https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L378\">https://github.com/IQSS/dataverse/blob/77c71024deda8f32a77be64bcd5210e20a1b8f6a/src/main/java/edu/harvard/iq/dataverse/dataaccess/DataAccess.java#L378</a></p>",
+        "id": 435643722,
+        "sender_full_name": "uclr17",
+        "timestamp": 1714158404
+    },
+    {
+        "content": "<p>Cool. Where in the docs should we add more info?</p>",
+        "id": 435643841,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714158475
+    },
+    {
+        "content": "<p>I know you were looking at a lot of docs! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 435643898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1714158489
+    }
+]

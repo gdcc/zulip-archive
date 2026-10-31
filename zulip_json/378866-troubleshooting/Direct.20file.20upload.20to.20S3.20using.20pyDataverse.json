@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  A user of our installation is trying to create datasets and upload larger files using pyDataverse. It seems the files are uploaded through the web server, not directly to our S3 storage. Does pyDataverse support direct S3 upload?</p>",
+        "id": 558678228,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1763736621
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651833\">@Philipp Conzett</span> pyDataverse does not yet support S3 uploads, but <a href=\"https://github.com/gdcc/python-dvuploader\">python-dvuploader</a> does. We are currently working on the next version, including some fixes to be compatible with 6.8. Hence, if you are using 6.8 we advise using the current <code>main</code>branch until the next version is released.</p>",
+        "id": 558679019,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1763736795
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span>! We are at v6.6 of Dataverse. Does python-dvuploader support v6.6?</p>",
+        "id": 558679623,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1763736931
+    },
+    {
+        "content": "<p>Yes, 6.x versions are supported and tested. The only issue with 6.8 was a change in how <code>directoryLabel</code>is processed, but this is fixed on the main branch. But, since you are using 6.6, the PyPI version can be used.</p>",
+        "id": 558680153,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1763737063
+    },
+    {
+        "content": "<p>Thanks! I'll point the user to python-dvuploader. <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span></p>",
+        "id": 558680505,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1763737138
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> , all, the user mentioned above has successfully adapted a python-dvuploder script to upload files to DataverseNO. However, he's experiencing some issues, which we're trying to resolve. Below [1], I've copied some parts of our conversation with the user. Do you have any idea what causes these issues?</p>\n<p>[1] Extracts from conversation with user:</p>\n<p>#####</p>\n<p>I’ve continued the upload process and it still fails at random intervals. I think today I got the internal server error once, then there have been http read errors reported by the python dvuploader library. The upload of some the datasets has gone without errors but mostly there has been at least one failure per dataset (each has 96 files). There is also large variation in upload times, some files every now and then are much slower to upload.</p>\n<p>Another problem is that in a few datasets the upload process seems to go through without any errors but there are one or two files missing from the dataset. I modified my upload script so that it first checks which files have already been uploaded and then it uploads only the missing ones so that I can easily iterate until all the files have been uploaded correctly.</p>\n<p>#####</p>\n<p>From the server logs I find this error in connection with the 10.18710/ZS5KYE doi:</p>\n<p>“com.amazonaws.SdkClientException: Unable to execute HTTP request: The target server failed to respond<br>\n…<br>\nCaused by: org.apache.http.NoHttpResponseException: The target server failed to respond”</p>\n<p>My guess here is that it might have been connection issues with the S3 storage server at the time of uploading.</p>",
+        "id": 562115737,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1764945404
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651833\">@Philipp Conzett</span> thanks for sharing the feedback! My first guess is that there may be too many requests hitting the server and it shuts down. Restricting the number of parallel uploads can help sometimes. </p>\n<p>Another suspect could be that data chunks of 1MB sent by the generator may be too small such that processing and next incoming chunk could overwhelm (see <a href=\"https://github.com/gdcc/python-dvuploader/blob/main/dvuploader/directupload.py#L666\">upload handler</a>). But this is just a guess.</p>\n<p>I have published a new version 0.3.1 which resolves some recent issues, which were similar to the ones you have shared with me.</p>",
+        "id": 562887331,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1765352968
+    },
+    {
+        "content": "<p>It could be that <code>httpx</code>'s async client limits apply randomly. Meaning, there is a connection pool of X workers and 96 distributed tasks, which are not executed in the order given in <a href=\"https://github.com/gdcc/python-dvuploader/blob/0dd059245dfbbd40d8351e63d257e5a22cedf10f/dvuploader/directupload.py#L75-L91\">this code</a> but at random. This could explain the varying upload progress. I was hoping that applying the limits on the client would achieve a balanced execution. I will look into this.</p>",
+        "id": 562888374,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1765353318
+    },
+    {
+        "content": "<p>Ah and I forgot, would it be possible to share the Python tracebacks?</p>",
+        "id": 562892855,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1765354712
+    },
+    {
+        "content": "<p>Thanks, <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span>, for looking into this! I'll share your comments with the depositor and ask for Python tracebacks.</p>",
+        "id": 563328872,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1765519186
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span>, unfortunately, the depositor doesn't have access to the tracebacks anymore, but informed me that the code  uploaded the images one by one with the following snippet with a 5 second sleep between the files.</p>\n<p>files = [ dv.File(filepath=tif) ]<br>\ndvuploader = dv.DVUploader(files=files, tab_ingest=False)<br>\ndvuploader.upload(api_token=API_TOKEN, dataverse_url=BASE_URL, persistent_id=ds_pid, n_parallel_uploads=1)</p>\n<p>and he also suspected that overall server load may have something to do with the problem.</p>",
+        "id": 563472774,
+        "sender_full_name": "Philipp Conzett",
+        "timestamp": 1765545724
+    }
+]
