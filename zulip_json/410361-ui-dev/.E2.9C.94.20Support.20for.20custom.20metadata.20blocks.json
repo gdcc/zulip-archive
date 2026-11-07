@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>Hi, In order to get a better understanding of the new SPA, I was building it and then deploying it on our own dev enviromment, which is a Rocky8 VM with Apache fronting Payara. The backend is our own prepopulated dev Dataverse on that VM. While I do get it to work, it is very limited; only the home page and root page work. <br>\nWhen I try to 'view' a dataset page, I get a 404 with the error mesage (console): \"There was an error getting the dataset Error: Failed to get dataset by persistent ID: Incorrect Metadata block name key<br>\n\". I traced it down to the <code>toMetadataBlockName</code> function. When it tries to find “citation” it works, but the next call is with “dansRights” an exception is thrown, because it is not in the <code>MetadataBlockName</code> enum. This \"dansRights\" is one of our custom metadata blocks. </p>\n<p>Could it be that the SPA cannot handle custom metadata blocks or might it be that our backend Dataverse version 6.5 is incompattible?</p>",
+        "id": 532913943,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1754399575
+    },
+    {
+        "content": "<p><a href=\"#narrow/channel/410361-ui-dev/topic/Incorrect.20Metadata.20block.20name.20key/near/532913943\">A message</a> was moved here from <a class=\"stream-topic\" data-stream-id=\"410361\" href=\"/#narrow/channel/410361-ui-dev/topic/Status.20of.20SPA/with/493989699\">#ui-dev &gt; Status of SPA</a> by <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span>.</p>",
+        "id": 532915271,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1754399976
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> thanks <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span> figured out that there's a hard-coded list of metadata blocks here: <a href=\"https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11\">https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11</a></p>\n<p>He's planning a fix. Also, we were able to replicate the bug here. Thanks for letting us know!</p>",
+        "id": 532941767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754408176
+    },
+    {
+        "content": "<p>When using a latest dev-env, I can reproduce this problem with the new 3d-object metadata; it is not in that list.</p>",
+        "id": 532941806,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1754408192
+    },
+    {
+        "content": "<p>Right. Makes sense.</p>",
+        "id": 532960202,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754415213
+    },
+    {
+        "content": "<p>The question was originally in 'Status of SPA' because I was not sure if custom metadata was supported. That question remains; is it supported but somehow flawed, or is it not supported?</p>",
+        "id": 533040399,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1754465230
+    },
+    {
+        "content": "<p>Hi <span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> , Germán here, I'm a frontend developer working on the SPA, thanks for detecting this. There was partial support for custom metadata, limited to the blocks you mentioned from the <code>MetadataBlockName</code> enum. We're currently working on a fix <span aria-label=\"wrench\" class=\"emoji emoji-1f527\" role=\"img\" title=\"wrench\">:wrench:</span>  for the SPA.</p>",
+        "id": 533078526,
+        "sender_full_name": "Germán Saracca",
+        "timestamp": 1754478609
+    },
+    {
+        "content": "<p>I'd say \"not supported\" at the moment. Certain blocks that are <a href=\"https://github.com/IQSS/dataverse-frontend/blob/45fcee44e8923bfc0dc6d5bce9230824089f8226/src/metadata-block-info/domain/models/MetadataBlockInfo.ts#L11\">hard-coded</a> work.</p>",
+        "id": 533098280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754485502
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> for now, the fixes are going into the 0.1.0 release branch: <a href=\"https://github.com/IQSS/dataverse-frontend/compare/develop...release/0.1.0\">https://github.com/IQSS/dataverse-frontend/compare/develop...release/0.1.0</a></p>\n<p>I believe it's these three commits by <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span>:</p>\n<p><a href=\"/user_uploads/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png\">Screenshot 2025-08-07 at 11.26.19 AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png\" title=\"Screenshot 2025-08-07 at 11.26.19 AM.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"1054x331\" src=\"/user_uploads/thumbnail/53090/G0zThPWwjdesGb9xUcD7_Ncj/Screenshot-2025-08-07-at-11.26.19AM.png/840x560.webp\"></a></div><p>(The PR at <a href=\"https://github.com/IQSS/dataverse-frontend/pull/777\">https://github.com/IQSS/dataverse-frontend/pull/777</a> is where we're merging the 0.1.0 release into the \"main\" branch, so the commits appear there as well.)</p>\n<p>Basically, the plan is for these fixes to go into the 0.1.0 release, so thanks for reporting it!</p>\n<p>These fixes will also make it into the develop branch at some point.</p>",
+        "id": 533316373,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754580505
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> oh and if you want, we can certainly rename this topic to \"support for custom metadata blocks\" or whatever. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 533319401,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1754581561
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Just changed it as suggested</p>",
+        "id": 534944391,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755521142
+    },
+    {
+        "content": "<p>Looks great, thanks.</p>",
+        "id": 534947447,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755522155
+    },
+    {
+        "content": "<p>Pulled develop and build and then deployed it on our test VM, now I do get Datasset metadata with those custom blocks. Great work  <span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span> <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span></p>",
+        "id": 535162121,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755619539
+    },
+    {
+        "content": "<p>Nice! Happy it’s working with the custom blocks , thanks for testing and sharing the feedback <span aria-label=\"praise\" class=\"emoji emoji-1f64c\" role=\"img\" title=\"praise\">:praise:</span>  <span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span></p>",
+        "id": 535191590,
+        "sender_full_name": "Germán Saracca",
+        "timestamp": 1755632007
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"770046\">Germán Saracca</span> has marked this topic as resolved.</p>",
+        "id": 537349066,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1756840167
+    }
+]

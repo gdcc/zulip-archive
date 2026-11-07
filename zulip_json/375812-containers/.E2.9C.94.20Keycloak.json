@@ -1,0 +1,104 @@
+[
+    {
+        "content": "<p>Talk to me about Keycloak. I'm reviewing PR <a href=\"https://github.com/IQSS/dataverse/issues/9532\">#9532</a> and as suggested in the description, I'm adding the following to our docker compose dev file:</p>\n<div class=\"codehilite\"><pre><span></span><code>  dev_keycloak:\n    container_name: &quot;dev_keycloack&quot;\n    image: &#39;quay.io/keycloak/keycloak:19.0&#39;\n    hostname: keycloak\n    environment:\n      - KEYCLOAK_ADMIN=kcadmin\n      - KEYCLOAK_ADMIN_PASSWORD=kcpassword\n      - KEYCLOAK_LOGLEVEL=DEBUG\n      - KC_HOSTNAME_STRICT=false\n    networks:\n      dataverse:\n        aliases:\n          - keycloak.mydomain.com #create a DNS alis within the network (add the same alias to your /etc/hosts to get a working OIDC flow)\n    command: start-dev --import-realm --http-port=8090  # change port to 8090, so within the network and external the same port is used\n    ports:\n      - &quot;8090:8090&quot;\n    volumes:\n      - &#39;./conf/keycloak/oidc-realm.json:/opt/keycloak/data/import/oidc-realm.json&#39;\n</code></pre></div>\n<p>If this works, maybe we should remove the older stuff (and related docs):</p>\n<div class=\"codehilite\"><pre><span></span><code>conf/keycloak\nconf/keycloak/oidc-realm.json\nconf/keycloak/rm-keycloak.sh\nconf/keycloak/docker-compose.yml\nconf/keycloak/run-keycloak.sh\nconf/keycloak/oidc-keycloak-auth-provider.json\n</code></pre></div>\n<p>Heads up especially to <span class=\"user-mention\" data-user-id=\"598442\">@Guillermo Portas</span> who added this in PR <a href=\"https://github.com/IQSS/dataverse/issues/9234\">#9234</a>.</p>",
+        "id": 357394839,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683749340
+    },
+    {
+        "content": "<p>Oh, I see, he's reusing the old config:</p>\n<div class=\"codehilite\"><pre><span></span><code>    volumes:\n      - &#39;./conf/keycloak/oidc-realm.json:/opt/keycloak/data/import/oidc-realm.json&#39;\n</code></pre></div>",
+        "id": 357398625,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683750543
+    },
+    {
+        "content": "<p>But maybe we don't need <code>conf/keycloak/docker-compose.yml</code> anymore (and the stop and start scripts).</p>",
+        "id": 357398841,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1683750603
+    },
+    {
+        "content": "<p>Sorry was talking with Leonid about version PIDs :-)</p>",
+        "id": 357408168,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754418
+    },
+    {
+        "content": "<p>I'm not sure if we should add it to that file</p>",
+        "id": 357408417,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754545
+    },
+    {
+        "content": "<p>On the other hand, maybe we can make it disabled/enabled in some way, so it doesn't sit around without doing anything</p>",
+        "id": 357408576,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754616
+    },
+    {
+        "content": "<p>We should talk about <a href=\"https://github.com/IQSS/dataverse/pull/9273\">https://github.com/IQSS/dataverse/pull/9273</a> as well to make it easier to integrate the app and the keycloak you're starting</p>",
+        "id": 357408656,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754672
+    },
+    {
+        "content": "<p>You could of course add it to the bootstrapping thingy to load the provider as a model</p>",
+        "id": 357408748,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754702
+    },
+    {
+        "content": "<p>I'm simply a fan of making these things deployable and changeable as easy as possible</p>",
+        "id": 357408857,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754759
+    },
+    {
+        "content": "<p>No finicky \"reload the provider as json\" when a detail changes, like a new password etc</p>",
+        "id": 357408934,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683754797
+    },
+    {
+        "content": "<p>We wanted Keycloak to be an optional dependency as opposed to the other dependencies, so I kept it in the original docker-compose file instead of adding it to docker-compose-dev.</p>\n<p>In any case, we can achieve something similar, using the same docker compose file, omitting the service when executing the up command:</p>\n<p><strong>docker-compose -f docker-compose-dev.yml up -d --scale dev_keycloak=0</strong></p>",
+        "id": 357510882,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1683794603
+    },
+    {
+        "content": "<p>Following this approach, we would handle only one docker-compose file, but running it may be less practical for most cases (where you don't need Keylcoak), because you need to append that arg to the command.</p>",
+        "id": 357511364,
+        "sender_full_name": "Guillermo Portas",
+        "timestamp": 1683794720
+    },
+    {
+        "content": "<p>Another thought: leave Keycloak in the separate compose file, but make it appear on the same network. You'd need to run two commands when using compose, but that may be fine. I'd need to look into how to integrate this in the Maven run, but that might be achievable</p>",
+        "id": 357512396,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1683794981
+    },
+    {
+        "content": "<p>Just a heads up that the PR has been replaced by PR <a href=\"https://github.com/IQSS/dataverse/issues/9591\">#9591</a>.</p>",
+        "id": 358442068,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684153010
+    },
+    {
+        "content": "<p>And it looks like my proposed change to edit the root docker compose file, adding Keycloak there, has been added. And a related note for the dev guide.</p>",
+        "id": 358442424,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1684153101
+    },
+    {
+        "content": "<p>We ended up merging <a href=\"https://github.com/IQSS/dataverse/issues/9591\">#9591</a>. Resolving.</p>",
+        "id": 384006296,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1691767223
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 384006307,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1691767226
+    }
+]

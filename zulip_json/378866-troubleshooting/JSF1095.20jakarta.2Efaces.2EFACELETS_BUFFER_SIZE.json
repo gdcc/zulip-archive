@@ -1,0 +1,584 @@
+[
+    {
+        "content": "<p>Hi there :)<br>\nWe have a lot of PROD logs \"<em>JSF1095: The response was already committed by the time we tried to set the outgoing cookie for the flash.  Any values stored to the flash will not be available on the next request.</em>\"<br>\nWe started by incrementing the related parameter<br>\n<code>glassfish/domains/datainra/applications/dataverse-5.14/WEB-INF/classes/META-INF/microprofile-config.properties:69:dataverse.jsf.buffer-size=350000</code><br>\nwhich reduce the number of logs but do not fix it completely.<br>\nI looked a bit deeper and the documentation says : <a href=\"https://jakarta.ee/specifications/faces/3.0/jakarta-faces-3.0.html#a6088\"><code>By default the value is 1024</code></a> <a href=\"https://github.com/jakartaee/faces/issues/1004\">A reasonable default such as \"1024\" should be specified</a><br>\nAnd dataverse default is way higher with <code>102400</code></p>\n<div class=\"codehilite\" data-code-language=\"XML\"><pre><span></span><code><span class=\"nt\">&lt;context-param&gt;</span>\n<span class=\"w\">        </span><span class=\"nt\">&lt;param-name&gt;</span>jakarta.faces.FACELETS_BUFFER_SIZE<span class=\"nt\">&lt;/param-name&gt;</span>\n<span class=\"w\">        </span><span class=\"cm\">&lt;!-- Uses Microprofile Config to replace at runtime. Not standardized, Payara App Server specific. --&gt;</span>\n<span class=\"w\">        </span><span class=\"nt\">&lt;param-value&gt;</span>${MPCONFIG=dataverse.jsf.buffer-size:102400}<span class=\"nt\">&lt;/param-value&gt;</span>\n<span class=\"w\">    </span><span class=\"nt\">&lt;/context-param&gt;</span>\n</code></pre></div>\n<p>I start to think that increasing it to more than <code>350000</code> is not the way to go. I would like your view on this :)<br>\n<span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span></p>",
+        "id": 447512907,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503514
+    },
+    {
+        "content": "<p>Can you give a little more log output for those? There should be a line indicating <em>where</em> this happens</p>",
+        "id": 447513063,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503555
+    },
+    {
+        "content": "<p>Also the way you set these numbers is very weird with editing the deployed file. I suggest you use a system property or other, easier MPCONFIG methods to get that number in</p>",
+        "id": 447513329,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503638
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>[2024-06-27T17:12:25.789+0200] [Payara 5.2022.4] [WARNING] [jsf.externalcontext.flash.response.already.committed] [javax.enterprise.resource.webcontainer.jsf.flash] [tid: _ThreadID=15325 _ThreadName=http-thread-pool::jk-connector(227)] [timeMillis: 1719501145789] [levelValue: 900] [[\n  JSF1095: The response was already committed by the time we tried to set the outgoing cookie for the flash.  Any values stored to the flash will not be available on the next request.]]\n</code></pre></div>",
+        "id": 447513497,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503681
+    },
+    {
+        "content": "<p>I don't really see a relation with a page or action in logs</p>",
+        "id": 447513757,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503757
+    },
+    {
+        "content": "<p>Oh you're still on an older release of Dataverse... May I suggest you upgrade to v6.x first? We changed to Jakarta EE 10 and Jakarta Faces / Mojarra received a major overhaul. Also, any upstream issues will ask for recent tech anyway.</p>",
+        "id": 447513880,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503776
+    },
+    {
+        "content": "<p>This is what I do, I have a <code>microprofile-config.properties</code> with <code>dataverse.jsf.buffer-size=350000</code><br>\nOr I misunderstood</p>",
+        "id": 447514027,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503822
+    },
+    {
+        "content": "<p>I have this issue on v6.0 also (currenly in upgrade process)</p>",
+        "id": 447514129,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503854
+    },
+    {
+        "content": "<p>You should not edit that file. It is solely used to ship defaults with the application.</p>",
+        "id": 447514134,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503856
+    },
+    {
+        "content": "<p>Are you saying that we can specify a path for our <code>microprofile-config.properties</code> ?</p>",
+        "id": 447514320,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719503905
+    },
+    {
+        "content": "<p>No</p>",
+        "id": 447514339,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503911
+    },
+    {
+        "content": "<p>None of that</p>",
+        "id": 447514349,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503914
+    },
+    {
+        "content": "<p>Also, web.xml is too early in the deployment lifecycle</p>",
+        "id": 447514397,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503932
+    },
+    {
+        "content": "<p>I very much doubt adding this option to the <a href=\"http://microprofile-config.properties\">microprofile-config.properties</a> file changes the value. It will probably still be on the default setting</p>",
+        "id": 447514523,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719503975
+    },
+    {
+        "content": "<p>That is what documentation suggest no ? <a href=\"https://guides.dataverse.org/en/5.14/developers/debugging.html\">https://guides.dataverse.org/en/5.14/developers/debugging.html</a></p>",
+        "id": 447514861,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504040
+    },
+    {
+        "content": "<p>It does not suggest you edit that file <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 447514980,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504074
+    },
+    {
+        "content": "<blockquote>\n<p>Some JSF options can be easily changed via MicroProfile Config (using environment variables, system properties, etc.)</p>\n</blockquote>",
+        "id": 447515021,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504089
+    },
+    {
+        "content": "<p>If you are on a classic installation, I highly recommend using a system property</p>",
+        "id": 447515173,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504126
+    },
+    {
+        "content": "<p>If you're using containers, an env var is usually simpler</p>",
+        "id": 447515251,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504153
+    },
+    {
+        "content": "<p>This topic was moved here from <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE\">#dev &gt; JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 447515366,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1719504191
+    },
+    {
+        "content": "<p>Hum, we understood that it was recommended to start using MP so we did by modifying <code>glassfish/domains/datainra/applications/dataverse-5.14/WEB-INF/classes/META-INF/microprofile-config.properties</code> and as it is a MP Key we thought it would work ^^</p>",
+        "id": 447515371,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504192
+    },
+    {
+        "content": "<p><a href=\"#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447515371\">A message</a> was moved here from <a class=\"stream-topic\" data-stream-id=\"379673\" href=\"/#narrow/stream/379673-dev/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE\">#dev &gt; JSF1095 jakarta.faces.FACELETS_BUFFER_SIZE</a> by <span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span>.</p>",
+        "id": 447515428,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1719504207
+    },
+    {
+        "content": "<p>This has never been officially recommended or been mentioned in the guides. IIRC this goes back to a misunderstanding of a few dataverse-docker users.</p>",
+        "id": 447515551,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504242
+    },
+    {
+        "content": "<p>What you are doing there is editing the deployment files. A new deployment of a new WAR would potentially overwrite it. It's not meant to be an admin editable file.</p>",
+        "id": 447515799,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504317
+    },
+    {
+        "content": "<p>We should probably include a big fat warning that this file is not meant to abused in this way</p>",
+        "id": 447515869,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504336
+    },
+    {
+        "content": "<p>Hum, I think we needed something that is was only on MP Key while upgrading to v5.14...</p>",
+        "id": 447515872,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504336
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447515799\">said</a>:</p>\n<blockquote>\n<p>What you are doing there is editing the deployment files. A new deployment of a new WAR would potentially overwrite it. It's not meant to be an admin editable file.</p>\n</blockquote>\n<p>you are right!</p>",
+        "id": 447515953,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504358
+    },
+    {
+        "content": "<p>this can be an issue while deploying, you are right</p>",
+        "id": 447516233,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504424
+    },
+    {
+        "content": "<p>We will work on this.</p>",
+        "id": 447516261,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504433
+    },
+    {
+        "content": "<p>Anyhow, what do you think about this buffer size ?:)</p>",
+        "id": 447516323,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504455
+    },
+    {
+        "content": "<p>Well so far you didn't actually enlarge it beyond the default of 102400 bytes...</p>",
+        "id": 447516450,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504486
+    },
+    {
+        "content": "<p>ah!</p>",
+        "id": 447516500,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504505
+    },
+    {
+        "content": "<p>From what I find about this error on SO etc, increasing the buffer helped</p>",
+        "id": 447516505,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504507
+    },
+    {
+        "content": "<p>So I suggest you try increasing it again, but with a system property or other valid MPCONFIG source</p>",
+        "id": 447516582,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504530
+    },
+    {
+        "content": "<p>Okay :)</p>",
+        "id": 447516638,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504546
+    },
+    {
+        "content": "<p>I wouldn't jump to the 350000 in one go, maybe double it first and then go smaller until it resurfaces</p>",
+        "id": 447516713,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504568
+    },
+    {
+        "content": "<p>I'll update the topic when tested.</p>",
+        "id": 447516729,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504573
+    },
+    {
+        "content": "<p>This one here is particularly interesting: <a href=\"https://stackoverflow.com/a/45284797\">https://stackoverflow.com/a/45284797</a></p>",
+        "id": 447516814,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504601
+    },
+    {
+        "content": "<p>Don't you think <code>102400</code> is so far from the default <code>1024</code> ?</p>",
+        "id": 447516906,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504616
+    },
+    {
+        "content": "<blockquote>\n<p>The size is given in bytes and should be larger than your biggest page</p>\n</blockquote>\n<p>I'm not sure we ever had another look at that... <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 447516953,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504632
+    },
+    {
+        "content": "<p>our biggest html page fastly found was around that <code>350000</code></p>",
+        "id": 447517185,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504705
+    },
+    {
+        "content": "<p>Interesting!</p>",
+        "id": 447517270,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504723
+    },
+    {
+        "content": "<p>I crawled the same SO as you :D</p>",
+        "id": 447517303,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504735
+    },
+    {
+        "content": "<p>I see that the default we provide has been around for quite some time. <a href=\"https://github.com/IQSS/dataverse/commit/5f99037e5df918cf5f653c61971b5a701d690e58\">https://github.com/IQSS/dataverse/commit/5f99037e5df918cf5f653c61971b5a701d690e58</a></p>",
+        "id": 447517314,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504741
+    },
+    {
+        "content": "<p>v4.17 damn I was not working with Dataverse at this time XD</p>",
+        "id": 447517445,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504786
+    },
+    {
+        "content": "<p>I'd be cautious with that number though - is fastly only counting the HTML or also JS and images?</p>",
+        "id": 447517499,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504806
+    },
+    {
+        "content": "<p>html response which contains some JS/CSS (settings of Dataverse like footer/GA/custom CSS..)</p>",
+        "id": 447517756,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504879
+    },
+    {
+        "content": "<p>And that HTML is 341 KiB? Fat chance! Did fastly say which page that is?</p>",
+        "id": 447518001,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719504949
+    },
+    {
+        "content": "<p>I'll check fastly XD</p>",
+        "id": 447518115,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719504971
+    },
+    {
+        "content": "<p>I mean that probably is like 175k characters (assuming all chars are UTF-8 2byte encoding). That's ~88 DIN A4 pages of text.</p>",
+        "id": 447518436,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505078
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>wget https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/1G5UQP -O dataset.html\n--2024-06-27 18:17:34--  https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/1G5UQP\nResolving entrepot.recherche.data.gouv.fr (entrepot.recherche.data.gouv.fr)... 147.100.174.24\nConnecting to entrepot.recherche.data.gouv.fr (entrepot.recherche.data.gouv.fr)|147.100.174.24|:443... connected.\nHTTP request sent, awaiting response... 200 OK\nLength: unspecified [text/html]\nSaving to: ‘dataset.html’\n\ndataset.html                                           [ &lt;=&gt;                                                                                                            ] 176,58K  --.-KB/s    in 0,1s\n\n2024-06-27 18:17:35 (1,42 MB/s) - ‘dataset.html’ saved [180817]\n</code></pre></div>",
+        "id": 447518446,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505082
+    },
+    {
+        "content": "<p>180k with a random dataset</p>",
+        "id": 447518623,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505127
+    },
+    {
+        "content": "<p>OK the pure HTML is ~180 KiB</p>",
+        "id": 447518686,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505152
+    },
+    {
+        "content": "<p>wget <a href=\"https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/SSA1VM\">https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/SSA1VM</a> -O dataset.html<br>\n‘dataset.html’ saved [249153]</p>",
+        "id": 447518944,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505232
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/Va5MlPUHChascWAP-b7NCPvI/image.png\"></a></div>",
+        "id": 447519106,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505292
+    },
+    {
+        "content": "<p>I see that there are tons of Javascript etc embedded</p>",
+        "id": 447519211,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505323
+    },
+    {
+        "content": "<p>Yes but this is default Dataverse settings</p>",
+        "id": 447519289,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505344
+    },
+    {
+        "content": "<p>This will obviously all go away with the new SPA</p>",
+        "id": 447519307,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505350
+    },
+    {
+        "content": "<p>yes</p>",
+        "id": 447519332,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505358
+    },
+    {
+        "content": "<p>Maybe I should sniff our reposity ^^</p>",
+        "id": 447519391,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505378
+    },
+    {
+        "content": "<p>SPA is far away from our production XD</p>",
+        "id": 447519443,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505397
+    },
+    {
+        "content": "<p>Really just the defaults? No viewers / vocab stuff going on?</p>",
+        "id": 447519467,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505407
+    },
+    {
+        "content": "<p>The Matomo tracking is already huge</p>",
+        "id": 447519548,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505441
+    },
+    {
+        "content": "<p>I'm thinking about : </p>\n<ul>\n<li><a href=\"https://guides.dataverse.org/en/latest/installation/config.html#custom-stylesheet\">Custom Stylesheet</a></li>\n<li><a href=\"https://guides.dataverse.org/en/latest/installation/config.html#footercustomizationfile\">:FooterCustomizationFile</a></li>\n<li><a href=\"https://guides.dataverse.org/en/latest/installation/config.html#webanalyticscode\">:WebAnalyticsCode</a></li>\n</ul>",
+        "id": 447519740,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505494
+    },
+    {
+        "content": "<p>It probably would be a good idea to make the CSS and Javascript embedding stuff go away</p>",
+        "id": 447519858,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505539
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/latest/installation/config.html#cvocconf\">:CVocConf</a> is not enabled yet...</p>",
+        "id": 447519912,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505556
+    },
+    {
+        "content": "<p>All of this does a huge number on the performance, as it needs to be sent everytime, while it can be cached as separate files</p>",
+        "id": 447520012,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505583
+    },
+    {
+        "content": "<p>100% agree</p>",
+        "id": 447520061,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505601
+    },
+    {
+        "content": "<p>it should be as CDN ressources</p>",
+        "id": 447520131,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505618
+    },
+    {
+        "content": "<p>That wouldn't even be necessary</p>",
+        "id": 447520188,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505629
+    },
+    {
+        "content": "<p>Just make it separated things</p>",
+        "id": 447520226,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505640
+    },
+    {
+        "content": "<p>\"as\"</p>",
+        "id": 447520227,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505640
+    },
+    {
+        "content": "<p>That way the JSF buffer wouldn't need to be so huge</p>",
+        "id": 447520291,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505664
+    },
+    {
+        "content": "<p>yes, just static apache is enough</p>",
+        "id": 447520304,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505668
+    },
+    {
+        "content": "<p>All of that processing is crazy</p>",
+        "id": 447520315,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505672
+    },
+    {
+        "content": "<p>You could even just let Payara hand it out</p>",
+        "id": 447520402,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505689
+    },
+    {
+        "content": "<p>yeah</p>",
+        "id": 447520451,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505704
+    },
+    {
+        "content": "<p>If you want, feel free to create an issue. A PR would probably be welcome. As you say - the SPA is still a long way to go.</p>",
+        "id": 447520540,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505733
+    },
+    {
+        "content": "<p>I don't know if it's easy to move, but it would also increase the page speed</p>",
+        "id": 447520574,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505745
+    },
+    {
+        "content": "<p>It shouldn't be too hard to implement</p>",
+        "id": 447520618,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505759
+    },
+    {
+        "content": "<p>But someone has to sit down and do it <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 447520684,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505781
+    },
+    {
+        "content": "<p>maybe just using <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#footercustomizationfile\">:FooterCustomizationFile</a> to call the required linked ressources could be an idea</p>",
+        "id": 447520790,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505803
+    },
+    {
+        "content": "<p>BTW all of this script and style stuff is also very bad for SEO</p>",
+        "id": 447520929,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505846
+    },
+    {
+        "content": "<p>I know :)</p>",
+        "id": 447520952,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505856
+    },
+    {
+        "content": "<p>this is why I mentionned CDN</p>",
+        "id": 447521000,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719505876
+    },
+    {
+        "content": "<p>Yeah. Still not necessary / easy to achieve once all of this stuff goes into separate files and you include those. Where those files are isn't that important...</p>",
+        "id": 447521193,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719505931
+    },
+    {
+        "content": "<p>footer is better for page speed</p>",
+        "id": 447521404,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506007
+    },
+    {
+        "content": "<p>still need to be tested</p>",
+        "id": 447521457,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506025
+    },
+    {
+        "content": "<p>G2G, I'll update after tests ;) thanks <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> for your time</p>",
+        "id": 447521596,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506064
+    },
+    {
+        "content": "<p>The whole customization stuff should be refactored to enable inclusion of &lt;link&gt; and &lt;script&gt; elements</p>",
+        "id": 447521657,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719506086
+    },
+    {
+        "content": "<p>Yes.</p>",
+        "id": 447521731,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506109
+    },
+    {
+        "content": "<p>And then enable serving content as files (so the existing properties are still usable in a backward compatible way)</p>",
+        "id": 447521771,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719506123
+    },
+    {
+        "content": "<p>That way you can actually start to serve the static content from some place else, or, if you don't want/need that kind of advanced setup, go for the all in one</p>",
+        "id": 447521906,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719506159
+    },
+    {
+        "content": "<p>Again, feel free to help with creating descriptive issues and solving PRs <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>",
+        "id": 447522019,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719506188
+    },
+    {
+        "content": "<p>C U <span aria-label=\"wave\" class=\"emoji emoji-1f44b\" role=\"img\" title=\"wave\">:wave:</span></p>",
+        "id": 447522055,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1719506201
+    },
+    {
+        "content": "<p>See you</p>",
+        "id": 447522123,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506215
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/JSF1095.20jakarta.2Efaces.2EFACELETS_BUFFER_SIZE/near/447522019\">said</a>:</p>\n<blockquote>\n<p>Again, feel free to help with creating descriptive issues and solving PRs <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span></p>\n</blockquote>\n<p>ofc</p>",
+        "id": 447522158,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1719506225
+    }
+]

@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> just stopped by and asked about something he observed that I can't easily answer. He used the Payara admin GUI to set some JVM options. He stopped the container and started it again. The JVM options were preserved. But where are they stored?</p>",
+        "id": 420675220,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707492599
+    },
+    {
+        "content": "<p>We both agree there's no domain.xml in the data directory (data rather than docker-dev-volumes for the demo tutorial). And in the past when I exec into the dataverse container, I haven't been able to find domain.xml.</p>",
+        "id": 420675552,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707492694
+    },
+    {
+        "content": "<p>You're looking for <code>${DOMAIN_DIR}/config/domain.xml</code></p>",
+        "id": 420676808,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707493055
+    },
+    {
+        "content": "<p>Changes to that file will be written into the overlayfs, which is usually sth you want to avoid</p>",
+        "id": 420676962,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707493088
+    },
+    {
+        "content": "<p>Hmm, I think I've heard of this overlayfs...</p>",
+        "id": 420677903,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707493355
+    },
+    {
+        "content": "<p>Is <a href=\"https://jvns.ca/images/overlay.jpeg\">https://jvns.ca/images/overlay.jpeg</a> more or less accurate?</p>\n<div class=\"message_inline_image\"><a href=\"https://jvns.ca/images/overlay.jpeg\"><img src=\"https://uploads.zulipusercontent.net/b7996d437a43ceee447020d5281e8d98c7faf6d4/68747470733a2f2f6a766e732e63612f696d616765732f6f7665726c61792e6a706567\"></a></div>",
+        "id": 420679132,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707493722
+    },
+    {
+        "content": "<p>Yeah that describes the concept well</p>",
+        "id": 420682481,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494632
+    },
+    {
+        "content": "<p>Please note this kind of writing into a container is a _very_ bad idea when on K8s. (I can elaborate if necessary)</p>",
+        "id": 420682657,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494679
+    },
+    {
+        "content": "<p>Ok. Thanks!</p>",
+        "id": 420683173,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707494811
+    },
+    {
+        "content": "<p>Also, I found domain.xml, with your help:</p>\n<div class=\"codehilite\"><pre><span></span><code>$ docker exec -it dataverse-1 bash\npayara@dataverse:~$\npayara@dataverse:~$ echo $DOMAIN_DIR\n/opt/payara/appserver/glassfish/domains/domain1\npayara@dataverse:~$\npayara@dataverse:~$ ls -l $DOMAIN_DIR/config/domain.xml\n-rw-r--r-- 1 payara payara 44474 Feb  9 16:03 /opt/payara/appserver/glassfish/domains/domain1/config/domain.xml\npayara@dataverse:~$\n</code></pre></div>",
+        "id": 420683299,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707494845
+    },
+    {
+        "content": "<p>For setting system properties, you really should not use the admin UI</p>",
+        "id": 420683380,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494877
+    },
+    {
+        "content": "<p>I mean, fine for a oneshot thing to test sth</p>",
+        "id": 420683448,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494887
+    },
+    {
+        "content": "<p>But aside from that: bad idea</p>",
+        "id": 420683469,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494894
+    },
+    {
+        "content": "<p>Either go JVM_ARGS or use the special handler to convert env vars</p>",
+        "id": 420683561,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1707494927
+    },
+    {
+        "content": "<p>Right, that's what I documented at <a href=\"https://preview.guides.gdcc.io/en/develop/container/running/demo.html#jvm-options-microprofile-config\">https://preview.guides.gdcc.io/en/develop/container/running/demo.html#jvm-options-microprofile-config</a></p>",
+        "id": 420700322,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1707500236
+    }
+]

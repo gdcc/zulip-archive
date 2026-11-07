@@ -1,0 +1,224 @@
+[
+    {
+        "content": "<p>Hello and good morning. Do we know if this repo is being used at the moment anywhere? <a href=\"https://github.com/gdcc/api-test-runner\">https://github.com/gdcc/api-test-runner</a></p>\n<p>gh search code says that its a downstream consumer of integration-tests.txt</p>",
+        "id": 631663795,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791987127
+    },
+    {
+        "content": "<p>It's been broken for years. Please don't worry about it.</p>",
+        "id": 631666244,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791987585
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> I feel like. If we move from .txt to @API. We're re-introducing the problem, but in a different flavor. There's nothing wrong with the file now except for the fact that you have to manually add tests to the file so that they're run. If we start adding tags to these tests, say a dev is pushing an emergency fix in the night and forgets a tag, the issue might be fixed at the moment, but its not gonna help us going forward. I want to see auto-discovery. If we're going to do this, let's do it exactly once in the right way. Ideally we'd want to reverse the default.</p>",
+        "id": 631684704,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791991011
+    },
+    {
+        "content": "<p>Maybe a new tag saying CI_EXCLUDED?</p>",
+        "id": 631685366,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791991151
+    },
+    {
+        "content": "<p>An example</p>\n<div class=\"codehilite\" data-code-language=\"Java\"><pre><span></span><code><span class=\"kd\">public</span><span class=\"w\"> </span><span class=\"kd\">static</span><span class=\"w\"> </span><span class=\"kd\">final</span><span class=\"w\"> </span><span class=\"n\">String</span><span class=\"w\"> </span><span class=\"n\">CI_EXCLUDED</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">\"ci-excluded\"</span><span class=\"p\">;</span>\n\n<span class=\"nd\">@Target</span><span class=\"p\">(</span><span class=\"n\">TYPE</span><span class=\"p\">)</span>\n<span class=\"nd\">@Retention</span><span class=\"p\">(</span><span class=\"n\">RUNTIME</span><span class=\"p\">)</span>\n<span class=\"nd\">@Tag</span><span class=\"p\">(</span><span class=\"n\">Tags</span><span class=\"p\">.</span><span class=\"na\">CI_EXCLUDED</span><span class=\"p\">)</span>\n<span class=\"kd\">public</span><span class=\"w\"> </span><span class=\"nd\">@interface</span><span class=\"w\"> </span><span class=\"n\">ExcludedFromCi</span><span class=\"w\"> </span><span class=\"p\">{</span>\n<span class=\"w\">    </span><span class=\"cm\">/** Why this class can't pass in the CI container setup. */</span>\n<span class=\"w\">    </span><span class=\"n\">String</span><span class=\"w\"> </span><span class=\"nf\">reason</span><span class=\"p\">();</span>\n<span class=\"w\">    </span><span class=\"cm\">/** Issue tracking the fix, if any. */</span>\n<span class=\"w\">    </span><span class=\"n\">String</span><span class=\"w\"> </span><span class=\"nf\">issue</span><span class=\"p\">()</span><span class=\"w\"> </span><span class=\"k\">default</span><span class=\"w\"> </span><span class=\"s\">\"\"</span><span class=\"p\">;</span>\n<span class=\"p\">}</span>\n\n<span class=\"nd\">@ExcludedFromCi</span><span class=\"p\">(</span><span class=\"n\">reason</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">\"needs review.tsv, which is not loaded out of the box\"</span><span class=\"p\">)</span>\n<span class=\"kd\">public</span><span class=\"w\"> </span><span class=\"kd\">class</span> <span class=\"nc\">ReviewsIT</span><span class=\"w\"> </span><span class=\"p\">{</span><span class=\"w\"> </span><span class=\"p\">...</span><span class=\"w\"> </span><span class=\"p\">}</span>\n</code></pre></div>\n<div class=\"codehilite\" data-code-language=\"XML\"><pre><span></span><code>In<span class=\"w\"> </span>the<span class=\"w\"> </span>pom<span class=\"w\"> </span>-Pci-api-tests.:\n<span class=\"nt\">&lt;it.groups.ci&gt;</span>!testcontainers<span class=\"w\"> </span><span class=\"ni\">&amp;amp;</span><span class=\"w\"> </span>!migration<span class=\"w\"> </span><span class=\"ni\">&amp;amp;</span><span class=\"w\"> </span>!performance<span class=\"w\"> </span><span class=\"ni\">&amp;amp;</span><span class=\"w\"> </span>!ci-excluded<span class=\"nt\">&lt;/it.groups.ci&gt;</span>\n</code></pre></div>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code>mvn<span class=\"w\"> </span>test-compile<span class=\"w\"> </span>failsafe:integration-test<span class=\"w\"> </span>failsafe:verify<span class=\"w\"> </span>-Pci-api-tests<span class=\"w\"> </span><span class=\"se\">\\</span>\n<span class=\"w\">  </span>-Ddataverse.test.baseurl<span class=\"o\">=</span>http://localhost:8080\n</code></pre></div>",
+        "id": 631686485,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791991414
+    },
+    {
+        "content": "<p>or even simpler: <code>mvn test -Pci-api-tests</code> and let all the flags for CI exist in the pom</p>",
+        "id": 631687595,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791991642
+    },
+    {
+        "content": "<p>The pom already has a TODO for it, right above the ct profile: \"Add a profile to run API tests (integration tests that end in IT.java...)\".</p>",
+        "id": 631688097,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791991753
+    },
+    {
+        "content": "<p>I'm fine with an \"excluded\" tag.</p>",
+        "id": 631694601,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791993135
+    },
+    {
+        "content": "<p>My vision here is somewhat different. I want to be able to run something like<code>mvn verify -Dit.groups=api</code> to simply run all the API tests in one go.</p>",
+        "id": 631778496,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013159
+    },
+    {
+        "content": "<p>The problem: we are using \"IT\" as a suffix for everything.</p>",
+        "id": 631778553,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013177
+    },
+    {
+        "content": "<p>Technically, you can do whatever you want. For good practice, unit tests usually end in \"Test\" and any kind of \"integration\" test ends in IT. Units tests get run by Maven Surefire, typically bound to the Maven \"test\" phase.</p>",
+        "id": 631778735,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013247
+    },
+    {
+        "content": "<p>Any \"IT\" by default is to be executed by Maven Failsafe, typically bound to the \"verify\" phase. Of course, any of the two can ran any test.</p>",
+        "id": 631778863,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013289
+    },
+    {
+        "content": "<p>The difference is in how they handle executing the tests: <a href=\"https://www.baeldung.com/maven-surefire-vs-failsafe\">https://www.baeldung.com/maven-surefire-vs-failsafe</a></p>",
+        "id": 631779037,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013353
+    },
+    {
+        "content": "<p>IMHO we should start adopting good practices and not fight the ecosystem, but move with it.</p>",
+        "id": 631779117,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013381
+    },
+    {
+        "content": "<p>Using Failsafe's default configuration to auto-discover any \"*IT\" classes and execute them is getting in the way for us.</p>",
+        "id": 631779248,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013420
+    },
+    {
+        "content": "<p>While for self-contained tests in the groups \"performance\", \"integration\", etc I made sure they can just be picked up, the same is not true for API tests.</p>",
+        "id": 631779386,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013469
+    },
+    {
+        "content": "<p>They require setting up the test instance first, before executing the tests.</p>",
+        "id": 631779445,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013490
+    },
+    {
+        "content": "<p>Eventually, I would very much prefer using something inside Maven or JUnit to setup this stack automatically before executing the tests.</p>",
+        "id": 631779586,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013530
+    },
+    {
+        "content": "<p>But we are not there (yet).</p>",
+        "id": 631779607,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013538
+    },
+    {
+        "content": "<p>So while I agree auto-discovery would be superb, we kind of have to live with our self-inflicted limitations.</p>",
+        "id": 631779682,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013571
+    },
+    {
+        "content": "<p>But even if we do auto-discovery, I totally would want to enable people just to run a selective set of tests. Not every test needs to be run all the time on local development, but maybe you want the full set of integration tests now. IMHO it would be nice to still keep these categories alive, but as an addition, not a requirement.</p>",
+        "id": 631779875,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013647
+    },
+    {
+        "content": "<p>So how about this: we do auto-discovery, but with a second Failsafe configuration. We invent a new coding standard by calling our API tests just that. Something like <code>DatasetAT</code> or <code>ApiTestDataset</code> or <code>DatasetTestApi</code>. (Not using <code>IT</code> or <code>Test</code> as a suffix would be crucial to avoid the necessity to declare more complex regex for surefire/failsafe).</p>",
+        "id": 631780227,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013783
+    },
+    {
+        "content": "<p>That way we get autodiscovery any time someone adds an API test where they don't need to put Tags on things (after all they were meant for more meaningful grouping than just test category).</p>",
+        "id": 631780452,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013855
+    },
+    {
+        "content": "<p>We can make the Maven configurations have their own skips, following the established patterns.</p>",
+        "id": 631780556,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013890
+    },
+    {
+        "content": "<p>This is all independent of Maven profiles (which we can use to do all sorts of crazy things)</p>",
+        "id": 631780761,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792013959
+    },
+    {
+        "content": "<p>We could even be so bold to use Maven phases to our advantage! Looking at the <a href=\"https://maven.apache.org/ref/3.10.0/maven-core/lifecycles.html#default-lifecycle\">default lifecycle</a>, we could bind running any \"IT\" to the \"integration-test\" phase and bind any \"AT\" to the \"verify\" phase. That would totally be inline with the tooling and good practices. Also, if we ever enable using a Maven/JUnit controlled stack deployment, that totally could be bound to any of the intermediate phases.</p>",
+        "id": 631782041,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792014409
+    },
+    {
+        "content": "<p>Just to give an example: using the Docker Maven Plugin (or any other plugin that steers containers, like the Docker Compose plugin) we can spin up a compose stack in \"post-integration-test\" and let any API tests \"attack\" it in \"verify\". That's cheap and easy to do, not involving any more complicated testcontainers setup.</p>",
+        "id": 631782394,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792014541
+    },
+    {
+        "content": "<p>Thanks for reading this far, braindump out.</p>",
+        "id": 631782436,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792014558
+    },
+    {
+        "content": "<p>Thank you for your detailed response. This makes a lot of sense to me. I agree with the plan, both don't have to be mutually exclusive. Few caveats.</p>\n<p>Number one, This means enforcing some kind of standard to developers that they have to manually name classes *AT. If say out of habit they name an API test *IT, and we aren't actively looking for it in the code review phase, it's going to slip by, CI is going to ignore it, and nobody will know.</p>\n<p>Number two, My biggest problem with mvn verify has been that it runs the mvn package step. Assuming this is how our testing pipeline is going to be going forward: <a href=\"https://github.com/IQSS/dataverse/pull/12783\">https://github.com/IQSS/dataverse/pull/12783</a> mvn verify kills the one thing that I intended to give from this PR which is time savings. In that specific PR, verify when tested rewrote the mounted /target/dataverse container. Until the stack setup itself moves fully into maven, we might have to make some tradeoffs here in terms of best practices and intended lifecycles.</p>\n<p>Number three, merge conflicts. Anyone who's actively editing one of these API test classes now is going to be in for a rude shock. We'll have to inform people ahead of time.</p>\n<p>So, here's what I might target in scope for three PRs:</p>\n<ol>\n<li>PR for Dataverse. I will rename the 56 (or 74?) classes to *AT or a different suffix/prefix as the team prefers it to be. Please do let me know if there's a preference. Some triage might be required here. I will add a ci-api-tests pom profile, and a second Failsafe configuration to detect *AT classes. I will add an exclusion marker for tests that don't run in CI. I will not remove the integration-tests.txt file just yet. I will rename the IT classes to AT for backwards compatibility reasons within the .txt file.</li>\n<li>PR for Dataverse Ansible. If we remove the .txt file immediately, it will break Dataverse Ansible for everyone. All of its branches that are used for older versions should be fine because they target specific tags. But I want to make a PR there and refactor the testing process so that when tested with develop, it doesn't fail.</li>\n<li>PR for Dataverse. At a later date, when downstream consumers seem to be working effectively, we nuke the integration-tests.txt file</li>\n</ol>\n<p>Does this sound like a plan?</p>",
+        "id": 631803543,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1792022349
+    },
+    {
+        "content": "<p>I'm totally fine with renaming classes to be in line with best practices. The only reason I started using IT at the end was that in Netbeans I would right-click an API class and click \"open test class\" and it would create DatasetsIT.java or whatever if it didn't exist. So I went with it. <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 631804006,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1792022513
+    },
+    {
+        "content": "<p>I'm not saying that using \"AT\" is a best practice. We're inventing our own good practice here out of necessity, allowing <em>our</em> test infrastructure to deal with things more easily.</p>\n<p>Here's another alternative to renaming: we could autodiscover based on Java package name. All of our API tests are in one package. It still is a coding standard / convention though, but avoids having a different suffix. My argument for not doing this: I want to create more integration tests for the API based on Jersey Tests. These would be \"ITs\" and live in the same package as the API tests, so the different suffix would make them distinguishable.</p>\n<p>Another crazy thought: what if we create a Maven submodule for the API tests? I've seen that pattern in the wild, too. Not getting rid of another type of codebase convention, but there is no free lunch here.</p>",
+        "id": 631870488,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792050481
+    },
+    {
+        "content": "<p>Should we write the plan down in a Google doc and send it around for comment?</p>",
+        "id": 631918668,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1792062587
+    },
+    {
+        "content": "<p>We absolutely should, yes!</p>",
+        "id": 632029680,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1792083629
+    },
+    {
+        "content": "<p>Anyone up for a campfire and a fireside chat in a cozy Zoom room to talk about this?</p>",
+        "id": 632030855,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792083939
+    },
+    {
+        "content": "<p>I am technically on vacation, but let's talk!</p>",
+        "id": 632031007,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1792083983
+    },
+    {
+        "content": "<p>LOL I hear you <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> I'm technically done for the day <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 632031069,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792084001
+    },
+    {
+        "content": "<p><a href=\"https://fz-juelich-de.zoom-x.de/j/66713629528?pwd=2hbZ4aZmMaisexaLioyBuNEiz8axdn.1\">https://fz-juelich-de.zoom-x.de/j/66713629528?pwd=2hbZ4aZmMaisexaLioyBuNEiz8axdn.1</a></p>",
+        "id": 632033139,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1792084486
+    }
+]

@@ -1,0 +1,536 @@
+[
+    {
+        "content": "<p><a href=\"https://github.com/gdcc/dataverse-ansible/issues/268\">https://github.com/gdcc/dataverse-ansible/issues/268</a> has the details but in short:</p>\n<ul>\n<li>Currently our \"spin up\" scripts create an EC2 instance and deploy Dataverse in classic (non-Docker) mode.</li>\n<li>We'd like to offer the option to deploy Dataverse within Docker instead.</li>\n</ul>",
+        "id": 591807528,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777471625
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> thanks for working on this! In the issue you asked for more details.</p>\n<p>Yes, I think this should be an additional flag.</p>",
+        "id": 591807882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777471704
+    },
+    {
+        "content": "<p>Here are the current flags:</p>\n<div class=\"codehilite\"><pre><span></span><code>% ./ec2-create-instance.sh -h\nUsage: ./ec2-create-instance.sh -b &lt;branch&gt; -r &lt;repo&gt; -p &lt;pem_path&gt; -g &lt;group_vars&gt; -a &lt;dataverse-ansible branch&gt; -i aws_image -u aws_user -s aws_size -t aws_tag -f aws_security group -e aws_profile -l local_log_path -d -v\ndefault branch is develop\ndefault repo is https://github.com/IQSS/dataverse\ndefault .pem location is /Users/pdurbin\nexample group_vars may be retrieved from https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/develop/defaults/main.yml\ndefault AWS AMI ID is ami-08ace1224b75d38c1, find the full list at https://rockylinux.org/ami/\ndefault AWS user is rocky\ndefault AWS instance size is t3a.large\ndefault AWS security group is dataverse-sg\nlocal log path will rsync Payara, Jacoco, Maven and other logs back to the specified path\n-d will destroy (terminate) the AWS instance once testing and reporting completes\n-v increases Ansible output verbosity\n</code></pre></div>",
+        "id": 591807922,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777471714
+    },
+    {
+        "content": "<p>How about <code>-c</code> for \"container mode\"? (<code>-d</code> is already used for \"destroy\".)</p>",
+        "id": 591808085,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777471747
+    },
+    {
+        "content": "<p>Putting my shell dev hat on: -c sounds reasonable.<br>\nPutting my devops hat on: dropping the script and replacing it with OpenTofu and potentially some Ansible sounds like a better plan than maintaining a shell script.</p>",
+        "id": 591810463,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472257
+    },
+    {
+        "content": "<p>(Ansible is probably no longer necessary when using OpenTofu to create all the AWS stuff and using cloud-init to bootstrap the node. But it may still come in handy.)</p>",
+        "id": 591810787,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472319
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> yeah? Are you thinking greenfield? <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> Don't hack on the existing script? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591811161,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472400
+    },
+    {
+        "content": "<p>Here's where we document the existing script, by the way: <a href=\"https://guides.dataverse.org/en/6.10.1/developers/deployment.html#deploying-the-dataverse-software-to-amazon-web-services-aws\">https://guides.dataverse.org/en/6.10.1/developers/deployment.html#deploying-the-dataverse-software-to-amazon-web-services-aws</a></p>",
+        "id": 591811465,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472467
+    },
+    {
+        "content": "<p>If we write a new script, we could just document it under a different heading, or otherwise tweak those docs so that they make sense.</p>",
+        "id": 591811516,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472480
+    },
+    {
+        "content": "<p>OpenTofu != Script. Open Tofu means Infrastructure as Code, using a declarative language to define the infrastructure and then create it. It usually keeps a state, too, which might not be that relevant for ephemeral deployments.</p>",
+        "id": 591811875,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472559
+    },
+    {
+        "content": "<p>But again: that's just me. If y'all feel just adding \"-c\" is good enough, do it!</p>",
+        "id": 591812076,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472604
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> can you please remind us... some of the environments we spin up with the existing script are not especially ephemeral, right? I'm think you may have created <a href=\"http://beta.dataverse.org\">beta.dataverse.org</a> with it. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 591812242,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472638
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> imagine if we spin up beta or <a href=\"http://demo.dataverse.org\">demo.dataverse.org</a> on Docker some day.</p>",
+        "id": 591812388,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472673
+    },
+    {
+        "content": "<p>Please don't.</p>",
+        "id": 591812465,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472686
+    },
+    {
+        "content": "<p>A mere docker thing is not very scalable</p>",
+        "id": 591812544,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472702
+    },
+    {
+        "content": "<p>For anything that is meant for production, you need probably more sophisticated things.</p>",
+        "id": 591812624,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472720
+    },
+    {
+        "content": "<p>sure</p>",
+        "id": 591813193,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472817
+    },
+    {
+        "content": "<p>The primary use case is to demo features before they are merged. Maybe the instance stays up for two weeks or a month.</p>",
+        "id": 591813341,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472844
+    },
+    {
+        "content": "<p>Also, seeing how the industry and tech stack changes, for a system that needs long term stability, I wouldn't recommend Docker. It has too many security problems. In addition, Docker itself is a company that needs to make money. It may be a good idea to use something with less dependencies on them. On the other hand, you will have to make some buy-in into a container runtime anyway... <img alt=\":shrugdog:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/86c833ef.png\" title=\"shrugdog\"></p>",
+        "id": 591813417,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472863
+    },
+    {
+        "content": "<p>Sure, for something like that, very close to dev, Docker or Podman can be a great fit, as it is well known by many devs already.</p>",
+        "id": 591813576,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777472899
+    },
+    {
+        "content": "<p>right</p>",
+        "id": 591813752,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777472933
+    },
+    {
+        "content": "<p>At some point it makes sense to try to rope in things like K8s (or similar orchestrators) into development as well. This makes development and production more aligned, making the ops side a lot easier for everyone. But that's another tale to tell <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 591814180,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777473021
+    },
+    {
+        "content": "<p>sure</p>",
+        "id": 591815682,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777473341
+    },
+    {
+        "content": "<p>I should stop babbling now and take the hint <span aria-label=\"face with peeking eye\" class=\"emoji emoji-1fae3\" role=\"img\" title=\"face with peeking eye\">:face_with_peeking_eye:</span></p>",
+        "id": 591815826,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777473376
+    },
+    {
+        "content": "<p>If it helps, I these are the steps we want to automate with a <code>-c</code> flag:</p>\n<ul>\n<li>Spin up an empty EC2 instance</li>\n<li>Install Docker</li>\n<li>Download the compose file from <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></li>\n<li>Run <code>docker compose up</code></li>\n<li>Install Traefik? Or nginx? <a href=\"https://github.com/IQSS/dataverse/issues/10359\">https://github.com/IQSS/dataverse/issues/10359</a> . And configure it.</li>\n<li>Wait, what about the frontend? We need that too. I think it was added in <a href=\"https://github.com/gdcc/dataverse-ansible/pull/278\">https://github.com/gdcc/dataverse-ansible/pull/278</a></li>\n<li>And now we need Keycloak. Add it to the compose file above? Or create a new compose file? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> </li>\n<li>etc., etc.</li>\n</ul>\n<p>I think we should start with the first four steps and see where this goes! <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 591817014,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777473659
+    },
+    {
+        "content": "<p>This sounds like a perfect usecase for Terraform</p>",
+        "id": 591819186,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474147
+    },
+    {
+        "content": "<p>Or as <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> rightly mentioned, OpenTofu</p>",
+        "id": 591819236,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474159
+    },
+    {
+        "content": "<p>Are they both open source? Our existing bash script is. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 591819517,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777474230
+    },
+    {
+        "content": "<p>OpenTofu is a fork of Terraform as HashiCorp is not very open for contributions to Terraform.</p>",
+        "id": 591819650,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474258
+    },
+    {
+        "content": "<p>I love the idea <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> and <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> loves it too!</p>\n<p>I am however of the mentality that Jenkins is a legacy project, and if you ask me we should shy away from adding more features to it and figure out more modern ways to do prototyping. Please do correct me if I'm wrong.</p>",
+        "id": 591819717,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474275
+    },
+    {
+        "content": "<p>With OpenTofu, you clone the repo, you type in tofu init, and tofu apply and the EC2 instance will be up however long y'all want it to. tofu destroy and its gone.</p>",
+        "id": 591820089,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474380
+    },
+    {
+        "content": "<p>Hmm, would you be able to put together a proof of concept I can try?</p>",
+        "id": 591820196,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777474408
+    },
+    {
+        "content": "<p>Absolutely</p>",
+        "id": 591820248,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474421
+    },
+    {
+        "content": "<p>podman instead of Docker?</p>",
+        "id": 591820360,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474448
+    },
+    {
+        "content": "<p>Just to make sure we're on the same page here.</p>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591817014\">said</a>:</p>\n<blockquote>\n<ul>\n<li>Spin up an empty EC2 instance</li>\n<li>Install Docker</li>\n</ul>\n</blockquote>\n<p>That's the Tofu job.</p>\n<blockquote>\n<ul>\n<li>Download the compose file from <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></li>\n</ul>\n</blockquote>\n<p>This is part Tofu, part cloud-init</p>\n<blockquote>\n<ul>\n<li>Run <code>docker compose up</code></li>\n<li>Install Traefik? Or nginx? <a href=\"https://github.com/IQSS/dataverse/issues/10359\">https://github.com/IQSS/dataverse/issues/10359</a> . And configure it.</li>\n<li>Wait, what about the frontend? We need that too. I think it was added in <a href=\"https://github.com/gdcc/dataverse-ansible/pull/278\">https://github.com/gdcc/dataverse-ansible/pull/278</a></li>\n<li>And now we need Keycloak. Add it to the compose file above? Or create a new compose file? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span> </li>\n<li>etc., etc.</li>\n</ul>\n</blockquote>\n<p>That's the part for a cloud-init script.</p>",
+        "id": 591820408,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474461
+    },
+    {
+        "content": "<p>yep, that's what i was thinking too</p>",
+        "id": 591820545,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474496
+    },
+    {
+        "content": "<p>I do something very similar in our Dataverse installations to renew certs without having to manually place them.</p>",
+        "id": 591820732,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474543
+    },
+    {
+        "content": "<p>I'll come back with a PoC, and y'all can help me iterate on it</p>",
+        "id": 591820802,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474560
+    },
+    {
+        "content": "<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>",
+        "id": 591820974,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474592
+    },
+    {
+        "content": "<p>The interesting part is always: how do I ship config etc into the spun up instance. This is where cloud-init and GitOps can shine.</p>",
+        "id": 591820994,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474597
+    },
+    {
+        "content": "<p>If I would try to write this as a Tofu job, I'd try to ship the compose file as part of the cloud-init payload via Tofu. Then a service unit for systemd to spin up compose with it, enabled by cloud-init.</p>",
+        "id": 591821752,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474731
+    },
+    {
+        "content": "<p>This keeps all the pieces like configuring the application etc as a job for compose, making it very flexible what to include etc.</p>",
+        "id": 591821908,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474768
+    },
+    {
+        "content": "<p>One thing to keep note of: cloud-init may need a list of /etc/hosts entries, depending on how the composed services are exposed via AWS.</p>",
+        "id": 591822249,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474836
+    },
+    {
+        "content": "<p>well only one way to find out!</p>",
+        "id": 591822456,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474866
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974\">said</a>:</p>\n<blockquote>\n<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>\n</blockquote>\n<p>?</p>",
+        "id": 591822510,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474874
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591822510\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974\">said</a>:</p>\n<blockquote>\n<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>\n</blockquote>\n<p>?</p>\n</blockquote>\n<p>I suppose only <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> can answer that. I don't have procura to spend money for IQSS <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span>  They have standup now</p>",
+        "id": 591822758,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777474922
+    },
+    {
+        "content": "<p>okee thank you</p>",
+        "id": 591822805,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777474931
+    },
+    {
+        "content": "<p>Should we do a zoom call? <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 591822934,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777474963
+    },
+    {
+        "content": "<p>Love to, but I need to run errands with my kids and will be off in ~10</p>",
+        "id": 591823093,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777475001
+    },
+    {
+        "content": "<p>we can set up a call later at a time that works for everyone. I'll get back to you with a PoC and my findings in the meanwhile</p>",
+        "id": 591823530,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777475104
+    },
+    {
+        "content": "<p>19:00 my time could work for me</p>",
+        "id": 591824793,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777475395
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> wanna try the clock button? <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> <br>\n<img alt=\"Screenshot 2026-04-29 at 11.10.39 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"140x53\" data-original-src=\"/user_uploads/53090/KZm27fKTjXne5iAG7spX6oF_/Screenshot-2026-04-29-at-11.10.39AM.png\" src=\"/user_uploads/thumbnail/53090/KZm27fKTjXne5iAG7spX6oF_/Screenshot-2026-04-29-at-11.10.39AM.png/840x560.webp\"></p>",
+        "id": 591825070,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777475455
+    },
+    {
+        "content": "<p>Hell yeah</p>",
+        "id": 591825255,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777475496
+    },
+    {
+        "content": "<p><time datetime=\"2026-04-29T17:00:00Z\">2026-04-29T19:00:00+02:00</time> would work for me!</p>",
+        "id": 591825319,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777475511
+    },
+    {
+        "content": "<p>so much easier, thanks!</p>",
+        "id": 591825347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777475519
+    },
+    {
+        "content": "<p>Could work for me. What do you think, <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span>?</p>",
+        "id": 591825496,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777475551
+    },
+    {
+        "content": "<p>Sure, as long as it is a quick call! I'll be off the clock this week and come back on Monday. Since I'm a GRA I can only work 20hrs :(</p>",
+        "id": 591828834,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777476355
+    },
+    {
+        "content": "<p>Great, we'll make it quick. We can use my Zoom at <a href=\"https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09\">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a> (in ~90 minutes)</p>",
+        "id": 591829282,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777476446
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591829282\">said</a>:</p>\n<blockquote>\n<p><a href=\"https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09\">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>\n</blockquote>\n<p>Whatever works!</p>",
+        "id": 591832090,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777477190
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/591820974\">said</a>:</p>\n<blockquote>\n<p>can I use the same creds that I currently use for ec2-create-instance on Harvard's AWS VPC?</p>\n</blockquote>\n<p>yes</p>",
+        "id": 591832224,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777477224
+    },
+    {
+        "content": "<p>talk soon!</p>",
+        "id": 591832338,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777477252
+    },
+    {
+        "content": "<p>I created an issue we can discuss and edit:</p>\n<p>Dataverse in Docker in the cloud (with Keycloak) <a href=\"https://github.com/IQSS/dataverse/issues/12369\">#12369</a></p>",
+        "id": 591850479,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777481933
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> ready? <a href=\"https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09\">https://harvard.zoom.us/my/pdurbin?pwd=em1WNUZGbnY2YjhxNEdSbjJJMXNSUT09</a></p>",
+        "id": 591850956,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777482039
+    },
+    {
+        "content": "<p>Almost there</p>",
+        "id": 591851272,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777482117
+    },
+    {
+        "content": "<p>do we even want global state for a use case like this?</p>",
+        "id": 591862595,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777485439
+    },
+    {
+        "content": "<p>Not necessarily. I was asking mostly because we will need ways to keep track of individual state to enable tearing down things again.</p>",
+        "id": 591862727,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777485483
+    },
+    {
+        "content": "<p>Otherwise keeping all these EC2s around is gonna cost IQSS <span aria-label=\"money\" class=\"emoji emoji-1f4b0\" role=\"img\" title=\"money\">:money:</span></p>",
+        "id": 591862852,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777485511
+    },
+    {
+        "content": "<p>probably a lifecycle block with local state?</p>",
+        "id": 591862898,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777485526
+    },
+    {
+        "content": "<p>I dunno, we'll figure smth out</p>",
+        "id": 591863190,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777485601
+    },
+    {
+        "content": "<p>It would probably be good to have a spinup environments by command or trigger (using a CI job to execute) that always gets an expiry date. Expiry can be extended by updates (CI trigger) or commands (triggering a CI job).</p>\n<p>On creation, the resources created become part of a persistent state, keeping track of the inventory. </p>\n<p>A scheduled janitor job removes any expired environments, leaves comments/warning/notes, etc.</p>",
+        "id": 591865508,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777486202
+    },
+    {
+        "content": "<p>If it helps, in the bash script there's a <code>-d</code> flag for delete that we use when spinning up EC2 instances from Jenkins. Plus <code>-t</code> that we use to tag images with \"jenkins_delete_me\". I think <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> has something set up on the AWS side to delete them automatically.</p>",
+        "id": 591879907,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777490911
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> Hello Oliver! Good evening! If you had the time I wanted to pick your brain about some concerns I have regarding using any state driven system like Tofu or Pulumi or CloudFormation for this specific usecase. Would you prefer I dump them here or write a clean proposal sorta document that outlines my main concerns?</p>",
+        "id": 592775785,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777909352
+    },
+    {
+        "content": "<p>Whatever works for you. If you feel like this needs a more formal discussion with comments and all, a document may be better.</p>",
+        "id": 592775947,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777909405
+    },
+    {
+        "content": "<p><a href=\"https://docs.google.com/document/d/1kQkYeW3FMCrpnDkWmBGq1ePeFR8aIrPC9OtHfcmj5fY/edit?usp=sharing\">https://docs.google.com/document/d/1kQkYeW3FMCrpnDkWmBGq1ePeFR8aIrPC9OtHfcmj5fY/edit?usp=sharing</a></p>",
+        "id": 592783812,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777911496
+    },
+    {
+        "content": "<p>These are some thoughts I had when thinking about this workflow. Please correct me wherever I'm wrong!</p>",
+        "id": 592783934,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777911534
+    },
+    {
+        "content": "<p>I completely agree with your analysis: using / involving too much IaC for a developer is a nightmare waiting to happen.</p>",
+        "id": 592784180,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777911612
+    },
+    {
+        "content": "<p>Where should I put more thoughts?</p>",
+        "id": 592784749,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777911781
+    },
+    {
+        "content": "<p>Comments should be enabled. Or I can enable edits too</p>",
+        "id": 592784801,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777911797
+    },
+    {
+        "content": "<p>Done</p>",
+        "id": 592784847,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777911810
+    },
+    {
+        "content": "<p>OK will do - need to continue hacking for now.</p>",
+        "id": 592784869,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777911814
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/375812-containers/topic/Docker.20mode.20when.20spinning.20up.20EC2.20instances/near/592784869\">said</a>:</p>\n<blockquote>\n<p>OK will do - need to continue hacking for now.</p>\n</blockquote>\n<p>Thank you! I appreciate your time and thoughts on this a lot. It's really good to have someone around to guide me who knows these systems well</p>",
+        "id": 592785021,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1777911865
+    },
+    {
+        "content": "<p>When it comes to IaC, I'm also still learning. The ecosystem is so vast and you can do things on so many different levels, sometimes it's hard to see the forest for the trees.</p>",
+        "id": 592785188,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1777911916
+    },
+    {
+        "content": "<p>Wow, this is getting a bit complicated! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> Thanks for all the work so far!</p>",
+        "id": 592862323,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1777938998
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> are we blocked? Is there anything we should discuss to get unblocked? Should I put \"docker mode\" on the agenda for next week's container meeting?</p>",
+        "id": 605792483,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782147472
+    },
+    {
+        "content": "<p>Can't say that it has been blocked from my side. I haven't just gotten around to it. I've been focused on our Dataverse frontend testing suite, I want it to be out the door before 6.11 so that we can test its usefulness. And as far as I understand from our discussions, Terraform doesn't fit this exact use case, we're better off using the ansible role. Once I'm done with this suite, I'll allocate bandwidth to the docker mode issue</p>",
+        "id": 605804714,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1782149838
+    },
+    {
+        "content": "<p>Great! When you have bandwidth to talk more, I'm all ears!</p>",
+        "id": 605805394,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782149952
+    },
+    {
+        "content": "<p>Just a quick update regarding the Ansible Container mode, I will be starting to work on this and explore it very soon, hopefully next week.</p>",
+        "id": 608824185,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1783453623
+    },
+    {
+        "content": "<p>Wonderful! Would it be possible to support both Docker and Podman? At the that container meeting we talked to <span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> about Podman. See <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/podman.20instead.20of.20docker/with/606279455\">#containers &gt; podman instead of docker</a></p>",
+        "id": 608833453,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783457170
+    },
+    {
+        "content": "<p>Yes! They're both fully interchangeable as far as testing is considered</p>",
+        "id": 608835611,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1783457991
+    }
+]
