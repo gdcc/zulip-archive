@@ -1,0 +1,56 @@
+[
+    {
+        "content": "<p>Hi,</p>\n<p>We are currently installing Dataverse. The purpose is twofold: publish datasets externally and/or make data sets available for internal consumption and reuse. Depending on the data set all three combinations are possible. The idea is to have 2 web-portals: one public - and one internal portal. I'm wondering whether such setup is possible at all to start with.</p>\n<p>If so, the next problem is in the \"and\" case. We want to have the same data set available with two metadata descriptions which in general overlap but have also have distinct fields. Think for instance on the contact field. On the public portal: we want to have as contact our service desk. On the internal portal we want to have as contact a real person or alternatively we would be an additional field \"internal contact\" which is not publicly available.  </p>\n<p>Is such setup possible?</p>\n<p>Best regards,<br>\nSjaak Derksen</p>",
+        "id": 523625114,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1749670133
+    },
+    {
+        "content": "<p>Everything is possible. But it might be harder to do than you think. If I understood you correctly, you want to have your inner portal as the \"source of truth\" and then mirror this with some minor modifications to some outside visible portal.</p>\n<p>This kind of setup is similar to what <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and others have been doing by mirroring the database, just the other way around (from production to an internal test system). So if you can have a sync job that enables you to automate the mirror, inject or transform any metadata you want changed from inside to outside, sure, that could work.</p>\n<p>I would take great care though about who is able to do changes on the outside instance. It should be \"read-only\", as you're likely to get into trouble when you need to do two-way merges. Also, you need to think about (read-only!) file access.</p>",
+        "id": 523732008,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1749726238
+    },
+    {
+        "content": "<p>Another way to go about this might be using OAI-PMH. Your internal instance would do all the heavy lifting like PIDs, etc and you use a search query to build a specific set of datasets that should be harvested by your outside instance. Keep in mind though that this will only take care of mirroring the metadata, but will not grant file access. There's probably some other kinks and caveats one need to look at.</p>",
+        "id": 523732592,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1749726424
+    },
+    {
+        "content": "<p>If you're willing to code some stuff or spend money for someone else to do that, there's probably more that can be made possible, but that would need a more in-depth discussion. Probably would be good to reach out to the GDCC (<a href=\"http://www.gdcc.io\">www.gdcc.io</a>) and ask for a consult.</p>",
+        "id": 523732953,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1749726561
+    },
+    {
+        "content": "<p>Thanks Oliver. It is a bit more intricate I think. We would have datasets that are only available internally (to have an internal repository, not all our data is public or worth to publicize). We also would have datasets that are available both externally and internally. The latter with metadata that is common and some fields distinct. We need to think a bit more on this. Perhaps mirroring is a viable approach.</p>",
+        "id": 523809438,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1749752183
+    },
+    {
+        "content": "<p>Also, we have 2 realms (IAM wise). An internal realm (hooked up to SSO) and an external realm (user+pwd+token). I guess a portal cannot be in 2 realms at the same time. So I think we need an internal portal for our admins and an external one: public most of the time, but some data sets private. For the time being we focus on the external portal.</p>",
+        "id": 523877078,
+        "sender_full_name": "Sjaak Derksen",
+        "timestamp": 1749794566
+    },
+    {
+        "content": "<p>I'll also forward this to Jim (GDCC) as it sounded like he might have some related work.</p>",
+        "id": 523943313,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1749820306
+    },
+    {
+        "content": "<p>I don't think Dataverse easily supports the exact requirements above but like Oliver said, everything is possible with code. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> </p>\n<p>If you only needed to advertise to the outside world the existence of some datasets (only their metadata, that is), yes, you could harvest (using OAI-PMH) from the private to the public instance.</p>\n<p>As long as you don't use the \"native JSON\" format when harvesting, you could put your \"internal only\" fields in a custom metadata block in the private instance. That is, if you use Dublin Core or DDI to harvest, those formats will contain an incomplete record (which is good for you!) from the private instance. So the public instance wouldn't have those \"internal only\" fields.</p>",
+        "id": 524322890,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750103078
+    },
+    {
+        "content": "<p>Like Oliver says, this wouldn't help at all with file requests. It would just be a way to advertise some metadata for discovery.</p>",
+        "id": 524322963,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1750103116
+    }
+]

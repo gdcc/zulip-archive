@@ -1,0 +1,170 @@
+[
+    {
+        "content": "<p>Hi there. We have an ingest job that is exhausting all our resources. We have run the imqcmd purge command to try to clear the job, but it will not clear for some reason. Are there any other steps we can take to clear the job?</p>",
+        "id": 506987789,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742480615
+    },
+    {
+        "content": "<p>it was my understanding that I could purge the job queue, but not running jobs - I just had to wait.</p>",
+        "id": 506994856,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742482076
+    },
+    {
+        "content": "<p>A number of installations preempt this problem by setting <a href=\"https://guides.dataverse.org/en/latest/installation/config.html#tabularingestsizelimit\">https://guides.dataverse.org/en/latest/installation/config.html#tabularingestsizelimit</a> to some fraction of your Payara JVM heap setting. Leonid has said that R formats in particular can consume up to 10x the file size in memory during ingest.</p>",
+        "id": 507003612,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742484044
+    },
+    {
+        "content": "<p>That's very helpful <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> I'll try that once this job finishes.</p>",
+        "id": 507004000,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742484128
+    },
+    {
+        "content": "<p>Is it possible to separate out the ingest process onto another machine? Has anyone else done that? We're thinking of using a worker job on another machine whose only job would be to process ingest jobs.</p>",
+        "id": 507021909,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742488187
+    },
+    {
+        "content": "<p>There is a proposal to do exactly that but I don't think the work has been planned / picked up yet.</p>",
+        "id": 507022217,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742488250
+    },
+    {
+        "content": "<p>Yeah. Here's a related issue: Ingest Modularity/Improvements <a href=\"https://github.com/IQSS/dataverse/issues/7852\">#7852</a></p>",
+        "id": 507024012,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742488618
+    },
+    {
+        "content": "<p>Is there a way to know if this particular job is actually making progress? How can we monitor it and know when it's done?</p>",
+        "id": 507036374,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742491816
+    },
+    {
+        "content": "<p>Is it feasible (and safe) to run two active Dataverse instances on different VMs, but using the same database, filesystem, etc.? We're wondering if, in that setup, we could load balance ingestion requests to one of the DV instances and web requests to the other. If it's possible without risking data corruption, that would eliminate the problem of ingestion interfering with web users.</p>",
+        "id": 507040949,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742493114
+    },
+    {
+        "content": "<p>That's what <a href=\"https://github.com/IQSS/dataverse.harvard.edu/issues/111\">https://github.com/IQSS/dataverse.harvard.edu/issues/111</a> is about, setting up a dedicated ingest server for Harvard Dataverse. We haven't done it though, and that issue is quite old at this point.</p>",
+        "id": 507045716,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742494585
+    },
+    {
+        "content": "<p>Harvard runs with a dual-application-node setup and has for some time: <a href=\"https://guides.dataverse.org/en/latest/installation/prep.html\">https://guides.dataverse.org/en/latest/installation/prep.html</a> though there were I think two concurrency problems in the database over the years.</p>",
+        "id": 507045862,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742494645
+    },
+    {
+        "content": "<p>It is possible and I dare say safe to run multiple app servers pointed at the same database. We do this for Harvard Dataverse (two app servers) but you'll want to keep in mind the caveats at <a href=\"https://guides.dataverse.org/en/6.6/installation/advanced.html#multiple-app-servers\">https://guides.dataverse.org/en/6.6/installation/advanced.html#multiple-app-servers</a></p>",
+        "id": 507045870,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742494648
+    },
+    {
+        "content": "<p>Thanks! What about the question of monitoring the ingest job. Is there a way to observe it's progress? We just want to make sure that it is in fact making progress.</p>",
+        "id": 507046890,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742495013
+    },
+    {
+        "content": "<p>Hmm, nothing at <a href=\"https://guides.dataverse.org/en/6.6/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources\">https://guides.dataverse.org/en/6.6/admin/troubleshooting.html#long-running-ingest-jobs-have-exhausted-system-resources</a></p>",
+        "id": 507048891,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742495644
+    },
+    {
+        "content": "<p>I assume that's where you found the <code>imqcmd</code> command.</p>",
+        "id": 507048931,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742495658
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"674237\">@Jay Sundu</span> if you're running Linux and have <code>strace</code> installed, you can watch the system calls made by the sub-process handling ingest. In my case I could see it reading and seeking, and just let it finish.</p>",
+        "id": 507049611,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742495881
+    },
+    {
+        "content": "<p>IIRC you can find the subprocess in <code>top</code> by pressing <code>H</code>? then <code>strace -p pid</code></p>",
+        "id": 507050037,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742496005
+    },
+    {
+        "content": "<p>Stopping and starting Payara will only slow things down, as Payara will maintain job state and pick up where it left off once you start it back up.</p>",
+        "id": 507050186,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742496055
+    },
+    {
+        "content": "<p>FYI, our long running job just finished and I've put in place the TabularIngestSizeLimit so hopefully that'll give us some safety but we're still looking at perhaps setting up another instance to offload the ingest process. Thanks for all your help!</p>",
+        "id": 507063196,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742500484
+    },
+    {
+        "content": "<p>Phew! How long did it take?</p>",
+        "id": 507065934,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742501485
+    },
+    {
+        "content": "<p>About twenty hours.</p>",
+        "id": 507074351,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742504542
+    },
+    {
+        "content": "<p>Wow, what kind of file was it?</p>",
+        "id": 507074464,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742504582
+    },
+    {
+        "content": "<p>There were six 3-5GB files with TXT and CSV. I haven't seen them myself yet just was told by the person who did the uploading what they were.</p>",
+        "id": 507074897,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742504730
+    },
+    {
+        "content": "<p>now THAT's gonna be some variable-level metadata!</p>",
+        "id": 507075264,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742504820
+    },
+    {
+        "content": "<p>Interesting. Was ingest successful?</p>",
+        "id": 507075400,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742504874
+    },
+    {
+        "content": "<p>Apparently the publish is still in progress</p>",
+        "id": 507083517,
+        "sender_full_name": "Jay Sundu",
+        "timestamp": 1742508161
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"674237\">@Jay Sundu</span> Dataverse will verify checksums on dataset publication; on larger files this can take some time depending on your datastore type. There is a maximum setting for that as well, but I haven't yet implemented it.</p>",
+        "id": 507253587,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1742556834
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/6.6/installation/config.html#datasetchecksumvalidationsizelimit\">https://guides.dataverse.org/en/6.6/installation/config.html#datasetchecksumvalidationsizelimit</a></p>",
+        "id": 507261903,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742559258
+    }
+]

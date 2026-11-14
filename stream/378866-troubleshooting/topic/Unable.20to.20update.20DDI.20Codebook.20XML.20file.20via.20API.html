@@ -1,0 +1,137 @@
+<html>
+<head><meta charset="utf-8"><title>Unable to update DDI Codebook XML file via API · troubleshooting · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/index.html">troubleshooting</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html">Unable to update DDI Codebook XML file via API</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="637972108"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/637972108" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paolo Marangio <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#637972108">(Nov 05 2026 at 22:47)</a>:</h4>
+<p>Hi everyone,</p>
+<p>I'm trying to update the DDI codebook metadata xml file of a dataset file using the Dataverse API. The dataset file in question is a .sav file that has been ingested on our Dataverse instance.</p>
+<p>I'm using the following <code>curl</code> command:</p>
+<div class="codehilite"><pre><span></span><code>curl -v \
+  -H "X-Dataverse-key:$API_TOKEN" \
+  -X PUT \
+  "https://dataverse-test.bsc.es/api/edit/3286" \
+  --upload-file ddi_corrected.xml
+</code></pre></div>
+<p>The request completes successfully, returning HTTP <code>200 OK</code> and the following response:</p>
+<p><code>{"status":"OK","data":{"message":"Nothing to update"}}</code></p>
+<p>See attached .txt file for the full <code>curl</code> output:</p>
+<p><a href="/user_uploads/53090/lom4iTIjsLhbm9HrQo3P6MRN/dataverse_api_error.txt">dataverse_api_error.txt</a></p>
+<p>The XML file (<code>ddi_corrected.xml</code>) is approximately 608 KB and contains the updated DDI metadata xml.</p>
+<p>Does anyone know why Dataverse might return <code>"Nothing to update"</code> despite the PUT request being successful?</p>
+<p>Is there a particular API endpoint or XML structure I should be using to update the metadata of an existing Dataset file through the Dataverse API?</p>
+<p>Just to give some extra context: the reason why I want to do this is because I noticed that for some categorical variables encoded as numbers in tabular files ingested via Dataverse there are some extra, unnecessary <code>sumStat</code> lines. I thought it would be possible to just update the resulting xml file that has been generated during the ingestion. See below an excerpt from the metadata file in question, with the lines I want to remove commented out:</p>
+<div class="codehilite" data-code-language="XML"><pre><span></span><code><span class="nt">&lt;var</span><span class="w"> </span><span class="na">ID=</span><span class="s">"v3242"</span><span class="w"> </span><span class="na">name=</span><span class="s">"DEVICE"</span><span class="w"> </span><span class="na">intrvl=</span><span class="s">"discrete"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;location</span><span class="w"> </span><span class="na">fileid=</span><span class="s">"f3287"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;labl</span><span class="w"> </span><span class="na">level=</span><span class="s">"variable"</span><span class="nt">&gt;</span>DEVICE<span class="nt">&lt;/labl&gt;</span>
+<span class="cm">&lt;!--</span>
+<span class="cm">&lt;sumStat type="mode"&gt;.&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="max"&gt;3.0&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="min"&gt;1.0&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="mean"&gt;2.44438202247191&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="stdev"&gt;0.88186201780734&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="medn"&gt;3.0&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="invd"&gt;0.0&lt;/sumStat&gt;</span>
+<span class="cm">&lt;sumStat type="vald"&gt;1780.0&lt;/sumStat&gt;</span>
+<span class="cm">--&gt;</span>
+<span class="nt">&lt;catgry&gt;</span>
+<span class="nt">&lt;catValu&gt;</span>3<span class="nt">&lt;/catValu&gt;</span>
+<span class="nt">&lt;labl</span><span class="w"> </span><span class="na">level=</span><span class="s">"category"</span><span class="nt">&gt;</span>Mobile<span class="nt">&lt;/labl&gt;</span>
+<span class="nt">&lt;catStat</span><span class="w"> </span><span class="na">type=</span><span class="s">"freq"</span><span class="nt">&gt;</span>1263<span class="nt">&lt;/catStat&gt;</span>
+<span class="nt">&lt;/catgry&gt;</span>
+<span class="nt">&lt;catgry&gt;</span>
+<span class="nt">&lt;catValu&gt;</span>1<span class="nt">&lt;/catValu&gt;</span>
+<span class="nt">&lt;labl</span><span class="w"> </span><span class="na">level=</span><span class="s">"category"</span><span class="nt">&gt;</span>Desktop<span class="nt">&lt;/labl&gt;</span>
+<span class="nt">&lt;catStat</span><span class="w"> </span><span class="na">type=</span><span class="s">"freq"</span><span class="nt">&gt;</span>472<span class="nt">&lt;/catStat&gt;</span>
+<span class="nt">&lt;/catgry&gt;</span>
+<span class="nt">&lt;catgry&gt;</span>
+<span class="nt">&lt;catValu&gt;</span>2<span class="nt">&lt;/catValu&gt;</span>
+<span class="nt">&lt;labl</span><span class="w"> </span><span class="na">level=</span><span class="s">"category"</span><span class="nt">&gt;</span>Tablet<span class="nt">&lt;/labl&gt;</span>
+<span class="nt">&lt;catStat</span><span class="w"> </span><span class="na">type=</span><span class="s">"freq"</span><span class="nt">&gt;</span>45<span class="nt">&lt;/catStat&gt;</span>
+<span class="nt">&lt;/catgry&gt;</span>
+<span class="nt">&lt;varFormat</span><span class="w"> </span><span class="na">type=</span><span class="s">"numeric"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;notes</span><span class="w"> </span><span class="na">subject=</span><span class="s">"Universal Numeric Fingerprint"</span><span class="w"> </span><span class="na">level=</span><span class="s">"variable"</span><span class="w"> </span><span class="na">type=</span><span class="s">"VDC:UNF"</span><span class="nt">&gt;</span>UNF:6:gM8qpKE4+3iy+u9WtjXY8A==<span class="nt">&lt;/notes&gt;</span>
+<span class="nt">&lt;/var&gt;</span>
+</code></pre></div>
+<p>Is this a known bug in Dataverse?<br>
+Thanks in advance!</p>
+
+
+
+<a name="637976087"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/637976087" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#637976087">(Nov 05 2026 at 23:11)</a>:</h4>
+<p>Hi. I'm not sure what version you're on, but for the latest, I'm seeing "Nothing to update" in two possible places:</p>
+<ul>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L151">https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L151</a></li>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L164">https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L164</a></li>
+</ul>
+
+
+
+<a name="637976624"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/637976624" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#637976624">(Nov 05 2026 at 23:14)</a>:</h4>
+<p><span class="user-mention" data-user-id="698148">@Victoria Lubitch</span> wrote this code and might be able to advise you.</p>
+
+
+
+<a name="637976739"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/637976739" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#637976739">(Nov 05 2026 at 23:15)</a>:</h4>
+<p><span class="user-mention" data-user-id="1225696">@Paolo Marangio</span> please feel free to go ahead and create a bug.</p>
+<p>Also, I'd be interested to know if you can reproduce it on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a></p>
+
+
+
+<a name="638055595"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/638055595" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paolo Marangio <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#638055595">(Nov 06 2026 at 08:16)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API/near/637976739">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1225696">Paolo Marangio</span> please feel free to go ahead and create a bug.</p>
+<p>Also, I'd be interested to know if you can reproduce it on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a></p>
+</blockquote>
+<p>I confirm that I have been able to reproduce the error on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a></p>
+<p><a href="/user_uploads/53090/8GahcgbG_xS38WVmRiDhbpMe/dataverse_harvard_api_error.txt">dataverse_harvard_api_error.txt</a></p>
+
+
+
+<a name="638055952"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/638055952" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paolo Marangio <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#638055952">(Nov 06 2026 at 08:17)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API/near/637976087">said</a>:</p>
+<blockquote>
+<p>Hi. I'm not sure what version you're on, but for the latest, I'm seeing "Nothing to update" in two possible places:</p>
+<ul>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L151">https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L151</a></li>
+<li><a href="https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L164">https://github.com/IQSS/dataverse/blob/v6.12.1/src/main/java/edu/harvard/iq/dataverse/api/EditDDI.java#L164</a></li>
+</ul>
+</blockquote>
+<p>The Dataverse instance I have been using here at BSC for my tests has the following version:<br>
+v. 6.10.1 build master-300d5b5</p>
+
+
+
+<a name="638059430"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/638059430" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Paolo Marangio <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#638059430">(Nov 06 2026 at 08:33)</a>:</h4>
+<p><span class="user-mention silent" data-user-id="598112">Philip Durbin 🚀</span> <a href="#narrow/channel/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API/near/637976739">said</a>:</p>
+<blockquote>
+<p><span class="user-mention silent" data-user-id="1225696">Paolo Marangio</span> please feel free to go ahead and create a bug.</p>
+<p>Also, I'd be interested to know if you can reproduce it on <a href="https://demo.dataverse.org">https://demo.dataverse.org</a></p>
+</blockquote>
+<p>Done<br>
+<a href="https://github.com/IQSS/dataverse/issues/12877">https://github.com/IQSS/dataverse/issues/12877</a></p>
+
+
+
+<a name="638133884"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/378866-troubleshooting/topic/Unable%20to%20update%20DDI%20Codebook%20XML%20file%20via%20API/near/638133884" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/378866-troubleshooting/topic/Unable.20to.20update.20DDI.20Codebook.20XML.20file.20via.20API.html#638133884">(Nov 06 2026 at 13:27)</a>:</h4>
+<p><span class="user-mention" data-user-id="1225696">@Paolo Marangio</span> thanks! Would it be possible to upload to that issue a zip file containing the files you're using to test with? The .sav file and the .xml file?</p>
+
+
+
+<hr><p>Last updated: Nov 14 2026 at 21:03 UTC</p>
+</html>

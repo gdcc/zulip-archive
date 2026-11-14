@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>I installed a new dataverse server for testing purposes. It is running dataverse 6.9 and was installed using the dataverse ansible from GDCC. I created a random 30GB files and tried to upload to an empty dataset using python dvuploader. After arriving to 100%, the process stalls forever and doesn't give a clue about what is happening. The machine has enough disc and RAM to handle that file.</p>\n<p>When the process arrives 100%, the files appears at /tmp as \"MIME0000000000.tmp\". I guess that is the ingestion process running. But after sometime, that files dissapears and I can't find any 30GB files in the system. In the apache logs I can see only this related to this upload (the DOI is the fake one for testing purposes):</p>\n<blockquote>\n<p>\"POST /dataset.xhtml?persistentId=doi%3A10.5072%2FFK2%2FIHEATG&amp;version=DRAFT HTTP/1.1\" 200 2365 \"<a href=\"http://dataverse\">http://dataverse</a>\"<br>\n\"GET /dataset.xhtml?persistentId=doi%3A10.5072%2FFK2%2FIHEATG&amp;version=DRAFT HTTP/1.1\" 200 153372 \"<a href=\"http://dataverse\">http://dataverse</a>\"</p>\n</blockquote>\n<p>I tried to upload the same file to my production dataverse server, which is running still v6.5 and had no issue on the process.</p>\n<p>What can be happening? Any hint to debug this issue?</p>\n<p>Thanks!</p>",
+        "id": 604172782,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781706055
+    },
+    {
+        "content": "<p>After some more digging, I found in the logs of payara this:<br>\njava.io.IOException: No space left on device</p>\n<p>This server was a VM on proxmox with a 30 gb disk and an attached NFS storage for the datasets with plenty of space. It is strange because the system was configured to use a folder on this NFS storage for uploading purposes by using the JVM option -Ddataverse.files.uploads, but it seems that somehow, first the system tries to upload the file to the root filesystem and then moves it to the NFS storage.</p>\n<p>I am recreating the VM with more space. Does someone know what more jvm options could apply in this case?</p>\n<p>Thanks</p>",
+        "id": 604182738,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781707677
+    },
+    {
+        "content": "<p>Hmm, I wonder if this is related to <a class=\"stream-topic\" data-stream-id=\"378866\" href=\"/#narrow/channel/378866-troubleshooting/topic/Uploads.20directory.20content.20not.20clearing.20after.206.2E2.20upgrade/with/599609134\">#troubleshooting &gt; Uploads directory content not clearing after 6.2 upgrade</a></p>",
+        "id": 604185561,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781708174
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1044607\">@Carlos Perez-Miguel</span> Depending on the filetype, Dataverse may attempt to make another copy beneath /usr/local/payara7/glassfish/domains/domain1/generated , if the root filesystem didn't have room for 2 copies of each file before copying to the NFS mount, that could explain the \"no space left on device\" error you're seeing. What filename extension did you use?</p>",
+        "id": 604234757,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1781717826
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> the extension was \".txt\". That file under the \"generated\" folder is removed after the ingestion is made or rests in there?</p>",
+        "id": 604415411,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781766470
+    },
+    {
+        "content": "<p>New test:<br>\nNow the VM has 256 GB of disk and 64 GB of RAM. Plenty of space for the file. Also, the final filesystem for datasets is the NFS folder. The file to upload is 3GB size of random data with the name sample_3gb.txt.</p>\n<p>Dvuploader uploads once but then the file appears several times on the /tmp folder. Each copy has the name MIMEXXXXXXXX.tmp. Sometimes the files disappears and the system creates a new copy</p>\n<p>Exception shown on the payara log:<br>\n<code>Could not find key \"externaltools.textPreviewer.displayname\" in bundle file: |#]</code><br>\nAnd then:</p>\n<div class=\"codehilite\"><pre><span></span><code>Caused by: Exception [EclipseLink-5010] (Eclipse Persistence Services - 4.0.1.payara-p3.v202409231228): org.eclipse.persistence.exceptions.OptimisticLockException\nException Description: The object [[DatasetVersion id:38]] cannot be merged because it has changed or been deleted since it was last read.\n</code></pre></div>\n<p>And then more:<br>\n<code>This file has the same content as sample_3GB.txt that is in the dataset. |#]</code></p>\n<div class=\"codehilite\"><pre><span></span><code>[#|2026-06-18T08:02:59.746+0000|INFO|Payara 6.2025.3|edu.harvard.iq.dataverse.ingest.IngestServiceBean|_ThreadID=104;_ThreadName=http-thread-pool::jk-connector(4);_TimeMillis=1781769779746;_LevelValue=800;|\n  Incrementing recorded storage use by 3221225472 bytes for dataset 6139|#]\n</code></pre></div>\n<p>After these errors, this 3GB file appears several times on the Dataverse UI with variations the original name but the dvuploader process never ends:</p>\n<div class=\"codehilite\"><pre><span></span><code>sample_3GB.txt\nsample_3GB-1.txt\nsample_3GB-2.txt\n</code></pre></div>\n<p>It seems that the system enter in some kind of loop trying to process the txt file, fails somehow, rinse and repeat.<br>\nI tried to upload it with the web UI and it doesn't finish but no files appear anywhere.</p>\n<p>I also tried the same thing with a 30MB random txt file and it works perfectly with both dvuploader and the web UI.</p>",
+        "id": 604440040,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781771527
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1044607\">@Carlos Perez-Miguel</span> please feel free to create an issue about this at <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a></p>",
+        "id": 604457653,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781775049
+    },
+    {
+        "content": "<p>This part is normal:</p>\n<div class=\"codehilite\"><pre><span></span><code>sample_3GB.txt\nsample_3GB-1.txt\nsample_3GB-2.txt\n</code></pre></div>\n<p>That is, when duplicates are uploaded, it's normal that -1, etc. is added to the filename.</p>",
+        "id": 604472392,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781778021
+    },
+    {
+        "content": "<p>But those 3 were created during the same upload session while Dvuploader was at 100%. I'll try the same with more versions of Dataverse and will create an issue eventually. Thank you <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span></p>",
+        "id": 604476980,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781779022
+    },
+    {
+        "content": "<p>Sure! When you do, please link back to this topic in Zulip. Thanks!</p>",
+        "id": 604482434,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781780136
+    },
+    {
+        "content": "<p>I have created a bug report. Could be a bug of python-dvuploader instead of dataverse. Not sure. In any case, here it is:<br>\n<a href=\"https://github.com/IQSS/dataverse/issues/12478\">https://github.com/IQSS/dataverse/issues/12478</a></p>",
+        "id": 604817641,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1781860597
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1044607\">@Carlos Perez-Miguel</span> thanks! And I'll ping <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> just in case!</p>",
+        "id": 604841488,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781865761
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> thanks for tagging me! The upload seems to stream the file content successfully, since the progress bar is tied to a stream handler. My guess is that the REST API <code>500</code>error keeps it from completing. It could be that the retry strategy fires and the file is uploaded again, while the progress bar is not reset.</p>\n<p>This is the function that basically handles the native REST API upload - <a href=\"https://github.com/gdcc/python-dvuploader/blob/9e9ce8b906c8b39e39598d73e8d002a82db211db/dvuploader/nativeupload.py#L293-L380\">https://github.com/gdcc/python-dvuploader/blob/9e9ce8b906c8b39e39598d73e8d002a82db211db/dvuploader/nativeupload.py#L293-L380</a></p>\n<p>When you upload the file again, do you spot that the self-hosted instance suddenly restarts? This has been an issue before that I was able to reproduce, but havent yet found a reason for why it is happening.</p>",
+        "id": 604849314,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1781867535
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> , after more tests with both the REST API and python dvuploader, I can say that it fails after the server answers with a 500 status code. In any case, I don't see any restart of the payara service.</p>",
+        "id": 605640689,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1782118501
+    }
+]

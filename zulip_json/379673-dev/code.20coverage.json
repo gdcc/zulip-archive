@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>Let's talk about code coverage.</p>\n<p><a href=\"https://github.com/IQSS/dataverse-frontend\">https://github.com/IQSS/dataverse-frontend</a> shows 97%, which is awesome:</p>\n<p><img alt=\"Screenshot 2026-10-05 at 10.04.21 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"509x48\" data-original-src=\"/user_uploads/53090/RVVYDeehF1BHYJi3U0RT54Rx/Screenshot-2026-10-05-at-10.04.21AM.png\" src=\"/user_uploads/thumbnail/53090/RVVYDeehF1BHYJi3U0RT54Rx/Screenshot-2026-10-05-at-10.04.21AM.png/840x560.webp\"></p>\n<p><a href=\"https://github.com/IQSS/dataverse\">https://github.com/IQSS/dataverse</a> shows 26% for unit tests and \"inaccessible\" for API tests:</p>\n<p><img alt=\"Screenshot 2026-10-05 at 10.05.27 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1045x56\" data-original-src=\"/user_uploads/53090/QHHAyqPR-AUjOCebIAuXvs6K/Screenshot-2026-10-05-at-10.05.27AM.png\" src=\"/user_uploads/thumbnail/53090/QHHAyqPR-AUjOCebIAuXvs6K/Screenshot-2026-10-05-at-10.05.27AM.png/840x560.webp\"></p>",
+        "id": 629256242,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791209205
+    },
+    {
+        "content": "<p>I have had trouble getting JaCoCo reports out of the Integration Test runners.</p>",
+        "id": 629257964,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791209517
+    },
+    {
+        "content": "<p>At the time, it was turning into a blocker, so I put it aside, but let me take another crack at it</p>",
+        "id": 629258112,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791209544
+    },
+    {
+        "content": "<p>Oliver said he was able to do it for some other workflows</p>",
+        "id": 629258249,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791209574
+    },
+    {
+        "content": "<p>Right. We probably talked about it during the move from Jenkins to GitHub Actions. I'm glad we didn't let this be a blocker. But we should revisit some day, yes.</p>\n<p>The backend README has those broken links to Jenkins. Do you think we should just remove them for now?</p>",
+        "id": 629258868,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791209683
+    },
+    {
+        "content": "<p>Yep, we should. Jenkins has been turned off</p>",
+        "id": 629261157,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791210135
+    },
+    {
+        "content": "<p>Ok. I created an issue: The README has broken links to Jenkins, now defunct <a href=\"https://github.com/IQSS/dataverse/issues/12784\">#12784</a></p>",
+        "id": 629262479,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791210384
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/12783\">#12783</a> addresses code coverage now. I am looking into reactivating the badges</p>",
+        "id": 630695077,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791680731
+    },
+    {
+        "content": "<p>Here's what it fixes:</p>\n<ul>\n<li>Containers built twice per commit. The JSF and API test workflows each did their own build. Now one build is handed off to all the test jobs.</li>\n<li>JSF browsers ran one after another, and a Chromium failure meant Firefox and WebKit never ran. Each browser now has its own job, and they run in parallel.</li>\n<li>Expensive re-runs. A flaky test meant re-running the whole ~50-minute workflow. Now you re-run just the failed job, on the saved build.</li>\n<li>CI failures couldn't be reproduced. The exact images a run tested against can now be downloaded and started locally.</li>\n<li>No code coverage since Jenkins. Every run now produces a JaCoCo report (HTML + XML) of what the API and JSF tests exercise on the server: about 51% of lines so far.</li>\n</ul>\n<p>Each browser job also runs the full API test suite against the same installation, so every commit gets three independent runs of the API tests under real UI load, which is good for catching flaky tests.</p>\n<p>Push to green: ~50 → ~42 min. The tests themselves are unchanged.</p>",
+        "id": 630695162,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791680819
+    },
+    {
+        "content": "<p>Current code coverage after <a href=\"https://github.com/IQSS/dataverse/issues/12783\">#12783</a> is looking at about 57% on Coveralls</p>",
+        "id": 632314113,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1792167733
+    },
+    {
+        "content": "<p><a href=\"https://coveralls.io/jobs/189690986\">https://coveralls.io/jobs/189690986</a></p>",
+        "id": 632314167,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1792167750
+    },
+    {
+        "content": "<p>57%! That's what I'm talking about!</p>",
+        "id": 632314376,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1792167809
+    },
+    {
+        "content": "<p>And at <a href=\"https://coveralls.io/jobs/189690986/source_files/12682577818\">https://coveralls.io/jobs/189690986/source_files/12682577818</a> for example I can see which lines in /src/main/java/edu/harvard/iq/dataverse/api/Datasets.java (part of the API) are green/covered or red/uncovered. Great!</p>\n<p><img alt=\"Screenshot 2026-10-16 at 12.25.24 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1184x606\" data-original-src=\"/user_uploads/53090/fO7FYsft65b_b6NVj_qK3Ygs/Screenshot-2026-10-16-at-12.25.24PM.png\" src=\"/user_uploads/thumbnail/53090/fO7FYsft65b_b6NVj_qK3Ygs/Screenshot-2026-10-16-at-12.25.24PM.png/840x560.webp\"></p>",
+        "id": 632315018,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1792167959
+    }
+]

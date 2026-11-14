@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>The UCLA Dataverse is part of the library. The library would like to pull Dataverse objects into an Elasticsearch index for public discovery. Which would involve querying solr. This is what they use for other apps: <br>\ncurl -I -L \"<a href=\"https://dataverse.ucla.edu:8983/solr/collection1/select?q=*:*\">https://dataverse.ucla.edu:8983/solr/collection1/select?q=*:*</a>\"</p>\n<p>I tried this from localhost:<br>\ncurl -I -L \"<a href=\"https://localhost:8983/solr/collection1/select?q=*:*\">https://localhost:8983/solr/collection1/select?q=*:*</a>\"</p>\n<p>curl: (35) SSL received a record that exceeded the maximum permissible length.</p>\n<p>If I try not from a local host I just get a timeout.   Is there a way  to get this solr information from outside the dataverse server?</p>",
+        "id": 451042910,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1720808008
+    },
+    {
+        "content": "<p>Hmm, let's try to get it working from localhost first.</p>\n<p>I dev I do something like this:</p>\n<p><code>curl -s 'http://localhost:8983/solr/collection1/select?rows=1000000&amp;wt=json&amp;indent=true&amp;q=*%3A*'</code></p>\n<p>That's not working for you?</p>\n<p>This if from <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query\">https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query</a> by the way.</p>",
+        "id": 451044796,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720808555
+    },
+    {
+        "content": "<p>That works perfectly from localhost.   But, it needs to be run  from the outside.   I probably need to research that part.<br>\nThank you!</p>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> <a href=\"#narrow/stream/375707-community/topic/connecting.20to.20solr/near/451044796\">said</a>:</p>\n<blockquote>\n<p>Hmm, let's try to get it working from localhost first.</p>\n<p>I dev I do something like this:</p>\n<p><code>curl -s 'http://localhost:8983/solr/collection1/select?rows=1000000&amp;wt=json&amp;indent=true&amp;q=*%3A*'</code></p>\n<p>That's not working for you?</p>\n<p>This if from <a href=\"https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query\">https://github.com/IQSS/dataverse/blob/v6.3/scripts/search/query</a> by the way.</p>\n</blockquote>",
+        "id": 451045505,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1720808741
+    },
+    {
+        "content": "<p>We have a section on Solr security, one sec.</p>",
+        "id": 451046568,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720809028
+    },
+    {
+        "content": "<p><a href=\"https://guides.dataverse.org/en/6.3/installation/prerequisites.html#securing-solr\">https://guides.dataverse.org/en/6.3/installation/prerequisites.html#securing-solr</a></p>",
+        "id": 451046624,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720809049
+    },
+    {
+        "content": "<p>It looks like there's a SOLR_IP_ALLOWLIST in <code>bin/solr.in.sh</code> (that file is mentioned above).</p>",
+        "id": 451047095,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720809237
+    },
+    {
+        "content": "<p>I've never used it.</p>",
+        "id": 451047159,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720809252
+    },
+    {
+        "content": "<p>The main thing is the make sure you keep blocking the rest of the Internet <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 451047187,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720809270
+    },
+    {
+        "content": "<p><span aria-label=\"+1\" class=\"emoji emoji-1f44d\" role=\"img\" title=\"+1\">:+1:</span></p>",
+        "id": 451047335,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1720809349
+    },
+    {
+        "content": "<p>It would be even better to protect your Solr with a username/password, but that would also require some code changes in Dataverse to inject these deets into the client. Also: it's probably a good idea to make use of HTTPS in Solr (which is no problemo for Dataverse already, as you can set the protocol bit).</p>",
+        "id": 451069861,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720816574
+    },
+    {
+        "content": "<p>Related: Adding Solr Basic Authentication <a href=\"https://github.com/IQSS/dataverse/issues/9337\">#9337</a></p>",
+        "id": 451072016,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1720817253
+    },
+    {
+        "content": "<p>I'm not sure if you can try to inject the basic auth stuff as part of the host definition</p>",
+        "id": 451072800,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720817453
+    },
+    {
+        "content": "<p>host = \"user:pass@host\"</p>",
+        "id": 451072829,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720817462
+    },
+    {
+        "content": "<p>MIght be worth a shot...</p>",
+        "id": 451072875,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720817476
+    },
+    {
+        "content": "<p>Or readin' some docs</p>",
+        "id": 451072907,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1720817483
+    }
+]

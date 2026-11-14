@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>I just finished upgrading to 6.0 without any significant issues. I'm now attempting to update to 6.1, but I'm encountering a problem right from the start. Here are the exact steps I'm following:</p>\n<div class=\"codehilite\" data-code-language=\"Bash Session\"><pre><span></span><code><span class=\"gp\"># </span>Step<span class=\"w\"> </span><span class=\"m\">0</span>:\n<span class=\"go\">export PAYARA=/usr/local/payara6</span>\n<span class=\"go\">sudo -u dataverse bash -c \"echo 'export PAYARA=/usr/local/payara6' &gt;&gt; ~/.bashrc\"</span>\n<span class=\"go\">sudo -u dataverse bash -c \"echo $PAYARA\"</span>\n<span class=\"gp\"># </span>Step<span class=\"w\"> </span><span class=\"m\">1</span>:\n<span class=\"go\">sudo -u dataverse bash -c \"$PAYARA/bin/asadmin undeploy dataverse-6.0\"</span>\n<span class=\"gp\"># </span>Step<span class=\"w\"> </span><span class=\"m\">2</span>:\n<span class=\"go\">sudo systemctl stop payara</span>\n<span class=\"go\">sudo rm -rf $PAYARA/glassfish/domains/domain1/generated</span>\n<span class=\"gp\"># </span>Step<span class=\"w\"> </span><span class=\"m\">3</span>:\n<span class=\"go\">sudo systemctl start payara</span>\n</code></pre></div>\n<p><strong>Issue:</strong> After deleting the <code>generated</code> directory I  can't restart payara. Step <a href=\"https://github.com/IQSS/dataverse/issues/3\">#3</a> fails at this point. However, if I redeploy 6.0, it starts without any problems. I haven't made any changes to the codebase (e.g., no <code>git pull</code> or similar operations).</p>\n<p>Has anyone encountered this issue or have any suggestions on how to resolve it? Should I skip starting payara?</p>",
+        "id": 470036013,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726255357
+    },
+    {
+        "content": "<p>Hmm. My first thought is about <code>systemctl stop</code> working properly. Maybe there's still a Paraya process that needs to be killed?</p>",
+        "id": 470596585,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726491938
+    },
+    {
+        "content": "<p>Our service runs the stop-domain command.</p>",
+        "id": 470971314,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726577927
+    },
+    {
+        "content": "<p>I'm not sure what to tell you. I used to blow away the \"generated\" directory all the time in development and I don't remember Payara not starting afterward. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 470976499,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726579039
+    },
+    {
+        "content": "<p>This might be slightly unrelated, but I'm upgrading our cloned Dataverse site from 5.14 to 6.0. We have a full copy of the database for testing, but to save costs, we didn't copy over the data mount (i.e., <code>/usr/local/dvn/data</code>). Will the lack of mounted content cause any issues post-upgrade?</p>",
+        "id": 471008123,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726585292
+    },
+    {
+        "content": "<p>Hmm, I wouldn't think so.</p>",
+        "id": 471013081,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726586334
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> do you have any thoughts on this?</p>",
+        "id": 471013230,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726586359
+    },
+    {
+        "content": "<p>Is there anything relevant in the server.log that might us here? (It sounds like you are starting Payara again in step 3, so there should be log output why things fail in there)</p>",
+        "id": 471018673,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726587367
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651907\">@Don Richards</span> did you get the osgi-cache subdirectory as well? old modules can sometimes cause problems. As Oliver says the answer should be in Payara's server.log.</p>",
+        "id": 471029315,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1726589617
+    },
+    {
+        "content": "<p>I'm seeing this a lot </p>\n<div class=\"codehilite\" data-code-language=\"Bash\"><pre><span></span><code><span class=\"o\">[</span><span class=\"m\">2024</span>-09-17T10:45:02.382-0400<span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[</span>Payara<span class=\"w\"> </span><span class=\"m\">6</span>.2023.8<span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[</span>WARNING<span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[]</span><span class=\"w\"> </span><span class=\"o\">[</span>jakarta.enterprise.web<span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[</span>tid:<span class=\"w\"> </span><span class=\"nv\">_ThreadID</span><span class=\"o\">=</span><span class=\"m\">98</span><span class=\"w\"> </span><span class=\"nv\">_ThreadName</span><span class=\"o\">=</span>http-thread-pool::jk-connector<span class=\"o\">(</span><span class=\"m\">4</span><span class=\"o\">)]</span><span class=\"w\"> </span><span class=\"o\">[</span>timeMillis:<span class=\"w\"> </span><span class=\"m\">1726584302382</span><span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[</span>levelValue:<span class=\"w\"> </span><span class=\"m\">900</span><span class=\"o\">]</span><span class=\"w\"> </span><span class=\"o\">[[</span>\n<span class=\"w\">  </span>StandardWrapperValve<span class=\"o\">[</span>Faces<span class=\"w\"> </span>Servlet<span class=\"o\">]</span>:<span class=\"w\"> </span>Servlet.service<span class=\"o\">()</span><span class=\"w\"> </span><span class=\"k\">for</span><span class=\"w\"> </span>servlet<span class=\"w\"> </span>Faces<span class=\"w\"> </span>Servlet<span class=\"w\"> </span>threw<span class=\"w\"> </span>exception\njava.io.IOException:<span class=\"w\"> </span>getDataAccessObject:<span class=\"w\"> </span>Unsupported<span class=\"w\"> </span>storage<span class=\"w\"> </span>method.\n...\n</code></pre></div>",
+        "id": 471046409,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726594419
+    },
+    {
+        "content": "<p>I noticed it more than one thing:</p>\n<ul>\n<li>Missing controlled vocabulary entries (e.g., <code>command_line_interface</code> in <code>propertyFiles/software</code> for <code>locale en</code>).</li>\n<li>Repeated warnings about \"Could not find storage driver for: s3\".</li>\n</ul>",
+        "id": 471049738,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726595372
+    },
+    {
+        "content": "<p>Hmm, do you have a custom metadata block called \"software\"?</p>",
+        "id": 471057667,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726597059
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"651907\">@Don Richards</span> on not copying over the data, that's exactly how I test with our staging server. just results in 404s for existing datafiles. on unspported storage method: have you reviewed your <code>dataverse.files.*</code> jvm-options?</p>",
+        "id": 471059287,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1726597408
+    },
+    {
+        "content": "<p>I'm not sure I follow.</p>",
+        "id": 471100024,
+        "sender_full_name": "Don Richards",
+        "timestamp": 1726608531
+    }
+]

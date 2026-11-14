@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>I believe we were suffering from <a href=\"https://github.com/IQSS/dataverse/issues/11757\">this bug</a> where the dataverse is still marked as unpublished.</p>\n<p>I decided to try and reindex everything, but now none of our published dataverses are showing up in the index.<br>\n<a href=\"/user_uploads/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"324x118\" src=\"/user_uploads/thumbnail/53090/Zp8EOAY9FTySI0-MDKVM0F_o/image.png/840x560.webp\"></a></div>",
+        "id": 553850481,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762348282
+    },
+    {
+        "content": "<p>Huh. Can you reproduce this on <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> ?</p>",
+        "id": 553856166,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762349723
+    },
+    {
+        "content": "<p>I wasn't involved with the publishing of the dataset. My guess was that they published the dataset at the same time as the dataverse -- but that works fine on the demo site.</p>\n<p>When I'm logged in as admin on our site, only the unpublished dataverses show up<br>\n<a href=\"/user_uploads/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png\" title=\"image.png\"><img data-original-content-type=\"image/png\" data-original-dimensions=\"309x280\" src=\"/user_uploads/thumbnail/53090/lYyuleh4qDgPhV91CMD8E0Dh/image.png/840x560.webp\"></a></div>",
+        "id": 553863472,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762351097
+    },
+    {
+        "content": "<p>Sigh.</p>\n<div class=\"codehilite\"><pre><span></span><code>&gt; sudo diff -u schema.xml /var/solr/data/collection1/conf/schema.xml\n--- schema.xml  2025-11-05 14:05:43.745073331 +0000\n+++ /var/solr/data/collection1/conf/schema.xml  2025-07-24 17:25:07.852093156 +0000\n@@ -242,7 +242,6 @@\n\n     &lt;field name=&quot;license&quot; type=&quot;string&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;\n     &lt;field name=&quot;fileCount&quot; type=&quot;plong&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;\n-    &lt;field name=&quot;datasetCount&quot; type=&quot;plong&quot; stored=&quot;true&quot; indexed=&quot;true&quot; multiValued=&quot;false&quot;/&gt;\n\n     &lt;!--\n         METADATA SCHEMA FIELDS\n</code></pre></div>",
+        "id": 553866065,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762351728
+    },
+    {
+        "content": "<p>Ah, yes, datasetCount must be it.</p>",
+        "id": 553866182,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762351751
+    },
+    {
+        "content": "<p>updated schema, re-indexed, all good.</p>",
+        "id": 553866223,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762351760
+    },
+    {
+        "content": "<p>PLUS, the initial issue with the \"unpublished\" icon seems to be resolved. perhaps related?</p>",
+        "id": 553866409,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762351801
+    },
+    {
+        "content": "<p>Hmm. Maybe. Do you want to leave a comment on that issue with your experience? It could be that <span class=\"user-mention silent\" data-user-id=\"770046\">Germán Saracca</span> simply had an out of date Solr schema.</p>",
+        "id": 553867801,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762352118
+    },
+    {
+        "content": "<p>Will do!</p>",
+        "id": 553869154,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762352437
+    },
+    {
+        "content": "<p>Done.</p>",
+        "id": 553870302,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762352734
+    },
+    {
+        "content": "<p>Thanks. As you may have seen I went ahead and closed that issue.</p>\n<p>The 6.8 release notes say, \"Due to changes in the Solr schema (the addition of field \"datasetCount\"), updating the Solr schema and reindexing is required.\"</p>\n<p>Do you think that's enough? Should I add something like \"Failure to do so will result in collections (dataverses) not transitioning from unpublished to published in terms of the Solr index.\"?</p>",
+        "id": 553871550,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762353054
+    },
+    {
+        "content": "<p>I typically heed those warnings, but it's possible that I overlooked it because it wasn't part of the files attached to the release</p>",
+        "id": 553881478,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762355234
+    },
+    {
+        "content": "<p>That makes sense. You're right, in the past we often attached schema.xml to the release. These days we explain how to download it. We made this change to streamline our release process. I hope you don't mind! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 553943397,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762370099
+    },
+    {
+        "content": "<p>Of course not! I'll be sure to read the notes more carefully in the future :)</p>",
+        "id": 553945528,
+        "sender_full_name": "Brian Cassidy",
+        "timestamp": 1762370875
+    },
+    {
+        "content": "<p>Cool, cool, thanks for understanding. <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 553945686,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762370924
+    }
+]

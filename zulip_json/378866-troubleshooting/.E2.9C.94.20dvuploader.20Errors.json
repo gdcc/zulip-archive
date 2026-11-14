@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>I have a feeling this will need to go to Jim (and I will ask this in the Google group too, for him to see) - getting an error when using DVUploader.<br>\nFirst file is the dvuploader command and ensuing error message:<br>\n<a href=\"/user_uploads/53090/E-D3NbwGNhBBde86Ol-bKBHI/dvuploader_cmd_error.txt\">dvuploader_cmd_error.txt</a></p>\n<p>Second file is the section for this job in the server logs:<br>\n<a href=\"/user_uploads/53090/7Qocl9Ipl1u4fJfiPagF1zIv/error_log.txt\">error_log.txt</a></p>\n<p>So......</p>\n<p>What happened? </p>\n<blockquote>\n<p>FYI:<br>\nMaxFileUploadSizeInBytes.  = 107374182400<br>\nThis file = 15616921658 bytes</p>\n</blockquote>\n<p>Where are the files? On S3?</p>\n<p>Should we delete them and start over?<br>\nOR since they are on S3, how can we get the dataset to know them?</p>",
+        "id": 501560036,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1740407720
+    },
+    {
+        "content": "<p>Yes, thanks for posting at <a href=\"https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs/m/36_tPhM2AgAJ\">https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs/m/36_tPhM2AgAJ</a> as well.</p>",
+        "id": 501569153,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409785
+    },
+    {
+        "content": "<p>For my part, I'm looking at the line that's throwing the error: <a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/datasetutility/AddReplaceFileHelper.java#L2148\">https://github.com/IQSS/dataverse/blob/v6.2/src/main/java/edu/harvard/iq/dataverse/datasetutility/AddReplaceFileHelper.java#L2148</a></p>",
+        "id": 501569288,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409805
+    },
+    {
+        "content": "<p>at edu.harvard.iq.dataverse.datasetutility.AddReplaceFileHelper.addFiles(AddReplaceFileHelper.java:2148)</p>",
+        "id": 501569405,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409837
+    },
+    {
+        "content": "<p>When we see errors like this...</p>\n<p>\"jakarta.ejb.EJBException: One or more Bean Validation constraints were violated while executing Automatic Bean Validation on callback event: prePersist for class: edu.harvard.iq.dataverse.DatasetFieldValue. Please refer to the embedded constraint violations for details.\"</p>\n<p>... it often means that values were saved in the database and then later the rules were made more restrictive.</p>",
+        "id": 501569683,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409907
+    },
+    {
+        "content": "<p>But I'm not seeing anything at <a href=\"https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ESQBIY\">https://dataverse.lib.virginia.edu/dataset.xhtml?persistentId=doi:10.18130/V3/ESQBIY</a> that's suspicious.</p>",
+        "id": 501569873,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409937
+    },
+    {
+        "content": "<p>Do you think you'd be able to easily replicate this on <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> ?</p>",
+        "id": 501570045,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740409972
+    },
+    {
+        "content": "<p>This dataset had the \"bounding box\" metadata (after upgrading 6.? became \"incomplete metadata\"). So the info in that metadata field was removed - in the latest version.<br>\nBut I am not sure if that metadata field was \"fixed\" and version saved BEFORE the files were uploaded.</p>",
+        "id": 501570823,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1740410155
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin ☃️</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/dvuploader.20Errors/near/501570045\">said</a>:</p>\n<blockquote>\n<p>Do you think you'd be able to easily replicate this on <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a> ?</p>\n</blockquote>\n<p>What is the MaxFileSizeLimit on demo.dataverse?<br>\nAnd demo.dataverse doesn't use S3 direct upload?<br>\nSo could would trying to replicate work?</p>",
+        "id": 501571101,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1740410214
+    },
+    {
+        "content": "<p>I see. Hmm. I'm wondering if it would be best to republish just the fix for the bounding box.</p>",
+        "id": 501591884,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740414844
+    },
+    {
+        "content": "<p>And then, once we clear that hurdle, try try to upload the files.</p>",
+        "id": 501591975,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740414863
+    },
+    {
+        "content": "<p>Also, if this is definitely the bounding box, I'd say it's a bug that Dataverse produces such a cryptic error.</p>",
+        "id": 501592238,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740414921
+    },
+    {
+        "content": "<p>Maybe the problem wouldn't have occurred if we had fixed the bounding box first, but the 70+GB files were already in our S3bucket (after we checked per Jim's advice)<br>\n<a href=\"https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs\">https://groups.google.com/g/dataverse-community/c/J7zdhcAC4bs</a></p>\n<p>Luckily, the fix was to run the API \"add file\" command using the instructions here:<br>\n<a href=\"https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset\">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a></p>\n<p>And since we had the DVUploader output , we had all the parameters for the JSON file.</p>\n<p>All files accounted for: <br>\n<a href=\"https://doi.org/10.18130/V3/ESQBIY\">https://doi.org/10.18130/V3/ESQBIY</a></p>",
+        "id": 501652464,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1740432735
+    },
+    {
+        "content": "<p>I'm glad you fixed it! <img alt=\":dataverse_woman:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/e231c302.png\" title=\"dataverse woman\"></p>",
+        "id": 501652628,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1740432817
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"599826\">Sherry Lake</span> has marked this topic as resolved.</p>",
+        "id": 501654035,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1740433380
+    }
+]

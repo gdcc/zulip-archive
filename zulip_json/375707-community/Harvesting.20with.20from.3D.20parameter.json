@@ -1,0 +1,92 @@
+[
+    {
+        "content": "<p>Hi :)<br>\nI'm experiencing issues with the <code>from=</code> parameter when doing a partial harvest.<br>\nMost of my repositories expect the format <code>YYYY-MM-DDThh:mm:ssZ</code> (which Dataverse sends) but a few expect the format <code>YYYY-MM-DD</code>.<br>\nAnd I have one that expects a real timestamp (in seconds).<br>\nErrors look like </p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;error code=&quot;badArgument&quot;&gt;From must be a datestamp&lt;/error&gt;\n&lt;error code=&quot;badArgument&quot;&gt;from: Invalid date &amp; time&lt;/error&gt;\n&lt;error code=&quot;badArgument&quot; /&gt;\n&lt;error code=&quot;badArgument&quot;&gt;The request includes illegal arguments, is missing required arguments, includes a repeated argument, or values for arguments have an illegal syntax.&lt;/error&gt;\n</code></pre></div>\n<p>Ex:<br>\n<a href=\"https://cds.unistra.fr/registry/?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z\">https://cds.unistra.fr/registry/?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z</a><br>\n<a href=\"https://cds.unistra.fr/registry/?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07\">https://cds.unistra.fr/registry/?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07</a></p>\n<p>Did you experienced it ?<br>\nShould we add an harvesting client configuration to specify the format to send ?</p>\n<p>One related post : <a href=\"https://groups.google.com/g/dataverse-community/c/ceXljDp2uTw/m/1hHX3taGAQAJ\">https://groups.google.com/g/dataverse-community/c/ceXljDp2uTw/m/1hHX3taGAQAJ</a></p>",
+        "id": 481979177,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731426230
+    },
+    {
+        "content": "<p>Sorry, I'm having a little trouble following this. The problem occurs when Dataverse is asking as a harvesting server, right?</p>",
+        "id": 481981126,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731426694
+    },
+    {
+        "content": "<p>Yes. <br>\nFirst run is good, next runs will add the <code>from=</code> parameter</p>",
+        "id": 481981267,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731426732
+    },
+    {
+        "content": "<p>To pick up any changes. Got it. Sounds like a bug. Or some ambiguity in the spec? Does the spec have anything to say about timestamp vs datestamp?</p>",
+        "id": 481982348,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731427027
+    },
+    {
+        "content": "<p>Both seems to be OK and most of my repositories work with both.<br>\nBut I didn't find the answer.</p>",
+        "id": 481983162,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731427239
+    },
+    {
+        "content": "<p>Ok, can you please create an issue?</p>",
+        "id": 481983231,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731427261
+    },
+    {
+        "content": "<p>Do you feel like Dataverse should handle it ? or I should tell to the repositories that they are not permissive enough ?</p>",
+        "id": 481983445,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731427315
+    },
+    {
+        "content": "<p>Well, I'm curious what the spec says. Shouldn't the spec say who's right? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 481986627,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731428180
+    },
+    {
+        "content": "<p><a href=\"https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates\">https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates</a></p>\n<p>Datestamps used as values of the optional arguments from and until in the ListIdentifiers and ListRecords requests are encoded using ISO8601 and are expressed in UTC. These arguments are used to specify datestamp-based selective harvesting. These arguments support the \"Complete date\" and the \"Complete date plus hours, minutes and seconds\" granularities defined in ISO8601. The legitimate formats are YYYY-MM-DD and YYYY-MM-DDThh:mm:ssZ. Both arguments must have the same granularity. All repositories must support YYYY-MM-DD. A repository that supports YYYY-MM-DDThh:mm:ssZ should indicate so in the Identify response. A request by a harvester with finer granularity than that supported by a repository must produce an error.</p>",
+        "id": 481989765,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731429105
+    },
+    {
+        "content": "<p>Now we have the answer :D <br>\nI'll get back to repositories admin</p>",
+        "id": 481990088,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731429201
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"649905\">luddaniel</span> has marked this topic as resolved.</p>",
+        "id": 481990126,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1731429215
+    },
+    {
+        "content": "<p>My god, I read so bad :D </p>\n<blockquote>\n<p>All repositories must support YYYY-MM-DD. A repository that supports YYYY-MM-DDThh:mm:ssZ should indicate so in the Identify response.</p>\n</blockquote>\n<p><a href=\"https://api.nakala.fr/oai2?verb=Identify\">https://api.nakala.fr/oai2?verb=Identify</a><br>\n<code>&lt;granularity&gt;YYYY-MM-DD&lt;/granularity&gt;</code><br>\n<a href=\"https://api.nakala.fr/oai2?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z\">https://api.nakala.fr/oai2?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z</a><br>\n<code>Error Code badArgument</code></p>\n<p><a href=\"https://www.seanoe.org/oai/OAIHandler?verb=Identify\">https://www.seanoe.org/oai/OAIHandler?verb=Identify</a><br>\n<code>&lt;granularity&gt;YYYY-MM-DD&lt;/granularity&gt;</code><br>\n<a href=\"https://www.seanoe.org/oai/OAIHandler?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z\">https://www.seanoe.org/oai/OAIHandler?verb=ListRecords&amp;metadataPrefix=oai_dc&amp;from=2024-11-07T14%3A40%3A49Z</a><br>\n<code>&lt;error code=\"badArgument\"&gt;The request includes illegal arguments, is missing required arguments, includes a repeated argument, or values for arguments have an illegal syntax.&lt;/error&gt;</code></p>\n<p>There is some issue in Dataverse as it always use <code>YYYY-MM-DDThh:mm:ssZ</code>. I'll create an issue and look at the fix soon.</p>",
+        "id": 482352318,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731578711
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/11020\">https://github.com/IQSS/dataverse/issues/11020</a></p>",
+        "id": 482359824,
+        "sender_full_name": "luddaniel",
+        "timestamp": 1731581100
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🐉</span> has marked this topic as unresolved.</p>",
+        "id": 482375790,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1731586166
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"649905\">@luddaniel</span> no worries and thanks for creating that issue!</p>",
+        "id": 482375836,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1731586185
+    }
+]

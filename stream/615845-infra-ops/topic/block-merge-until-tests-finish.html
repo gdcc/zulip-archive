@@ -1,0 +1,49 @@
+<html>
+<head><meta charset="utf-8"><title>block-merge-until-tests-finish · infra-ops · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/index.html">infra-ops</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/block-merge-until-tests-finish.html">block-merge-until-tests-finish</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="639203031"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/block-merge-until-tests-finish/near/639203031" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/block-merge-until-tests-finish.html#639203031">(Nov 10 2026 at 16:34)</a>:</h4>
+<p>Hello and good afternoon!</p>
+<p>I was monitoring one of the develop commits when I saw some tests failing due to a fringe missing ref, and then immediately afterward I noticed a merge commit was made into develop.</p>
+<p>Although in this case, the failure occurred due to a simple missing reference, and could easily be resolved with a re-run (or in this case a merge), I was wondering what would happen if a PR got merged into develop, then the tests started failing, and multiple PRs were merged above it. Say test failed on commit 1, and commits 2, 3, 4 were merged back to back. It could happen for multiple reasons, say stale tests. Tests for commits 2, 3, 4 ran on a version of the develop branch where commit 1 didn't exist yet, and it could cause issues and conflict with 2 or 3 or 4.</p>
+<p>In the current model, this will cancel all the tests supposed to run on 1, 2, 3, and the failure would only show up for commit <a href="https://github.com/IQSS/dataverse/issues/4">#4</a> although in reality commit <a href="https://github.com/IQSS/dataverse/issues/4">#4</a> was probably just fine. This could lead to valuable developer hours/business days wasted trying to pinpoint an issue that never existed in the first place.</p>
+<p>I have an example here:<br>
+<img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="1274x906" data-original-src="/user_uploads/53090/OpE1bKT_qvo1CcDgSycvj8Mr/image.png" src="/user_uploads/thumbnail/53090/OpE1bKT_qvo1CcDgSycvj8Mr/image.png/840x560.webp"><br>
+<img alt="image.png" class="inline-image" data-original-content-type="image/png" data-original-dimensions="1274x906" data-original-src="/user_uploads/53090/8NyHgsIwbg2zHtFdgLy8lJt_/image.png" src="/user_uploads/thumbnail/53090/8NyHgsIwbg2zHtFdgLy8lJt_/image.png/840x560.webp"></p>
+<p>This could be solved either of two ways:</p>
+<ol>
+<li>Either let tests finish for older commits so that we know WHEN the tests started failing so we can pinpoint the exact commit to investigate from the get-go</li>
+<li>Block merging into develop until the tests for the current tip has finished.</li>
+</ol>
+<p>I think this needs to be addressed ASAP. It looks fine until one day it isn't. What does everyone think?</p>
+
+
+
+<a name="639204316"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/block-merge-until-tests-finish/near/639204316" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/block-merge-until-tests-finish.html#639204316">(Nov 10 2026 at 16:38)</a>:</h4>
+<p>We should also try and look into a merge queue: <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue</a></p>
+
+
+
+<a name="639205161"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/block-merge-until-tests-finish/near/639205161" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/block-merge-until-tests-finish.html#639205161">(Nov 10 2026 at 16:41)</a>:</h4>
+<p>Hmm, so you don't like how I merged a bunch of PRs one after another during Triage Tuesday? <span aria-label="sweat smile" class="emoji emoji-1f605" role="img" title="sweat smile">:sweat_smile:</span></p>
+
+
+
+<a name="639205587"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/615845-infra-ops/topic/block-merge-until-tests-finish/near/639205587" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Ash Manda <a href="https://gdcc.github.io/zulip-archive/stream/615845-infra-ops/topic/block-merge-until-tests-finish.html#639205587">(Nov 10 2026 at 16:42)</a>:</h4>
+<p>I'm not specifically talking about today, but I think there is a possibility to obscure failures that might hard to diagnose.</p>
+
+
+
+<hr><p>Last updated: Nov 14 2026 at 21:03 UTC</p>
+</html>

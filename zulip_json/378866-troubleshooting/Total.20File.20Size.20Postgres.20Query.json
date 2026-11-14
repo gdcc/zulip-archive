@@ -1,0 +1,128 @@
+[
+    {
+        "content": "<p>I have been using Julian's list of postgres queries:<br>\n<a href=\"https://docs.google.com/document/d/1-Y_iUduSxdDNeK1yiGUxe7t-Md7Fy965jp4o4m1XEoE/edit?tab=t.0\">https://docs.google.com/document/d/1-Y_iUduSxdDNeK1yiGUxe7t-Md7Fy965jp4o4m1XEoE/edit?tab=t.0</a></p>\n<p><span class=\"user-mention\" data-user-id=\"621770\">@Julian Gautier</span> do you have a new updated set?</p>\n<p>I ask because this dataset in our repo: <a href=\"https://doi.org/10.18130/V3/G1NW7F\">https://doi.org/10.18130/V3/G1NW7F</a><br>\nw/ 76 files (74 of them &gt; 5GB) gets a \"result\" from the query: \"Sum of file sizes in a specific dataset\"...... of only 16GB... which is not correct.</p>\n<p><em>Here I am only showing the affected dataset...</em></p>\n<blockquote>\n<p>dataset_id |   byte_size   | file_count <br>\n------------+---------------+------------<br>\n     58650 |   16440586164 |         76</p>\n</blockquote>\n<p>So I don't know how accurate this query is. Spot checking some of my other datasets, looks pretty accurate, not sure why this one is wonky.</p>\n<p>There is an API command for total storage, which shows 431GB</p>\n<div class=\"codehilite\"><pre><span></span><code>curl -H &quot;X-Dataverse-key:$API_TOKEN&quot; &quot;https://dataverse.lib.virginia.edu/api/datasets/58650/storagesize&quot;\n{&quot;status&quot;:&quot;OK&quot;,&quot;data&quot;:{&quot;message&quot;:&quot;Total size of the files stored in this dataset: 431,676,682,164 bytes&quot;}}\n</code></pre></div>\n<p>but I like the query of combo of total filesize with total number of files. (if it is reliable).</p>",
+        "id": 477040613,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729014037
+    },
+    {
+        "content": "<p>Hey <span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span>. I don't have a different query and I'm not sure why that one returns the wrong size for your dataset while returning the right number of files. It's a relatively simple dataset, too. Only one major version, no ingested tabular files, the usual things that I think make these queries more complex.</p>\n<p>Would you be able to adjust the database query, like the select statement and the \"group by\" part, so you can see what it's saying each file's size is? Then you could compare those sizes to what's in the Dataverse JSON metadata export to see if there are particular files whose right sizes aren't being returned for some reason?</p>",
+        "id": 477050009,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729017660
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"621770\">@Julian Gautier</span>  Here you go..... I'm taking off for the day, so no need to hurry to get back to me today.</p>\n<p><em>Would you be able to adjust the database query, like the select statement and the \"group by\" part, so you can see what it's saying each file's size is?</em></p>\n<p>[Note from Sherry, I added \"DISTINCT\" because there are two versions 1.0, 1.1 -both have the same files, so those were just being repeated]</p>\n<div class=\"codehilite\"><pre><span></span><code>select\n         DISTINCT  dataset.id as dataset_id,\n        datafile.filesize,\n        filemetadata.datafile_id\nfrom filemetadata\njoin datafile on datafile.id = filemetadata.datafile_id\nfull outer join datatable on datatable.datafile_id = filemetadata.datafile_id\nfull outer join datasetversion on datasetversion.id = filemetadata.datasetversion_id\njoin dataset on dataset.id = datasetversion.dataset_id\nwhere\n        dataset.harvestingclient_id is null and dataset.id = 58650;\n</code></pre></div>\n<blockquote>\n<p>dataset_id |  filesize  | datafile_id <br>\n------------+------------+-------------<br>\n      58650 | 5767168000 |       58710<br>\n      58650 | 5767168000 |       58654<br>\n      58650 | 5767168000 |       58715<br>\n      58650 | 5767168000 |       58684<br>\n      58650 | 5767168000 |       58656<br>\n      58650 | 5767168000 |       58720<br>\n      58650 | 5767168000 |       58692<br>\n      58650 | 5767168000 |       58723<br>\n      58650 | 5767168000 |       58655<br>\n      58650 | 5767168000 |       58680<br>\n      58650 | 5767168000 |       58665<br>\n      58650 | 5767168000 |       58724<br>\n      58650 | 5767168000 |       58683<br>\n      58650 | 5767168000 |       58676<br>\n      58650 | 5767168000 |       58722<br>\n      58650 | 5767168000 |       58717<br>\n      58650 | 5767168000 |       58660<br>\n      58650 | 5767168000 |       58659<br>\n      58650 | 5767168000 |       58704<br>\n      58650 | 5767168000 |       58706<br>\n      58650 | 5767168000 |       58661<br>\n      58650 | 5767168000 |       58718<br>\n      58650 | 5767168000 |       58653<br>\n      58650 | 5767168000 |       58694<br>\n      58650 | 5767168000 |       58669<br>\n      58650 | 5767168000 |       58664<br>\n      58650 | 5767168000 |       58716<br>\n      58650 | 5767168000 |       58695<br>\n      58650 | 5767168000 |       58675<br>\n      58650 | 5767168000 |       58693<br>\n      58650 | 5767168000 |       58700<br>\n      58650 | 5767168000 |       58658<br>\n      58650 | 5767168000 |       58701<br>\n      58650 | 5767168000 |       58699<br>\n      58650 | 2923070292 |       58719<br>\n      58650 | 5767168000 |       58703<br>\n      58650 | 5767168000 |       58671<br>\n      58650 | 5767168000 |       58697<br>\n      58650 | 5767168000 |       58707<br>\n      58650 | 5767168000 |       58698<br>\n      58650 | 5767168000 |       58681<br>\n      58650 | 5767168000 |       58663<br>\n      58650 | 5767168000 |       58651<br>\n      58650 | 5767168000 |       58673<br>\n      58650 | 5767168000 |       58721<br>\n      58650 | 5767168000 |       58662<br>\n      58650 | 5767168000 |       58685<br>\n      58650 | 5767168000 |       58689<br>\n      58650 | 5767168000 |       58674<br>\n      58650 | 5767168000 |       58667<br>\n      58650 | 5767168000 |       58702<br>\n      58650 | 5767168000 |       58682<br>\n      58650 | 5767168000 |       58668<br>\n      58650 | 5767168000 |       58714<br>\n      58650 | 5767168000 |       58726<br>\n      58650 | 5767168000 |       58690<br>\n      58650 | 5767168000 |       58711<br>\n      58650 | 5767168000 |       58712<br>\n      58650 | 5767168000 |       58691<br>\n      58650 | 5699988502 |       58679<br>\n      58650 | 5767168000 |       58696<br>\n      58650 | 5767168000 |       58709<br>\n      58650 | 5767168000 |       58713<br>\n      58650 | 5767168000 |       58666<br>\n      58650 | 5767168000 |       58686<br>\n      58650 | 5767168000 |       58725<br>\n      58650 | 5767168000 |       58705<br>\n      58650 | 5767168000 |       58677<br>\n      58650 | 5767168000 |       58687<br>\n      58650 | 5767168000 |       58678<br>\n      58650 | 2050359370 |       58672<br>\n      58650 | 5767168000 |       58652<br>\n      58650 | 5767168000 |       58708<br>\n      58650 | 5767168000 |       58688<br>\n      58650 | 5767168000 |       58670<br>\n      58650 | 5767168000 |       58657<br>\n(76 rows)</p>\n</blockquote>\n<p><em>Then you could compare those sizes to what's in the Dataverse JSON metadata export</em> <br>\n------  Filesizes in export looks OK - what is showing in UI.<br>\nHere's a snipped from the file metadata export - they match.</p>\n<p><code>curl https://dataverse.lib.virginia.edu/api/datasets/58650 | jq .</code></p>\n<blockquote>\n<p>\"files\": [<br>\n        {<br>\n          \"label\": \"CAESAR-Dataset-L.z01\",<br>\n          \"restricted\": false,<br>\n          \"version\": 1,<br>\n          \"datasetVersionId\": 1109,<br>\n          \"dataFile\": {<br>\n            \"id\": 58713,<br>\n            \"persistentId\": \"\",<br>\n            \"filename\": \"CAESAR-Dataset-L.z01\",<br>\n            \"contentType\": \"application/octet-stream\",<br>\n            \"friendlyType\": \"Unknown\",<br>\n            \"filesize\": 5767168000,<br>\n            \"storageIdentifier\": \"s3://dataverse-storage-production:183b84ee6a2-4bec26798f2a\",<br>\n            \"rootDataFileId\": -1,<br>\n            \"md5\": \"ae8f61ab138ff61a54a2ff6708f738ed\",<br>\n            \"checksum\": {<br>\n              \"type\": \"MD5\",<br>\n              \"value\": \"ae8f61ab138ff61a54a2ff6708f738ed\"<br>\n            },<br>\n            \"tabularData\": false,<br>\n            \"creationDate\": \"2022-10-08\",<br>\n            \"publicationDate\": \"2022-10-09\",<br>\n            \"fileAccessRequest\": true<br>\n          }<br>\n        },<br>\n        {<br>\n          \"label\": \"CAESAR-Dataset-L.z02\",<br>\n          \"restricted\": false,<br>\n          \"version\": 1,<br>\n          \"datasetVersionId\": 1109,<br>\n          \"dataFile\": {<br>\n            \"id\": 58714,<br>\n            \"persistentId\": \"\",<br>\n            \"filename\": \"CAESAR-Dataset-L.z02\",<br>\n            \"contentType\": \"application/octet-stream\",<br>\n            \"friendlyType\": \"Unknown\",<br>\n            \"filesize\": 5767168000,<br>\n            \"storageIdentifier\": \"s3://dataverse-storage-production:183b8514ef2-f3ded382cbbb\",<br>\n            \"rootDataFileId\": -1,<br>\n            \"md5\": \"5b8e6403ffe0788fa43143462addccc4\",<br>\n            \"checksum\": {<br>\n              \"type\": \"MD5\",<br>\n              \"value\": \"5b8e6403ffe0788fa43143462addccc4\"<br>\n            },<br>\n            \"tabularData\": false,<br>\n            \"creationDate\": \"2022-10-08\",<br>\n            \"publicationDate\": \"2022-10-09\",<br>\n            \"fileAccessRequest\": true<br>\n          }<br>\n        },<br>\n        {<br>\n          \"label\": \"CAESAR-Dataset-L.z03\",<br>\n          \"restricted\": false,<br>\n          \"version\": 1,<br>\n          \"datasetVersionId\": 1109,<br>\n          \"dataFile\": {<br>\n            \"id\": 58681,<br>\n            \"persistentId\": \"\",<br>\n            \"filename\": \"CAESAR-Dataset-L.z03\",<br>\n            \"contentType\": \"application/octet-stream\",<br>\n            \"friendlyType\": \"Unknown\",<br>\n            \"filesize\": 5767168000,<br>\n            \"storageIdentifier\": \"s3://dataverse-storage-production:183b853bc91-2b8b3c5374e0\",<br>\n            \"rootDataFileId\": -1,<br>\n            \"md5\": \"4781b0004eba02b871f68e6b9b30cf39\",<br>\n            \"checksum\": {<br>\n              \"type\": \"MD5\",<br>\n              \"value\": \"4781b0004eba02b871f68e6b9b30cf39\"<br>\n            },<br>\n            \"tabularData\": false,<br>\n            \"creationDate\": \"2022-10-08\",<br>\n            \"publicationDate\": \"2022-10-09\",<br>\n            \"fileAccessRequest\": true<br>\n          }<br>\n        },</p>\n</blockquote>",
+        "id": 477062854,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729022929
+    },
+    {
+        "content": "<p>Thanks. Yeah I see that the file sizes for each file match.</p>\n<p>When I take the sum of all the byte sizes from the results of your database query, I get 431,676,682,164 bytes. Exactly what your API call reports.</p>\n<p>I think that the problem is with the part of the database query that's getting the sum of non-tabular files. It's \"sum(distinct coalesce(datafile.filesize, 0)\". This is getting the sum of all files that have a distinct size, and because most of the files in this dataset have the same size, it's getting the sum of just the four distinct file sizes in this dataset, which is exactly the number you reported yesterday, 16440586164.</p>\n<p>And maybe the database query works with other datasets you've spot checked because those datasets have files that all have different sizes?</p>\n<p>So we need another way to get the sum of distinct files <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 477269107,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729101122
+    },
+    {
+        "content": "<p>Wait.... <span class=\"user-mention\" data-user-id=\"621770\">@Julian Gautier</span>  didn't you have a new SQL line for me to try?<br>\nI was just reading it, went to open a window.... and you removed it?</p>\n<p>Didn't want to miss anything.</p>",
+        "id": 477270244,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729101506
+    },
+    {
+        "content": "<p>And <span class=\"user-mention\" data-user-id=\"621770\">@Julian Gautier</span> great detective work!!!! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 477270520,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729101593
+    },
+    {
+        "content": "<p>Lol as I was writing I realized that how I thought to edit the query wouldn't work, so I removed it</p>",
+        "id": 477271125,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729101745
+    },
+    {
+        "content": "<p>Was hoping you wouldn't see that. Thought you had today off. Or was that yesterday?</p>",
+        "id": 477271374,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729101828
+    },
+    {
+        "content": "<p>Took off early yesterday. All <span aria-label=\"eyes\" class=\"emoji emoji-1f440\" role=\"img\" title=\"eyes\">:eyes:</span> today. <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 477271496,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729101862
+    },
+    {
+        "content": "<p>We/I should probably remove that query until we can figure out how to improve it. Or leave a note saying it doesn't really work <span aria-label=\"grimacing\" class=\"emoji emoji-1f62c\" role=\"img\" title=\"grimacing\">:grimacing:</span></p>",
+        "id": 477272696,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729102280
+    },
+    {
+        "content": "<p>Wonder if there is a way to mimic what the API is doing? I'm looking at that code.... but I'm no Java programmer.</p>",
+        "id": 477272890,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729102354
+    },
+    {
+        "content": "<p>Is the reason why you prefer the queries to the API endpoint because you need to also see the number of files?</p>",
+        "id": 477273192,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729102472
+    },
+    {
+        "content": "<p>I think a comment around the query would be helpful. It does work most of the time. I checked and out of 432 datasets - only 59 had differing file sizes (from the SQL query vs the API).</p>",
+        "id": 477273289,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729102516
+    },
+    {
+        "content": "<p>And, yes, I need to see number of files with file sizes.</p>\n<p>We are manually bagging our datasets to send to our preservation system (APTrust). There is a great command linescript to bag all \"un-bagged\" datasets, but I don't want to include the \"large\" ones in the auto script (large file sizes, large number of files), so I do those separately - from the list that the SQL Query provides.</p>\n<p>This one dataset is the only one that was WAY off with size.</p>\n<p>I created a spreadsheet comparing the SQL query and API:<br>\n<a href=\"https://docs.google.com/spreadsheets/d/1Mw5l_pU7NZXJ54fV2R321r80JTx2DGQX/edit?usp=sharing&amp;ouid=100246654920053034549&amp;rtpof=true&amp;sd=true\">https://docs.google.com/spreadsheets/d/1Mw5l_pU7NZXJ54fV2R321r80JTx2DGQX/edit?usp=sharing&amp;ouid=100246654920053034549&amp;rtpof=true&amp;sd=true</a></p>\n<p>I was trying to see if there was a pattern why they were different (draft, multi versions, zip, tab...... etc.), that's what the colors and comments are about.</p>",
+        "id": 477274114,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729102850
+    },
+    {
+        "content": "<p>I added a comment to the query for now. Will probably figure out later how to get it working for datasets with files that are the same sizes.</p>\n<p>Sometimes I use database queries instead of the API because it's faster than the API, which are usually pretty granular. And I've heard the same from folks running other installations.</p>\n<p>Is that true for you here, too? I imagine running one more endpoints on hundreds or thousands of files would take too long</p>",
+        "id": 477279853,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729104736
+    },
+    {
+        "content": "<p>I changed <a href=\"https://docs.google.com/document/d/1-Y_iUduSxdDNeK1yiGUxe7t-Md7Fy965jp4o4m1XEoE/edit#bookmark=id.vdush2gpwcg3\">the query that's in that Google Doc</a> so that it gets the sum of file sizes from the database's storageuse table, which I think was added in v6.1. UVA Dataverse is on 6.2 right? So I think it should work for you <span class=\"user-mention\" data-user-id=\"599826\">@Sherry Lake</span>. I tested the query a little and it seemed to work well. Definitely simpler!</p>",
+        "id": 477453752,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729174306
+    },
+    {
+        "content": "<p>I made a correction to your new query  on the google doc: \"=\" in place of \"in\".</p>\n<p>It didn't work for me with \"in\". </p>\n<p>Changing to \"=\" and it worked for me;  got the correct correct size for the single dataset.</p>\n<p>Now can we have it do all datasets? Something to work on later. Not needed now.</p>",
+        "id": 477464459,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729177213
+    },
+    {
+        "content": "<p>Oh thanks! Yeah I briefly considered making the query work with a list of dataset IDs and backed out of that idea, but left that \"in\" in.</p>",
+        "id": 477468511,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729178243
+    },
+    {
+        "content": "<p>About making it work with all datasets, I think we'd just remove the where clause in that temporary \"datasetfilecount\" table or cte. I left a comment to indicate this.</p>\n<p>I wrote \"should\" 'cause I haven't tested this to make sure. Do you plan to test it?</p>",
+        "id": 477469484,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729178531
+    },
+    {
+        "content": "<p>I tested it a bit since I was already querying for another reason.</p>\n<p>Removing that where clause seems to work well. I didn't even have to add a clause to exclude harvested datasets, which was a nice surprise.</p>",
+        "id": 477496991,
+        "sender_full_name": "Julian Gautier",
+        "timestamp": 1729187981
+    },
+    {
+        "content": "<p>Thanks, Julian.  I was trying to figure a pyDataverse problem - see my zulip question in python channel (not for you.... just an FYI... I have been catching up on Dataverse things, that have been on my todo list.</p>",
+        "id": 477497541,
+        "sender_full_name": "Sherry Lake",
+        "timestamp": 1729188139
+    }
+]
