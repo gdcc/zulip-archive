@@ -1,0 +1,206 @@
+[
+    {
+        "content": "<p>hello .. i have a thread about the 3d previewers but this seems to be different .. i have recently registered the new previewers (v1.4) in our dataverse .. and getting this error on some of the <a href=\"https://dataverse.asu.edu/file.xhtml?persistentId=doi:10.48349/ASU/BCHZPR/5GVXWQ&amp;version=2.1\">map images</a> when trying to preview .. these are shapefile zip archives, so not sure how it knows whether to use the zip previewer or the map previewer, but both are installed .. I literally just ran the curl commands <a href=\"https://github.com/gdcc/dataverse-previewers/blob/develop/6.1curlcommands.md\">here</a> as I usually do .. we don't run them locally .. but maybe should? any ideas on what I messed up?</p>",
+        "id": 444509607,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718296403
+    },
+    {
+        "content": "<p>also a little weird that it displays harvard's footer on the error</p>",
+        "id": 444509803,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718296462
+    },
+    {
+        "content": "<p>It's going to <a href=\"https://dataverse.asu.edu/gdcc.github.io/dataverse-previewers/previewers/v1.4/MapShpPreview.html\">https://dataverse.asu.edu/gdcc.github.io/dataverse-previewers/previewers/v1.4/MapShpPreview.html</a></p>\n<p>Is that what you want? Is that where you're hosting that previewer? On your server itself?</p>",
+        "id": 444511692,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718297000
+    },
+    {
+        "content": "<p>You're seeing Harvard College in the footer because it's a 404. You'd see it here as well: <a href=\"https://dataverse.asu.edu/foobar\">https://dataverse.asu.edu/foobar</a></p>",
+        "id": 444511765,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718297029
+    },
+    {
+        "content": "<p>Please feel free to open an issue about how the 404 shouldn't show Harvard College (or 2023). The file is here: <a href=\"https://github.com/IQSS/dataverse/blob/v6.2/src/main/webapp/404static.xhtml\">https://github.com/IQSS/dataverse/blob/v6.2/src/main/webapp/404static.xhtml</a></p>",
+        "id": 444512396,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718297235
+    },
+    {
+        "content": "<p>okay sorry, i'm confused .. yes we are using the previewers hosted at gdcc and not on our site .. so does the 404 error mean I have done that incorrectly as it is not actually showing the preview of the file? i just used the curl command provided</p>",
+        "id": 444515602,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718298257
+    },
+    {
+        "content": "<p>not so concerned about the harvard college citing .. just want the previewer to work</p>",
+        "id": 444515703,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718298292
+    },
+    {
+        "content": "<p>Ah, it's a bug in the curl command. See how it says this?</p>\n<p><code>  \"toolUrl\":\"gdcc.github.io/dataverse-previewers/previewers/v1.4/MapShpPreview.html\",</code></p>",
+        "id": 444519825,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718299521
+    },
+    {
+        "content": "<p>It should be more like this:</p>\n<p><code>  \"toolUrl\":\"https://gdcc.github.io/dataverse-previewers/previewers/v1.4/MdPreview.html\",</code></p>",
+        "id": 444519874,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718299534
+    },
+    {
+        "content": "<p>Do you want to make a pull request? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 444519925,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718299545
+    },
+    {
+        "content": "<p>ah yea i see it wrong in my db too .. sure i can try to do the pull request :-)  .. and will just manually fix in the db first and see if that works</p>",
+        "id": 444521189,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718299877
+    },
+    {
+        "content": "<p>Awesome, please keep us posted.</p>",
+        "id": 444521902,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1718300109
+    },
+    {
+        "content": "<p>fixed it directly in the db <a href=\"https://dataverse-qa.lib.asu.edu/file.xhtml?fileId=413&amp;version=DRAFT&amp;toolType=PREVIEW\">here</a> and it finds the previewer now, but the image just spins</p>",
+        "id": 444527063,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1718301844
+    },
+    {
+        "content": "<p>.. adding onto this thread because it is part of the same issue .. however with a little variety now .. <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span>  .. we did fix the URL in the db .. </p>\n<p>.. but we see another aspect to this .. when we upload the file to a dataset and try to view it .. on our QA site it previews as a \"Zip archive\" (ie: <a href=\"https://dataverse-qa.lib.asu.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/PW392Q\">these</a> examples ..)  .. but on our production site it shows as a \"Shapefile as zip file\" and is trying to preview as per, but just spins and never loads ... (not published yet .. see images) </p>\n<p><a href=\"/user_uploads/53090/WvCOjBECz35iHwwFSkw66Lro/file-details-fireresultszip.jpg\">file-details-fireresultszip.jpg</a><br>\n<a href=\"/user_uploads/53090/ldF7ry_uYjCswnvDM-d9aGFq/fire_results_preview.jpg\">fire_results_preview.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/WvCOjBECz35iHwwFSkw66Lro/file-details-fireresultszip.jpg\" title=\"file-details-fireresultszip.jpg\"><img data-original-content-type=\"image/jpeg\" data-original-dimensions=\"377x103\" src=\"/user_uploads/thumbnail/53090/WvCOjBECz35iHwwFSkw66Lro/file-details-fireresultszip.jpg/840x560.webp\"></a></div><div class=\"message_inline_image\"><a href=\"/user_uploads/53090/ldF7ry_uYjCswnvDM-d9aGFq/fire_results_preview.jpg\" title=\"fire_results_preview.jpg\"><img data-original-content-type=\"image/jpeg\" data-original-dimensions=\"732x705\" src=\"/user_uploads/thumbnail/53090/ldF7ry_uYjCswnvDM-d9aGFq/fire_results_preview.jpg/840x560.webp\"></a></div><p>I noticed in the db .. the URL listed for both ZIP and ELN ZIP previewers is the same .. but they are in a different order .. in QA the db looks like this:</p>\n<p><a href=\"/user_uploads/53090/Fw1UpbjWU-tNAbr-Zjt10fj2/qa-previewers-zipfile.jpg\">qa-previewers-zipfile.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Fw1UpbjWU-tNAbr-Zjt10fj2/qa-previewers-zipfile.jpg\" title=\"qa-previewers-zipfile.jpg\"><img data-original-content-type=\"image/jpeg\" data-original-dimensions=\"900x85\" src=\"/user_uploads/thumbnail/53090/Fw1UpbjWU-tNAbr-Zjt10fj2/qa-previewers-zipfile.jpg/840x560.webp\"></a></div><p>and in prod it looks like this:</p>\n<p><a href=\"/user_uploads/53090/Mhr3Imfb5N7kxDDOk3TUQ7bZ/prod-previewers-zipfile.jpg\">prod-previewers-zipfile.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/Mhr3Imfb5N7kxDDOk3TUQ7bZ/prod-previewers-zipfile.jpg\" title=\"prod-previewers-zipfile.jpg\"><img data-original-content-type=\"image/jpeg\" data-original-dimensions=\"899x108\" src=\"/user_uploads/thumbnail/53090/Mhr3Imfb5N7kxDDOk3TUQ7bZ/prod-previewers-zipfile.jpg/840x560.webp\"></a></div><p>.. so, it seems in QA it is previewing this particular zip file as a zip file (and lists it as a \"zip archive\"), but in prod it lists it as a \"Shapefile as zip archive\", but i think is trying to view it with a map previewer? .. lol i'm not sure what it's doing! </p>\n<p>.. so how does it determine whether to mark it as a \"zip archive\" or \"shapefile zip archive\" (and preview it as such), and is it trying to use the map previewer and not working? The file from the original discussion does the same thing .. shows as a zip archive and previews as such in qa and just spins in production.</p>\n<p>I hope this makes sense .. any insight on this is appreciated! Do we have something installed incorrectly? (errr pointing to things incorrectly)?  Thanks!!</p>",
+        "id": 508101284,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742928038
+    },
+    {
+        "content": "<p>That shapefile map previewer was added in <a href=\"https://github.com/gdcc/dataverse-previewers/pull/36\">https://github.com/gdcc/dataverse-previewers/pull/36</a></p>",
+        "id": 508102183,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742928320
+    },
+    {
+        "content": "<p>For \"contentType\":\"application/zipped-shapefile\"</p>",
+        "id": 508102387,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742928385
+    },
+    {
+        "content": "<p>oh sorry, yes, i have the shapefile map previewer installed .. i think i just have the wrong URL (<a href=\"https://github.com/gdcc/dataverse-previewers/blob/develop/6.1curlcommands.md\">copied from here</a>).. </p>\n<p>the .md file there says \"<a href=\"http://gdcc.github.io/dataverse-previewers/previewers/betatest/MapShpPreview.html\">gdcc.github.io/dataverse-previewers/previewers/betatest/MapShpPreview.html</a>\" </p>\n<p>and I have \"<a href=\"https://gdcc.github.io/dataverse-previewers/previewers/v1.4/MapShpPreview.html\">https://gdcc.github.io/dataverse-previewers/previewers/v1.4/MapShpPreview.html</a>\"</p>",
+        "id": 508113135,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742931768
+    },
+    {
+        "content": "<p>Right. So is the behavior expected? For a file with <code>\"contentType\":\"application/zipped-shapefile\"</code> the shapefile map should be shown. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 508113828,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742932007
+    },
+    {
+        "content": "<p>I changed the URL to the one with \"betatest\" in it .. I verified in the db the contenttype is \"application/zipped-shapefile\" .. and I believe it tries to show the map but it just spins (like the image above) .. the zip archive file is 67K</p>",
+        "id": 508115192,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742932491
+    },
+    {
+        "content": "<p>There's a lot for my little mind to keep up with. <span aria-label=\"smiley\" class=\"emoji emoji-1f603\" role=\"img\" title=\"smiley\">:smiley:</span> </p>\n<p>Is the bug that the shapefile map previewer isn't working? We don't even have it installed on our demo server. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> I just checked: <a href=\"https://demo.dataverse.org/api/externalTools\">https://demo.dataverse.org/api/externalTools</a></p>",
+        "id": 508115556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742932629
+    },
+    {
+        "content": "<p>i changed it on the qa site as well, and it still just goes to the zip previewer <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 508115586,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742932638
+    },
+    {
+        "content": "<p>Do you want to upload your file to the demo site? Maybe I can go install the shapefile map previewer.</p>",
+        "id": 508115802,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742932710
+    },
+    {
+        "content": "<p>well, there are 2 things ..</p>\n<p>in our qa site when i try to preview a file with type \"application/zipped-shapefile\" it just goes to the zip previewer</p>\n<p>in our prod site, when I try to preview a file with type 'application/zipped-shapefile\" it seems to try but just spins</p>",
+        "id": 508115814,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742932714
+    },
+    {
+        "content": "<p>the only difference that i can see is that, in the qa and prod sites the order of the previewers installed is a little different</p>",
+        "id": 508115894,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742932745
+    },
+    {
+        "content": "<p>yeah, I noticed that but the order shouldn't matter</p>",
+        "id": 508115943,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742932757
+    },
+    {
+        "content": "<p>we always have some weird thing <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 508116189,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742932806
+    },
+    {
+        "content": "<p>like that storage system a while back <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 508116308,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742932845
+    },
+    {
+        "content": "<p>omg that was a nightmare! <span aria-label=\"scared\" class=\"emoji emoji-1f628\" role=\"img\" title=\"scared\">:scared:</span></p>",
+        "id": 508117074,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742933138
+    },
+    {
+        "content": "<p>Which problem are you more interested in solving? The qa one or the prod one?</p>",
+        "id": 508117321,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742933218
+    },
+    {
+        "content": "<p>well i guess the prod one .. we would like for the file to preview before we publish this researcher's dataset .. i am digging through the previewers to see if we have anything configured wrong .. i may just delete them all and re-register them</p>",
+        "id": 508117471,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742933280
+    },
+    {
+        "content": "<p>I guess you could remove the shapefile map previewer if it's buggy. Does it work with any other shapefiles?</p>",
+        "id": 508117639,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742933334
+    },
+    {
+        "content": "<p>yea, that's probably a good idea .. as far as i know it hasn't worked with any other files, but we don't have a lot of those type in there .. i'll remove it and see what happens</p>",
+        "id": 508117752,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742933380
+    },
+    {
+        "content": "<p>Maybe once you publish that dataset you can create an issue about the shapefile map previewer at <a href=\"https://github.com/gdcc/dataverse-previewers\">https://github.com/gdcc/dataverse-previewers</a> and link to the problematic file.</p>",
+        "id": 508117964,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1742933460
+    },
+    {
+        "content": "<p>okay i'll do that .. thanks so much!</p>",
+        "id": 508118063,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1742933499
+    }
+]

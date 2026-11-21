@@ -1,0 +1,50 @@
+[
+    {
+        "content": "<p>Hello, </p>\n<p>We are using dataverse  v. 6.10.1</p>\n<p>We have a user attempting to delete a draft revision of a dataset containing 160,000 files.  They started it Friday and there is still a lock on the dataset Monday. </p>\n<p>What can I look at to determine if this delete failed?  The dataset size doesn't appear to have changed and I'm not sure how to check status, and when to give up on it having worked.  </p>\n<p>If \"delete draft\" doesn't work - how else can I get rid of this draft so they can still us the dataset (it has a published version 1) and upload more a more consolidated file set? </p>\n<p>Thanks!<br>\nBethany</p>",
+        "id": 640787273,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794844389
+    },
+    {
+        "content": "<p>Some errors from the log -- though I'm not sure they are related: </p>\n<p>Internal Exception: java.sql.SQLException: __SYSTEM/pools/__datasource_definition/dataverse-6.10.1/java:app/jdbc/dataverse: No Pool Meta Data object associated with the pool : __SYSTEM/pools/__datasource_definition/dataverse-6.10.1/java:app/jdbc/dataverse. Try redeploying the application.                       Error Code: 0<br>\nCall: SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG = ?))                                                                                 bind =&gt; [2 parameters bound]                                                                                                                        Query: ReadAllQuery(name=\"Setting.findByName\" referenceClass=Setting sql=\"SELECT ID, CONTENT, LANG, NAME FROM SETTING WHERE ((NAME = ?) AND (LANG = ?))\").]]                                                                                                </p>\n<p>It has a very long stack trace with the call to deleteDatasetVersion in it.  Any clue what's happening?  Could it be timing out?</p>",
+        "id": 640790729,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794845028
+    },
+    {
+        "content": "<p>Another stack trace as well: </p>\n<p>[2026-11-12T21:10:39.767+0000] [Payara 7.2026.2] [WARNING] [] [javax.enterprise.resource.jta.com.sun.enterprise.transaction] [tid: _ThreadID=152 _ThreadName=http-thread-pool::jk-connector(1)] [timeMillis: 1794517839767] [levelValue: 900] [[                                                                          DTX5014: Caught exception in beforeCompletion() callback:                                                                                                 jakarta.persistence.PersistenceException: Exception [EclipseLink-4002] (Eclipse Persistence Services - 5.0.0-B08.payara-p1.v202511041741-60b8f7dca811786130b4d36785cc926eb8cff): org.eclipse.persistence.exceptions.DatabaseException                                                                                Internal Exception: java.sql.SQLException: __SYSTEM/pools/__datasource_definition/dataverse-6.10.1/java:app/jdbc/dataverse: No Pool Meta Data object associated with the pool : __SYSTEM/pools/__datasource_definition/dataverse-6.10.1/java:app/jdbc/dataverse. Try redeploying the application.                       Error Code: 0                                                                                                                                               Call: INSERT INTO ACTIONLOGRECORD (ID, ACTIONRESULT, ACTIONSUBTYPE, ACTIONTYPE, ENDTIME, INFO, STARTTIME, USERIDENTIFIER) VALUES (?, ?, ?, ?, ?, ?, ?, ?)           bind =&gt; [8 parameters bound]                                                                                                                        Query: InsertObjectQuery([ActionLogRecord id:8ea2c0a9-3076-4afd-bbc6-0ad609fb8e99 type:Command/edu.harvard.iq.dataverse.engine.command.impl.DeleteDataFileCommand result:InternalError])<br>\n        at org.eclipse.persistence.internal.jpa.EntityManagerSetupImpl$1.handleException(EntityManagerSetupImpl.java:797)<br>\n        at org.eclipse.persistence.transaction.AbstractSynchronizationListener.handleException(AbstractSynchronizationListener.java:279)<br>\n        at org.eclipse.persistence.transaction.AbstractSynchronizationListener.beforeCompletion(AbstractSynchronizationListener.java:174)<br>\n        at org.eclipse.persistence.transaction.JTASynchronizationListener.beforeCompletion(JTASynchronizationListener.java:70)<br>\n        at com.sun.enterprise.transaction.JavaEETransactionImpl.commit(JavaEETransactionImpl.java:496)<br>\n        at com.sun.enterprise.transaction.JavaEETransactionManagerSimplified.commit(JavaEETransactionManagerSimplified.java:960)</p>",
+        "id": 640791520,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794845201
+    },
+    {
+        "content": "<p>Is my database having issues, or perhaps something is timing out before this finishes?  It's very big dataset.</p>",
+        "id": 640791675,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794845234
+    },
+    {
+        "content": "<p>Happy to share the larger stack trace, but zulip is limiting me, so let me know what's relevant and I'll share more.</p>",
+        "id": 640791941,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794845289
+    },
+    {
+        "content": "<p>Yikes. My first thought is... would it be possible to publish a new dataset with a consolidated set of files? And then link the two datasets to each other using the \"Related Dataset\" field?</p>",
+        "id": 640840594,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794855866
+    },
+    {
+        "content": "<p>Good news!  Our devops team and I got together and tried to delete the draft of the dataset while monitoring logs/RAM/CPU/etc to see where any potential issues were happening.  For some reason the delete worked successfully for us and the draft is now gone.  Phew!</p>\n<p>In case you're curious it took about 20 minutes for it to delete the draft of ~163,000 files.    (We have dataset file count limits in place now)</p>",
+        "id": 641386663,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1794954136
+    },
+    {
+        "content": "<p>Glad to hear it kept chugging along!</p>",
+        "id": 641390533,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794955327
+    }
+]

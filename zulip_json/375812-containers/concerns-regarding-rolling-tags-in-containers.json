@@ -1,0 +1,170 @@
+[
+    {
+        "content": "<p>Hello! Good afternoon!</p>",
+        "id": 627830599,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697447
+    },
+    {
+        "content": "<p>Don wanted me to try and replicate an issue on 6.8</p>\n<p>So, I cloned the develop branch and attempted to spin up the docker-compose-dev for 6.8</p>",
+        "id": 627830787,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697489
+    },
+    {
+        "content": "<p>There were some issues which I don't think the team could possibly do anything about like MinIO dying and such, which I used some workarounds for</p>",
+        "id": 627830904,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697512
+    },
+    {
+        "content": "<p>But, then it started pulling Payara 7 and Postgres 17 for 6.8</p>",
+        "id": 627830994,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697530
+    },
+    {
+        "content": "<p>I think this is one of the quirks of using tags like :latest or :unstable</p>",
+        "id": 627831095,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697552
+    },
+    {
+        "content": "<p>But, do we want to think about container reproducibility? I just wanted to collect some thoughts</p>",
+        "id": 627831174,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790697573
+    },
+    {
+        "content": "<p>We're talking about this file at this version, right? <a href=\"https://github.com/IQSS/dataverse/blob/v6.8/docker-compose-dev.yml\">https://github.com/IQSS/dataverse/blob/v6.8/docker-compose-dev.yml</a></p>",
+        "id": 627853031,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790702594
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>image: postgres:${POSTGRES_VERSION}\n</code></pre></div>",
+        "id": 627853259,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790702653
+    },
+    {
+        "content": "<p>POSTGRES_VERSION=17 is expected. It's from <a href=\"https://github.com/IQSS/dataverse/blob/v6.8/.env\">https://github.com/IQSS/dataverse/blob/v6.8/.env</a></p>\n<p>We've been using PG17 in dev for a long time.</p>",
+        "id": 627853469,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790702706
+    },
+    {
+        "content": "<p>Payara should be 6, though, not 7. Specifically <code>&lt;payara.version&gt;6.2025.3&lt;/payara.version&gt;</code> according to <a href=\"https://github.com/IQSS/dataverse/blob/v6.8/modules/dataverse-parent/pom.xml#L152\">https://github.com/IQSS/dataverse/blob/v6.8/modules/dataverse-parent/pom.xml#L152</a></p>",
+        "id": 627853733,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790702767
+    },
+    {
+        "content": "<p>My workflow would be something like this:</p>\n<ul>\n<li>to switch to the v6.8 tag</li>\n<li>delete the base image (Payara 7.x)</li>\n<li>build the base image (Payara 6.x)</li>\n<li>spin up Dataverse</li>\n</ul>",
+        "id": 627854092,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790702842
+    },
+    {
+        "content": "<p>I think this is what caused a Payara 7 pull</p>\n<p>\"APP_IMAGE=gdcc/dataverse:unstable\"</p>",
+        "id": 627861593,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704440
+    },
+    {
+        "content": "<p>ah, from .env, yes</p>",
+        "id": 627862626,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790704683
+    },
+    {
+        "content": "<p>I guess you have to know to build the base image if you're going back in time like that.</p>\n<p>Should we document it, at least? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 627862845,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790704731
+    },
+    {
+        "content": "<p>It makes sense to. I kept running into a brick wall.</p>",
+        "id": 627863358,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704835
+    },
+    {
+        "content": "<p>Also the note about MinIO too, if its not already documented!</p>",
+        "id": 627863507,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704869
+    },
+    {
+        "content": "<p>docker pull fails on everything</p>",
+        "id": 627863554,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704878
+    },
+    {
+        "content": "<p>Hmm. Ok. Where would you look for those tidbits?</p>",
+        "id": 627863662,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790704903
+    },
+    {
+        "content": "<p>Within the container guide, maybe a section named backwards compatability or legacy installs?</p>",
+        "id": 627864032,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704984
+    },
+    {
+        "content": "<p>I had to use this for minIO:</p>\n<p>docker pull pgsty/minio:latest<br>\ndocker tag pgsty/minio:latest minio/minio:latest</p>",
+        "id": 627864085,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790704996
+    },
+    {
+        "content": "<p>Sure, sounds find. Do you want to make a PR?</p>",
+        "id": 627864674,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790705130
+    },
+    {
+        "content": "<p>Sure! I'll make a PR</p>",
+        "id": 627864970,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790705197
+    },
+    {
+        "content": "<p>Thanks!</p>",
+        "id": 627865250,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790705272
+    },
+    {
+        "content": "<p>I just added this to the agenda for Thursday. Please see <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/meetings/with/627877163\">#containers &gt; meetings</a>.</p>",
+        "id": 627877401,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790708453
+    },
+    {
+        "content": "<p>Please note that APP_IMAGE is overwritten by whatever Maven has in app.image. If you are spinning up using docker directly, you'd fall into that trap.</p>",
+        "id": 627879596,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790709023
+    },
+    {
+        "content": "<p>It's really hard to maintain compatibility between both worlds <img alt=\":sad-docker:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/1f831097.png\" title=\"sad-docker\"></p>",
+        "id": 627879779,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1790709072
+    },
+    {
+        "content": "<p>Sorry we didn't get to this today.</p>",
+        "id": 628468110,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1790881036
+    },
+    {
+        "content": "<p>no worries, today's discussions were more important in my opinion</p>",
+        "id": 628476918,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1790883510
+    }
+]

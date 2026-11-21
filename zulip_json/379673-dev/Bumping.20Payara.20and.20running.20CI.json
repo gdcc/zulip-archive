@@ -1,0 +1,260 @@
+[
+    {
+        "content": "<p>In <a href=\"https://github.com/IQSS/dataverse/issues/12498\">#12498</a> Jim made a PR to bump the version of Payara but CI is failing for both API tests and JSF tests:</p>\n<p><img alt=\"Screenshot 2026-08-12 at 3.28.31 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1136x259\" data-original-src=\"/user_uploads/53090/-i2bOangBXP7CYtKt13fFjWy/Screenshot-2026-08-12-at-3.28.31PM.png\" src=\"/user_uploads/thumbnail/53090/-i2bOangBXP7CYtKt13fFjWy/Screenshot-2026-08-12-at-3.28.31PM.png/840x560.webp\"></p>",
+        "id": 616163986,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786562832
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> any ideas?</p>",
+        "id": 616164075,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786562865
+    },
+    {
+        "content": "<p>The <a href=\"https://github.com/IQSS/dataverse/actions/runs/31630120651/job/94226427298?pr=12498\">error</a> is <code>Unable to pull 'gdcc/base:6.12-noble-p7.2026.7-j21'</code>.</p>",
+        "id": 616164369,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786562973
+    },
+    {
+        "content": "<p><img alt=\"Screenshot 2026-08-12 at 3.30.08 PM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1354x632\" data-original-src=\"/user_uploads/53090/tB7Xt_sOzjXlSnK1Y2oOanNe/Screenshot-2026-08-12-at-3.30.08PM.png\" src=\"/user_uploads/thumbnail/53090/tB7Xt_sOzjXlSnK1Y2oOanNe/Screenshot-2026-08-12-at-3.30.08PM.png/840x560.webp\"></p>",
+        "id": 616164534,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786563023
+    },
+    {
+        "content": "<p>For some context, and history, I suppose, in the past, when we made upgrades of Payara during the Jenkins era, <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> would often set up a dedicated job and server for us. We'd get the API tests passing. Then we'd merge.</p>",
+        "id": 616164743,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786563107
+    },
+    {
+        "content": "<p>I think I understand what the issue is</p>",
+        "id": 616167144,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564040
+    },
+    {
+        "content": "<p>yeah?</p>",
+        "id": 616167168,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786564049
+    },
+    {
+        "content": "<p>But I'm not sure how to fix it</p>",
+        "id": 616167175,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564051
+    },
+    {
+        "content": "<p>The image clearly doesn't exist on Docker's page:</p>\n<p>docker pull gdcc/base:6.12-noble-p7.2026.2-j21</p>",
+        "id": 616167295,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564098
+    },
+    {
+        "content": "<p>It wants 2026.7 and only 2026.2 is on Docker</p>",
+        "id": 616167404,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564141
+    },
+    {
+        "content": "<p>So someone needs to push a 2026.7 image</p>",
+        "id": 616167432,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564149
+    },
+    {
+        "content": "<p>Can we build the image locally?</p>",
+        "id": 616167477,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786564167
+    },
+    {
+        "content": "<p>I am not sure. The issue is in pom.xml</p>",
+        "id": 616168236,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564447
+    },
+    {
+        "content": "<p><img alt=\"Screenshot 2026-08-12 at 15.54.25.heic\" class=\"inline-image\" data-original-content-type=\"image/heic\" data-original-dimensions=\"1792x1290\" data-original-src=\"/user_uploads/53090/pWZRT7eFNg9UgTtEC7B5IFNP/Screenshot-2026-08-12-at-15.54.25.heic\" data-transcoded-image=\"4032x3024.webp\" src=\"/user_uploads/thumbnail/53090/pWZRT7eFNg9UgTtEC7B5IFNP/Screenshot-2026-08-12-at-15.54.25.heic/840x560.webp\"></p>",
+        "id": 616168479,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564540
+    },
+    {
+        "content": "<p>I am using the ct container profile to build the container, and the ct profile is using gdcc/base</p>",
+        "id": 616168531,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564562
+    },
+    {
+        "content": "<p>we can absolutely build it locally and tag it exactly like it expects</p>",
+        "id": 616168945,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786564705
+    },
+    {
+        "content": "<p>Right, but can we build gdcc/base locally, before building the app image.</p>\n<p>That's what I do on my laptop to test Payara upgrades: build the base image first. Like this: <a href=\"https://guides.dataverse.org/en/6.11/container/base-image.html#build-instructions\">https://guides.dataverse.org/en/6.11/container/base-image.html#build-instructions</a></p>",
+        "id": 616168957,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786564711
+    },
+    {
+        "content": "<p>Here too: <a href=\"https://guides.dataverse.org/en/6.11/container/dev-usage.html#building-your-own-base-image\">https://guides.dataverse.org/en/6.11/container/dev-usage.html#building-your-own-base-image</a></p>\n<p>\"If you find yourself tasked with upgrading Payara (or reviewing or testing such an upgrade), you will need to create your own base image\"</p>",
+        "id": 616170738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786565299
+    },
+    {
+        "content": "<p>I am building a fix right now</p>",
+        "id": 616170767,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786565310
+    },
+    {
+        "content": "<p>I am testing the workflow fix on Jim's branch now, it seems to be working, but I will keep y'all updated</p>",
+        "id": 616172950,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786566157
+    },
+    {
+        "content": "<p>nice! thanks!</p>",
+        "id": 616172985,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786566169
+    },
+    {
+        "content": "<p>Fix in this PR: <a href=\"https://github.com/IQSS/dataverse/pull/12607\">https://github.com/IQSS/dataverse/pull/12607</a></p>",
+        "id": 616174991,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786566877
+    },
+    {
+        "content": "<p>It works on Jim's branch as well, it builds the gdcc/base image locally</p>",
+        "id": 616175087,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786566901
+    },
+    {
+        "content": "<p>Thanks for the PR!</p>\n<p>How did you test Jim's branch?</p>",
+        "id": 616175418,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786566992
+    },
+    {
+        "content": "<p>I forked Jim's fork of Dataverse into my personal GitHub account, made commits directly to his branch, opened a PR to dev within it and tested it</p>",
+        "id": 616175587,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567046
+    },
+    {
+        "content": "<p><a href=\"https://github.com/srmanda-cs/dataverse/actions/runs/31637279292/job/94250673110\">https://github.com/srmanda-cs/dataverse/actions/runs/31637279292/job/94250673110</a></p>",
+        "id": 616175636,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567066
+    },
+    {
+        "content": "<p>Ok, cool, I figured it was something like that. Thanks.</p>",
+        "id": 616175767,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786567104
+    },
+    {
+        "content": "<p>I guess it will slow down our CI a bit, building the base image. Any idea how much?</p>",
+        "id": 616175889,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786567141
+    },
+    {
+        "content": "<p>2 minutes 30 seconds on average</p>",
+        "id": 616175986,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567173
+    },
+    {
+        "content": "<p>I'd say it's worth it.</p>",
+        "id": 616176301,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786567274
+    },
+    {
+        "content": "<p>I mean, I guess we could add some logic to only build the base image when Payara is upgraded, right?</p>",
+        "id": 616176362,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786567295
+    },
+    {
+        "content": "<p>We could, yes</p>",
+        "id": 616176534,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567357
+    },
+    {
+        "content": "<p>it will simply ping Docker to see if an image exists, otherwise it will build it</p>",
+        "id": 616176610,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567384
+    },
+    {
+        "content": "<p>I am going to go ahead and test that functionality</p>",
+        "id": 616177088,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786567553
+    },
+    {
+        "content": "<p>Sounds great!</p>",
+        "id": 616179048,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786568316
+    },
+    {
+        "content": "<p>Done. Should not have any overhead when the docker image exists now</p>",
+        "id": 616179127,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786568352
+    },
+    {
+        "content": "<p>/me looks at <a href=\"https://github.com/IQSS/dataverse/issues/12607\">#12607</a> again</p>",
+        "id": 616179386,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786568424
+    },
+    {
+        "content": "<p>Cool. Once tests are passing I'll merge it. Then ask Jim to update his branch. Thanks again!</p>",
+        "id": 616179483,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786568461
+    },
+    {
+        "content": "<p>When Docker Image doesn't exist<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1936x496\" data-original-src=\"/user_uploads/53090/NyuBe8Km64Mvho4o1P5VXD80/image.png\" src=\"/user_uploads/thumbnail/53090/NyuBe8Km64Mvho4o1P5VXD80/image.png/840x560.webp\"></p>",
+        "id": 616181625,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786569364
+    },
+    {
+        "content": "<p>When docker image exists<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1936x840\" data-original-src=\"/user_uploads/53090/bGMSMVJj4IkHsLFTF-xVtv1i/image.png\" src=\"/user_uploads/thumbnail/53090/bGMSMVJj4IkHsLFTF-xVtv1i/image.png/840x560.webp\"></p>",
+        "id": 616181687,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786569403
+    },
+    {
+        "content": "<p>Nice, clear messaging.</p>",
+        "id": 616188302,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786572699
+    },
+    {
+        "content": "<p>Merged! Thanks, <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span>!</p>",
+        "id": 616537835,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1786712469
+    },
+    {
+        "content": "<p>Of course! Always happy to help</p>",
+        "id": 616552476,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1786716876
+    }
+]

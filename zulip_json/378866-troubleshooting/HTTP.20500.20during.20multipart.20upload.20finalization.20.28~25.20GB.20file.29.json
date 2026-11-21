@@ -1,0 +1,50 @@
+[
+    {
+        "content": "<p>Hi everyone,</p>\n<p>I am uploading a large dataset to Harvard Dataverse using DVUploader v1.4.0 in direct-upload mode from a university HPC data transfer node.</p>\n<p>I am encountering an HTTP 500 error during the finalization of a multipart upload, and I am hoping someone familiar with the Dataverse/S3 upload pipeline can help determine whether this is a known issue.</p>\n<ul>\n<li>Total dataset size: ~957 GB</li>\n<li>DVUploader: v1.4.0</li>\n<li>Upload mode: Direct upload</li>\n<li>Failed file: zip file (~25 GB)</li>\n<li>Multipart parts: 25</li>\n</ul>\n<p>The upload proceeds normally through the S3 multipart stage:</p>\n<ul>\n<li>All 25 parts uploaded successfully to the Dataverse S3 bucket.</li>\n<li>Each part reached 100% and returned a valid ETag.</li>\n<li>The subsequent Dataverse request to complete/finalize the multipart upload returned HTTP 500.</li>\n<li>The file was consequently not registered in the dataset.</li>\n</ul>\n<ol>\n<li>\n<ul>\n<li>The DVUploader log reports: “Partial upload of [...]/beam_rad_annual_conus_tiles.zip, complete upload failed with status: 500”</li>\n</ul>\n</li>\n<li>followed by:   “Not uploaded due to error during processing.”</li>\n</ol>\n<p>Unfortunately, DVUploader does not appear to log the response body from the HTTP 500, so I do not have the server-side exception.</p>\n<p>I previously encountered a different error (SignatureDoesNotMatch) during another large-file upload, but the current failure is specifically an HTTP 500 after all multipart parts have successfully uploaded.</p>\n<p>I am particularly interested in whether anyone has encountered this sequence:</p>\n<p>S3 multipart parts successfully uploaded → Dataverse multipart completion/finalization → HTTP 500 → file not registered</p>\n<p>and whether there are known limitations related to file size (~25 GB), number of multipart parts (25), or the Dataverse finalization/registration step.</p>\n<p>I have approximately 39 archives, averaging ~24 GB each to upload. If anyone has suggestions for additional logging, relevant Dataverse configuration, known issues, or a GitHub issue that matches this behavior, I would greatly appreciate the guidance.</p>\n<p>Thank you,<br>\nManaswini</p>",
+        "id": 621188574,
+        "sender_full_name": "Manaswini Ganjam",
+        "timestamp": 1788392734
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1195694\">@Manaswini Ganjam</span> hi! Thanks for all the details. Can you please send them to <a href=\"mailto:support@dataverse.harvard.edu\">support@dataverse.harvard.edu</a>? This will generate a ticket and once the problem is solved we can summarize here in Zulip.</p>",
+        "id": 621350831,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788435000
+    },
+    {
+        "content": "<p>Oh good, you also posted to <a href=\"https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ\">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ</a></p>",
+        "id": 621386408,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788442047
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  Hi, I submitted a ticket and the response is below.  <br>\nResponse: Hi Manaswini,<br>\nYes, I understand the problem with dv-uploader. Let me see if someone can look<br>\nat this when they have time. No guarantees, since the team is in the middle of<br>\na release. You may want to connect with the Google community or the Dataverse<br>\nZulip community and ask your question there and see if anyone has encountered<br>\nthe same problem before.</p>\n<p>What I am saying is that, since the project is so large, you would not have to<br>\ndeal with DV uploader issues if you used the paid storage option. It's $11/TB<br>\nper year, plus 30% overhead on the total price. Minimum 6 years of storage. But<br>\nif you would rather wait for a solution, that is completely an option.<br>\nRegards</p>",
+        "id": 621454233,
+        "sender_full_name": "Manaswini Ganjam",
+        "timestamp": 1788454558
+    },
+    {
+        "content": "<p>Ah, in <a href=\"https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045\">https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045</a> . Thanks.</p>\n<p>As stated, we're trying to get a release out. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> See <a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/Release.206.2E12.20Timeline/with/615705804\">#community &gt; Release 6.12 Timeline</a> </p>\n<p>What's your take on the responses you've gotten so far at <a href=\"https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ\">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/6ZzqkqP3BQAJ</a> ?</p>",
+        "id": 621475677,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788458883
+    },
+    {
+        "content": "<p>I believe the responses are suggesting admin-side config change (<code>DataFileChecksumValidationSizeLimit</code> + disabling <code>FileValidationOnPublishEnabled</code>), and checksum computation on a 25 GB file finalizing server-side is a very plausible timeout culprit for an HTTP 500 that happens right at completion. But I will need Harvard's Dataverse admins to apply it. I submitted the intake form for large data.</p>",
+        "id": 621492668,
+        "sender_full_name": "Manaswini Ganjam",
+        "timestamp": 1788462547
+    },
+    {
+        "content": "<p>Right, hmm. I think it's unlikely we'll turn off <code>FileValidationOnPublishEnabled</code> on Harvard Dataverse. I'm not sure if we have <code>DataFileChecksumValidationSizeLimit</code> set or not. The person would who advise on the technical side is on vacation, it being Labor Day weekend and all. We he gets back I'll ask him to look at <a href=\"https://help.hmdc.harvard.edu/Ticket/Display.html?id=423045\">your ticket</a>. Meanwhile, thanks for submitting the large data intake form. (The person who reads those is also on vacation, though.)</p>",
+        "id": 621717991,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788529976
+    },
+    {
+        "content": "<p>Oh, I see Jim replied as well: <a href=\"https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/4fgJJ9E_BgAJ\">https://groups.google.com/g/dataverse-community/c/YNy5G8vlGAg/m/4fgJJ9E_BgAJ</a></p>\n<p>He's the author of DVUploader and worked a lot on this part of the backend as well.</p>",
+        "id": 621725328,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788531724
+    }
+]

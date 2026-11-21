@@ -1,0 +1,812 @@
+[
+    {
+        "content": "<p>So if I am understanding the docs build process correctly, the worker node is cloning the git repo, doing a sphinx build on the Jenkins hardware, scp'ing the zipped archive from the Jenkins hardware into <a href=\"mailto:rocky@54.198.97.45\">rocky@54.198.97.45</a>, and then unzipping that file on the server, and setting it up.</p>\n<p>What is stopping me from creating two GitHub Actions, one that builds the guides and uploads the built artifact for any branch and any PR, and another GitHub Action with AWS IAM role perms set for the action to be able to access the server only from the main branch of the dataverse repo, taking it and unzipping it on the server?</p>",
+        "id": 598171448,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779911789
+    },
+    {
+        "content": "<p>Well, won't the guides server get a bit clogged up if we put docs on it from every PR?</p>",
+        "id": 598172636,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779912231
+    },
+    {
+        "content": "<p>Currently we only use that Jenkins job at two times:</p>\n<ul>\n<li>To build a preview release of the guides - <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate</a></li>\n<li>To build the final release of the guides - <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></li>\n</ul>",
+        "id": 598172762,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779912267
+    },
+    {
+        "content": "<p>If we build for every PR, I'm worried we'll fill the disk on the guides server.</p>",
+        "id": 598172963,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779912336
+    },
+    {
+        "content": "<p>That's a really good point. Hmmm. Manual trigger then? But with a manual trigger, you would have to specify the exact git branch as an input every single time. It will default to main. Do you ever run build jobs for PRs or other branches? Or only on main/develop?</p>",
+        "id": 598174358,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779912849
+    },
+    {
+        "content": "<p>We use \"develop\" for <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release-candidate</a></p>\n<p>We use \"master\" for <a href=\"https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release\">https://guides.dataverse.org/en/6.10.1/developers/making-releases.html#build-the-guides-for-the-release</a></p>\n<p>I'm fine with a manual trigger (workflow dispatch).</p>",
+        "id": 598177687,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779914033
+    },
+    {
+        "content": "<p>Makes sense to me, I will get a staging Amazon server up and test a mock workflow to see how a workflow dispatch with inputs would look like. Thank you so much!</p>",
+        "id": 598181601,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779915477
+    },
+    {
+        "content": "<p>Sure! Thanks for working on this! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 598181669,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779915497
+    },
+    {
+        "content": "<p>UNC hosts <a href=\"https://guides.dataverse.org\">https://guides.dataverse.org</a> . Is that still ok, going forward?</p>",
+        "id": 598181890,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779915559
+    },
+    {
+        "content": "<p>I wish I could give you a concrete answer, but that's a question for <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span></p>",
+        "id": 598182803,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779915775
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> I can't answer for my superiors (who are out today), but it's a lot less work for us to use GitHub Actions to publish to say <a href=\"http://guides.gdcc.io\">guides.gdcc.io</a>. How do we feel about GH pages-hosted guides?</p>",
+        "id": 598339554,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1779976600
+    },
+    {
+        "content": "<p>In theory, it sounds fine. Can you please do a <code>du</code> to see how much space is used for all the <a href=\"https://guides.dataverse.org/en/latest/versions.html\">old versions</a> of the guides? However many GB it is, I don't think it'll be completely unreasonable for a git repo. At least I hope not.</p>",
+        "id": 598347922,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779978458
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> 2.3GB though I see four old branch builds that could probably be cleaned up</p>",
+        "id": 598351260,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1779979181
+    },
+    {
+        "content": "<p>Hmm, \"We recommend repositories remain small, ideally less than 1 GB, and less than 5 GB is strongly recommended.\" -- <a href=\"https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github\">https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github</a></p>\n<p>I dunno, I'm a bit nervous that at 2.3 GB we're already halfway toward the 5 GB strongly recommended limit.</p>\n<p>I'm not saying UNC should host it forever (of course!) but maybe we shouldn't move so much content into a git repo.</p>",
+        "id": 598354547,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779979983
+    },
+    {
+        "content": "<p>We have a lot of eternally free options. We have Cloudflare Pages/Workers. We can use S3 + GitHub pages. Or we have <a href=\"https://about.readthedocs.com/\">https://about.readthedocs.com/</a> which is forever free for Open Source. No GitHub Actions, no large builds, just point them at the repo, and forget about them. </p>\n<p>The current setup works with Jenkins, but translating it into Actions, Role ARNs, staging servers for testing, and security reviews is going to be a long drawn out months long process which we would rather not get into unless there's no other way.</p>",
+        "id": 598359913,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779981248
+    },
+    {
+        "content": "<p>Those setups are so easy that with org approval, I can have deployments up within minutes</p>",
+        "id": 598360899,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779981474
+    },
+    {
+        "content": "<p>I'm not a fan of the ads on ReadTheDocs. If we can continue to serve up Dataverse documentation without ads, this would be my preference.</p>",
+        "id": 598362235,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779981785
+    },
+    {
+        "content": "<p>I don't think there's a way we can opt out of their ethical ads feature. Cloudflare Pages then? Would that be alright?</p>",
+        "id": 598362710,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779981909
+    },
+    {
+        "content": "<p>I've never used Cloudflare but I've certainly heard good things about it.</p>",
+        "id": 598362935,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779981966
+    },
+    {
+        "content": "<p>I use it regularly for my production deployments. <a href=\"http://dash.srmanda.com\">dash.srmanda.com</a> and <a href=\"http://srmanda.com\">srmanda.com</a> are some examples from my side. Heavy builds.</p>",
+        "id": 598363074,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779982007
+    },
+    {
+        "content": "<p>But you'll have to move the DNS over to Cloudflare, that's the catch. There's always a catch</p>",
+        "id": 598363202,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779982041
+    },
+    {
+        "content": "<p>I don't see any ads at <a href=\"https://srmanda.com\">https://srmanda.com</a> (great!) but at <a href=\"https://dash.srmanda.com\">https://dash.srmanda.com</a> I'm seeing this:</p>\n<p><img alt=\"Screenshot 2026-05-28 at 11.27.55 AM.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"504x427\" data-original-src=\"/user_uploads/53090/g0oH0xeAP118FeOwmadncdHt/Screenshot-2026-05-28-at-11.27.55AM.png\" src=\"/user_uploads/thumbnail/53090/g0oH0xeAP118FeOwmadncdHt/Screenshot-2026-05-28-at-11.27.55AM.png/840x560.webp\"></p>\n<p>Is that an ad? It looks like one! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 598363421,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779982096
+    },
+    {
+        "content": "<p>No, that's my login page for the dash <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 598363526,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779982119
+    },
+    {
+        "content": "<p>oh, phew!</p>",
+        "id": 598363554,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779982128
+    },
+    {
+        "content": "<p>I never thought that it looks like an ad. Now I see it very clearly. Good advice, I'll work on that page. Thank you!</p>",
+        "id": 598363701,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779982160
+    },
+    {
+        "content": "<p>ha, sure</p>",
+        "id": 598363789,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779982172
+    },
+    {
+        "content": "<p>Are you blocked on a decision on which way to go? I'd like to discuss this with the team.</p>",
+        "id": 598363812,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779982175
+    },
+    {
+        "content": "<p>Yes please, feel free to discuss! I'm just trying to find what's the best way I can make this transition smooth</p>",
+        "id": 598363981,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779982214
+    },
+    {
+        "content": "<p>Well I was trying to build a Proof of Concept to showcase to the team in Cloudflare. I didn't realize this looking at the logs, but apparently pip install graphviz doesn't install the actual dot executable, that has to be installed separately. And serverless environments like GitHub Pages or Cloudflare don't support installation of the graphviz binary. </p>\n<p>As long as the docs use graphviz, the docs build will always require a full server to run</p>\n<p>The only real workaround is for the docs graphs to be rewritten into mermaid, which isn't a complete rewrite, but it is still a major change. And even after we do that, I'm not entirely sure what other hiccups I will run into. But, I can always experiment and try. So I will rewrite my fork's doc graphs into mermaid and let you know how it goes</p>",
+        "id": 598390519,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779990298
+    },
+    {
+        "content": "<p>If it helps, on my Mac I install dot by installing graphviz: <a href=\"https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#sphinx-installed-locally\">https://guides.dataverse.org/en/6.10.1/contributor/documentation.html#sphinx-installed-locally</a></p>",
+        "id": 598394063,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779991333
+    },
+    {
+        "content": "<p>mhmm I read your docs, they were very helpful, but cloudflare is serverless so brew/apt-get all are disabled and restricted</p>",
+        "id": 598396281,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779992031
+    },
+    {
+        "content": "<p>Cloudflare proof of concept is live at: <a href=\"https://dataverse-smr.pages.dev/\">https://dataverse-smr.pages.dev/</a></p>",
+        "id": 598398454,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779992658
+    },
+    {
+        "content": "<p>Compare both the rendering softwares at:<br>\nGraphviz: <a href=\"https://guides.dataverse.org/en/latest/developers/dependencies.html\">https://guides.dataverse.org/en/latest/developers/dependencies.html</a><br>\nMermaid: <a href=\"https://dataverse-smr.pages.dev/developers/dependencies\">https://dataverse-smr.pages.dev/developers/dependencies</a></p>",
+        "id": 598398707,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779992732
+    },
+    {
+        "content": "<p>I was just looking at the one at <a href=\"https://dataverse-smr.pages.dev/api/intro#what-is-an-api\">https://dataverse-smr.pages.dev/api/intro#what-is-an-api</a> ! Amazing!</p>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> check this out ^^</p>",
+        "id": 598398800,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779992767
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> you converted all the dot/graphviz images to Mermaid?</p>",
+        "id": 598398928,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779992820
+    },
+    {
+        "content": "<p>Yep. Wasn't that hard</p>",
+        "id": 598401070,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779993532
+    },
+    {
+        "content": "<p>Just some syntax rewrite</p>",
+        "id": 598401093,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779993540
+    },
+    {
+        "content": "<p>Do you have a branch on GitHub for this? Maybe we should just merge it!</p>",
+        "id": 598402596,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779994051
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> would you miss dot/graphviz terribly?</p>",
+        "id": 598402631,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779994067
+    },
+    {
+        "content": "<p>If we replace dot/graphviz with mermaid, that's fine by me.</p>",
+        "id": 598402774,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779994122
+    },
+    {
+        "content": "<p><span class=\"topic-mention\">@topic</span> we don't need to commit the built pages as sources to Git. So Github Pages may still be an option.</p>",
+        "id": 598403209,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779994250
+    },
+    {
+        "content": "<p>But we have 2.3 GB of old versions we need to put somewhere.</p>",
+        "id": 598403829,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779994472
+    },
+    {
+        "content": "<p>I thought I'd read that we can use the artifact deployment method to get around that, but apparently this is no longer true. <a href=\"https://github.com/marketplace/actions/upload-github-pages-artifact#artifact-validation\">https://github.com/marketplace/actions/upload-github-pages-artifact#artifact-validation</a></p>",
+        "id": 598404641,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779994782
+    },
+    {
+        "content": "<p>Personally, I'd vote against using Cloudflare. They are putting hefty price tags on their services wherever they can. I know that quite a bunch of things like the Turing Way Guide are using Netlify: <a href=\"https://github.com/the-turing-way/the-turing-way/blob/main/netlify.toml\">https://github.com/the-turing-way/the-turing-way/blob/main/netlify.toml</a></p>",
+        "id": 598406171,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779995338
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> do you have statistics about the guide usage like bandwidth/month and requests/month?</p>",
+        "id": 598406759,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779995552
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598406759\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"626369\">Don Sizemore</span> do you have statistics about the guide usage like bandwidth/month and requests/month?</p>\n</blockquote>\n<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> see <a class=\"message-link\" href=\"/#narrow/channel/446770-docs/topic/analytics/near/507857503\">#docs &gt; analytics @ 💬</a></p>",
+        "id": 598406861,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779995594
+    },
+    {
+        "content": "<p>I do have a branch here: <a href=\"https://github.com/srmanda-cs/dataverse/tree/12408-move-docs-jenkins-builds\">https://github.com/srmanda-cs/dataverse/tree/12408-move-docs-jenkins-builds</a></p>\n<p>But the PR needs to come from unc-ch rdmc, for now it's just an experiment more than anything else.</p>\n<p>The mermaid change has to be made for ANY serverless deployment though. GitHub Pages, Cloudflare, Netlify, Railway</p>",
+        "id": 598408282,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996156
+    },
+    {
+        "content": "<p>I'm not against using Mermaid, but wouldn't it be sufficient to just install the necessary dependencies at build time in CI?</p>",
+        "id": 598408383,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996203
+    },
+    {
+        "content": "<p>(Or use a readily available Docker image for the job)</p>",
+        "id": 598408463,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996232
+    },
+    {
+        "content": "<p>Looking at <a href=\"https://github.com/IQSS/dataverse/blob/develop/.github/workflows/guides_build_sphinx.yml\">https://github.com/IQSS/dataverse/blob/develop/.github/workflows/guides_build_sphinx.yml</a>  this is what we use so far...</p>",
+        "id": 598408588,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996278
+    },
+    {
+        "content": "<p>It takes care of setting up the requirements.</p>",
+        "id": 598408620,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996292
+    },
+    {
+        "content": "<p>Yeah Cloudflare doesn't give access to apt-get or brew, it's a locked down image</p>",
+        "id": 598408739,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996340
+    },
+    {
+        "content": "<p>Why would we need that image?</p>",
+        "id": 598408766,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996353
+    },
+    {
+        "content": "<p>Isn't uploading the stuff (resulting artifact) to cloudflare a separate step?</p>",
+        "id": 598408808,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996372
+    },
+    {
+        "content": "<p>Ohhhh so build in GitHub actions and upload to Cloudflare? That could work.</p>",
+        "id": 598408911,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996409
+    },
+    {
+        "content": "<p>Here's how I do it with Maven Site and upload the artifact after for the dataverse-spi: <a href=\"https://github.com/gdcc/dataverse-spi/blob/main/.github/workflows/site.yml\">https://github.com/gdcc/dataverse-spi/blob/main/.github/workflows/site.yml</a></p>",
+        "id": 598409021,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996443
+    },
+    {
+        "content": "<p>The workflow above with building the guide in Github Actions should already give you something usable as a deployment.</p>",
+        "id": 598409102,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996470
+    },
+    {
+        "content": "<p>let me do an upload, I'll let you know</p>",
+        "id": 598409179,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996497
+    },
+    {
+        "content": "<p>So is the final decision to go with GitHub Pages? This is viable</p>",
+        "id": 598409935,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996765
+    },
+    {
+        "content": "<p>No no, this won't be possible I think</p>",
+        "id": 598409988,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996781
+    },
+    {
+        "content": "<p>If y'all want to go with Cloudflare though, I would strongly recommend Mermaid, then you can retire all the GitHub Actions and have a lot less to maintain. Just one build command that's it</p>",
+        "id": 598410040,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996803
+    },
+    {
+        "content": "<p>and Cloudflare Pages is very very generous</p>",
+        "id": 598410072,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996814
+    },
+    {
+        "content": "<p>Github Pages has a supported limit of 1 GB, independent of using a Git branch or Deployment artifact.</p>",
+        "id": 598410101,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996824
+    },
+    {
+        "content": "<p>Ok, so even smaller than the 5 GB limit I mentioned above.</p>",
+        "id": 598410177,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779996856
+    },
+    {
+        "content": "<p>Should I create a separate topic in <a class=\"stream\" data-stream-id=\"446770\" href=\"/#narrow/channel/446770-docs\">#docs</a> about moving from dot/graphviz to Mermaid? And maybe we can have a dedicated issue and PR?</p>",
+        "id": 598410321,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779996919
+    },
+    {
+        "content": "<p>SGTM if the team is okay with it</p>",
+        "id": 598410399,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996951
+    },
+    {
+        "content": "<p>Cloudflare's free tier limit is 20k files, each not exceeding 25MB</p>",
+        "id": 598410453,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779996968
+    },
+    {
+        "content": "<p>That might be cutting it close...</p>",
+        "id": 598410494,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996986
+    },
+    {
+        "content": "<p>We have a lot of versions...</p>",
+        "id": 598410522,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779996998
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410399\">said</a>:</p>\n<blockquote>\n<p>SGTM if the team is okay with it</p>\n</blockquote>\n<p>Great, please see <a class=\"stream-topic\" data-stream-id=\"446770\" href=\"/#narrow/channel/446770-docs/topic/switch.20from.20dot.2Fgraphviz.20to.20mermaid/with/598410582\">#docs &gt; switch from dot/graphviz to mermaid</a></p>",
+        "id": 598410627,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779997040
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598410522\">said</a>:</p>\n<blockquote>\n<p>We have a lot of versions...</p>\n</blockquote>\n<p>we might have to use R2 then. 1.5 cents a month per GB. It's all tradeoffs, no perfect solution <span aria-label=\"sob\" class=\"emoji emoji-1f62d\" role=\"img\" title=\"sob\">:sob:</span></p>",
+        "id": 598410772,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779997094
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> as you hate the ads on RTD, by using the new deployment mechanism (whatever it may be in the end) we can drop using it if we build the deploy chain on our own. Will impact the amount of files and used bandwidth though.</p>",
+        "id": 598412051,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779997630
+    },
+    {
+        "content": "<p>well do let me know what the team converges on! I'm happy to go any way. But that unc docs server is going away, that much is sure, and I want to prevent the site from going down completely.</p>",
+        "id": 598412654,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779997849
+    },
+    {
+        "content": "<p>I've also been chatting with <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> and <span class=\"user-mention\" data-user-id=\"600327\">@Ceilyn Boyd</span> about this in Slack. Please stay tuned!</p>",
+        "id": 598412991,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779997977
+    },
+    {
+        "content": "<p>AI Summary of everything so far so that I don't get confused and cause y'all headaches</p>\n<p>Context: The UNC docs server and Jenkins build server are both going away. We need a new home for the Dataverse documentation. Here's where things stand:</p>\n<p>The disk reality: du on the current docs is 2.3 GiB, which already exceeds GitHub Pages' 1 GiB hard limit and puts us uncomfortably close to the soft 5 GiB repo ceiling. GitHub Pages is effectively off the table.</p>\n<p>Options on the table:</p>\n<p>ReadTheDocs: Works today with zero migration effort, but has ads. Its an option but Phil has noted the ads are a pain.</p>\n<p>GitHub Pages: Hard 1 GiB limit for Pages, soft 5 GiB for the repo. GitHub actively enforces the 1 GB limit and has taken down sites for violations. GitHub Pages is fundamentally not built for this usecase. At 2.3 GiB we already exceed the Pages limit. Not viable without significant pruning of old versions.</p>\n<p>Cloudflare Pages: Unlimited bandwidth, generous free tier, but capped at 20,000 files per deployment and 25 MB per file. Graphviz (dot) cannot be installed in Cloudflare's locked-down build environment, so this option requires either switching to Mermaid or building the artifact elsewhere first.</p>\n<p>The two paths if we go Cloudflare:</p>\n<p>Path A: Build on GitHub Actions, upload artifact to Cloudflare: Keep Graphviz, use the existing guides_build_sphinx.yml (which already installs Graphviz and runs the build but does not publish), add a deploy step using cloudflare/pages-action. More moving parts, two systems to maintain.</p>\n<p>Path B: Mermaid + Cloudflare native build: Replace Graphviz with sphinxcontrib-mermaid, let Cloudflare handle the entire build with a single command (cd doc/sphinx-guides &amp;&amp; pip install -r requirements.txt &amp;&amp; make html &amp;&amp; make epub &amp;&amp; cp build/epub/Dataverse.epub build/html). Retires all the GitHub Actions pipeline entirely. Simpler long-term, one system to maintain.</p>\n<p>Active work: There is an experimental branch already at <a href=\"https://github.com/IQSS/dataverse/compare/develop...srmanda-cs:dataverse:12408-move-docs-jenkins-builds\">https://github.com/IQSS/dataverse/compare/develop...srmanda-cs:dataverse:12408-move-docs-jenkins-builds</a> with the Mermaid migration (8 commits, 4 files changed). A live Cloudflare deployment of the docs is already running at <a href=\"https://dataverse-smr.pages.dev/\">https://dataverse-smr.pages.dev/</a> on v6.10.1 as proof of concept.</p>\n<p>The 20k file ceiling concern: With multiple versioned doc releases this could become an issue on Cloudflare's free tier. Mitigation would be Cloudflare R2 at roughly $0.015/month per GB, and additional pricing for Class A/Class B operations which adds cost, but is bearable.</p>\n<p>Decision needed: Which hosting platform, and if Cloudflare, Path A or Path B?</p>\n<p>My priority: It is to make sure the site does not accidentally go down, the migration is smooth, and nobody gets left holding a broken build or left hanging. I am happy to own the entire transition end to end and build whatever path the team decides on. No matter which option we go with, even servers, I will make it work.</p>",
+        "id": 598415681,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1779998981
+    },
+    {
+        "content": "<p>Sounds right.</p>",
+        "id": 598416242,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1779999203
+    },
+    {
+        "content": "<p>The part that seems missing here: how does Cloudflare pages handle the versioning? If building in CI, we control where to put things. How does this work when building on Cloudflare pages?</p>",
+        "id": 598418093,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1779999911
+    },
+    {
+        "content": "<p>One other thing that comes to mind when building at Cloudflare and others (and not in CI): we loose some control over the process, potentially making it less portable. But this may just be me being overly cautious.</p>",
+        "id": 598418466,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780000053
+    },
+    {
+        "content": "<p>By versioning, if you mean version control then cloudflare makes a new deployment url per commit<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"2540x1116\" data-original-src=\"/user_uploads/53090/vRc0rBtd0Gwpps1zDIkcO9Jo/image.png\" src=\"/user_uploads/thumbnail/53090/vRc0rBtd0Gwpps1zDIkcO9Jo/image.png/840x560.webp\"><br>\nThey exist indefinitely.</p>",
+        "id": 598418520,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780000072
+    },
+    {
+        "content": "<p>versioning is very important</p>\n<p>right now we just have subdirectories for 6.9 or 6.2 or whatever</p>",
+        "id": 598418961,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780000249
+    },
+    {
+        "content": "<p>Well technically, since Cloudflare is capable of generating a static url per commit, you wouldn't need any old docs, you would just point it to an old commit url say the commit url for 6.9 master and point them to view the docs there so number of files won't ever exceed like 700. But in practice I wouldn't know what that would look like. It's definitely possible though</p>",
+        "id": 598419406,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780000433
+    },
+    {
+        "content": "<p>I'm not sure I follow but that's ok. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> We want people to have the same experience as today when they visit docs for their old version of Dataverse.</p>",
+        "id": 598420094,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780000741
+    },
+    {
+        "content": "<p>Not to forget we must make sure not to break any existing links. Installations rely on the versioned links to be kept intact, as they link to the guides.</p>",
+        "id": 598420152,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780000762
+    },
+    {
+        "content": "<p>yes, exactly</p>",
+        "id": 598420478,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780000918
+    },
+    {
+        "content": "<p>so the URLs need to stay the same, <a href=\"https://guides.dataverse.org/en/6.2/\">https://guides.dataverse.org/en/6.2/</a> or whatever old version</p>",
+        "id": 598420548,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780000949
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420094\">said</a>:</p>\n<blockquote>\n<p>I'm not sure I follow but that's ok. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span> We want people to have the same experience as today when they visit docs for their old version of Dataverse.</p>\n</blockquote>\n<p>Well this is my very first time moving a Sphinx deployment from a server to serverless so this is all very very new to me ;(</p>\n<p>From what I understand, this is something Cloudflare does. So every time you push a commit to a branch it is monitoring, it creates a separate static url for THAT specific commit and that specific docs build.</p>\n<p>Right now, for example /6.9/ is an entire separate directory with its own files. The way Cloudflare handles it, it would just redirect to a build made using an older commit which has its own url instead of storing all the files in one place. I hope this makes sense?</p>",
+        "id": 598420743,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780001029
+    },
+    {
+        "content": "<p>sort of?</p>",
+        "id": 598420888,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001093
+    },
+    {
+        "content": "<p>I think I'd need to see it in action to know if it's what we need.</p>",
+        "id": 598420935,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001108
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> do we have any deep links into a specific page of a version from the application that are user facing? (notifications, ...)</p>",
+        "id": 598421115,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780001189
+    },
+    {
+        "content": "<p>yep, I'm pretty sure we do</p>",
+        "id": 598421161,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001206
+    },
+    {
+        "content": "<p>This might break depending on the possibilities for a redirect. I don't know enough about their setup, but should be verified.</p>",
+        "id": 598421166,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780001208
+    },
+    {
+        "content": "<p><img alt=\":doh:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/343009b9.png\" title=\"doh\"></p>",
+        "id": 598421189,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001215
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598420935\">said</a>:</p>\n<blockquote>\n<p>I think I'd need to see it in action to know if it's what we need.</p>\n</blockquote>\n<p>Yeah, I agree. As I said, it might not work as we need in practice.</p>",
+        "id": 598421305,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780001264
+    },
+    {
+        "content": "<p>What we have today is a static site served up by Apache. Very 90s. Works fine! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 598421735,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001462
+    },
+    {
+        "content": "<p>(or maybe it's nginx, I dunno)</p>",
+        "id": 598421766,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001474
+    },
+    {
+        "content": "<p>it's probably going to be fine for the next few decades even, very robust, but it needs a server  ; )</p>",
+        "id": 598421932,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780001544
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> would IQSS be fine in putting some money into this? Or does it have to be for free?</p>",
+        "id": 598422129,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780001636
+    },
+    {
+        "content": "<p>well not just money, the server needs constant upkeep and maintenance too from personnel</p>",
+        "id": 598422253,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780001679
+    },
+    {
+        "content": "<p>I'm saying there's a ton of option when it comes to static website hosting that do not involve any maintenance. We can just mimic what we do now with Jenkins and keep all the old versions the same way we always did. This may involve spending a small fee though.</p>",
+        "id": 598422432,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780001760
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598422129\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> would IQSS be fine in putting some money into this? Or does it have to be for free?</p>\n</blockquote>\n<p>It's a fair question. We can ask <span class=\"user-mention silent\" data-user-id=\"600327\">Ceilyn Boyd</span> about it.</p>",
+        "id": 598422588,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780001836
+    },
+    {
+        "content": "<p>I mean, maybe we could give ReadTheDocs some money to get rid of the ads. They seem like a nice company.</p>",
+        "id": 598423034,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780002023
+    },
+    {
+        "content": "<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>",
+        "id": 598424130,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780002474
+    },
+    {
+        "content": "<p>Look at what I just found... <a href=\"https://pico.sh\">https://pico.sh</a> It's 2$/month and seems to enable just dropping off stuff as we used to via SSH. (Would need building in CI though)</p>",
+        "id": 598425309,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780002974
+    },
+    {
+        "content": "<p>BTW a build of our guides takes ~40MB of space.</p>",
+        "id": 598425530,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780003083
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598424130\">said</a>:</p>\n<blockquote>\n<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>\n</blockquote>\n<p>Decommissioning what? Everything UNC hosts? Originally we were talking about Jenkins.</p>",
+        "id": 598538319,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780054344
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425530\">said</a>:</p>\n<blockquote>\n<p>BTW a build of our guides takes ~40MB of space.</p>\n</blockquote>\n<p>Does that include HTML, epub, and PDF?</p>",
+        "id": 598538463,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780054391
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538319\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598424130\">said</a>:</p>\n<blockquote>\n<p>Leadership would love to know about a timeline for the decommissioning, is there one that y'all think is realistic from your side?</p>\n</blockquote>\n<p>Decommissioning what? Everything UNC hosts? Originally we were talking about Jenkins.</p>\n</blockquote>\n<p>Jenkins, yes!</p>",
+        "id": 598542330,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780055774
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598538463\">said</a>:</p>\n<blockquote>\n<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598425530\">said</a>:</p>\n<blockquote>\n<p>BTW a build of our guides takes ~40MB of space.</p>\n</blockquote>\n<p>Does that include HTML, epub, and PDF?</p>\n</blockquote>\n<p>Only HTML.</p>",
+        "id": 598548002,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1780057628
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> for Jenkins, can we pick up the conversation from here: <a class=\"message-link\" href=\"/#narrow/channel/375812-containers/topic/goodbye-jenkins-you-did-an-amazing-job/near/597880132\">#containers &gt; goodbye-jenkins-you-did-an-amazing-job @ 💬</a>  ?</p>",
+        "id": 598558403,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780060518
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span>  what do you think about an S3-compatible static host instead of a full-blown server? Cloudflare R2? </p>\n<p>GitHub Actions can build, and upload the entire build artifact to R2 using aws s3 sync, the same thing that Jenkins is doing right now. Cloudflare will provide an SSL certificate for <a href=\"http://guides.dataverse.org\">guides.dataverse.org</a>.</p>\n<p>R2 is going to be free practically forever since the first 10GiB is completely free, egress is zero. Class A operations are writes, Class B operations are reads. That's A LOT.<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1212x646\" data-original-src=\"/user_uploads/53090/m-mcQIKd3svZr35WqWFTIY94/image.png\" src=\"/user_uploads/thumbnail/53090/m-mcQIKd3svZr35WqWFTIY94/image.png/840x560.webp\"></p>\n<p>This setup can also be emulated with AWS S3 directly, but S3 doesn't provide SSL certificates, so unless we put Cloudfront in front of it, the guides link will only serve HTTP.</p>",
+        "id": 598611858,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780076135
+    },
+    {
+        "content": "<p>Looks nice but let's wait to hear from <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> on their preferences.</p>",
+        "id": 598612316,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780076258
+    },
+    {
+        "content": "<p>Some hard statistics. The current guides deployment has 42k files and weighs about 2.1GB<br>\n<img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"994x140\" data-original-src=\"/user_uploads/53090/MR54VHY51mvVTLbdIF826HaN/image.png\" src=\"/user_uploads/thumbnail/53090/MR54VHY51mvVTLbdIF826HaN/image.png/840x560.webp\"></p>",
+        "id": 598627776,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780081694
+    },
+    {
+        "content": "<p>beefy <span aria-label=\"cow\" class=\"emoji emoji-1f404\" role=\"img\" title=\"cow\">:cow:</span></p>",
+        "id": 598631508,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780083154
+    },
+    {
+        "content": "<p>Cloudflare R2 PoC live at: <a href=\"https://guides.srmanda.com/\">https://guides.srmanda.com/</a></p>\n<p>GitHub Actions for regular updates, for example 6.11, will look like this:</p>\n<ol>\n<li>Sphinx Build</li>\n<li>rclone sync /en/6.11/</li>\n<li>rclone sync /en/latest/</li>\n</ol>\n<p>and that's about it. Cost? $0</p>\n<p>This is a direct dump of the current docs server</p>",
+        "id": 598632491,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1780083537
+    },
+    {
+        "content": "<p>Nice! You have all the versions all the way back to <a href=\"https://guides.srmanda.com/en/3.6.2/\">https://guides.srmanda.com/en/3.6.2/</a> ! If nothing else, this is a good backup! <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 598632692,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780083612
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/446770-docs/topic/move-docs-builds-from-jenkins-to-github-actions/near/598611858\">said</a>:</p>\n<blockquote>\n<p>R2 is going to be free practically forever since the first 10GiB is completely free</p>\n</blockquote>\n<p>And the first 10 GB is free, you said ^^</p>",
+        "id": 598632845,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780083668
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> was is your latest thinking on the guides?</p>\n<p>Do you want to focus on the smaller step of moving the build process from Jenkins to a GitHub Action? And continue hosting the guides on the existing guides server?</p>\n<p>Or do you want the larger step of both moving the build process and replacing the guides server itself?</p>",
+        "id": 605793316,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782147636
+    },
+    {
+        "content": "<p>We would strongly prefer to replace the guides server. Servers require continuous maintenance and labor regardless of an automated GitHub actions. Patches, DDoS protection, DHCP assignments. I would like to solve this problem permanently for IQSS so that y'all don't get pushed into a SPOF situation</p>",
+        "id": 605796305,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1782148248
+    },
+    {
+        "content": "<p>Ok. And you want to go with Cloudflare R2?</p>",
+        "id": 605796524,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782148291
+    },
+    {
+        "content": "<p>As far as my personal research and experience with Cloudflare goes, R2 is the simplest and most cost-effective replacement.</p>",
+        "id": 605796683,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1782148327
+    },
+    {
+        "content": "<p>Ok. I think I'll add this to the agenda for tech hours tomorrow. Sound good?</p>",
+        "id": 605796898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782148369
+    },
+    {
+        "content": "<p>Sounds good to me!</p>",
+        "id": 605796946,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1782148379
+    },
+    {
+        "content": "<p>Great, done: <a href=\"https://docs.google.com/document/d/1xVD_Xi5OYlJnU1scEDQv5jjEIovu1GZDuilxwpgorpo/edit?usp=sharing\">https://docs.google.com/document/d/1xVD_Xi5OYlJnU1scEDQv5jjEIovu1GZDuilxwpgorpo/edit?usp=sharing</a></p>",
+        "id": 605797175,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782148429
+    },
+    {
+        "content": "<p>Thank you so much! Some additional context.</p>\n<p>Prototype available at: <a href=\"https://guides.srmanda.com/\">https://guides.srmanda.com/</a></p>\n<p>Guides Size: 2.44GiB, Cloudflare Egress fees is 0, and free until 10GiB, 1M Class B, and 10M Class A<br>\n<a href=\"https://developers.cloudflare.com/r2/pricing/\">https://developers.cloudflare.com/r2/pricing/</a></p>\n<p>Estimated migration effort: &lt;24hrs we can keep both guides up as long as IQSS is comfortable, possibly few months.</p>\n<p>Proposed Architecture: R2 with Redirect Rules/R2 behind Cloudflare Workers</p>",
+        "id": 605798976,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1782148807
+    },
+    {
+        "content": "<p>Added! Thanks!</p>",
+        "id": 605799449,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1782148915
+    },
+    {
+        "content": "<p>I believe the final decision that was made here was to move the guides from UNC's server into Demo Dataverse's server iirc. We will need pems and secrets from upstream's side, I will be starting work on this very soon. Thank you!</p>",
+        "id": 608823587,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1783453432
+    },
+    {
+        "content": "<p>Yes! When you're ready, let's work with <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> or <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> (who's on vacation this week and next) to get you an ssh key for the demo server.</p>",
+        "id": 608833639,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1783457231
+    },
+    {
+        "content": "<p>Hello. Good afternoon. I want to request an SSH key for the demo server.</p>\n<p>Here is my draft plan. I will restrict all my work to a separate folder say \"docs\" maybe. Please create a usergroup named \"docs\" and assign the ssh key user to this usergroup. Give this user access to only the docs folder r/w permissions. I will port the entire current docs build from the UNC docs server over to this demo server. Then I will establish a process to automatically push new builds into this server. Then I will reuse Oliver's docs building action to use an SSH key and have GitHub Actions push a docs build into this server. I will most likely restrict the GitHub Action to workflow_dispatch only. Then DNS can be updated to point to the demo server. I would love to know if the Dataverse team has any advice or ideas.</p>",
+        "id": 611934003,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1784651246
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> sounds like I good plan. I just pinged <span class=\"user-mention\" data-user-id=\"637063\">@Leo Andreev</span> and <span class=\"user-mention\" data-user-id=\"980865\">@Steven Winship</span> about the ssh key.</p>",
+        "id": 611947169,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784655163
+    },
+    {
+        "content": "<p>In the case that Harvard IT does not give access to the GitHub Network Space to call into Harvard's infrastructure, I will most likely pivot to using a Message Queue, maybe like Amazon SQS or something, and the demo server will poll the queue to see if a workflow dispatch was initiated. Little bit of setup, but would be completely free and no maintenance overhead.</p>",
+        "id": 611954978,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1784657242
+    },
+    {
+        "content": "<p>We have GitHub Actions that already call into Harvard infra. We deploy the frontend to the beta server, for example.</p>",
+        "id": 611959891,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784658682
+    },
+    {
+        "content": "<p>Thank you, that makes me feel a lot better!</p>",
+        "id": 611960655,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1784658947
+    },
+    {
+        "content": "<p>Sure. Don't worry. We've been down this road already.</p>",
+        "id": 611961284,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784659145
+    },
+    {
+        "content": "<p><a href=\"mailto:steven_winship@iq.harvard.edu\">steven_winship@iq.harvard.edu</a> would like to recall the message, \"Re: #docs &gt; move-docs-builds-from-jenkins-to-github-actions\".</p>",
+        "id": 611985592,
+        "sender_full_name": "Steven Winship",
+        "timestamp": 1784667209
+    },
+    {
+        "content": "<p>Don't worry, I deleted it already. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 611985716,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1784667256
+    }
+]

@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>I wanted to collect some thoughts on this PR: <a href=\"https://github.com/uncch-rdmc/dataverse/pull/99\">https://github.com/uncch-rdmc/dataverse/pull/99</a></p>",
+        "id": 629250174,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791208029
+    },
+    {
+        "content": "<p>It builds on top of the work in: <a href=\"https://github.com/IQSS/dataverse/pull/12783\">https://github.com/IQSS/dataverse/pull/12783</a></p>",
+        "id": 629250266,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791208048
+    },
+    {
+        "content": "<p>What does this PR do?</p>\n<p>It splits the current integration tests into 3 groups that take about the same time to run.</p>\n<p>This PR causes 6 GitHub Action runners to run concurrently at the same time, but it pushes down the entire process from PR to test results in about 20-25 minutes flat.</p>\n<p>Build Containers ──┬── JSF Tests (chromium) ~ 20 mins<br>\n                   ├── JSF Tests (firefox) ~ 23 mins<br>\n                   ├── JSF Tests (webkit) ~ 21 mins<br>\n                   └── Integration Tests (Group 1) ~ 18 mins<br>\n                   └── Integration Tests (Group 2) ~ 18 mins<br>\n                   └── Integration Tests (Group 3) ~ 18 mins</p>\n<p>So overall this is a very major improvement for development speed.</p>\n<p>So, what's the catch? Well, GitHub Free Organizations (like IQSS) have a concurrency limit of 20 runners for the WHOLE org. So this means at max 3 PRs can be processed every 20 minutes for all repos within the org. I linked some numbers onto the PR.</p>",
+        "id": 629250628,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791208117
+    },
+    {
+        "content": "<p>Does \"each on its own runner with a fresh Dataverse\" mean you're spinning up three instances of Dataverse?</p>",
+        "id": 629252460,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791208487
+    },
+    {
+        "content": "<p>that's right</p>",
+        "id": 629253550,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791208717
+    },
+    {
+        "content": "<p>actually in this PR, six instances</p>",
+        "id": 629253651,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791208737
+    },
+    {
+        "content": "<p>Sounds like a good way to get more work done more quickly! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span></p>",
+        "id": 629254315,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791208851
+    },
+    {
+        "content": "<p>If we want to make this experimental PR happen without causing traffic bottlenecks for other developers, we might have to create a separate testing org with a GitHub Teams subscription. That's why I wanted to just start the conversation on how this might look. I don't want to pay GitHub any money.</p>",
+        "id": 629262158,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791210326
+    },
+    {
+        "content": "<p>Do you have a sense of how close we are to maxing out our limits? I'm not even very aware of them. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 629263844,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791210622
+    },
+    {
+        "content": "<p><img alt=\"image.png\" class=\"inline-image\" data-original-content-type=\"image/png\" data-original-dimensions=\"1568x388\" data-original-src=\"/user_uploads/53090/bkAMrZWRplNj9GQtPXDdY3La/image.png\" src=\"/user_uploads/thumbnail/53090/bkAMrZWRplNj9GQtPXDdY3La/image.png/840x560.webp\"><br>\nSo P99 is essentially worst case, P90 is the average experience. I modeled based on past week's usage, but release times might be more hectic</p>\n<p>Right now for P90 we're nowhere near the limits. After 12783 is merged, P90 goes to 53 seconds, and P99 goes to 6 minutes, but this is completely acceptable, since the tests finish 50% faster and the runners get released fast, so overall it is a win no matter what.</p>\n<p>With the experimental PR, P90 goes to 3 min and P99 goes to 10 mins. Realistically, this means we would erase any savings that we got with the optimization, and create more overhead. Especially during releases.</p>",
+        "id": 629265024,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791210828
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1034135\">Ash Manda</span> <a href=\"#narrow/channel/379673-dev/topic/experimental-pr-split-integration-tests/near/629265024\">said</a>:</p>\n<blockquote>\n<p>Right now for P90 we're nowhere near the limits.</p>\n</blockquote>\n<p>I'm glad to hear this! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 629266089,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791211049
+    },
+    {
+        "content": "<p>If I'm able to find a safe way to run the Integration Tests and JSF tests on the same instance in parallel, we would kill two birds with one shot</p>",
+        "id": 629266796,
+        "sender_full_name": "Ash Manda",
+        "timestamp": 1791211207
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> and <span class=\"user-mention\" data-user-id=\"1034135\">@Ash Manda</span> : I'm clearing Jenkins from the docs (and code comments) as we convert to containerized GitHub Actions. What say y'all about</p>\n<div class=\"codehilite\"><pre><span></span><code>./src/test/java/edu/harvard/iq/dataverse/api/UsersIT.java:    // This test is disabled because it is only compatible with the containerized development environment and would cause the Jenkins job to fail.\n./src/test/java/edu/harvard/iq/dataverse/api/FilesIT.java:    // This test is disabled because it is only compatible with the containerized development environment and would cause the Jenkins job to fail.\n</code></pre></div>\n<p>?</p>",
+        "id": 629314938,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1791221325
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> please don't mess with those lines. I'm messing with them (enabling the disabled tests!) in this PR: support SPA dev - <a href=\"https://github.com/IQSS/dataverse/issues/12746\">#12746</a></p>\n<p>Please see also <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/channel/375812-containers/topic/support.20SPA.20dev.20.2312746/with/628784841\">#containers &gt; support SPA dev #12746</a></p>",
+        "id": 629335338,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1791225863
+    }
+]

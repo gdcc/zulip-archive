@@ -1,0 +1,62 @@
+[
+    {
+        "content": "<p>Hi, not sure if this will fit into this channel, sorry if not.</p>\n<p>At DIPC we have been working with an old server as our Dataverse installation for the last year. Now we have purchased a new one and I am looking into the best strategy for migrating all the contents from our ancient server to the new one.</p>\n<ul>\n<li>Is there any guide about this?</li>\n<li>Is there any tool?</li>\n<li>What would be the required steps?</li>\n</ul>\n<p>I saw that there is a backup script on the dataverse repo but it is quite old.</p>\n<p>Thank you!</p>",
+        "id": 578680538,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1773244857
+    },
+    {
+        "content": "<p>Hi! Will you be keeping the same version of Dataverse, for now? That will make things easier, I would think. Fewer changes.</p>",
+        "id": 578681700,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1773245093
+    },
+    {
+        "content": "<p>Once you installed your new server's operating system, it shouldn't be that hard to migrate the installation. It will require planned downtime though.</p>\n<p>Here's some things you'll need to consider (not necessarily complete):</p>\n<ul>\n<li>Shutdown the application, database and index before attempting any copy operations.</li>\n<li>Depending on where you store your data at rest, you may need to copy the data from old to new. You're taking the easy way when you store your data on S3 or some network file system. For local filesystems, you will need a copy &amp; sync job, probably with rsync. You could also start by only migrating your data to a new network filesystem in case you have it now on a local disk, that will make the transition easier.</li>\n<li>Depending on how you installed Postgres and Solr, you can probably just use rsync to copy your installation's files (minus the actual data) from the old to the new server. When you used some package to install Postgres or Solr, you'll need to install them in the new location and then do a data migration with those. Not to hard, but you should read up on that.</li>\n<li>Take care of any Cronjobs and Startup Scripts. Depending on your current OS you might need to adapt (e.g. because of SystemD changes). Cronjobs are usually easy to copy and paste between servers.</li>\n</ul>\n<p>I can only highly recommend to automate such tasks to make it easier in case of necessary recovery.<br>\nProbably <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> has more thoughts on this.</p>",
+        "id": 578682937,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1773245364
+    },
+    {
+        "content": "<p>Also - what Phil said. Don't make a migration and an upgrade at the same time. Avoid too many moving parts at once.</p>",
+        "id": 578683042,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1773245389
+    },
+    {
+        "content": "<p>So basically we could say these steps apply?</p>\n<ol>\n<li>stop payara</li>\n<li>backup Solr</li>\n<li>backup Postgres</li>\n<li>install Dataverse on new server</li>\n<li>copy collection files to new server</li>\n<li>restore Solr and Postgres backup on new server</li>\n</ol>",
+        "id": 578858484,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1773304063
+    },
+    {
+        "content": "<p>Basically, yes. You'll also want to copy over logos for collections (dataverses), if you have any of those. The are usually stored in <code>/usr/local/payara6/glassfish/domains/domain1/docroot/logos</code></p>",
+        "id": 578894167,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1773314327
+    },
+    {
+        "content": "<p>That's one of the steps in <a href=\"https://github.com/IQSS/dataverse/issues/12043\">#12043</a> which is about upgrading from Payara 6 to 7. (This pull request hasn't been merged yet.) See this file in that pull request: doc/release-notes/12020-Payara-and-Java-updates.md</p>",
+        "id": 578894386,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1773314391
+    },
+    {
+        "content": "<p>If I copy the entire <code>/usr/local/payara6/glassfish/</code> between installations, will payara still work?</p>",
+        "id": 578897412,
+        "sender_full_name": "Carlos Perez-Miguel",
+        "timestamp": 1773315256
+    },
+    {
+        "content": "<p>I'm not sure, but it's probably worth a shot!</p>",
+        "id": 578903218,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1773317060
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"1044607\">Carlos Perez-Miguel</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Best.20strategy.20for.20migrate.20to.20a.20new.20server/near/578897412\">said</a>:</p>\n<blockquote>\n<p>If I copy the entire <code>/usr/local/payara6/glassfish/</code> between installations, will payara still work?</p>\n</blockquote>\n<p>You can probably do that, yes, but on a new system I'd exclude <code>/usr/local/payara6/glassfish/domains/domain1/generated/</code> <code>/usr/local/payara6/glassfish/domains/domain1/osgi-cache/</code> and possibly <code>lib/databases/ejb/</code></p>",
+        "id": 578906111,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1773317937
+    }
+]

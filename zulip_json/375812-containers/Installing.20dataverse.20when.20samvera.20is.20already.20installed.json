@@ -1,0 +1,110 @@
+[
+    {
+        "content": "<p>Trying to connect to <a href=\"http://localhost:8080/\">http://localhost:8080/</a> and <a href=\"http://dataverse:8080/api/info/version\">http://dataverse:8080/api/info/version</a> results in ERR_CONNECTION_REFUSED.</p>\n<p>Running netstat -nlt | grep 5432<br>\ngets the following response:<br>\ntcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN     <br>\ntcp6       0      0 ::1:5432                :::*                    LISTEN    </p>\n<p>I suspect this issue might be due to having an installation of samvera that was already using postgres prior to installing dataverse.</p>",
+        "id": 600741303,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780683244
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> hi! You found your way to Zulip! I haven't checked your <a href=\"https://help.hmdc.harvard.edu/Ticket/Display.html?id=409083\">ticket</a> in a while, sorry.</p>",
+        "id": 600741517,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780683314
+    },
+    {
+        "content": "<p>Is this on Linux, Mac, or Windows, please?</p>",
+        "id": 600741861,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780683426
+    },
+    {
+        "content": "<p>It's on Linux.</p>",
+        "id": 600742167,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780683514
+    },
+    {
+        "content": "<p>And are you evaluating Dataverse? Something like this: <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html</a></p>",
+        "id": 600742980,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780683840
+    },
+    {
+        "content": "<p>Yes, although I was also following steps from <a href=\"https://guides.dataverse.org/en/latest/developers/dev-environment.html\">https://guides.dataverse.org/en/latest/developers/dev-environment.html</a> because I needed to install Java 21 and Maven.</p>",
+        "id": 600743395,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780683996
+    },
+    {
+        "content": "<p>Ah, that makes sense.</p>",
+        "id": 600743456,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780684018
+    },
+    {
+        "content": "<p>Hmm, actually, for <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html</a> you should only need Docker. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 600743540,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780684045
+    },
+    {
+        "content": "<p>Can you please give this a try? <a href=\"https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart\">https://guides.dataverse.org/en/6.10.1/container/running/demo.html#quickstart</a></p>",
+        "id": 600743659,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780684082
+    },
+    {
+        "content": "<p>I saw the following error messages:  </p>\n<p>dv_initializer exited with code 1<br>\nsolr_initializer exited with code 1<br>\nError response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint postgres (887dc6ab81c1ff565c7720544e9b3133fea9192d956f6cecbee<br>\nc566f858640f4): failed to bind host port 0.0.0.0:5432/tcp: address already in use</p>",
+        "id": 600746071,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780684883
+    },
+    {
+        "content": "<p>Ok, and you need to keep the old instance of Postgres running, right? You can't just stop it? Samvera is using it?</p>",
+        "id": 600746215,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780684934
+    },
+    {
+        "content": "<p>Yes, I need the old instance of Postgres too for Samvera.</p>",
+        "id": 600746293,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780684967
+    },
+    {
+        "content": "<p>Let's see, I think we'll need to change which port postgres is running on. I should be here in your file: <a href=\"https://github.com/IQSS/dataverse/blob/v6.10.1/docker/compose/demo/compose.yml#L117\">https://github.com/IQSS/dataverse/blob/v6.10.1/docker/compose/demo/compose.yml#L117</a></p>",
+        "id": 600746475,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780685048
+    },
+    {
+        "content": "<p>And up around here we'll need to add <code>DATAVERSE_DB_PORT</code> with whatever new port you pick: <a href=\"https://github.com/IQSS/dataverse/blob/v6.10.1/docker/compose/demo/compose.yml#L13-L15\">https://github.com/IQSS/dataverse/blob/v6.10.1/docker/compose/demo/compose.yml#L13-L15</a></p>\n<p><code>DATAVERSE_DB_PORT</code> is described (sort of) at <a href=\"https://guides.dataverse.org/en/6.10.1/installation/config.html#basic-database-settings\">https://guides.dataverse.org/en/6.10.1/installation/config.html#basic-database-settings</a></p>",
+        "id": 600746570,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780685085
+    },
+    {
+        "content": "<p>Does that make sense? Those two edits?</p>",
+        "id": 600746742,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780685154
+    },
+    {
+        "content": "<p>That makes sense.  I think that second edit is what I've been looking for...</p>",
+        "id": 600747577,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1780685482
+    },
+    {
+        "content": "<p>Sure, and it's not explained well in the guides. Please feel free to open an issue about this at <a href=\"https://github.com/IQSS/dataverse/issues\">https://github.com/IQSS/dataverse/issues</a></p>",
+        "id": 600747960,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1780685640
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> hopefully the above worked for you. This morning <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> brought up the fact that an easier workaround might be to keep Dataverse (and Postgres) using the standard postgres port but make it so a different port is exposed to the host (a laptop, in my case, but perhaps a server for you) or not exposed at all. Here's the <a href=\"https://drive.google.com/drive/folders/1-HjwWrvQggmILe0hSBKgPLREmt6uwgy-?usp=drive_link\">recording</a>, <a href=\"https://docs.google.com/document/d/1TYsovyRWdygGglZ9pOqWMhNnmPl_CRqi0OzMIwvdyGQ/edit?usp=sharing\">notes</a>, and the docs we looked at: <a href=\"https://docs.docker.com/reference/compose-file/services/#ports\">https://docs.docker.com/reference/compose-file/services/#ports</a></p>",
+        "id": 602198357,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1781191882
+    }
+]
