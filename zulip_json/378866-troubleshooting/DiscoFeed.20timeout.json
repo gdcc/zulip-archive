@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>It looks like that works!    Still don't have federated on but based on what I'm getting with  the test account I'm very certain that this setting is correct.<br>\nWhich leads to Shibboleth Problem <a href=\"https://github.com/IQSS/dataverse/issues/2\">#2</a>.  No t sure why but suddely Shibboleth with the federeated login started to run so slow that the library systems group rolled back to the pre-federated settings.  It basically ground to a hald. The time-out error was:    <br>\n       Failed to download metadata from /Shibboleth.sso/DiscoFeed.</p>\n<p>According to Stephen Guernick (he's on slack), the hangup was loading in all the metadata for federated log-in.  His guess wasthat the startup process was encountering a time-out-limit and that the start-up kept trying and failing. The new metatdata file was being downloaded on each restart.</p>\n<p>So I went digging in the shibboleth settings.  Could this be the problem?<br>\n  &lt;S<strong>essions lifetime=\"7200\" timeout=\"3600\"</strong> checkAddress=\"false\"<br>\n            handlerURL=\"/Shibboleth.sso\" handlerSSL=\"true\"<br>\n            idpHistory=\"false\" idpHistoryDays=\"7\" cookieProps=\"https\"&gt;</p>",
+        "id": 393810904,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1695938300
+    },
+    {
+        "content": "<p><a href=\"#narrow/stream/378866-troubleshooting/topic/DiscoFeed.20timeout/near/393810904\">A message</a> was moved here from <a class=\"stream-topic\" data-stream-id=\"378866\" href=\"/#narrow/stream/378866-troubleshooting/topic/federated.20login.20and.20shibboleth.20group\">#troubleshooting &gt; federated login and shibboleth group</a> by <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span>.</p>",
+        "id": 393969549,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1696005862
+    },
+    {
+        "content": "<p>I'm really not sure. Did increasing the timeout help? Harvard and UNC both use the full feed and I don't remember hearing about any problems.</p>",
+        "id": 393969668,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696005910
+    },
+    {
+        "content": "<p>I'll have to find out what the full feed is.  And get back with what happens.</p>",
+        "id": 393971598,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696006737
+    },
+    {
+        "content": "<p>Sorry, full feed is probably confusing. I mean that UNC and Harvard let anyone from the InCommon feed log in. Hundreds of schools and other orgs.</p>",
+        "id": 393978062,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696009473
+    },
+    {
+        "content": "<p>Most Dataverse installations only let their institution log in via Shibboleth.</p>",
+        "id": 393978105,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696009492
+    },
+    {
+        "content": "<p>No need to apologize.  I'm still learning all this.</p>",
+        "id": 393979712,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696010249
+    },
+    {
+        "content": "<p>Don is on vacation or I'd ping him to see if he's seen timeouts.</p>",
+        "id": 393980239,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696010448
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"653479\">jamie jamison</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/DiscoFeed.20timeout/near/393810904\">said</a>:</p>\n<blockquote>\n<p>It looks like that works!    Still don't have federated on but based on what I'm getting with  the test account I'm very certain that this setting is correct.<br>\nWhich leads to Shibboleth Problem <a href=\"https://github.com/IQSS/dataverse/issues/2\">#2</a>.  No t sure why but suddely Shibboleth with the federeated login started to run so slow that the library systems group rolled back to the pre-federated settings.  It basically ground to a hald. The time-out error was:    <br>\n       Failed to download metadata from /Shibboleth.sso/DiscoFeed.</p>\n<p>According to Stephen Guernick (he's on slack), the hangup was loading in all the metadata for federated log-in.  His guess wasthat the startup process was encountering a time-out-limit and that the start-up kept trying and failing. The new metatdata file was being downloaded on each restart.</p>\n<p>So I went digging in the shibboleth settings.  Could this be the problem?<br>\n  &lt;S<strong>essions lifetime=\"7200\" timeout=\"3600\"</strong> checkAddress=\"false\"<br>\n            handlerURL=\"/Shibboleth.sso\" handlerSSL=\"true\"<br>\n            idpHistory=\"false\" idpHistoryDays=\"7\" cookieProps=\"https\"&gt;</p>\n</blockquote>\n<p>I've had trouble with Shibboleth exceeding the systemd default timeout on launch (then systemd restarts it, then it takes too long, then systemd restarts it...). You can set the shibd.service file to use <code>TimeoutStartSec=7m</code> (or maybe longer) and Shibboleth launches for me. I hope this helps?</p>",
+        "id": 394499610,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1696274805
+    },
+    {
+        "content": "<p>From the UCLA systems person helping me (Stephen Guernick, not on zulip yet):    he tried setting it to 10 minutes and shibboleth still timed-out. Not sure at this time why the problem started.</p>",
+        "id": 395742074,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696873239
+    },
+    {
+        "content": "<p>Stephen set the shibd startup timeout value to 2 hours.  It looks like it's working and I'm going to watch it all week to be sure.</p>",
+        "id": 395765472,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696887250
+    },
+    {
+        "content": "<p>The recommendation he followed:   <a href=\"https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335578/LinuxSystemd\">https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065335578/LinuxSystemd</a></p>",
+        "id": 395765687,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696887329
+    },
+    {
+        "content": "<p>Wow, 2 hours. Well, I'm glad it's working!</p>",
+        "id": 395770413,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1696890278
+    },
+    {
+        "content": "<p>I was a bit surprised by the 2 hours myself.</p>",
+        "id": 395907668,
+        "sender_full_name": "jamie jamison",
+        "timestamp": 1696951452
+    }
+]

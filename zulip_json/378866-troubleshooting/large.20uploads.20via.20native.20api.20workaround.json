@@ -1,0 +1,224 @@
+[
+    {
+        "content": "<p>hi folks - i know it's been discussed before, but can someone verify the recommended process for dealing with a large files over the native api? as i understand it it's something like the following, but i can't confirm it anywhere in the documentation.</p>\n<ol>\n<li>upload a small placeholder file with the same filename and (preferably) the same mime type</li>\n<li>find the info in the dataverse backend database for the placeholder file to get the storage location</li>\n<li>copy the large file you'd like to place in this storage location identified in (2)</li>\n<li>update the row in dataverse database that corresponds to the file, updating the <code>checksumvalue</code>, <code>contenttype</code>, and <code>filesize</code> columns.</li>\n</ol>",
+        "id": 453530970,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721770261
+    },
+    {
+        "content": "<p>relatedly: in the case that this large file is, for example, a zip file, will dataverse extract the file placed in this location? if it can't be done automatically, is there a way to trigger this to happen?</p>",
+        "id": 453531157,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721770331
+    },
+    {
+        "content": "<p>Right, we used to talk about that placeholder workaround, in <a href=\"https://groups.google.com/g/dataverse-community/c/yXDpdg-thqw/m/CWVgiGBBAwAJ\">this thread</a> on the mailing list, for example.</p>\n<p>However, these days I think we enable direct upload (requires S3) and push the files up from the client.</p>",
+        "id": 453697364,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721827994
+    },
+    {
+        "content": "<p>No, I don't believe there's a way to tell Dataverse to unzip a file afterwards.</p>\n<p>(There is a way to trigger a <a href=\"https://guides.dataverse.org/en/6.3/api/native-api.html#reingest-a-file\">reingest</a> of a tabular file, but that's different.)</p>",
+        "id": 453697706,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721828082
+    },
+    {
+        "content": "<p>okay, thanks. at Berkeley, we're still relying on <code>file</code> backend storage, and i don't think we'll be able to switch to S3 before we launch our Dataverse instance.</p>",
+        "id": 453734824,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721836963
+    },
+    {
+        "content": "<p>we do want to revisit using object storage post launch, though (along with a number of other things!)</p>",
+        "id": 453737376,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721837476
+    },
+    {
+        "content": "<p>There are some additional big data options on the horizon, such as Globus.</p>",
+        "id": 453737569,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721837513
+    },
+    {
+        "content": "<p>do you know if there's a diagram or something that describes the workflow of steps a file goes through on upload? i realize i could look at the code, but curious if there's something in addition that.</p>",
+        "id": 453757359,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721842258
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> created a nice diagram in this issue: Refactor file upload from web UI and temporary storage <a href=\"https://github.com/IQSS/dataverse/issues/6656\">#6656</a></p>",
+        "id": 453767557,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721845319
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png\">file-upload.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png\" title=\"file-upload.png\"><img src=\"/user_uploads/thumbnail/53090/m33boLPBbEWXgzzPOfQ2Q0Gx/file-upload.png/840x560.webp\"></a></div>",
+        "id": 453767737,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721845369
+    },
+    {
+        "content": "<p>got it - so i gather that <code>FileUtil</code> is where that process occurs?</p>",
+        "id": 453770643,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721846167
+    },
+    {
+        "content": "<p>Well, I think a lot happens in the IngestService as well. I haven't looked closely in a while. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 453771502,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721846578
+    },
+    {
+        "content": "<p>got it - trying to figure out which seam i should advocate for there to be an API endpoint for <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 453771620,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721846637
+    },
+    {
+        "content": "<p>Sorry, I'm multi-tasking poorly. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span> You might want to make a PR? To do what?</p>",
+        "id": 453771948,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721846766
+    },
+    {
+        "content": "<p>at this point, not a PR, just a feature request for an api endpoint to be able to retrigger these tasks.</p>",
+        "id": 453772949,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721847276
+    },
+    {
+        "content": "<p>Oh, retriggering unzipping of a file, for example?</p>",
+        "id": 453774280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721847752
+    },
+    {
+        "content": "<p>exactly. <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 453774331,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721847775
+    },
+    {
+        "content": "<p>Sure, please go ahead and create an issue for that one, if you like.</p>\n<p>Smaller issues are better for us.</p>",
+        "id": 453774442,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721847813
+    },
+    {
+        "content": "<p>done: <a href=\"https://github.com/IQSS/dataverse/issues/10723\">https://github.com/IQSS/dataverse/issues/10723</a></p>",
+        "id": 453812372,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1721862272
+    },
+    {
+        "content": "<p>Thanks!</p>",
+        "id": 453829882,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721872889
+    },
+    {
+        "content": "<p>related question: is it possible that the replace file API method would work here (writing just the json data, not the file itself) instead of updating the database directly? again, this is for <code>file</code>-backed storage, not s3. (rationale: i'd be more comfortable sending this as an API request rather than mucking about in the database.)</p>",
+        "id": 455233816,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722379126
+    },
+    {
+        "content": "<p>Yes, or maybe this API: <a href=\"https://guides.dataverse.org/en/6.3/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset\">https://guides.dataverse.org/en/6.3/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a></p>",
+        "id": 455476966,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722457396
+    },
+    {
+        "content": "<p>ah, i see. i think the issue with using the <code>/add</code> endpoint  is that there might not be an existing <code>storageIdentifier</code> for  the file. is there something that i'm missing there?</p>",
+        "id": 455492582,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722463116
+    },
+    {
+        "content": "<p>okay, interesting. <code>/replace</code> is failing in this case because of a uniqueness constraint violation on dvobject if i pass it the same storage identifier. i take it that this is expected? would it be more correct to mint a new storage identifier?</p>",
+        "id": 455496995,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722464782
+    },
+    {
+        "content": "<p>okay, i <em>think</em> i've got this figured out. i do need to mint a new storage identifier, which i can do fairly easily.</p>",
+        "id": 455504416,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722468142
+    },
+    {
+        "content": "<p><code>/add</code>, however, doesn't work if i've minted a new storage location; i get a 400 error (<code>Dataset store configuration does not allow provided storageIdentifier.</code>)</p>",
+        "id": 455506443,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722469156
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"735407\">María A. Matienzo</span> <a href=\"#narrow/stream/378866-troubleshooting/topic/large.20uploads.20via.20native.20api.20workaround/near/455492582\">said</a>:</p>\n<blockquote>\n<p>ah, i see. i think the issue with using the <code>/add</code> endpoint  is that there might not be an existing <code>storageIdentifier</code> for  the file. is there something that i'm missing there?</p>\n</blockquote>\n<p>Well, my mental model of this the storageIdentifier should be whatever filename you give the file. So you put the file on disk as <code>b4c5c9ab-4b4f</code>and then use that same string as the storageIdentifier in the JSON.</p>\n<p>I'm not sure if I've ever done this. I'm not sure if it'll work for non-S3 files. (That S3 direct upload API should work for files on S3.)</p>",
+        "id": 455655168,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722520338
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> got it. i think the new work around, which seems to work, is as follows:</p>\n<ol>\n<li>upload a small placeholder file with the same filename</li>\n<li>get the file's ID from the API response</li>\n<li>move the actual file into a file with a <em>new</em> <code>storageIdentifier</code></li>\n<li>call the <code>/replace</code> (or, in theory, the <code>/replaceFiles</code>) endpoint</li>\n</ol>",
+        "id": 455699610,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722530003
+    },
+    {
+        "content": "<p>Great! Do you want to create a pull request to document it? <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 455710731,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722532928
+    },
+    {
+        "content": "<p>yup, sure - once i've done some more testing, i'd be happy to. any recommendation about where it should sit?</p>",
+        "id": 455723753,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722536294
+    },
+    {
+        "content": "<p>i suppose it could go in the direct upload documentation, if people know to look there</p>",
+        "id": 455723950,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722536343
+    },
+    {
+        "content": "<p>Hmm, you're doing this because the file is large, right? How about somewhere under a future version of <a href=\"https://guides.dataverse.org/en/6.3/developers/big-data-support.html\">https://guides.dataverse.org/en/6.3/developers/big-data-support.html</a> ?</p>",
+        "id": 455725014,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722536544
+    },
+    {
+        "content": "<p>yup, that sounds good. thanks!</p>",
+        "id": 455725118,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722536565
+    },
+    {
+        "content": "<p>This just in from Jim Myers:</p>\n<p>\"File stores can use dataverse.files.&lt;id&gt;.upload-out-of-band flag which allows an improved file hack - you place the file and then call the <a href=\"https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset\">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#adding-the-uploaded-file-to-the-dataset</a> or <a href=\"https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset\">https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#to-add-multiple-uploaded-files-to-the-dataset</a> to add the metadata (including size, hash, etc.). It just avoids having to edit the db.\"</p>",
+        "id": 455944556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1722608052
+    },
+    {
+        "content": "<p>oh, neat. thanks! i'll give that a shot.</p>",
+        "id": 455972893,
+        "sender_full_name": "maría a. matienzo",
+        "timestamp": 1722614366
+    },
+    {
+        "content": "<p>If you don't mind my asking, what's considered a large upload?  Anything greater than 2GB?  We are troubleshooting some issues with files greater than 2GB so I'm trying to figure out if the above suggestions are where we need to go with things as well. Thanks!</p>",
+        "id": 462151266,
+        "sender_full_name": "Bethany Seeger",
+        "timestamp": 1723564603
+    },
+    {
+        "content": "<p>Sure, 2GB is pretty big. I would suggest trying DVUploader, either the traditional <a href=\"https://guides.dataverse.org/en/6.3/user/dataset-management.html#command-line-dvuploader\">Java one</a> or the <a href=\"https://github.com/gdcc/python-dvuploader\">Python one</a>.</p>",
+        "id": 462153048,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1723565103
+    }
+]

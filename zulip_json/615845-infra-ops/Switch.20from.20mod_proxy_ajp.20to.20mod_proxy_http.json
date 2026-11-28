@@ -1,0 +1,80 @@
+[
+    {
+        "content": "<p>Hi all .. I've been meaning to ask this question and now it's kind of urgent .. </p>\n<p>We are running Dataverse 6.11 on Payara 7 with the standard Apache + mod_proxy_ajp + Shibboleth configuration from the installation guide. We are occasionally seeing <code>mod_proxy_ajp</code> <code>BufferOverflowException</code> / <code>ajp_marshal_into_msgb: Error appending the header value</code> errors during Shibboleth-authenticated requests, resulting in a 400 Bad Request before the request reaches Payara. Our institution's IdP is known to send relatively large SAML-derived headers, and we've previously had to work around header-size issues by stripping cookies on /shib.xhtml. </p>\n<p>Has anyone successfully migrated a Dataverse 6.x installation from <code>mod_proxy_ajp</code> to <code>mod_proxy_http</code> with Shibboleth? If so, were there any Dataverse- or Shibboleth-specific configuration changes required beyond updating the Apache proxy configuration?</p>",
+        "id": 621550795,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788478165
+    },
+    {
+        "content": "<p>In the <a href=\"https://guides.dataverse.org/en/6.11/installation/shibboleth.html\">guides</a>, we definitely promote using AJP, like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>ProxyPass / ajp://localhost:8009/\n</code></pre></div>\n<p>But long ago I think I played around with...</p>\n<div class=\"codehilite\"><pre><span></span><code>ProxyPass / http://localhost:8080/\n</code></pre></div>\n<p>... and I seem to remember it working. Maybe give it a try on a test server?</p>",
+        "id": 621569714,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788484162
+    },
+    {
+        "content": "<p>It looks like I took some notes over a decade ago at <a href=\"https://github.com/IQSS/dataverse/issues/2294\">#2294</a> if that helps! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 621570021,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788484260
+    },
+    {
+        "content": "<p>Some possible security implications? I'm not sure.</p>",
+        "id": 621571253,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788484711
+    },
+    {
+        "content": "<p>Ah yea, if I'm reading that thread right, it seems that method was not really suggested .. is not supported and seems insecure .. so I likely won't go that way .. need to figure out some other way to resolve this header issue .. i did find there is a <code>ProxyIOBufferSize</code> directive that I can add to the apache config .. will try that. Thanks!</p>",
+        "id": 621601695,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788498406
+    },
+    {
+        "content": "<p>This is the first I've heard of large SAML-derived headers and having to modify shib.xhtml because of them.</p>\n<p>I wonder if you can handle this somehow in your Shibboleth config.</p>\n<p>For example, <span class=\"user-mention\" data-user-id=\"772415\">@Király Péter</span> was able to remap an attribute from one to another (e.g. from <a href=\"https://groups.google.com/g/dataverse-community/c/a5H0i7tn65c/m/k_6eeMvOBQAJ\">uid to eppn</a>) by specifying a rule in attribute-map.xml.</p>\n<p>Of course, this may be completely different from your situation.</p>\n<p>If you haven't already, you might want to ask on the <a href=\"https://shibboleth.net/mailman/listinfo/users\">shib-users</a> mailing list. I haven't posted in a while but they've always been friendly and responsive.</p>",
+        "id": 621676555,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788520852
+    },
+    {
+        "content": "<p>I didn't modify shib.html .. I just added <code>RequestHeader unset Cookie</code> to Location /shib.html in the apache config. I thought that would help but apparently it didn't. Yea I'll ask on the shib-users list .. I've asked things there before. I'm not sure they are SAML headers this is all just a guess, that's why I posted here, just wondering if anyone else has run into this.</p>",
+        "id": 621739163,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788534705
+    },
+    {
+        "content": "<p>Sure. Maybe <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> knows.</p>",
+        "id": 621749255,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788537381
+    },
+    {
+        "content": "<p>I did find that Apache was still using the default AJP buffer. After setting <code>ProxyIOBufferSize 65536</code>, the mod_proxy_ajp debug logs now show <code>data to read (max 65530 at 4)</code> instead of the previous 8 KB ?? limit. Leaving this in place to see if it resolves the intermittent BufferOverflowException during shib account creation. <span aria-label=\"fingers crossed\" class=\"emoji emoji-1f91e\" role=\"img\" title=\"fingers crossed\">:fingers_crossed:</span></p>",
+        "id": 621757044,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788539434
+    },
+    {
+        "content": "<p>That would be sweet!</p>",
+        "id": 621759744,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1788540164
+    },
+    {
+        "content": "<p>I've never encountered this, no. What on earth does your IdP send that's larger than 8kb?</p>",
+        "id": 621804062,
+        "sender_full_name": "Don Sizemore",
+        "timestamp": 1788553207
+    },
+    {
+        "content": "<p>the more i look into it the more i think it is not just shib headers, but cookies, shib information, and other request metadata so that the overall authenticated request from ASU headers is too large .. but as I said I'm just guessing at this .. idk</p>",
+        "id": 621816470,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788557764
+    },
+    {
+        "content": "<p>we have a similar issue when users make a lot of requests to our vendor e-resources .. after a lot of searching they start to get a \"request header too large\" error from those vendors because of the org headers added</p>",
+        "id": 621816656,
+        "sender_full_name": "Deirdre Kirmis",
+        "timestamp": 1788557848
+    }
+]

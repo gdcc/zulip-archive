@@ -1,0 +1,110 @@
+[
+    {
+        "content": "<p>From what I understand, to rebuild configbaker I have to do a \"package\" of the whole Dataverse app. Is that right? I ask because it's slow. If I could rebuild just the configbaker image I would.</p>",
+        "id": 385284844,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692133159
+    },
+    {
+        "content": "<p>Yes you can rebuild cb only</p>",
+        "id": 385294395,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692138447
+    },
+    {
+        "content": "<p>Lookup DMP filter. IIRC it's docker.filter or similar</p>",
+        "id": 385294417,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1692138467
+    },
+    {
+        "content": "<p>Great!</p>",
+        "id": 385296181,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692139208
+    },
+    {
+        "content": "<p>I tried <code>mvn -Pct clean package -Ddocker.filter=\"gdcc/configbaker\"</code> but it didn't work.</p>",
+        "id": 385467470,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692193833
+    },
+    {
+        "content": "<p><a href=\"https://dmp.fabric8.io\">https://dmp.fabric8.io</a> says:</p>\n<p>\"In order to temporarily restrict the operation of plugin goals this configuration option can be used. Typically this will be set via the system property docker.filter when Maven is called. The value can be a single image name (either its alias or full name) or it can be a comma separated list with multiple image names. Any name which doesn’t refer an image in the configuration will be ignored.\"</p>",
+        "id": 385467552,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692193862
+    },
+    {
+        "content": "<p><a href=\"https://stackoverflow.com/questions/74239993/fabric8-docker-maven-plugin-how-to-tag-just-one-image-dockertag\">https://stackoverflow.com/questions/74239993/fabric8-docker-maven-plugin-how-to-tag-just-one-image-dockertag</a> isn't very helpful</p>",
+        "id": 385467686,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1692193899
+    },
+    {
+        "content": "<p>I just tried <code>mvn -Pct clean package -Ddocker.filter=dev_bootstrap</code> but it's still slow and still builds dataverse-5.14.jar.</p>",
+        "id": 388321331,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1693487469
+    },
+    {
+        "content": "<p>Does <code>mvn -Pct docker:run -Ddocker.filter=dev_bootstrap</code> run more than just the configbakery?</p>",
+        "id": 388323649,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1693488188
+    },
+    {
+        "content": "<p>And can you try \"docker:build\" instead of \"package\"?</p>",
+        "id": 388323844,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1693488252
+    },
+    {
+        "content": "<p>Oh wait - \"package\" obviously will do compilation and packaging of the Java app... That's not really avoidable because these are just the normal Maven steps, triggered by the \"package\" target</p>",
+        "id": 388324060,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1693488329
+    },
+    {
+        "content": "<p>So if you want to avoid compilation etc, you will have to go for \"docker:build\"</p>",
+        "id": 388324130,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1693488353
+    },
+    {
+        "content": "<p>Thanks, I think it's working!!!</p>\n<div class=\"codehilite\"><pre><span></span><code>mvn -Pct docker:build -Ddocker.filter=dev_bootstrap\n</code></pre></div>",
+        "id": 388337766,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1693492104
+    },
+    {
+        "content": "<p>As mentioned, go try <code>mvn -Pct docker:build docker:run -Ddocker.filter=dev_bootstrap</code> to build and execute in the same go!</p>",
+        "id": 388338184,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1693492217
+    },
+    {
+        "content": "<p>I just tried messing with a script in configbaker (modules/container-configbaker/scripts/bootstrap.sh) as part of <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/running.20using.20compose\">#containers &gt; running using compose</a> and the above worked fine!</p>",
+        "id": 389508351,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694030587
+    },
+    {
+        "content": "<p>Before resolving this, we should document it. Or at least add it to a list of things to document.</p>",
+        "id": 389508399,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694030612
+    },
+    {
+        "content": "<p>I just created a PR: <a href=\"https://github.com/IQSS/dataverse/pull/9885\">https://github.com/IQSS/dataverse/pull/9885</a></p>",
+        "id": 389510141,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1694031477
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin</span> has marked this topic as resolved.</p>",
+        "id": 389626308,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1694083633
+    }
+]

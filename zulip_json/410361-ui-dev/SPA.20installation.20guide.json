@@ -1,0 +1,170 @@
+[
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> and everyone, would you benefit from some sort of installation guide for the SPA? I took a few notes while deploying to <a href=\"https://dev1.dataverse.org/spa/\">https://dev1.dataverse.org/spa/</a></p>",
+        "id": 535162699,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755619751
+    },
+    {
+        "content": "<p>This is what I have so far, very much a work in progress:</p>\n<h1>Dataverse Frontend Installation Guide</h1>\n<p>This is an opinionated guide that make the following assumptions:</p>\n<ul>\n<li>You're ok with hosting the SPA from Payara</li>\n<li>You're ok with /spa in the URL</li>\n</ul>\n<div class=\"codehilite\"><pre><span></span><code>git clone https://github.com/IQSS/dataverse-frontend.git\ncd dataverse-frontend\ngit checkout develop\ngit pull\n# adjust version as needed\nexport VERSION=v0.1.0\ngit checkout $VERSION\nsudo yum install nodejs\nnpm install\ncd packages/design-system &amp;&amp; npm run build\ncd ../..\ncp .env.example .env\n# edit .env, especially VITE_DATAVERSE_BACKEND_URL\nvi .env\nnpm run build -- --base=/spa\ncd deployment/payara\nmvn package -Dversion=$VERSION\n# replace with your server\nscp target/dataverse-frontend.war rocky@dev1.dataverse.org:/tmp\n</code></pre></div>\n<div class=\"codehilite\"><pre><span></span><code>/usr/local/payara6/glassfish/bin/asadmin deploy --name dataverse-frontend --contextroot /spa /tmp/dataverse-frontend.war\n</code></pre></div>",
+        "id": 535162938,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755619856
+    },
+    {
+        "content": "<p>Especially the <code>sudo yum install nodejs</code> part is a work in progress. In practice, for now, I'm running <code>npm</code> commands on my Mac laptop.</p>",
+        "id": 535163080,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755619919
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🚀</span> Looks elegant to deploy a war. <br>\nWhen you have Dataverse frontend with Apache (httpd) then alternatively you could deploy the frontend under the Apache webroot (default /var/www/html). <br>\nSo after the building step you need to copy the dist folder to that apache webroot and rename it to /var/www/html/spa. Then the apache config must be changed; place the folowing in the config<br>\n<code>ProxyPassMatch ^/spa !</code> <br>\nBe sure to put it before the line for the AJP to Payara. <br>\nThen restart Apache: <br>\n<code>sudo systemctl restart httpd</code></p>",
+        "id": 535248930,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755672548
+    },
+    {
+        "content": "<p>I do have Dataverse fronted with Apache. I think I might like your way better.</p>",
+        "id": 535295299,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755690244
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> before the build you have to configure a .env file, right?</p>",
+        "id": 535298359,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755691342
+    },
+    {
+        "content": "<p>Yes indeed, you have to set the <code>VITE_DATAVERSE_BACKEND_URL</code> correctly, thats what I did, but I start to think that might only be needed in a dev environmen?</p>",
+        "id": 535300648,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755692162
+    },
+    {
+        "content": "<p>BTW I was not to happy about building the application for each server specifically. But a workaround could be to build it wit some GUUID and the do some magical find and replace on the resulting files for each server.</p>",
+        "id": 535304667,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755693505
+    },
+    {
+        "content": "<p>Yeah, I wasn't too happy either. Hopefully we can find a solution.</p>",
+        "id": 535310132,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695206
+    },
+    {
+        "content": "<p>I updated my draft installation guide above to mention the .env file.</p>",
+        "id": 535310775,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695417
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> do you have auth working? For now I skipped all that. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 535310831,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695436
+    },
+    {
+        "content": "<p>Same for me, I looked into getting Keycloak to work on my VM, but it is kind of involved, using a Postgres db and a jar that connects with the Datavesre db to handle build-in autentication...</p>",
+        "id": 535311152,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755695534
+    },
+    {
+        "content": "<p>Have you played around with dev-env at <a href=\"https://github.com/IQSS/dataverse-frontend\">https://github.com/IQSS/dataverse-frontend</a> yet? That's what I'll try next.</p>",
+        "id": 535311257,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695573
+    },
+    {
+        "content": "<p>That dev-env works, but with docker containers, and we run our stuff on servers and the development with Vagrant/Virtualbox VM's</p>",
+        "id": 535311472,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755695652
+    },
+    {
+        "content": "<p>Gotcha, non-Docker.</p>",
+        "id": 535311552,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755695675
+    },
+    {
+        "content": "<p>I guess that building the SPA can also be done with some container that has everything in place for building, but I am not to confident in my docker skills yet to try it out.</p>",
+        "id": 535312479,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755695965
+    },
+    {
+        "content": "<p>If you're not confident you can only imagine how I feel! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 535312783,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696061
+    },
+    {
+        "content": "<p>As for using the dev-env with another backend, I did try to connect the SPA to the backend on my Vagrant box, but ran into problems...  think is was CORS, anyways it didn't work and I abondened the idea.</p>",
+        "id": 535313835,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755696372
+    },
+    {
+        "content": "<p>Right. Well, it sounds like you'd appreciate an installation guide for classic, non-Docker installations.</p>",
+        "id": 535314671,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696616
+    },
+    {
+        "content": "<p>When I mentioned I took some notes yesterday <span class=\"user-mention\" data-user-id=\"770046\">@Germán Saracca</span> said they are open to a pull request. Maybe we can work together on it.</p>",
+        "id": 535314755,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755696639
+    },
+    {
+        "content": "<p>Sure, but if it means we have to figure out how to get that Keycloak working and also have that Filestorage (needs Minio S3) problem fixed there is a lot to do.</p>",
+        "id": 535318976,
+        "sender_full_name": "Paul Boon",
+        "timestamp": 1755697931
+    },
+    {
+        "content": "<p>Yeah. No rush! <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 535320637,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755698409
+    },
+    {
+        "content": "<p>So, <code>yum install nodejs</code> didn't \"just work\" for me (see <a class=\"stream-topic\" data-stream-id=\"378866\" href=\"/#narrow/channel/378866-troubleshooting/topic/building.20the.20SPA.20on.20Rocky.209/with/536266846\">#troubleshooting &gt; building the SPA on Rocky 9</a>) so I switched to nvm (which worked fine) and made a few more tweaks. Here's my latest version of the installation guide.</p>",
+        "id": 536284933,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1756229930
+    },
+    {
+        "content": "<h1>Dataverse Frontend Installation Guide</h1>\n<p>This is an opinionated guide that make the following assumptions:</p>\n<ul>\n<li>You're ok (for now) with having the SPA in read-only mode (no auth, no OIDC)</li>\n<li>You're ok with hosting the SPA from Payara</li>\n<li>You're ok with /spa in the URL</li>\n</ul>\n<div class=\"codehilite\"><pre><span></span><code>git clone https://github.com/IQSS/dataverse-frontend.git\ncd dataverse-frontend\ngit checkout develop\ngit pull\n# adjust version as needed\nexport VERSION=v0.1.0\ngit checkout $VERSION\n# set up NVM: https://github.com/nvm-sh/nvm\ncurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash\nsource ~/.bashrc\n# use node 19, for correct version see DEVELOPER_GUIDE.md in https://github.com/IQSS/dataverse-frontend\nnvm install 19\nnvm use 19\n# install SPA dependencies\nnpm install\n# build design system\ncd packages/design-system &amp;&amp; npm run build\ncd ../..\n# configure SPA. TODO: auth and OIDC. See docs/KEYCLOAK_DEPLOYMENT.md in https://github.com/IQSS/dataverse-frontend\ncp .env.example .env\n# change this to your Dataverse backend URL\nexport SITE_URL=https://demo.dataverse.org\nsed -i &quot;s|VITE_DATAVERSE_BACKEND_URL=http://localhost:8000|VITE_DATAVERSE_BACKEND_URL=$SITE_URL|&quot; .env\n# build SPA\nnpm run build -- --base=/spa\n# build war file\ncd deployment/payara\nmvn package -Dversion=$VERSION\n# deploy war file\n/usr/local/payara6/glassfish/bin/asadmin deploy --name dataverse-frontend --contextroot /spa target/dataverse-frontend.war\n</code></pre></div>",
+        "id": 536284945,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1756229937
+    },
+    {
+        "content": "<p>Should we put containerization of the SPA including its build on the #ct meeting agenda?</p>",
+        "id": 538216584,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1757335729
+    },
+    {
+        "content": "<p>I'm not actively working on that, but please feel free!</p>",
+        "id": 538218207,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757336142
+    },
+    {
+        "content": "<p>In this topic, I'm talking about non-Docker installations, so far anyway. <span aria-label=\"smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 538231647,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1757339359
+    },
+    {
+        "content": "<p>In <a href=\"https://github.com/IQSS/dataverse-frontend/pull/880\">https://github.com/IQSS/dataverse-frontend/pull/880</a> we're switching from VITE_DATAVERSE_BACKEND_URL to backendUrl in a config file.</p>",
+        "id": 553383449,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1762177266
+    }
+]

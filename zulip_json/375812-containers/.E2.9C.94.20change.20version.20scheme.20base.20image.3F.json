@@ -1,0 +1,1604 @@
+[
+    {
+        "content": "<p>Today I was thinking about the fresh dependency hell we created for ourselves with the base image requiring rebuilds in some cases.</p>\n<p>How about we change from the unstable/stable thing to an independently versioned scheme?</p>\n<p>Having a static version of the base image would solve the problem of base images not up to date on people's machines.</p>\n<p>We could push merged versions to Docker Hub and PR versions to GHCR, so easy to switch to a preview for fast testing.</p>\n<p>We should pin down the Payara version for the images independent from the main app, allowing us to do security updates much faster. We should have a build time script with an acceptance list for app vs image server version, so we detect early when forgetting to update the property.</p>\n<p>A scheduled CI script might either only update the latest version with OS updates or we can create a matrix with commit ids to update (monorepo means we need to go to a certain place in commit history to update older versions).</p>\n<p>What do y'all think?</p>",
+        "id": 405636949,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1701599802
+    },
+    {
+        "content": "<p>I think I'm struggling a bit without examples. Ultimately we're talking about tags, right? What would some example tags look like?</p>",
+        "id": 405830745,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1701698574
+    },
+    {
+        "content": "<p>Thx for putting it on the agenda!</p>",
+        "id": 407902868,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1702540361
+    },
+    {
+        "content": "<p>Sure. The recording is here: <a href=\"https://harvard.zoom.us/rec/share/-e5CHUCBg7STDie4RF7dFx-YHB74pYQewg6hzKUAuNFBTrD_S7UvH0WrlvZ95erw.eVB72Eyc16Y_kcHE\">https://harvard.zoom.us/rec/share/-e5CHUCBg7STDie4RF7dFx-YHB74pYQewg6hzKUAuNFBTrD_S7UvH0WrlvZ95erw.eVB72Eyc16Y_kcHE</a></p>",
+        "id": 408192056,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702648923
+    },
+    {
+        "content": "<p>See also <a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/tagging.20images.20with.20versions\">#containers &gt; tagging images with versions</a></p>",
+        "id": 408192135,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1702648935
+    },
+    {
+        "content": "<p>With the upgrade to 6.2024.4 should we go for tags on the base image?</p>",
+        "id": 432496704,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712753440
+    },
+    {
+        "content": "<p>How about we use the Payara version included plus a suffix?</p>",
+        "id": 432496751,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712753457
+    },
+    {
+        "content": "<p>Like 6.2024.4-base1</p>",
+        "id": 432496804,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712753475
+    },
+    {
+        "content": "<p>Then we can increment on changes to the base image where no payara update is done</p>",
+        "id": 432496861,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712753493
+    },
+    {
+        "content": "<p>Should we talk about it tomorrow?</p>",
+        "id": 432497685,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1712753672
+    },
+    {
+        "content": "<p>Let me try it out and see how it goes so we have something concrete to talk about</p>",
+        "id": 432498001,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1712753774
+    },
+    {
+        "content": "<p>So now I have a workflow with the different versions going... Now <a href=\"https://github.com/IQSS/dataverse/issues/10508\">I discovered I had some flaws</a> in the image we currently tag as alpha. And the temurin <code>17-jre</code> tag is probably moving to a new Ubuntu version, but our Dockerfiles are not compatible (yet). Maybe we need a way to override some stuff even for tagged releases when brewing the base image...</p>",
+        "id": 434333624,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1713522614
+    },
+    {
+        "content": "<p>Yes, good point. Thanks for the investigation and for writing it up in that issue!</p>",
+        "id": 434715554,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1713782828
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> just a reminder to please link to the Bitnami example you found</p>",
+        "id": 452361123,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721313185
+    },
+    {
+        "content": "<p><a href=\"https://docs.vmware.com/en/VMware-Tanzu-Application-Catalog/services/tutorials/GUID-understand-rolling-tags-containers-index.html\">https://docs.vmware.com/en/VMware-Tanzu-Application-Catalog/services/tutorials/GUID-understand-rolling-tags-containers-index.html</a></p>",
+        "id": 452365150,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721314341
+    },
+    {
+        "content": "<p>\"What if you depend on a specific revision of an image? For these scenarios, Bitnami also attaches a static (immutable) tag to each revision. In this example, the <em>6.4.3-debian-12-r10</em> tag refers to WordPress 6.4.3 revision 10, and using this tag ensures that users always get the same image every time.\"</p>\n<p>Interesting. Thanks!</p>",
+        "id": 452366418,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1721314657
+    },
+    {
+        "content": "<p>It seems to work for them, so why not inherit their good practice? <span aria-label=\"smiling face\" class=\"emoji emoji-263a\" role=\"img\" title=\"smiling face\">:smiling_face:</span></p>",
+        "id": 452366913,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1721314761
+    },
+    {
+        "content": "<p>Progress! I have files patching in place and already create better tags for the base images for v6.1, 6.2 and 6.3</p>",
+        "id": 465274491,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724707796
+    },
+    {
+        "content": "<p>Curious people can take a <a href=\"https://github.com/gdcc/wip-dataverse-base-image/tree/10478-version-base-img/modules/container-base/src/backports\">look at the patch files</a>, or <a href=\"https://github.com/gdcc/wip-dataverse-base-image/actions/workflows/container_base_push.yml\">see some action output</a> and <a href=\"https://hub.docker.com/r/gdcc/base/tags\">see new tags on Docker Hub</a></p>",
+        "id": 465274923,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708004
+    },
+    {
+        "content": "<p>BTW here's my plan how this could actually work:</p>\n<ul>\n<li>apply patches for tag -&gt; with this we get stuff hacked if we have to rebuild something afterwards</li>\n<li>pull respective newest base image -&gt; we know the name from mvn help:evaluate</li>\n<li>get created timestamp from labels</li>\n<li>pull tag details for java base image from dockerhub (we know the name from mvn help:evaluate)</li>\n<li>has the tag been updated after the created timestap -&gt; rebuild</li>\n<li>if not: check if there are updates for our manually installed packages:<ul>\n<li>extract package list from dockerfile</li>\n<li>apt install -s &lt;LIST&gt; | grep “0 upgraded” --&gt; simulate, if the grep fails it must be rebuilt</li>\n</ul>\n</li>\n</ul>",
+        "id": 465275284,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708212
+    },
+    {
+        "content": "<p>So for now, I encoded quite a bit of things into the tags... Each tag has a version at the beginning, enabling expressing which feature set is usable. On the other hand, the scripts etc might not need changing when we update Payara or Java version... So I added that as a component in the tag, too.</p>",
+        "id": 465276246,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708763
+    },
+    {
+        "content": "<p>In addition I added the OS flavor. So we can make OS upgrades without changing the other stuff. Or add more flavors, e.g. using Redhat UBI or whatever.</p>",
+        "id": 465276292,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708813
+    },
+    {
+        "content": "<p>And last but not least there is the \"rX\" suffix (r = revision). These images will never be touched again after they have been created.</p>",
+        "id": 465276346,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708853
+    },
+    {
+        "content": "<p>The revision will be increased every time we rebuild, obviously... When we update the version, it will start at r0 again</p>",
+        "id": 465276504,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708939
+    },
+    {
+        "content": "<p>Version number change = functionality changes. Scripts are changed, software added/removed,  etc etc</p>",
+        "id": 465276569,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724708986
+    },
+    {
+        "content": "<p>Revision changes = no functionality changes, only updates as minimal as possible</p>",
+        "id": 465276661,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709013
+    },
+    {
+        "content": "<p>I'm no sure yet what I want as a base image tag for the application image. Maybe for local development it should be the base tag without a revision. In CI we probably should reference the exact revision for the sake of reproducible builds.</p>",
+        "id": 465276836,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709121
+    },
+    {
+        "content": "<p>Do we need shorter tags, too? Like gdcc/base:0.9.1, pointing to a sensible default? Or do we want people to pin down versions?</p>",
+        "id": 465277495,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709497
+    },
+    {
+        "content": "<p>Thinking about what happens when we merge a Payara update to develop. If we keep the version number for the base image unchanges, all of a sudden the Payara version changes. Which is back to square one, where unstable all of a sudden changes...</p>",
+        "id": 465277657,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709604
+    },
+    {
+        "content": "<p>If we really want those shorter things, IMHO we'd need some automation to seriously fail CI jobs when we forget to increase the base image version if Payara, Java version or OS change.</p>",
+        "id": 465277811,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709688
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> this is probably something we could discuss Thursday</p>",
+        "id": 465277880,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709722
+    },
+    {
+        "content": "<p>Some sanity check in a CI job that helps avoiding drift between base image version used in the application image and shipped by the actual base module is necessary anyway</p>",
+        "id": 465278231,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724709935
+    },
+    {
+        "content": "<p>The tags look jammy! Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span> </p>\n<p>And, yes, let's discuss on Thursday (<a class=\"stream-topic\" data-stream-id=\"375812\" href=\"/#narrow/stream/375812-containers/topic/weekly.20meeting\">#containers &gt; weekly meeting</a> where all are welcome!).</p>",
+        "id": 465418623,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724758578
+    },
+    {
+        "content": "<p>I think I'm ok with \"unstable\" changing when we upgrade Payara. Of course, I might be missing something important.</p>\n<p>To me we're really trying to support people who don't want to be on \"unstable\", who want to be on a tag like \"6.4\" or whatever.</p>",
+        "id": 465418902,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724758683
+    },
+    {
+        "content": "<p>Sure! But the base image is very different from the app image. I was thinking about using the app version for the base image back and forth, but it's probably not a good idea</p>",
+        "id": 465453501,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724765309
+    },
+    {
+        "content": "<p>There might be intermediate changes in the base image when we merge to develop. So people should not all of a sudden have a changed image. But I also don't like the idea of extraspecific references to a revision image when being in a development context</p>",
+        "id": 465453865,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724765387
+    },
+    {
+        "content": "<p>IMHO the combined tag of app version + base image revision number does not fully express a functionality change in the base image.</p>",
+        "id": 465454227,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724765449
+    },
+    {
+        "content": "<p>I'm fine with different tags for the base image vs. the app image.</p>",
+        "id": 465455569,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724765656
+    },
+    {
+        "content": "<p>Do you think we should have short rolling tags, too?</p>",
+        "id": 465456019,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724765796
+    },
+    {
+        "content": "<p>Example: <code>0.9.1-jammy-pyr6.2024.6-tmrn17</code> -&gt; <code>0.9.1-jammy</code> or even just <code>0.9.1</code></p>",
+        "id": 465456147,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724765831
+    },
+    {
+        "content": "<p>Well, at a high level, I'm ok with getting some kind of tagging going and then iterating over time.</p>\n<p>That said, it would be nice to get it \"right\" or close to right, the first time.</p>\n<p>Short tags are definitely easier on the eyes. <span aria-label=\"eyes\" class=\"emoji emoji-1f440\" role=\"img\" title=\"eyes\">:eyes:</span></p>",
+        "id": 465456614,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724765937
+    },
+    {
+        "content": "<p>I would be pretty simple to cut them off...</p>",
+        "id": 465457127,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724766030
+    },
+    {
+        "content": "<p>And technically we are talking rolling tags - they are expected to change</p>",
+        "id": 465457224,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724766046
+    },
+    {
+        "content": "<p>Alright. Let's pin these images down. Let's make rolling tags &lt;version&gt;-&lt;flavor&gt; and let only the stable tags contain payara and temurin version plus the revision number</p>",
+        "id": 465461669,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724766877
+    },
+    {
+        "content": "<p>So... <code>0.9.1-jammy</code>?</p>",
+        "id": 465463264,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724767274
+    },
+    {
+        "content": "<p>Aye</p>",
+        "id": 465463289,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767281
+    },
+    {
+        "content": "<p>Leaves the option make images that have different OSes</p>",
+        "id": 465463356,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767303
+    },
+    {
+        "content": "<p>Maybe at some point we want Dataverse app images based on Redhat UBI as well as Ubuntu</p>",
+        "id": 465463507,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767329
+    },
+    {
+        "content": "<p>Right now we're on Ubuntu because that's what Temurin is based on, right?</p>",
+        "id": 465464398,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724767585
+    },
+    {
+        "content": "<p>Yes and no</p>",
+        "id": 465464445,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767600
+    },
+    {
+        "content": "<p>Temurin has more images available</p>",
+        "id": 465464475,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767609
+    },
+    {
+        "content": "<p>They offer variants with Redhat UBI, Alpine, different Ubuntu versions and Windows</p>",
+        "id": 465464547,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767631
+    },
+    {
+        "content": "<p>Quoting <a href=\"https://github.com/docker-library/docs/blob/master/eclipse-temurin/README.md#supported-tags-and-respective-dockerfile-links\">https://github.com/docker-library/docs/blob/master/eclipse-temurin/README.md#supported-tags-and-respective-dockerfile-links</a></p>\n<ul>\n<li>17-jre-alpine</li>\n<li>17-jre-focal  </li>\n<li>17-jre-jammy  </li>\n<li>17-jre-noble</li>\n<li>17-jre-ubi9-minimal</li>\n<li>17-jre-windowsservercore-ltsc2022  </li>\n<li>17-jre-nanoserver-ltsc2022  </li>\n<li>17-jre-windowsservercore-1809</li>\n<li>17-jre-nanoserver-1809</li>\n</ul>",
+        "id": 465465060,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724767774
+    },
+    {
+        "content": "<p>I see!</p>",
+        "id": 465465771,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724767969
+    },
+    {
+        "content": "<p>The Redhat bit might become important for MassOC <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 465465926,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724768005
+    },
+    {
+        "content": "<p>To run on OpenShift? Yeah, maybe.</p>",
+        "id": 465465988,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724768023
+    },
+    {
+        "content": "<p>Dang... While writing docs I came across another pitfall: if a release and develop does not have changes or just a Payara update, both branches will fight for authority over the shorter tags...</p>",
+        "id": 465487980,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724773635
+    },
+    {
+        "content": "<p>I <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span> Documentation Driven Development <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 465488999,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724773894
+    },
+    {
+        "content": "<p>Now I'm thinkin we maybe should add the dataverse version to the tag <span aria-label=\"unamused\" class=\"emoji emoji-1f612\" role=\"img\" title=\"unamused\">:unamused:</span></p>",
+        "id": 465489247,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724773947
+    },
+    {
+        "content": "<p>For the base image too?</p>",
+        "id": 465489349,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724773975
+    },
+    {
+        "content": "<p>Thinking about adding the DV version to the image labels. Don't update the image if these don't match</p>",
+        "id": 465489768,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724774063
+    },
+    {
+        "content": "<p>So avoid fighting over it</p>",
+        "id": 465489789,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724774067
+    },
+    {
+        "content": "<p>You know best!</p>",
+        "id": 465492347,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724774500
+    },
+    {
+        "content": "<p>Ha! You wish!</p>",
+        "id": 465492438,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724774514
+    },
+    {
+        "content": "<p>Well, we're all gaining a lot of good experience, at least <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 465493455,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1724774678
+    },
+    {
+        "content": "<p>Truer words have seldomly been spoken. <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 465493613,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1724774712
+    },
+    {
+        "content": "<p>We discussed this during our working group meeting yesterday and came to a better understanding of what we want. <a href=\"https://docs.google.com/document/d/1X49oElqgORdTCMECRfb5BuKUI1_yw86G3qnu8TXK76k/edit\">https://docs.google.com/document/d/1X49oElqgORdTCMECRfb5BuKUI1_yw86G3qnu8TXK76k/edit</a></p>",
+        "id": 466252481,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725019408
+    },
+    {
+        "content": "<p>Looks like this is working now as discussed</p>",
+        "id": 466296693,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725032506
+    },
+    {
+        "content": "<p><a href=\"https://hub.docker.com/r/gdcc/base/tags\">https://hub.docker.com/r/gdcc/base/tags</a></p>",
+        "id": 466296922,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725032549
+    },
+    {
+        "content": "<p>Very nice - the scheduled update ran (<a href=\"https://github.com/gdcc/wip-dataverse-base-image/actions/runs/10650721620/job/29522439082\">https://github.com/gdcc/wip-dataverse-base-image/actions/runs/10650721620/job/29522439082</a>), but didn't do anything as neither a new Java image nor package updates were available</p>",
+        "id": 466696217,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725192960
+    },
+    {
+        "content": "<p>So. This basically works. Now what. Should I rope versioning application images into this same PR? <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span> WDYT?</p>",
+        "id": 467547653,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725458613
+    },
+    {
+        "content": "<p>You know, I listened to the recordings but I'm still a bit lost, I'm afraid. Does the PR have docs?</p>",
+        "id": 467557269,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725460421
+    },
+    {
+        "content": "<p>There isn't a  PR yet, but I can make one quickly</p>",
+        "id": 467557415,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725460447
+    },
+    {
+        "content": "<p>Do you want me to?</p>",
+        "id": 467557438,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725460452
+    },
+    {
+        "content": "<p>(Then you have preview docs)</p>",
+        "id": 467557456,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725460460
+    },
+    {
+        "content": "<p>Well, no rush. If you link to the branch I can look at the rst files.</p>",
+        "id": 467558141,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725460610
+    },
+    {
+        "content": "<p>Here you go:<br>\n<a href=\"https://github.com/IQSS/dataverse/compare/develop...gdcc:wip-dataverse-base-image:10478-version-base-img#diff-5f17f4ddba1f4dde9b5874d0373f7368f80ea49046d097f4da2f1dead9965def\">Base Image</a><br>\n<a href=\"https://github.com/IQSS/dataverse/compare/develop...gdcc:wip-dataverse-base-image:10478-version-base-img#diff-f9e7e94822695ee59f5f33bc9ee446f407fd4e6bd2e221c61aea0fbaa65e93f4\">Making Releases</a></p>",
+        "id": 467574363,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725463432
+    },
+    {
+        "content": "<p>Oh wow, you can even enable a \"rich diff\" that will the changes rendered!<br>\n<a href=\"/user_uploads/53090/NdKAWR4_GtxPyfu0_AmADvrK/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/NdKAWR4_GtxPyfu0_AmADvrK/image.png\" title=\"image.png\"><img data-original-dimensions=\"1008x736\" src=\"/user_uploads/thumbnail/53090/NdKAWR4_GtxPyfu0_AmADvrK/image.png/840x560.webp\"></a></div>",
+        "id": 467574842,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725463526
+    },
+    {
+        "content": "<p><code>s/Bitname/Bitnami/</code></p>",
+        "id": 467577566,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725464089
+    },
+    {
+        "content": "<p>Good catch, but I expect more <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 467580310,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725464653
+    },
+    {
+        "content": "<p>Ha. Overall, looks great. Confusing though. Maybe I'll try to write my own version and you can tell me if it's accurate. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 467581561,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725464862
+    },
+    {
+        "content": "<p>There's no PR yet that I can make a ```suggestion against, right?</p>",
+        "id": 468262908,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725647897
+    },
+    {
+        "content": "<p>I thought I created one... Maybe I just dreamt that?</p>",
+        "id": 468263115,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725647938
+    },
+    {
+        "content": "<p>Don't let me rush you! <span aria-label=\"stuck out tongue wink\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"stuck out tongue wink\">:stuck_out_tongue_wink:</span></p>",
+        "id": 468263395,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725648001
+    },
+    {
+        "content": "<p>Actually, I could make a PR into your branch.</p>",
+        "id": 468263559,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725648030
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/pull/10827\">https://github.com/IQSS/dataverse/pull/10827</a></p>",
+        "id": 468263950,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725648127
+    },
+    {
+        "content": "<p>Thanks. The branch is <a href=\"https://github.com/gdcc/wip-dataverse-base-image/tree/10478-version-base-img\">https://github.com/gdcc/wip-dataverse-base-image/tree/10478-version-base-img</a> but there's a branch with the same name in origin/upstream. Can we delete it? This: <a href=\"https://github.com/IQSS/dataverse/tree/10478-version-base-img\">https://github.com/IQSS/dataverse/tree/10478-version-base-img</a></p>",
+        "id": 468265509,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725648447
+    },
+    {
+        "content": "<p>Sure thing. I started working on that one first but then realised I need a fork with that branch as default to test more stuff</p>",
+        "id": 468265708,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725648496
+    },
+    {
+        "content": "<p>Deleted. Thanks.</p>",
+        "id": 468266178,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725648622
+    },
+    {
+        "content": "<p>Ah <code>git remote update origin --prune</code> is my friend.</p>",
+        "id": 468266811,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725648806
+    },
+    {
+        "content": "<p>I don't love this: \"there is no review or QA necessary, as it is a predefined necessity.\"</p>",
+        "id": 468270491,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725649697
+    },
+    {
+        "content": "<p>Feel free to rephrase</p>",
+        "id": 468270626,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725649735
+    },
+    {
+        "content": "<p>Do I need to elaborate?</p>",
+        "id": 468270660,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725649751
+    },
+    {
+        "content": "<p>Well, help me understand. Does it need to be the first PR merged after a release?</p>",
+        "id": 468270696,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725649773
+    },
+    {
+        "content": "<p>I changed it to just \"Now create a pull request and merge it.\"</p>",
+        "id": 468270872,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725649831
+    },
+    {
+        "content": "<p>Yes and no. If it isn't the first, someone might use some old base image with it. That may or may not work, depending on what's going on.</p>",
+        "id": 468270882,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725649836
+    },
+    {
+        "content": "<p>It probably should be the first. It's a very simple thing to do. As it is part of the release process, it kind of should always be the first one. We don't merge other things before the release process is done, aye? <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 468271033,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725649902
+    },
+    {
+        "content": "<p>Right. It's a clean slate.</p>",
+        "id": 468271596,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725650115
+    },
+    {
+        "content": "<p>Ok, I'm not done but please see <a href=\"https://github.com/gdcc/wip-dataverse-base-image/pull/1\">https://github.com/gdcc/wip-dataverse-base-image/pull/1</a></p>",
+        "id": 468271654,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725650132
+    },
+    {
+        "content": "<p>I'm going to use the same PR to look at other docs.</p>",
+        "id": 468271681,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725650144
+    },
+    {
+        "content": "<p>Will do. But not today. Weekend's started <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span> <span aria-label=\"cocktail\" class=\"emoji emoji-1f378\" role=\"img\" title=\"cocktail\">:cocktail:</span></p>",
+        "id": 468271802,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1725650185
+    },
+    {
+        "content": "<p>Enjoy! For Monday, I went ahead and pushed another commit. That PR is ready for you.</p>",
+        "id": 468286146,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725655683
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span> when you have a moment, I'm curious what you think of <a href=\"https://github.com/gdcc/wip-dataverse-base-image/pull/1\">https://github.com/gdcc/wip-dataverse-base-image/pull/1</a></p>",
+        "id": 469054071,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1725964206
+    },
+    {
+        "content": "<p>Thanks for going over my docs PR in the meeting just now.</p>",
+        "id": 469691910,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726151347
+    },
+    {
+        "content": "<p>TODO: send an email to the google group with a link to the recording and ask what they think about the plan for tags.</p>",
+        "id": 469692117,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726151399
+    },
+    {
+        "content": "<p>Sent! <a href=\"https://groups.google.com/g/dataverse-community/c/c_AbRdiBo_c/m/ALVmh0qLAQAJ\">https://groups.google.com/g/dataverse-community/c/c_AbRdiBo_c/m/ALVmh0qLAQAJ</a></p>",
+        "id": 469725169,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726158896
+    },
+    {
+        "content": "<p>I like the proposed change for container tags.  However, I believe outside of the developer community the base image is not actively used and even their the usage is limit to a sub group. Hence, use whatever tag system works for you. Nevertheless, it would be nice if the suggested changes for the base image could be also applied to the application image.  Here the suggested change would work great...</p>",
+        "id": 469872290,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726210894
+    },
+    {
+        "content": "<p>Of course it's planned to dona similar thing for the application images! But it's a different issue <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 469872886,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211076
+    },
+    {
+        "content": "<p>Did you watch the recording?</p>",
+        "id": 469872939,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211097
+    },
+    {
+        "content": "<p>parts of it</p>",
+        "id": 469872987,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726211113
+    },
+    {
+        "content": "<p>We were particularly unsure about the Flexi Stack tags. They are mostly relevant for getting images down to backend devs if there are breaking changes like Payara or Java version.</p>",
+        "id": 469873130,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211149
+    },
+    {
+        "content": "<p>Would that be helpful? Or are devs OK with just getting told to pull again after such large breaking changes are merged?</p>",
+        "id": 469873301,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211192
+    },
+    {
+        "content": "<p>Also happy to jump on a call for this. Can fire up a Zoom room quick</p>",
+        "id": 469873604,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211291
+    },
+    {
+        "content": "<p>IMHO those tags are great, I can change them as I need as a developer and they offer a great environment for matrix builds to test various java and application server combinations</p>",
+        "id": 469874028,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726211377
+    },
+    {
+        "content": "<p>I hear you!</p>",
+        "id": 469874354,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211434
+    },
+    {
+        "content": "<p>However, most of the time I don't care about the java version or application server version. Hence, I just use whatever is configured in maven.</p>",
+        "id": 469874474,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726211464
+    },
+    {
+        "content": "<p>That's what I said <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 469874543,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211478
+    },
+    {
+        "content": "<p>The tag string will just be glued together by Maven for you.</p>",
+        "id": 469874640,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211506
+    },
+    {
+        "content": "<p>You probably won't even recognize in day to day work</p>",
+        "id": 469874736,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211524
+    },
+    {
+        "content": "<p>Phil said Frontend devs are using unstable now for the SPA work. Should we add a rolling tag 6.x-flavor which looks the same as the production rolling tag, but is for the next unreleased version?</p>",
+        "id": 469874902,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211599
+    },
+    {
+        "content": "<p>Once the release is cut, it would roll over to be a production tag, also accompanied by the immutable tags</p>",
+        "id": 469874983,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211630
+    },
+    {
+        "content": "<p>(Obviously I would try to copy most of these ideas and policies to the app image)</p>",
+        "id": 469875366,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726211723
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> <a href=\"#narrow/stream/375812-containers/topic/change.20version.20scheme.20base.20image.3F/near/469874902\">said</a>:</p>\n<blockquote>\n<p>Phil said Frontend devs are using unstable now for the SPA work. Should we add a rolling tag 6.x-flavor which looks the same as the production rolling tag, but is for the next unreleased version?</p>\n</blockquote>\n<p>Yep, that would be awesome. Two rolling ones <code>latest</code> for the main branch and <code>development</code> for the development one would be awesome.</p>",
+        "id": 469877141,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726212075
+    },
+    {
+        "content": "<p>Oh wait so you're in favor of latest pointing to the latest production tag?</p>",
+        "id": 469877267,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212116
+    },
+    {
+        "content": "<p>I'm not sure this is a good idea... it violates the Bitnami pattern and the well known definition of latest tag as an unstable thing.</p>",
+        "id": 469877419,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212157
+    },
+    {
+        "content": "<p>Oh wait actually that's wrong. They just say latest points to the most current revision</p>",
+        "id": 469877687,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212242
+    },
+    {
+        "content": "<p>Would that latest tag pointing to the latest release be helpful for you?</p>",
+        "id": 469877982,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212317
+    },
+    {
+        "content": "<p>Maybe I'm wrong but my intuition says latest refers the latest release. Whenever I use docker images I want to use the latest stable version.  It's rather seldom that I want some development or test version, unless I'm involved in the development testing.</p>",
+        "id": 469878589,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726212480
+    },
+    {
+        "content": "<p>I hear you!</p>",
+        "id": 469878885,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212563
+    },
+    {
+        "content": "<p>As I said above, it would actually be more in line with the Bitnami policy. I had that wrong in my head.</p>",
+        "id": 469879034,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212590
+    },
+    {
+        "content": "<p>Most of the image users are (will) not be part of the development circle but rather users or sys admins. Hence, the tags should suit their needs.</p>",
+        "id": 469879063,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726212596
+    },
+    {
+        "content": "<p>Ok so maybe we can just keep the unstable tag as before for a rolling tag of develop</p>",
+        "id": 469879374,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212646
+    },
+    {
+        "content": "<p>Now I'm glad I already have the code to detect being on the latest release <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 469879644,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212723
+    },
+    {
+        "content": "<p>Maybe we could even adopt <a href=\"https://semver.org/\">https://semver.org/</a> ;)</p>",
+        "id": 469879877,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726212811
+    },
+    {
+        "content": "<p>We kind of have. There are patch releases for DV every now and then</p>",
+        "id": 469880005,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212847
+    },
+    {
+        "content": "<p>but thats a discussion independent of containers...</p>",
+        "id": 469880079,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726212861
+    },
+    {
+        "content": "<p>Do you think we should prolong the tags carrying the 0 for the patch version?</p>",
+        "id": 469880167,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212883
+    },
+    {
+        "content": "<p>I'd find that odd because I'm accustomed to the shorter tags in DV releases</p>",
+        "id": 469880239,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212905
+    },
+    {
+        "content": "<p>Most people also reference a DV version using these shorter variants. Probably because a patch release happens so rarely</p>",
+        "id": 469880367,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726212940
+    },
+    {
+        "content": "<p>Once application tags are used. We'll need some method to distinguish between the base and the hotfix container version.</p>",
+        "id": 469880656,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726213004
+    },
+    {
+        "content": "<p>Do we? We have revisions... Is there harm in adding the patches?</p>",
+        "id": 469880830,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213051
+    },
+    {
+        "content": "<p>People should always use the immutable tags for production l, so no one will be surprised</p>",
+        "id": 469881025,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213090
+    },
+    {
+        "content": "<p>If I use 6.3 in production and want/need to update the the hotfix version do I upgrade the image version to 6.3.1 or to some SHA revision number?</p>",
+        "id": 469881322,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726213151
+    },
+    {
+        "content": "<p>No, you'd upgrade from -r1 to -r2</p>",
+        "id": 469881424,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213177
+    },
+    {
+        "content": "<p>(Numbers only being placeholders here)</p>",
+        "id": 469881536,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213197
+    },
+    {
+        "content": "<p>So on your K8s deployment you're always referencing the immutable tags.</p>",
+        "id": 469881714,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213221
+    },
+    {
+        "content": "<p>If you want to update, you can just change the Revision number and properly test deploys, but also roll back easily.</p>",
+        "id": 469881989,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213265
+    },
+    {
+        "content": "<p>Much easier than a SHA sum <span aria-label=\"innocent\" class=\"emoji emoji-1f607\" role=\"img\" title=\"innocent\">:innocent:</span></p>",
+        "id": 469882071,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213279
+    },
+    {
+        "content": "<p>The same would be true for any other backported changes we might provide for security purposes. So I'm not sure why it wouldn't be good to do the same with backporting application patches</p>",
+        "id": 469882489,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213365
+    },
+    {
+        "content": "<p>I see. I wasn't aware of the revision part of the tag. With a bit of rearranging (dropping <code>r</code>) it would be compliment to a semantic version...</p>",
+        "id": 469882633,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726213413
+    },
+    {
+        "content": "<p>Hmm yeah I'd like to stick to the Bitnami pattern with the -r suffix.</p>",
+        "id": 469882772,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213448
+    },
+    {
+        "content": "<p>Also because these are on scheduled maintenance. If the content needs to change because of updates, the revision will be incremented</p>",
+        "id": 469882920,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213488
+    },
+    {
+        "content": "<p>That's not the same as an actual patch release of Dataverse</p>",
+        "id": 469883010,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213513
+    },
+    {
+        "content": "<p>I'm offering that Zoom room again <span aria-label=\"innocent\" class=\"emoji emoji-1f607\" role=\"img\" title=\"innocent\">:innocent:</span></p>",
+        "id": 469883337,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213599
+    },
+    {
+        "content": "<p>As said I'm fine with all of that:)</p>",
+        "id": 469883445,
+        "sender_full_name": "Johannes D",
+        "timestamp": 1726213623
+    },
+    {
+        "content": "<p>Ok great!</p>",
+        "id": 469883685,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213684
+    },
+    {
+        "content": "<p>To summarize as TLDR:</p>\n<ul>\n<li>make latest point to current production</li>\n<li>keep unstable around for latest of develop</li>\n<li>keep the flexible stack option to support matrix builds and auto updates</li>\n</ul>",
+        "id": 469884104,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726213781
+    },
+    {
+        "content": "<p>Hmm, during the call I was on board with having \"latest\" be equivalent to \"unstable\" but I hear you that \"latest\" should be stable, which is \"master\" (the latest release).</p>\n<p>We do endeavor to keep the \"develop\" branch (which maps to \"unstable\") release-ready but sometimes a bug creeps in that we fix before we release. So yeah, \"master\" should be a bit more stable.</p>\n<p>And like we're saying, developers are already used to using \"unstable\" so there would be no change for them.</p>",
+        "id": 469928698,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726224516
+    },
+    {
+        "content": "<p>Thanks for the feedback, <span class=\"user-mention\" data-user-id=\"617722\">@Johannes D</span>! <span aria-label=\"heart\" class=\"emoji emoji-2764\" role=\"img\" title=\"heart\">:heart:</span></p>",
+        "id": 469928788,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726224535
+    },
+    {
+        "content": "<p>Do we want to try to get this in for 6.4? I'm asking because this is the last sprint before we release. The sprint ends next Wednesday, Sep. 25.</p>\n<p>No pressure! I'm just trying to raise awareness of when 6.4 might come out.</p>",
+        "id": 470615732,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726495153
+    },
+    {
+        "content": "<p>Working on it. Would be good to have it in.</p>",
+        "id": 470616021,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495195
+    },
+    {
+        "content": "<p>Awesome. Is there anything I can do to help?</p>",
+        "id": 470618997,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726495576
+    },
+    {
+        "content": "<p>Not sure. I'm changing the docs again to fit what we discussed during the last CT meeting</p>",
+        "id": 470619246,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495615
+    },
+    {
+        "content": "<p>What are we gonna do about review and QA?</p>",
+        "id": 470619370,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495632
+    },
+    {
+        "content": "<p>Once I change all stuff to be suitable for upstream merge, it's not possible to run and test this anymore</p>",
+        "id": 470619453,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495656
+    },
+    {
+        "content": "<p>I'd probably just merge it, honestly.</p>",
+        "id": 470619569,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726495681
+    },
+    {
+        "content": "<p>There's always <code>git blame</code> <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 470619710,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495700
+    },
+    {
+        "content": "<p>If we get something wrong, we can try again, right?</p>",
+        "id": 470619725,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726495704
+    },
+    {
+        "content": "<p>Yes of course!</p>",
+        "id": 470619763,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726495713
+    },
+    {
+        "content": "<p>I merged your PR <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> and tweaked the docs some more. Here's the preview: <a href=\"https://dataverse-guide--10827.org.readthedocs.build/en/10827/container/base-image.html#supported-image-tags\">https://dataverse-guide--10827.org.readthedocs.build/en/10827/container/base-image.html#supported-image-tags</a></p>",
+        "id": 470622372,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726496238
+    },
+    {
+        "content": "<p>Right, right, <code>latest</code> can be used for production now. Makes sense.</p>",
+        "id": 470626125,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726496975
+    },
+    {
+        "content": "<p>Flexibile stack has a stray trailng comma (sorry): \"<code>n&gt;-j&lt;java.version&gt;</code>:\"</p>",
+        "id": 470626586,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726497044
+    },
+    {
+        "content": "<p>Also, we should keep the NOTE indented with flexible stack if we can.</p>",
+        "id": 470626900,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726497093
+    },
+    {
+        "content": "<p>Well the same thing is true for the other \"upcoming\" tag</p>",
+        "id": 470627127,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726497125
+    },
+    {
+        "content": "<p>Which is why I extracted it.</p>",
+        "id": 470627199,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726497133
+    },
+    {
+        "content": "<p>Oh! Never mind, then!</p>",
+        "id": 470627375,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726497155
+    },
+    {
+        "content": "<p>Maybe we could add, \"in these tags for development use, the current tag will...\"</p>",
+        "id": 470627688,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726497192
+    },
+    {
+        "content": "<p>Sure <span aria-label=\"smile\" class=\"emoji emoji-1f642\" role=\"img\" title=\"smile\">:smile:</span></p>",
+        "id": 470630156,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726497486
+    },
+    {
+        "content": "<p>Done!</p>",
+        "id": 470631162,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726497620
+    },
+    {
+        "content": "<p>Should we call it <code>&lt;dv-minor-next&gt;</code> instead of <code>&lt;dv-minor&gt;</code>? This might reduce confusion.</p>",
+        "id": 470634338,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726498060
+    },
+    {
+        "content": "<p>Oh good idea!</p>",
+        "id": 470634455,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726498079
+    },
+    {
+        "content": "<p>I already made it 6.4 in prod and 6.5 in dev</p>",
+        "id": 470634608,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726498094
+    },
+    {
+        "content": "<p>So that's well aligned then</p>",
+        "id": 470634659,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726498100
+    },
+    {
+        "content": "<p>Added and pushed</p>",
+        "id": 470635019,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726498153
+    },
+    {
+        "content": "<p>Awesome. I just mentioned at standup that ideally we'd like to get this into 6.4. I didn't hear any objections.</p>",
+        "id": 470646179,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726500376
+    },
+    {
+        "content": "<p>I've added details to the description in <a href=\"https://github.com/IQSS/dataverse/pull/10827\">https://github.com/IQSS/dataverse/pull/10827</a> to better communicate the state of this and what I see is still a TODO to get the job done. Feel free to take a look and think about what y'all might be able to contribute. (E.g. the feature to generate a proper README would be sth someone else can look into)</p>",
+        "id": 471027185,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726589226
+    },
+    {
+        "content": "<p><span aria-label=\"point up\" class=\"emoji emoji-1f446\" role=\"img\" title=\"point up\">:point_up:</span> <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span>  <span aria-label=\"wink\" class=\"emoji emoji-1f609\" role=\"img\" title=\"wink\">:wink:</span></p>",
+        "id": 471027358,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726589253
+    },
+    {
+        "content": "<p>I'm off now to get some construction work done...</p>",
+        "id": 471027618,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726589284
+    },
+    {
+        "content": "<p>Wow, I appreciate all the hard work on this! Thanks, <span class=\"user-mention\" data-user-id=\"598183\">@Oliver Bertuch</span>! <img alt=\":dataverse_man:\" class=\"emoji\" src=\"https://avatars.zulip.com/53090/emoji/images/c7b94a03.png\" title=\"dataverse man\"></p>",
+        "id": 471048407,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726595025
+    },
+    {
+        "content": "<p>I have to admit I'm having trouble parsing this:</p>\n<p>\"Move Docker Hub image description README update for gdcc/base to maintenance workflow, also listing the supported tags\"</p>",
+        "id": 471290606,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726673762
+    },
+    {
+        "content": "<p>You want the README to be updated programmatically?</p>",
+        "id": 471290694,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726673773
+    },
+    {
+        "content": "<p>It has always been like this</p>",
+        "id": 471290747,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673786
+    },
+    {
+        "content": "<p>But for now, the tags are hardcoded to \"unstable\" and \"alpha\"</p>",
+        "id": 471290791,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673799
+    },
+    {
+        "content": "<p>Now I want to have a list of the tags that are really supported</p>",
+        "id": 471290863,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673824
+    },
+    {
+        "content": "<p>Just like you can see them with other projects</p>",
+        "id": 471290903,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673839
+    },
+    {
+        "content": "<p>Otherwise people will click on \"tags\" and see a bunch of old tags lying around that we don't actually support?</p>",
+        "id": 471291093,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726673885
+    },
+    {
+        "content": "<p>Exactly</p>",
+        "id": 471291115,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673893
+    },
+    {
+        "content": "<p>Could we just state our policy?</p>",
+        "id": 471291158,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726673910
+    },
+    {
+        "content": "<p>We could, but that's kind of hard to parse when you're on Docker Hub</p>",
+        "id": 471291212,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673929
+    },
+    {
+        "content": "<p>It's not very convenient</p>",
+        "id": 471291227,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673934
+    },
+    {
+        "content": "<p>I'd rather properly list what's happening</p>",
+        "id": 471291298,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673955
+    },
+    {
+        "content": "<p>might be a good way to trim the tail</p>",
+        "id": 471291301,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726673956
+    },
+    {
+        "content": "<p>Trim which tail?</p>",
+        "id": 471291337,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726673971
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/PhWgB8oSAiV6TYLzTrRlYX7T/Screenshot-2024-09-18-at-11.39.58AM.png\">Screenshot-2024-09-18-at-11.39.58AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/PhWgB8oSAiV6TYLzTrRlYX7T/Screenshot-2024-09-18-at-11.39.58AM.png\" title=\"Screenshot-2024-09-18-at-11.39.58AM.png\"><img data-original-dimensions=\"508x227\" src=\"/user_uploads/thumbnail/53090/PhWgB8oSAiV6TYLzTrRlYX7T/Screenshot-2024-09-18-at-11.39.58AM.png/840x560.webp\"></a></div>",
+        "id": 471291518,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674013
+    },
+    {
+        "content": "<p>via <a href=\"https://blog.crisp.se/2012/10/25/henrikkniberg/agile-product-ownership-in-a-nutshell\">https://blog.crisp.se/2012/10/25/henrikkniberg/agile-product-ownership-in-a-nutshell</a></p>",
+        "id": 471291556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674025
+    },
+    {
+        "content": "<p>Ha!</p>",
+        "id": 471291587,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674033
+    },
+    {
+        "content": "<p>Sure, we could skip that for now. But it's not very far away now...</p>",
+        "id": 471291694,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674064
+    },
+    {
+        "content": "<p>I've just moved on from using a Github Action matrix to a build script that does the matrix itself.</p>",
+        "id": 471291709,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674067
+    },
+    {
+        "content": "<p>Whoops, I cut it off but the x axis is time.</p>",
+        "id": 471291726,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674073
+    },
+    {
+        "content": "<p>Github Action matrixes are just no good for advanced usage</p>",
+        "id": 471291742,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674077
+    },
+    {
+        "content": "<p>huh, interesting</p>",
+        "id": 471291816,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674099
+    },
+    {
+        "content": "<p>Also, I think the shell script is a lot more readable than the chatty thing you need to GH actions</p>",
+        "id": 471291875,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674117
+    },
+    {
+        "content": "<p>And we can run it locally to test it...</p>",
+        "id": 471291940,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674125
+    },
+    {
+        "content": "<p>nice</p>",
+        "id": 471291968,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674135
+    },
+    {
+        "content": "<p>It's up already, if you want to take a look</p>",
+        "id": 471292014,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674151
+    },
+    {
+        "content": "<p>.github/workflows/scripts/maintenance-job.sh I assume</p>",
+        "id": 471292377,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674255
+    },
+    {
+        "content": "<p>Aye</p>",
+        "id": 471292513,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674295
+    },
+    {
+        "content": "<p>IMHO it's way more readable...</p>",
+        "id": 471292573,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674309
+    },
+    {
+        "content": "<p>You remind me of Hamilton. <span aria-label=\"musical notes\" class=\"emoji emoji-1f3b6\" role=\"img\" title=\"musical notes\">:musical_notes:</span>  \"Why do you write like you're running out of time? <span aria-label=\"musical notes\" class=\"emoji emoji-1f3b6\" role=\"img\" title=\"musical notes\">:musical_notes:</span> --<a href=\"https://en.wikipedia.org/wiki/Non-Stop_(Hamilton_song)\">Non-Stop</a></p>",
+        "id": 471292575,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726674310
+    },
+    {
+        "content": "<p>The log looks like this now: <a href=\"https://github.com/gdcc/wip-dataverse-base-image/actions/runs/10925611937/job/30327491858\">https://github.com/gdcc/wip-dataverse-base-image/actions/runs/10925611937/job/30327491858</a></p>",
+        "id": 471293304,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726674511
+    },
+    {
+        "content": "<p>Looks good!</p>",
+        "id": 471297631,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726675734
+    },
+    {
+        "content": "<p>Now on <a href=\"https://hub.docker.com/r/gdcc/base\">https://hub.docker.com/r/gdcc/base</a>:<br>\n<a href=\"/user_uploads/53090/8MmIzRYqpkbfFfwtz6CioOCt/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/8MmIzRYqpkbfFfwtz6CioOCt/image.png\" title=\"image.png\"><img data-original-dimensions=\"1085x439\" src=\"/user_uploads/thumbnail/53090/8MmIzRYqpkbfFfwtz6CioOCt/image.png/840x560.webp\"></a></div>",
+        "id": 471515837,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726760972
+    },
+    {
+        "content": "<p>Nicer than Bitnami even! <span aria-label=\"smiling imp\" class=\"emoji emoji-1f608\" role=\"img\" title=\"smiling imp\">:smiling_imp:</span></p>",
+        "id": 471518917,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726761878
+    },
+    {
+        "content": "<p>Hrhr</p>",
+        "id": 471518955,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726761890
+    },
+    {
+        "content": "<p>Just fixing that the revision tags are included in the list, too.</p>",
+        "id": 471518987,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726761901
+    },
+    {
+        "content": "<p>Not that it's a competition. Everybody settle down.</p>",
+        "id": 471518992,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726761902
+    },
+    {
+        "content": "<p>Alright we're getting close here!</p>",
+        "id": 471525106,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726763934
+    },
+    {
+        "content": "<p>Only the release note is missing <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> !!!</p>",
+        "id": 471528173,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726764975
+    },
+    {
+        "content": "<p>I applied the finishing touches, so no more running the jobs in the fork now...</p>",
+        "id": 471528245,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726765000
+    },
+    {
+        "content": "<p>Oh wait I forgot the input param thing. Now I'm glad I did that list of TODOs. But everything else is done!</p>",
+        "id": 471529364,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726765350
+    },
+    {
+        "content": "<p>I'm off now. More later or tomorrow.</p>",
+        "id": 471529412,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726765369
+    },
+    {
+        "content": "<p>I'm back <span aria-label=\"see no evil\" class=\"emoji emoji-1f648\" role=\"img\" title=\"see no evil\">:see_no_evil:</span></p>",
+        "id": 471557133,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726777047
+    },
+    {
+        "content": "<p>I didn't write the release note. Sorry. I'm still working on 6.4 release notes. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 471558245,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777562
+    },
+    {
+        "content": "<p>I DID warn people at standup that we might want to get this PR in 6.4.</p>",
+        "id": 471558289,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777577
+    },
+    {
+        "content": "<p>I've been working really hard to get there <span aria-label=\"smiling\" class=\"emoji emoji-1f972\" role=\"img\" title=\"smiling\">:smiling:</span></p>",
+        "id": 471558349,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726777607
+    },
+    {
+        "content": "<p>Go go go!</p>",
+        "id": 471558389,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777624
+    },
+    {
+        "content": "<p>Lots of blood, sweat and tears in those 140 commits</p>",
+        "id": 471558409,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726777631
+    },
+    {
+        "content": "<p>Ha. Should we go ahead and put the PR into \"in review\"? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 471558453,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777651
+    },
+    {
+        "content": "<p>Let me get that one thing fixed with the empty tag, then we can do the release note and put it into ready for review while writing the note</p>",
+        "id": 471558575,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726777700
+    },
+    {
+        "content": "<p>And put a size on it? Maybe a 3 since I'll probably just merge it. <span aria-label=\"smiling imp\" class=\"emoji emoji-1f608\" role=\"img\" title=\"smiling imp\">:smiling_imp:</span></p>",
+        "id": 471558577,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777701
+    },
+    {
+        "content": "<p>Oh, sorry, yes, I meant \"ready for review\".</p>",
+        "id": 471558609,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777718
+    },
+    {
+        "content": "<p>IIRC I already gave it a size</p>",
+        "id": 471558617,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726777721
+    },
+    {
+        "content": "<p>Ah, yes, a 3. Perfect.</p>",
+        "id": 471558657,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726777743
+    },
+    {
+        "content": "<p>OK I think I have a fix. But I can't test it because of the upstream adaption...</p>",
+        "id": 471561228,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726778875
+    },
+    {
+        "content": "<p>Should we just merge it and cross fingers?</p>",
+        "id": 471561290,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726778889
+    },
+    {
+        "content": "<p>I'll draft a release note now</p>",
+        "id": 471561302,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726778899
+    },
+    {
+        "content": "<p>I'm fine with crossing fingers.</p>",
+        "id": 471562104,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726779287
+    },
+    {
+        "content": "<p>Done! Let me know what you think: <a href=\"https://github.com/IQSS/dataverse/pull/10827/commits/52e6408a5a0d33629139c2098253e6ca8f08588a\">https://github.com/IQSS/dataverse/pull/10827/commits/52e6408a5a0d33629139c2098253e6ca8f08588a</a></p>",
+        "id": 471563287,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726779762
+    },
+    {
+        "content": "<p>I'll put it in \"RfR\"</p>",
+        "id": 471563319,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726779777
+    },
+    {
+        "content": "<p>143 commits. <span aria-label=\"firecracker\" class=\"emoji emoji-1f9e8\" role=\"img\" title=\"firecracker\">:firecracker:</span> <span aria-label=\"exploding head\" class=\"emoji emoji-1f92f\" role=\"img\" title=\"exploding head\">:exploding_head:</span> (And I am quite thorough with my commits, I try to avoid single typo commits...)</p>",
+        "id": 471563493,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726779853
+    },
+    {
+        "content": "<p>Looks perfect. We can always tweak it as we add it to <a href=\"https://github.com/IQSS/dataverse/issues/10866\">#10866</a> (the 6.4 release notes).</p>",
+        "id": 471563912,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726780056
+    },
+    {
+        "content": "<p>Splendid!</p>",
+        "id": 471563934,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726780068
+    },
+    {
+        "content": "<p>I put my name on it and took you off. Thanks!</p>",
+        "id": 471564035,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726780110
+    },
+    {
+        "content": "<p>Looks like you're still reviewing...</p>",
+        "id": 471564813,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726780497
+    },
+    {
+        "content": "<p>Any chance you'll merge today <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> ?  Then I'd stay a while longer and see if I need to hotfix stuff that breaks...</p>",
+        "id": 471564890,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726780529
+    },
+    {
+        "content": "<p>Oh, uh, lemme ask in #dv-tech!</p>",
+        "id": 471565408,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726780737
+    },
+    {
+        "content": "<p>Ok, I asked. <span aria-label=\"fingers crossed\" class=\"emoji emoji-1f91e\" role=\"img\" title=\"fingers crossed\">:fingers_crossed:</span></p>",
+        "id": 471565921,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726780971
+    },
+    {
+        "content": "<p>Haha you're fine with crossing fingers that someone else gives a green light, not with hitting the merge button <span aria-label=\"innocent\" class=\"emoji emoji-1f607\" role=\"img\" title=\"innocent\">:innocent:</span> <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span> <span aria-label=\"hug\" class=\"emoji emoji-1f917\" role=\"img\" title=\"hug\">:hug:</span></p>",
+        "id": 471566093,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726781049
+    },
+    {
+        "content": "<p>I cannot act unilaterally. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span> We need a multilateral agreement. <span aria-label=\"crazy\" class=\"emoji emoji-1f61c\" role=\"img\" title=\"crazy\">:crazy:</span></p>",
+        "id": 471566655,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726781388
+    },
+    {
+        "content": "<p>I left a tiny review for you</p>",
+        "id": 471566738,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726781417
+    },
+    {
+        "content": "<p>Well it's already bilateral <span aria-label=\"flag germany\" class=\"emoji emoji-1f1e9-1f1ea\" role=\"img\" title=\"flag germany\">:flag_germany:</span> <span aria-label=\"flag us outlying islands\" class=\"emoji emoji-1f1fa-1f1f2\" role=\"img\" title=\"flag us outlying islands\">:flag_us_outlying_islands:</span></p>",
+        "id": 471567091,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726781614
+    },
+    {
+        "content": "<p>Alright seems like we won't get a quorum today. I'm gonna call it a night, it's late here. More hubbub tomorrow.</p>",
+        "id": 471569596,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726783125
+    },
+    {
+        "content": "<p>Merged: Releasing versioned (base) images <a href=\"https://github.com/IQSS/dataverse/issues/10827\">#10827</a></p>",
+        "id": 471691502,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726828875
+    },
+    {
+        "content": "<p>And no jobs failed! Smooth!</p>",
+        "id": 471742595,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1726841530
+    },
+    {
+        "content": "<p>German engineering <span aria-label=\"muscle\" class=\"emoji emoji-1f4aa\" role=\"img\" title=\"muscle\">:muscle:</span> <span aria-label=\"flag germany\" class=\"emoji emoji-1f1e9-1f1ea\" role=\"img\" title=\"flag germany\">:flag_germany:</span></p>",
+        "id": 471762179,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1726846111
+    },
+    {
+        "content": "<p>Looks like the scheduled maintenance came through as well. And the tags list on the Hub now also has latest in it.</p>",
+        "id": 472279267,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1727109368
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598183\">Oliver Bertuch</span> has marked this topic as resolved.</p>",
+        "id": 472279299,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1727109383
+    }
+]

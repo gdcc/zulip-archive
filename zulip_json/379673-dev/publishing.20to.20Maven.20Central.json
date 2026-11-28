@@ -1,0 +1,764 @@
+[
+    {
+        "content": "<p>I'd like to publish a jar to Maven Central but I'm hitting various roadblocks.</p>\n<p>Locally, from my laptop, using my \"pdurbin\" account, I'm able to publish a snapshot to org.dataverse but not io.gdcc. (I've emailed Central Support about getting permission to publish to io.gdcc.) For example, a <a href=\"https://s01.oss.sonatype.org/content/repositories/snapshots/org/dataverse/test/hello/\">snapshot jar</a>, is available, built from a <a href=\"https://github.com/gdcc/hello\">hello</a> app.</p>\n<p>I'm using credentials from my pdurbin account (User Access Token) and placing them in <code>~/.m2/settings.xml</code> like this:</p>\n<div class=\"codehilite\"><pre><span></span><code>&lt;settings&gt;\n  &lt;servers&gt;\n    &lt;server&gt;\n      &lt;id&gt;ossrh&lt;/id&gt;\n      &lt;username&gt;REDACTED&lt;/username&gt;\n      &lt;password&gt;REDACTED&lt;/password&gt;\n    &lt;/server&gt;\n  &lt;/servers&gt;\n&lt;/settings&gt;\n</code></pre></div>\n<p>Then I type <code>mvn deploy</code> to publish the snapshot. Pretty easy from local, but...</p>",
+        "id": 440094203,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716385122
+    },
+    {
+        "content": "<p>I have a <a href=\"https://github.com/gdcc/hello/blob/900b0e9c993bbce2a0453bdcb669898ab98a625a/.github/workflows/maven-snapshot.yml\">snapshot</a> GitHub Action set up for the hello app, but it's <a href=\"https://github.com/gdcc/hello/actions/runs/9192250925/job/25280446686#step:6:91\">showing</a> (as <span class=\"user-mention\" data-user-id=\"648750\">@Juan Pablo Tosca Villanueva</span> noticed) this debug output:</p>\n<p><code>[DEBUG] Failed to decrypt password for server github: org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException: java.io.FileNotFoundException: /home/runner/.m2/settings-security.xml (No such file or directory)</code></p>\n<p>Then it fails with this error:</p>\n<p><code>Error: Failed to execute goal org.sonatype.plugins:nexus-staging-maven-plugin:1.6.13:deploy (injected-nexus-deploy) on project hello: Failed to deploy artifacts: Could not transfer artifact org.dataverse.test:hello:jar:0.0.1-20240522.132907-4 from/to ossrh (https://s01.oss.sonatype.org/content/repositories/snapshots): authentication failed for https://s01.oss.sonatype.org/content/repositories/snapshots/org/dataverse/test/hello/0.0.1-SNAPSHOT/hello-0.0.1-20240522.132907-4.jar, status: 401 Unauthorized -&gt; [Help 1]</code></p>\n<p>I'm using the same credentials, in repository secrets under <a href=\"https://github.com/gdcc/hello/settings/secrets/actions\">https://github.com/gdcc/hello/settings/secrets/actions</a></p>\n<p>Why does it work locally but not in GitHub Actions? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440095108,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716385422
+    },
+    {
+        "content": "<p>Is there anything in runners on the  other repo that is missing from this?</p>",
+        "id": 440095525,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716385546
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png\">image.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png\" title=\"image.png\"><img src=\"/user_uploads/53090/H6aXslOOpDBtwOoaYpguxhLk/image.png\"></a></div>",
+        "id": 440095565,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716385557
+    },
+    {
+        "content": "<p>Do you mean <a href=\"https://github.com/IQSS/UNF/settings/actions/runners\">https://github.com/IQSS/UNF/settings/actions/runners</a> , for example? Nothing there:</p>\n<p><a href=\"/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png\">Screenshot-2024-05-22-at-9.57.26-AM.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png\" title=\"Screenshot-2024-05-22-at-9.57.26-AM.png\"><img src=\"/user_uploads/53090/_HlgeRLL5cgj7vBtPVtJfbLc/Screenshot-2024-05-22-at-9.57.26-AM.png\"></a></div>",
+        "id": 440098245,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716386264
+    },
+    {
+        "content": "<p>Yes but from <a href=\"https://github.com/gdcc/dataverse-exporters\">https://github.com/gdcc/dataverse-exporters</a></p>",
+        "id": 440101068,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716386951
+    },
+    {
+        "content": "<p>Nothing at <a href=\"https://github.com/gdcc/dataverse-exporters/settings/actions/runners\">https://github.com/gdcc/dataverse-exporters/settings/actions/runners</a> either.</p>",
+        "id": 440113101,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716389898
+    },
+    {
+        "content": "<p>I wonder where this settings-security.xml is setup</p>",
+        "id": 440117591,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716391012
+    },
+    {
+        "content": "<p>Does this seems similar? <span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin</span>  <a href=\"https://github.com/orgs/community/discussions/27165\">https://github.com/orgs/community/discussions/27165</a></p>",
+        "id": 440117874,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716391090
+    },
+    {
+        "content": "<p>Yes, it does seem related.</p>",
+        "id": 440118459,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716391245
+    },
+    {
+        "content": "<p>I just tried to push a snapshot to another org.dataverse project and it also says \"401 Unauthorized\": <a href=\"https://github.com/IQSS/UNF/actions/runs/9194059373\">https://github.com/IQSS/UNF/actions/runs/9194059373</a></p>\n<p>Maybe I should add the extra debugging.</p>",
+        "id": 440118830,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716391348
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>The ‘settings-security.xml’ file contains the master password used to encrypt remote repository credentials. The default location of this file is ‘~&lt;user_home&gt;/.m2/settings-security.xml’.\n\nNormally, if this file does not exist, or if it does not contain valid content, the ‘mvn --encrypt-password’ command line will fail with the error like:\n</code></pre></div>\n<p>So prob this is on the cache of the github action that was previously set up by someone? (not an expert just trying to figure this out <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span>)</p>",
+        "id": 440119211,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716391445
+    },
+    {
+        "content": "<p>I added extra debugging: <a href=\"https://github.com/IQSS/UNF/actions/runs/9194126200\">https://github.com/IQSS/UNF/actions/runs/9194126200</a></p>\n<p>No mention of settings-security.xml. Seems like it's just straight up 401 unauthorized.</p>",
+        "id": 440119563,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716391546
+    },
+    {
+        "content": "<p><span aria-label=\"open mouth\" class=\"emoji emoji-1f62e\" role=\"img\" title=\"open mouth\">:open_mouth:</span> <a href=\"https://www.bitshifted.co/blog/deploy-maven-central-github-actions-step-by-step-guide/\">https://www.bitshifted.co/blog/deploy-maven-central-github-actions-step-by-step-guide/</a></p>",
+        "id": 440119955,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716391630
+    },
+    {
+        "content": "<p>I just heard back from Maven Central Support: \"It appears that you are an authorized publisher on <code>org.dataverse</code>, but not yet <code>io.gdcc</code>, which explains the issues you're experiencing.\"</p>",
+        "id": 440156497,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716402617
+    },
+    {
+        "content": "<p>\"In order to grant publishing access on <code>io.gdcc</code>, we'll need an email on this thread approving your request from one of the accounts already authorized to publish under that domain.\"</p>",
+        "id": 440156539,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716402631
+    },
+    {
+        "content": "<p><span aria-label=\"upside down\" class=\"emoji emoji-1f643\" role=\"img\" title=\"upside down\">:upside_down:</span></p>",
+        "id": 440156860,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716402734
+    },
+    {
+        "content": "<p>But how we can publish from one repo</p>",
+        "id": 440157402,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716402922
+    },
+    {
+        "content": "<p>Unless whoever set this up used credentials valid for <a href=\"http://gdcc.io\">gdcc.io</a></p>",
+        "id": 440157502,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716402957
+    },
+    {
+        "content": "<p>But we have credentials for <a href=\"http://dataverse.org\">dataverse.org</a></p>",
+        "id": 440157587,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716402975
+    },
+    {
+        "content": "<p>I feel like this is only the first step, authorizing my pdurbin account to publish to io.gdcc.</p>",
+        "id": 440160264,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716403819
+    },
+    {
+        "content": "<p>There's still a lot of other weird stuff going on.</p>",
+        "id": 440160315,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716403833
+    },
+    {
+        "content": "<p>At least I hopes that is a fix, I was running out of ideas <span aria-label=\"laughing\" class=\"emoji emoji-1f606\" role=\"img\" title=\"laughing\">:laughing:</span></p>",
+        "id": 440161838,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716404353
+    },
+    {
+        "content": "<p>I don't think we're out of the woods yet.</p>",
+        "id": 440161898,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716404377
+    },
+    {
+        "content": "<p><code>have you tried turning it off and on again</code></p>",
+        "id": 440162038,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716404414
+    },
+    {
+        "content": "<p>It looks like they key we use to sign is not yet expired (but will soon, at the end of July):</p>\n<div class=\"codehilite\"><pre><span></span><code>$ gpg --show-keys --keyid-format 0xshort privatekey.txt\nsec#  rsa4096/0xC031F36B 2021-07-30 [SC] [expires: 2024-07-29]\n      2DFF887456235B4550B857DFBAFC446FC031F36B\nuid                      Dataverse Bot (Signing Bot for Dataverse and GDCC packages) &lt;dataversebot@gdcc.io&gt;\n</code></pre></div>",
+        "id": 440175276,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716409091
+    },
+    {
+        "content": "<p>That prob explains why the other one stopped working (?)</p>",
+        "id": 440175407,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716409145
+    },
+    {
+        "content": "<p>well, it isn't expired</p>",
+        "id": 440175511,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716409190
+    },
+    {
+        "content": "<p>The one from UNF?</p>",
+        "id": 440175605,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716409215
+    },
+    {
+        "content": "<p>They all use the same key, the one above.</p>",
+        "id": 440175639,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716409230
+    },
+    {
+        "content": "<p><span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440175659,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716409238
+    },
+    {
+        "content": "<p>DATAVERSEBOT_GPG_KEY</p>",
+        "id": 440175697,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716409252
+    },
+    {
+        "content": "<p>I'm hopeful that this is working, locally: <code>mvn -Prelease -Dgpg.keyname=$DATAVERSEBOT_GPG_KEYNAME -Dgpg.passphrase=$DATAVERSEBOT_GPG_PASSWORD deploy</code></p>",
+        "id": 440177792,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716409965
+    },
+    {
+        "content": "<p>I had to import the private key first: <code>gpg --import privatekey.txt</code></p>",
+        "id": 440177939,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716410014
+    },
+    {
+        "content": "<div class=\"codehilite\"><pre><span></span><code>[INFO]  * Upload of locally staged artifacts finished.\n[INFO]  * Closing staging repository with ID &quot;orgdataverse-1003&quot;.\n\nWaiting for operation to complete...\n..........\n\n[INFO] Remote staged 1 repositories, finished with success.\n[INFO] Remote staging repositories are being released...\n\nWaiting for operation to complete...\n......\n\n[INFO] Remote staging repositories released.\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  57.213 s\n[INFO] Finished at: 2024-05-22T16:37:17-04:00\n[INFO] ------------------------------------------------------------------------\n</code></pre></div>",
+        "id": 440178697,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716410272
+    },
+    {
+        "content": "<p>Nothing at <a href=\"https://repo1.maven.org/maven2/org/dataverse/\">https://repo1.maven.org/maven2/org/dataverse/</a> though.</p>",
+        "id": 440180254,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716410766
+    },
+    {
+        "content": "<p>So they give you access already? I got lost</p>",
+        "id": 440181898,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716411387
+    },
+    {
+        "content": "<p>Or that will take some time</p>",
+        "id": 440181935,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716411400
+    },
+    {
+        "content": "<p>No, I still don't have access to io.gdcc. Waiting. I replied from the dataversebot email account and said that Phil guy is trustworthy. <span aria-label=\"grinning\" class=\"emoji emoji-1f600\" role=\"img\" title=\"grinning\">:grinning:</span></p>",
+        "id": 440182047,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411441
+    },
+    {
+        "content": "<p>Above I'm trying to publish \"hello\" to org.dataverse. To real Maven Central, not staging.</p>",
+        "id": 440182114,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411466
+    },
+    {
+        "content": "<p>There it is: <a href=\"https://repo1.maven.org/maven2/org/dataverse/test/hello/0.0.1/\">https://repo1.maven.org/maven2/org/dataverse/test/hello/0.0.1/</a></p>",
+        "id": 440183298,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411867
+    },
+    {
+        "content": "<p>In real Maven Central.</p>",
+        "id": 440183310,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411872
+    },
+    {
+        "content": "<p><span aria-label=\"partying face\" class=\"emoji emoji-1f973\" role=\"img\" title=\"partying face\">:partying_face:</span></p>",
+        "id": 440183335,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716411881
+    },
+    {
+        "content": "<p><a href=\"https://central.sonatype.com/artifact/org.dataverse.test/hello\">https://central.sonatype.com/artifact/org.dataverse.test/hello</a></p>",
+        "id": 440183504,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411949
+    },
+    {
+        "content": "<p>I created that \"test\" area so we can practice.</p>",
+        "id": 440183578,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716411966
+    },
+    {
+        "content": "<p>This was deployed locally? No github action right</p>",
+        "id": 440183632,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716411995
+    },
+    {
+        "content": "<p>Right, from my laptop.</p>",
+        "id": 440183669,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412013
+    },
+    {
+        "content": "<p>At least I know it's possible <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 440183691,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412020
+    },
+    {
+        "content": "<p>And I'm ok pushing the croissant jar this way, if I have to.</p>",
+        "id": 440183726,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412032
+    },
+    {
+        "content": "<p>But I would like to get GitHub Actions working.</p>",
+        "id": 440183747,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412043
+    },
+    {
+        "content": "<p>I hope once we have the right keys will be easy <span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span></p>",
+        "id": 440183793,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716412068
+    },
+    {
+        "content": "<p>Well, the gpg key is fine. I just proved that.</p>",
+        "id": 440185507,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412727
+    },
+    {
+        "content": "<p>And the dataversebot sonotype username and password work from dataverse-exporters, as we discussed in <a href=\"https://docs.google.com/spreadsheets/d/1uO4bHrftt7YDD6lZWU4MCb3LekorlBCov-xm8qRIQfA/edit?usp=sharing\">the spreadsheet</a> we made:</p>\n<p><a href=\"/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png\">maven-central.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png\" title=\"maven-central.png\"><img src=\"/user_uploads/53090/COEEBOLtuRyJyb8GB8QZmiG7/maven-central.png\"></a></div><p>(I just updated it to say that I can push hello to org.dataverse final with my pdurbin credentials. To real Maven Central.)</p>",
+        "id": 440186119,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716412953
+    },
+    {
+        "content": "<p>Here are the docs I just wrote: <a href=\"https://github.com/gdcc/hello/commit/d2a2fa230af6889aec112717be6fb7e5de31e3d5\">https://github.com/gdcc/hello/commit/d2a2fa230af6889aec112717be6fb7e5de31e3d5</a></p>",
+        "id": 440186246,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716413015
+    },
+    {
+        "content": "<p>I <a href=\"https://github.com/gdcc/hello/commit/efeca9c20b23bd6f4b106d359b79d37aec832075\">added</a> a step to let me ssh into the runner. This is what I see:</p>\n<div class=\"codehilite\"><pre><span></span><code>runner@fv-az973-728:~/work/hello/hello$ cd ~/.m2/\nrunner@fv-az973-728:~/.m2$ ls\nrepository  settings.xml  toolchains.xml\nrunner@fv-az973-728:~/.m2$ cat settings.xml\n&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;\n  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;\n  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;\n  &lt;servers&gt;\n    &lt;server&gt;\n      &lt;id&gt;github&lt;/id&gt;\n      &lt;username&gt;${env.GITHUB_ACTOR}&lt;/username&gt;\n      &lt;password&gt;${env.GITHUB_TOKEN}&lt;/password&gt;\n    &lt;/server&gt;\n  &lt;/servers&gt;\n&lt;/settings&gt;runner@fv-az973-728:~/.m2$\n</code></pre></div>",
+        "id": 440230996,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716429920
+    },
+    {
+        "content": "<p>That id reminds me that the error is \"Failed to decrypt password for server github\".</p>\n<p>Instead of \"github\" it should be \"ossrh\".</p>\n<p>And the username and password should be updated, of course.</p>",
+        "id": 440231373,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716430137
+    },
+    {
+        "content": "<p><a href=\"https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-Apache-Maven\">https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-Apache-Maven</a></p>",
+        "id": 440231634,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716430279
+    },
+    {
+        "content": "<p>Interesting. The <code>settings.xml</code> above was from the \"hello\" app. I just <a href=\"https://github.com/gdcc/dataverse-exporters/commit/bc7d0b9658aba415738dce6a963e0b515ad009f6\">added</a> tmate to dataverse-exporters and the values are updated correctly:</p>\n<div class=\"codehilite\"><pre><span></span><code>runner@fv-az1108-124:~/work/dataverse-exporters/dataverse-exporters$ cd ~/.m2\nrunner@fv-az1108-124:~/.m2$ ls\nrepository  settings.xml  toolchains.xml\nrunner@fv-az1108-124:~/.m2$ cat settings.xml\n&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;\n  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;\n  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;\n  &lt;servers&gt;\n    &lt;server&gt;\n      &lt;id&gt;ossrh&lt;/id&gt;\n      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;\n      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;\n    &lt;/server&gt;\n  &lt;/servers&gt;\n&lt;/settings&gt;runner@fv-az1108-124:~/.m2$\n</code></pre></div>",
+        "id": 440232786,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716430893
+    },
+    {
+        "content": "<p>(Kudos to Oliver for suggesting tmate: <a href=\"https://mxschmitt.github.io/action-tmate/\">https://mxschmitt.github.io/action-tmate/</a> )</p>",
+        "id": 440236502,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716432816
+    },
+    {
+        "content": "<p><span aria-label=\"open mouth\" class=\"emoji emoji-1f62e\" role=\"img\" title=\"open mouth\">:open_mouth:</span></p>",
+        "id": 440236639,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716432890
+    },
+    {
+        "content": "<p>Oh this looks cool</p>",
+        "id": 440236645,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716432895
+    },
+    {
+        "content": "<p>Interesting, when I <a href=\"https://github.com/gdcc/hello/commit/6c621ade48ea1ffc6da75cf70a9efa1212bed46c\">move the tmate debugging</a> to just after setup-java, the values are there on the hello project:</p>\n<div class=\"codehilite\"><pre><span></span><code>runner@fv-az568-806:~/work/hello/hello$ cd ~/.m2\nrunner@fv-az568-806:~/.m2$ ls\nsettings.xml  toolchains.xml\nrunner@fv-az568-806:~/.m2$ cat settings.xml\n&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;\n  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;\n  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;\n  &lt;servers&gt;\n    &lt;server&gt;\n      &lt;id&gt;ossrh&lt;/id&gt;\n      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;\n      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;\n    &lt;/server&gt;\n  &lt;/servers&gt;\n&lt;/settings&gt;runner@fv-az568-806:~/.m2$\n</code></pre></div>",
+        "id": 440293255,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716460136
+    },
+    {
+        "content": "<p>Maybe it's the caching? I <a href=\"https://github.com/gdcc/hello/commit/0a95067f269834fca124d7c048f43e2bb4d3fe84\">moved debugging</a> to just after the caching and the values are not there:</p>\n<div class=\"codehilite\"><pre><span></span><code>runner@fv-az1433-508:~/work/hello/hello$ cd ~/.m2\nrunner@fv-az1433-508:~/.m2$ ls\nrepository  settings.xml  toolchains.xml\nrunner@fv-az1433-508:~/.m2$ cat settings.xml\n&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;\n  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;\n  xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;\n  &lt;servers&gt;\n    &lt;server&gt;\n      &lt;id&gt;github&lt;/id&gt;\n      &lt;username&gt;${env.GITHUB_ACTOR}&lt;/username&gt;\n      &lt;password&gt;${env.GITHUB_TOKEN}&lt;/password&gt;\n    &lt;/server&gt;\n  &lt;/servers&gt;\n&lt;/settings&gt;runner@fv-az1433-508:~/.m2$\n</code></pre></div>",
+        "id": 440293823,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716460361
+    },
+    {
+        "content": "<p>It works! <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span> <span aria-label=\"tada\" class=\"emoji emoji-1f389\" role=\"img\" title=\"tada\">:tada:</span>  I <a href=\"https://github.com/gdcc/hello/commit/63f3dbc2fb02d27d93fe601c0f173fe2fa948cf7\">removed</a> the \"Cache Maven Packages\" step:</p>\n<p><a href=\"https://github.com/gdcc/hello/actions/runs/9206483018\">https://github.com/gdcc/hello/actions/runs/9206483018</a></p>\n<p><a href=\"https://s01.oss.sonatype.org/content/groups/staging/org/dataverse/test/hello/0.0.2-SNAPSHOT/\">https://s01.oss.sonatype.org/content/groups/staging/org/dataverse/test/hello/0.0.2-SNAPSHOT/</a></p>\n<p><a href=\"/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png\">works.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png\" title=\"works.png\"><img src=\"/user_uploads/53090/7V22n-w5eg57mnG-h2SnIK5K/works.png\"></a></div><p><a href=\"/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png\">uploaded.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png\" title=\"uploaded.png\"><img src=\"/user_uploads/53090/zHCxwHzDJIQUkSYTSiikN3G2/uploaded.png\"></a></div>",
+        "id": 440294547,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716460654
+    },
+    {
+        "content": "<p>Hmm, what we do is slightly different than <a href=\"https://github.com/actions/cache/blob/v4.0.2/examples.md#java---maven\">https://github.com/actions/cache/blob/v4.0.2/examples.md#java---maven</a></p>",
+        "id": 440299833,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716462754
+    },
+    {
+        "content": "<p>Maybe we are suffering from this: Maven documentation example leads to cached settings.xml - <a href=\"https://github.com/actions/cache/issues/1195\">https://github.com/actions/cache/issues/1195</a></p>",
+        "id": 440300033,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716462839
+    },
+    {
+        "content": "<p>Ok, I <a href=\"https://github.com/gdcc/hello/blob/c1d5b127ede6de43e9d24943e552b384224c9d92/.github/workflows/maven-snapshot.yml#L30-L36\">added</a> the cache step back and publishing still works.</p>",
+        "id": 440302835,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716463848
+    },
+    {
+        "content": "<p>But why does the old caching config work on dataverse-exporters?</p>\n<p>As is the failure on the UNF repo due to caching or something else?</p>",
+        "id": 440308550,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716466033
+    },
+    {
+        "content": "<p>So the action for the snapshot of Hello works now right?</p>",
+        "id": 440310796,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716466916
+    },
+    {
+        "content": "<p><code>the time of validity for the key defaults to *2 years*</code></p>",
+        "id": 440311212,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716467071
+    },
+    {
+        "content": "<p>Last successful run was 8 months ago</p>",
+        "id": 440311266,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716467088
+    },
+    {
+        "content": "<p><span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440311275,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716467091
+    },
+    {
+        "content": "<p>With the debugger can you re-export the key and test that locally?</p>",
+        "id": 440311451,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716467150
+    },
+    {
+        "content": "<p>Yes, the snapshot action for \"hello\" works now. It was the cache.</p>\n<p>Now I'll move on to making sure <code>.github/workflows/maven-release.yml</code> works.</p>",
+        "id": 440314919,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716468373
+    },
+    {
+        "content": "<p>So in theory this should also work for deploying the croissant exporter to croissant?</p>",
+        "id": 440320376,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716470085
+    },
+    {
+        "content": "<p>Yes, I'm hoping the same tweak regarding caching will work on <a href=\"https://github.com/gdcc/exporter-croissant\">https://github.com/gdcc/exporter-croissant</a></p>",
+        "id": 440326546,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716471975
+    },
+    {
+        "content": "<p>Also, I just heard back from Maven Central Support: \"We have provisioned your <code>pdurbin</code> OSSRH account on <a href=\"https://s01.oss.sonatype.org/\">https://s01.oss.sonatype.org</a> as a publisher for the <code>io.gdcc</code> namespace.\"</p>",
+        "id": 440326692,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716472009
+    },
+    {
+        "content": "<p>I just tested, and yes, I can push from pdurbin to io.gdcc, the exporter-croissant repo. I updated the <a href=\"https://docs.google.com/spreadsheets/d/1uO4bHrftt7YDD6lZWU4MCb3LekorlBCov-xm8qRIQfA/edit?usp=sharing\">spreadsheet</a>:</p>\n<p><a href=\"/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png\">can-push.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png\" title=\"can-push.png\"><img src=\"/user_uploads/53090/_kohPf9N6Wsm5EhIslqnDKmj/can-push.png\"></a></div>",
+        "id": 440332243,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716473499
+    },
+    {
+        "content": "<p>Wait, i thought you were able to push hello with the github action?</p>",
+        "id": 440332849,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716473680
+    },
+    {
+        "content": "<p>Oh the image is not updated</p>",
+        "id": 440332997,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716473719
+    },
+    {
+        "content": "<p>I am, I am. I just updated the image again:<br>\n<a href=\"/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png\">green.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png\" title=\"green.png\"><img src=\"/user_uploads/53090/VBN8VmBEGbFJLRbpwlwUGafT/green.png\"></a></div>",
+        "id": 440333065,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716473743
+    },
+    {
+        "content": "<p>more green</p>",
+        "id": 440333102,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716473752
+    },
+    {
+        "content": "<p>shoot I missed one</p>",
+        "id": 440333215,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716473779
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png\">even-more-green.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png\" title=\"even-more-green.png\"><img src=\"/user_uploads/53090/B-28sPvKPf3VUGejpRwuTXeD/even-more-green.png\"></a></div>",
+        "id": 440333280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716473809
+    },
+    {
+        "content": "<p>It is looking good!</p>",
+        "id": 440334015,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716474044
+    },
+    {
+        "content": "<p>So what did you have to do with the cache?</p>",
+        "id": 440334038,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716474053
+    },
+    {
+        "content": "<p>The issue is basically this: <a href=\"https://github.com/actions/cache/issues/1195\">https://github.com/actions/cache/issues/1195</a></p>",
+        "id": 440334155,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716474086
+    },
+    {
+        "content": "<p>And the fix is to change the path.</p>",
+        "id": 440334205,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716474101
+    },
+    {
+        "content": "<p>I removed some green. Still working on \"pdurbin creds GitHub Action (hello)\" for org.dataverse. To push a final version using actions only.</p>",
+        "id": 440339171,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716475512
+    },
+    {
+        "content": "<p>Ok it seems to me you are out of the woods <span aria-label=\"tree\" class=\"emoji emoji-1f333\" role=\"img\" title=\"tree\">:tree:</span>  <span aria-label=\"tree\" class=\"emoji emoji-1f333\" role=\"img\" title=\"tree\">:tree:</span> <span aria-label=\"tree\" class=\"emoji emoji-1f333\" role=\"img\" title=\"tree\">:tree:</span> <span aria-label=\"tree\" class=\"emoji emoji-1f333\" role=\"img\" title=\"tree\">:tree:</span> <span aria-label=\"tree\" class=\"emoji emoji-1f333\" role=\"img\" title=\"tree\">:tree:</span></p>",
+        "id": 440347925,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716478276
+    },
+    {
+        "content": "<p><span aria-label=\"rolling on the floor laughing\" class=\"emoji emoji-1f923\" role=\"img\" title=\"rolling on the floor laughing\">:rolling_on_the_floor_laughing:</span></p>",
+        "id": 440347934,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716478281
+    },
+    {
+        "content": "<p>Going to do some PPR stuff but ping me if I can help with anything</p>",
+        "id": 440348005,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716478303
+    },
+    {
+        "content": "<p>I think so! I hope so! I feel less blocked than I have in days. <span aria-label=\"relieved\" class=\"emoji emoji-1f60c\" role=\"img\" title=\"relieved\">:relieved:</span></p>",
+        "id": 440349435,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716478772
+    },
+    {
+        "content": "<p>There's still a mystery here. The dataversebot sonatype creds I have on file don't work. I tried in GitHub Actions and locally (settings.xml) with the \"hello\" app.</p>",
+        "id": 440526222,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716562629
+    },
+    {
+        "content": "<p>I've been assuming the dataversebot creds are being used for dataverse-exporters but maybe it's using Oliver's creds? They are set at the org (gdcc) level.</p>",
+        "id": 440526379,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716562684
+    },
+    {
+        "content": "<p>In short, now that I've reset the password for the databasebot sonatype account, I'm thinking about regenerating the creds (a username and token).</p>",
+        "id": 440526556,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716562746
+    },
+    {
+        "content": "<p>We could verify the value of the keys with the debugger right?</p>",
+        "id": 440527034,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716562910
+    },
+    {
+        "content": "<p>I don’t think github lets you see them after they are saved?</p>",
+        "id": 440527145,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716562939
+    },
+    {
+        "content": "<p>From the dataverse-exporters, repo, yes, I should be able to look at settings.xml.</p>",
+        "id": 440527216,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716562974
+    },
+    {
+        "content": "<p>But that is because you had those locally, but I was wondering if we can verify the credentials for dataverse bot and check if these are Oliver’s or something else</p>",
+        "id": 440527588,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716563108
+    },
+    {
+        "content": "<p>No, for dataverse-exporters the secrets were already defined at the org (gdcc) level.</p>",
+        "id": 440527681,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716563144
+    },
+    {
+        "content": "<p>Oh, right, it's just this:</p>\n<div class=\"codehilite\"><pre><span></span><code>      &lt;username&gt;${env.MAVEN_USERNAME}&lt;/username&gt;\n      &lt;password&gt;${env.MAVEN_PASSWORD}&lt;/password&gt;\n</code></pre></div>",
+        "id": 440529606,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716563891
+    },
+    {
+        "content": "<p>Not sure how to get the actual values. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440529639,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716563907
+    },
+    {
+        "content": "<p>That is what I was thinking</p>",
+        "id": 440530416,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564250
+    },
+    {
+        "content": "<p>Can you echo</p>",
+        "id": 440530428,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564257
+    },
+    {
+        "content": "<p>Or write them with the debuger?</p>",
+        "id": 440530448,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564266
+    },
+    {
+        "content": "<p>Debugger</p>",
+        "id": 440530480,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564280
+    },
+    {
+        "content": "<p>Got them! With this: <a href=\"https://github.com/gdcc/dataverse-exporters/commit/01e7d2aaa664829eae60a3fa62ed156eb9d9d9e6\">https://github.com/gdcc/dataverse-exporters/commit/01e7d2aaa664829eae60a3fa62ed156eb9d9d9e6</a></p>\n<p><a href=\"https://stackoverflow.com/questions/67503656/echo-github-action-environment-variables\">https://stackoverflow.com/questions/67503656/echo-github-action-environment-variables</a></p>\n<p>And they are different than what I have on file!</p>",
+        "id": 440530907,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564456
+    },
+    {
+        "content": "<p>Aha!</p>",
+        "id": 440531002,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564486
+    },
+    {
+        "content": "<p>That is kind of wild those</p>",
+        "id": 440531306,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564611
+    },
+    {
+        "content": "<p>Tho</p>",
+        "id": 440531314,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564614
+    },
+    {
+        "content": "<p>Lol</p>",
+        "id": 440531320,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564615
+    },
+    {
+        "content": "<p>Reading this</p>",
+        "id": 440531337,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564621
+    },
+    {
+        "content": "<p>Let me try them on \"hello\"</p>",
+        "id": 440531339,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564622
+    },
+    {
+        "content": "<p>‘You can't show secrets through echo otherwise there would be a huge security problem (even using env variables as an intermediary).’</p>",
+        "id": 440531414,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564648
+    },
+    {
+        "content": "<p>That would make me think that you wouldn’t be able but <span aria-label=\"stuck out tongue\" class=\"emoji emoji-1f61b\" role=\"img\" title=\"stuck out tongue\">:stuck_out_tongue:</span></p>",
+        "id": 440531529,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716564677
+    },
+    {
+        "content": "<p>wait, wait, didn't I already try them, by getting them at the org (gdcc) level? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440531610,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564701
+    },
+    {
+        "content": "<p>I'll try them locally first, from settings.xml</p>",
+        "id": 440531645,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564716
+    },
+    {
+        "content": "<p><a href=\"/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg\">strands.jpg</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg\" title=\"strands.jpg\"><img src=\"/user_uploads/53090/LagOB6EwsZOmkLXT_VQKLVFQ/strands.jpg\"></a></div>",
+        "id": 440531980,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564803
+    },
+    {
+        "content": "<p>The gddc org creds work from my laptop.</p>",
+        "id": 440532414,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716564952
+    },
+    {
+        "content": "<p>Nice, for the \"hello\" app, I switched to the gddc org creds (gpg too, while I was in there) and they work, published: <a href=\"https://github.com/gdcc/hello/actions/runs/9226506854/job/25386421143\">https://github.com/gdcc/hello/actions/runs/9226506854/job/25386421143</a></p>",
+        "id": 440533088,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716565243
+    },
+    {
+        "content": "<p>So between the wrong dataversebot creds and the cache thing I really didn't stand a chance.</p>",
+        "id": 440533130,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716565268
+    },
+    {
+        "content": "<p>For the UNF repo, I simply updated DATAVERSEBOT_SONATYPE_USERNAME and DATAVERSEBOT_SONATYPE_TOKEN and now it works. Phew. I was about to mess with the cache setting. Not sure why I didn't have to. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 440568280,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716580071
+    },
+    {
+        "content": "<p>Changing <code>path: ~/.m2</code> to <code>path: ~/.m2/repository</code> was enough to get exporters-croissant to upload a snapshot from GitHub Actions: <a href=\"https://github.com/gdcc/exporter-croissant/commit/de84d164beb51fd85aeb2be4a39633065f29d9f7\">https://github.com/gdcc/exporter-croissant/commit/de84d164beb51fd85aeb2be4a39633065f29d9f7</a></p>",
+        "id": 440569723,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716580812
+    },
+    {
+        "content": "<p>I just left a comment here: <a href=\"https://github.com/actions/cache/issues/1195#issuecomment-2130284022\">https://github.com/actions/cache/issues/1195#issuecomment-2130284022</a></p>",
+        "id": 440570679,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716581281
+    },
+    {
+        "content": "<p>I don't have any more red. All green for pushes I've tried at least:<br>\n<a href=\"/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png\">green.png</a></p>\n<div class=\"message_inline_image\"><a href=\"/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png\" title=\"green.png\"><img src=\"/user_uploads/53090/TpjmcNPvA3YKljqPCCHxf0qR/green.png\"></a></div>",
+        "id": 440570887,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1716581364
+    },
+    {
+        "content": "<p><span aria-label=\"walking\" class=\"emoji emoji-1f6b6\" role=\"img\" title=\"walking\">:walking:</span><span aria-label=\"evergreen tree\" class=\"emoji emoji-1f332\" role=\"img\" title=\"evergreen tree\">:evergreen_tree:</span><span aria-label=\"evergreen tree\" class=\"emoji emoji-1f332\" role=\"img\" title=\"evergreen tree\">:evergreen_tree:</span><span aria-label=\"evergreen tree\" class=\"emoji emoji-1f332\" role=\"img\" title=\"evergreen tree\">:evergreen_tree:</span><span aria-label=\"evergreen tree\" class=\"emoji emoji-1f332\" role=\"img\" title=\"evergreen tree\">:evergreen_tree:</span></p>",
+        "id": 440570982,
+        "sender_full_name": "Juan Pablo Tosca Villanueva",
+        "timestamp": 1716581409
+    }
+]

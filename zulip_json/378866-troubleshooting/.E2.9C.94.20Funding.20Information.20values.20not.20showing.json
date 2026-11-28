@@ -1,0 +1,68 @@
+[
+    {
+        "content": "<p>Hi there, I am currently using dataverse version 6.2 and in Dataset page Metadata tab the values for Funding Information field in citation metadatablock are not showing, but the values appear when editing the dataset.<br>\nI am trying to debug this situation by looking at the code block that starts <a href=\"https://github.com/IQSS/dataverse/blob/a218417e875a41e03495581fb6f0e8207c07bd75/src/main/webapp/metadataFragment.xhtml#L113\">here in metadataFragment.xhtml</a>, but I don't have any changes there. I am also looking at datafieldvalue table to check if the fields are correctly defined. Everything seems fine but the values don't appear. Any ideas/suggestions?</p>\n<p>My configuration in citation.tsv for the fields not showing is as follows:</p>\n<div class=\"codehilite\" data-code-language=\"tsv\"><pre><span></span><code>#datasetField   name    title   description watermark    fieldType  displayOrder    displayFormat   advancedSearchField allowControlledVocabulary   allowmultiples  facetable   displayoncreate required    parent  metadatablock_id    termURI\n\n...\n\ngrantNumber Funding Information Information about the Dataset's financial support       none    46  :   FALSE   FALSE   TRUE    FALSE   FALSE   FALSE       citation    https://schema.org/sponsor\ngrantNumberAgency   Agency  The agency that provided financial support for the Dataset  Organization XYZ    text    47  #VALUE  TRUE    FALSE   FALSE   TRUE    FALSE   FALSE   grantNumber citation\ngrantNumberValue    Identifier  The grant identifier or contract identifier of the agency that provided financial support for the Dataset       text    48  #VALUE  TRUE    FALSE   FALSE   TRUE    FALSE   FALSE   grantNumber citation\n</code></pre></div>",
+        "id": 534247136,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755096610
+    },
+    {
+        "content": "<p>Is this a published, public dataset we can look at?</p>",
+        "id": 534247465,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755096692
+    },
+    {
+        "content": "<p>Yes, for example this one: <a href=\"https://qty.polen.fccn.pt/dataset.xhtml?persistentId=doi:10.82210/VFANW5\">https://qty.polen.fccn.pt/dataset.xhtml?persistentId=doi:10.82210/VFANW5</a></p>",
+        "id": 534247682,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755096756
+    },
+    {
+        "content": "<p>I can see grantNumberValue, etc when I export as JSON: <a href=\"https://qty.polen.fccn.pt/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi%3A10.82210/VFANW5\">https://qty.polen.fccn.pt/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi%3A10.82210/VFANW5</a></p>",
+        "id": 534249047,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755097132
+    },
+    {
+        "content": "<p>Yes, the metadata when exporting as JSON seems correct, but when previewing the metadata tab the Funding Information is empty.</p>",
+        "id": 534249892,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755097349
+    },
+    {
+        "content": "<p>In that case it should appear the grantNumberValue. In this <a href=\"https://qty.polen.fccn.pt/dataset.xhtml?persistentId=doi:10.82210/HIQEKZ\">example</a> both fields for grantNumber have values but nothing appears in Metadata and the JSON export has these values <a href=\"https://qty.polen.fccn.pt/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi:10.82210/HIQEKZ\">https://qty.polen.fccn.pt/api/datasets/export?exporter=dataverse_json&amp;persistentId=doi:10.82210/HIQEKZ</a></p>",
+        "id": 534250987,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755097661
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"622863\">César Ferreira</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/Funding.20Information.20values.20not.20showing/near/534247136\">said</a>:</p>\n<blockquote>\n<p>but I don't have any changes there</p>\n</blockquote>\n<p>Did you make other changes? Are you running a fork? If you create a dataset using that JSON on <a href=\"https://demo.dataverse.org\">https://demo.dataverse.org</a>, does it look ok?</p>",
+        "id": 534280206,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755108800
+    },
+    {
+        "content": "<p>I think I found the issue, I am using an external controlled vocabulary script for that field. It was supposed to only work in edit mode but somehow it interferes with the loading of that field in view mode. After I changed the condition in the script for when to run, everything is working as intended.</p>",
+        "id": 534430257,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755159034
+    },
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"622863\">César Ferreira</span> has marked this topic as resolved.</p>",
+        "id": 534430282,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1755159043
+    },
+    {
+        "content": "<p>I also had parent field name in the JSON config file for external controlled vocabularies and that was also causing the issue. After I changed it to grantNumberValue it started showing the values.</p>",
+        "id": 534431251,
+        "sender_full_name": "César Ferreira",
+        "timestamp": 1755159424
+    },
+    {
+        "content": "<p>Ah, CVOC. I should have asked about that. Glad you figured it out!</p>",
+        "id": 534457655,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1755170087
+    }
+]

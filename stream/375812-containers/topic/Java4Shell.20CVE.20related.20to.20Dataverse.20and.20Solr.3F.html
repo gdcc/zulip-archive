@@ -1,0 +1,81 @@
+<html>
+<head><meta charset="utf-8"><title>Java4Shell CVE related to Dataverse and Solr? · containers · Zulip Chat Archive</title></head>
+<h2>Stream: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/index.html">containers</a></h2>
+<h3>Topic: <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html">Java4Shell CVE related to Dataverse and Solr?</a></h3>
+
+<hr>
+
+<base href="https://dataverse.zulipchat.com">
+
+<head><link href="https://gdcc.github.io/zulip-archive/style.css" rel="stylesheet"></head>
+
+<a name="643182648"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643182648" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Oussama Zoubia (UKK) <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643182648">(Nov 24 2026 at 08:51)</a>:</h4>
+<p>I haven't tried the env with solr nor upgraded yet, but I will and then let u know if it works.</p>
+
+
+
+<a name="643233772"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643233772" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643233772">(Nov 24 2026 at 12:13)</a>:</h4>
+<p>Awesome, thanks.</p>
+
+
+
+<a name="643325916"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643325916" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643325916">(Nov 24 2026 at 16:57)</a>:</h4>
+<p>Good news! At least on a new installation of Dataverse, I'm able to switch to Solr 9.11 and indexing still works. This might be the easiest thing rather than messing with JVM options.</p>
+
+
+
+<a name="643325957"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643325957" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643325957">(Nov 24 2026 at 16:57)</a>:</h4>
+<p>This is the change I made:</p>
+<div class="codehilite"><pre><span></span><code>[root@ip-172-31-37-44 dataverse-demo]# diff -u compose.yml.orig compose.yml
+--- compose.yml.orig    2026-11-24 16:22:45.770073105 +0000
++++ compose.yml 2026-11-24 16:23:03.741314774 +0000
+@@ -135,7 +135,7 @@
+   solr:
+     container_name: "solr"
+     hostname: "solr"
+-    image: solr:9.8.0
++    image: solr:9.11.0
+     depends_on:
+       - solr_initializer
+     restart: on-failure
+[root@ip-172-31-37-44 dataverse-demo]#
+</code></pre></div>
+
+
+
+<a name="643326147"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643326147" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643326147">(Nov 24 2026 at 16:57)</a>:</h4>
+<p>I confirmed I'm running 9.11.0 with this:</p>
+<p><code>curl http://localhost:8983/solr/admin/info/system | jq '.lucene."solr-spec-version"'</code></p>
+
+
+
+<a name="643326966"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643326966" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643326966">(Nov 24 2026 at 17:00)</a>:</h4>
+<p>I checked and Solr is running on a version of Java that isn't vulnerable:</p>
+<div class="codehilite"><pre><span></span><code>$ sudo docker exec -it solr java --version
+openjdk 17.0.21.1 2026-11-17
+OpenJDK Runtime Environment Temurin-17.0.21.1+2 (build 17.0.21.1+2)
+OpenJDK 64-Bit Server VM Temurin-17.0.21.1+2 (build 17.0.21.1+2, mixed mode, sharing)
+</code></pre></div>
+
+
+
+<a name="643411107"></a>
+<h4><a href="https://dataverse.zulipchat.com#narrow/stream/375812-containers/topic/Java4Shell%20CVE%20related%20to%20Dataverse%20and%20Solr%3F/near/643411107" class="zl"><img src="https://gdcc.github.io/zulip-archive/assets/img/zulip.svg" alt="view this post on Zulip" style="width:20px;height:20px;"></a> Philip Durbin 🚀 <a href="https://gdcc.github.io/zulip-archive/stream/375812-containers/topic/Java4Shell.20CVE.20related.20to.20Dataverse.20and.20Solr.3F.html#643411107">(Nov 24 2026 at 22:47)</a>:</h4>
+<p>I just sent an advisory but I didn't link back to this topic because I get a bit nervous about talking about security vulnerabilities in a public channel like this.</p>
+<p>Please see also:</p>
+<ul>
+<li><a class="stream-topic" data-stream-id="379856" href="/#narrow/channel/379856-security/topic/security.20policy/with/471942089">#security &gt; security policy</a> </li>
+<li><a class="stream-topic" data-stream-id="375876" href="/#narrow/channel/375876-zulip/topic/.23security.20cleanup/with/579350658">#zulip &gt; #security cleanup</a> </li>
+<li><a class="stream-topic" data-stream-id="375876" href="/#narrow/channel/375876-zulip/topic/private.20channel.20for.20security.3F/with/592304005">#zulip &gt; private channel for security?</a></li>
+</ul>
+
+
+
+<hr><p>Last updated: Nov 28 2026 at 14:52 UTC</p>
+</html>

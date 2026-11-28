@@ -1,0 +1,74 @@
+[
+    {
+        "content": "<p>Hi, I have a problem. Just upgraded Dataverse from 5.14 to 6.0. I followed the release notes, and I ran into a trouble. Those dataverses that are configured to work with S3 (we use CEPH S3 not AWS), are inaccessible, they produce the following on the web side:</p>\n<div class=\"codehilite\"><pre><span></span><code>XML Parsing Error: mismatched tag. Expected: &lt;/br&gt;.\nLocation: https://data.goettingen-research-online.de/dataverse/pkiraly\nLine Number 355, Column 9:\n      &lt;/div&gt;\n--------^\n</code></pre></div>\n<p>Payara server.log says: \"java.io.IOException: ERROR: S3AccessIO - Failed to look up bucket gro-data (is AWS properly configured?): null (Service: Amazon S3; Status Code: 400; Error Code: InvalidArgument; Request ID: tx00000feb01b793cfaf500-0067208fa0-5263351e-default; S3 Extended Request ID: 5263351e-default-default; Proxy: null).<br>\nI can access the bucket with command line:</p>\n<div class=\"codehilite\"><pre><span></span><code>aws --endpoint=https://s3.gwdg.de s3 ls --human-readable --summarize s3://gro-data/\n</code></pre></div>\n<p>and I have the following JVM options:</p>\n<div class=\"codehilite\"><pre><span></span><code>-Ddataverse.files.s3.bucket-name=gro-data\n-Ddataverse.files.s3.custom-endpoint-url=https://s3.gwdg.de\n-Ddataverse.files.s3.download-redirect=true\n-Ddataverse.files.s3.ingestsizelimit=1073741824\n-Ddataverse.files.s3.label=S3 storage\n-Ddataverse.files.s3.type=s3\n-Ddataverse.files.s3.upload-redirect=true\n</code></pre></div>\n<p>I rechecked Dataverse config guide, but I do not found what is the problem. Do you have any suggestion what to check/restart? Many thanks for any suggestions!</p>",
+        "id": 479417870,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1730187994
+    },
+    {
+        "content": "<p><a href=\"#narrow/channel/378866-troubleshooting/topic/failed.20to.20look.20up.20S3.20bucket/near/479417870\">A message</a> was moved here from <a class=\"stream-topic\" data-stream-id=\"375707\" href=\"/#narrow/channel/375707-community/topic/AWS.20S3.20and.20class.20transitions\">#community &gt; AWS S3 and class transitions</a> by <span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🐉</span>.</p>",
+        "id": 479445858,
+        "sender_full_name": "Notification Bot",
+        "timestamp": 1730197707
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"772415\">@Király Péter</span> hmm, it looks like the error is coming from here: <a href=\"https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L117\">https://github.com/IQSS/dataverse/blob/v6.0/src/main/java/edu/harvard/iq/dataverse/dataaccess/S3AccessIO.java#L117</a></p>",
+        "id": 479445930,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730197741
+    },
+    {
+        "content": "<p><code>throw new IOException(\"ERROR: S3AccessIO - Failed to look up bucket \"+bucketName+\" (is AWS properly configured?): \" + sce.getMessage());</code></p>",
+        "id": 479445976,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730197757
+    },
+    {
+        "content": "<p><code>bucketName</code> is null for you.</p>",
+        "id": 479446041,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730197787
+    },
+    {
+        "content": "<p>Perhaps you could add some additional print line debugging? From a quick look your JVM settings look ok to me. <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 479446529,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730197952
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"598112\">@Philip Durbin 🐉</span> Many thanks for the tip, but I disagree this time. The error message starts with \"Failed to look up bucket gro-data (is AWS properly configured?)\", so the <code>bucketName</code> is  <code>gro-data</code>.  The <code>null</code> comes from the <code>sce.getMessage()</code> call, but it is not clear from there what is null. In the details one value is null: the Proxy. In dataverse documentation there is a optional configuration for proxy:<br>\nJVM Option: dataverse.files.&lt;id&gt;.proxy-url<br>\nValue: &lt;?&gt;<br>\nDescription: URL of a proxy protecting the S3 store. Optional.<br>\nDefault value: (none)</p>",
+        "id": 479449063,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1730198827
+    },
+    {
+        "content": "<p>Is there probably a service I should restart?</p>",
+        "id": 479450409,
+        "sender_full_name": "Király Péter",
+        "timestamp": 1730199291
+    },
+    {
+        "content": "<p>Oh, sorry, sorry, you're right. The <code>bucketName</code> is not null, obviously.</p>",
+        "id": 479453473,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730200336
+    },
+    {
+        "content": "<p>So a <code>SdkClientException</code> is being caught but its <code>getMessage() method</code> is null? But the message shows \"null\" and keeps going (<code>...properly configured?): null (Service: Amazon S3; Status...</code>). Strange. Are you able to add any extra debugging? I'm not sure what to say about the proxy. I don't believe I've ever used it myself.</p>",
+        "id": 479454829,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730200787
+    },
+    {
+        "content": "<p><a href=\"https://github.com/IQSS/dataverse/issues/8285\">#8285</a> by <span class=\"user-mention\" data-user-id=\"626369\">@Don Sizemore</span> show a non-null message from SdkClientException</p>",
+        "id": 479455013,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1730200847
+    },
+    {
+        "content": "<p>Let's eliminate all the straightforward/simple possibilities. Could you please confirm that the new Payara 6 is running under the same user as Payara 5/Dataverse 5.14 used to (presumably the same user for whom the aws command line is still working).</p>",
+        "id": 479469086,
+        "sender_full_name": "Leo Andreev",
+        "timestamp": 1730205470
+    }
+]

@@ -1,0 +1,146 @@
+[
+    {
+        "content": "<p><span class=\"user-mention silent\" data-user-id=\"598112\">Philip Durbin 🚀</span> <a href=\"#narrow/channel/378866-troubleshooting/topic/.E2.9C.94.20Solr.20indexing.20failure.2C.20missing.20dataset.20and.20folder.20on.20UI/near/630359435\">said</a>:</p>\n<blockquote>\n<p>Definitely related. Maybe you should reinstall Solr and reindex everything.</p>\n</blockquote>\n<p>Hi Philip, how does one reinstall Solr using containers, especially podman containers?</p>",
+        "id": 640805227,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1794847877
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> good question! I moved this into its own topic.</p>",
+        "id": 640838502,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794855395
+    },
+    {
+        "content": "<p><span class=\"user-mention\" data-user-id=\"928678\">@Paul Boon</span> do you have any suggestions, since you run Solr in containers, in production, I think?</p>",
+        "id": 640838605,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794855419
+    },
+    {
+        "content": "<p>In dev my data is here: <code>docker-dev-volumes/solr</code></p>\n<p><span class=\"user-mention\" data-user-id=\"1091328\">@Renee L.</span> where is your data?</p>",
+        "id": 640838931,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794855496
+    },
+    {
+        "content": "<p>It should be in data/solar, but it is missing right now.</p>",
+        "id": 640859737,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1794860519
+    },
+    {
+        "content": "<p>Ok, that's what I thought, that your data directory would be called <code>data</code>.</p>\n<p>You want to leave Dataverse alone and only reinstall or reinitialize Solr?</p>",
+        "id": 640860369,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794860676
+    },
+    {
+        "content": "<p>Deleting the data folder and starting over with just the compose.yml file hasn't helped, so I'm trying to find a way to just reinstall or reinitialize solar, yes.</p>",
+        "id": 640873069,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1794863776
+    },
+    {
+        "content": "<p>There is no \"reinstallation\" when it comes to containers. There is only \"drop the data and reindex\".</p>",
+        "id": 641214261,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917614
+    },
+    {
+        "content": "<p>Anytime you run Solr in a container, whatever has been installed in the container at runtime, will be executed</p>",
+        "id": 641214416,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917653
+    },
+    {
+        "content": "<p>This saves you the burden of going through the installations steps yourself. A \"reinstallation\" roughly is equivalent to \"pulling and runing a different image\".</p>",
+        "id": 641214495,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917675
+    },
+    {
+        "content": "<p>The important part is to ensure the data is at the correct locations, otherwise Solr doesn't know anything about it.</p>",
+        "id": 641214605,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917710
+    },
+    {
+        "content": "<p>In case you are not sure which file on your disk is being mounted into the container at runtime (to hold your Solr core(s)), you can \"inspect\" (docker/podman inspect) the running container. That will give you a JSON you can comb through for the mounted volumes.</p>",
+        "id": 641215099,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917822
+    },
+    {
+        "content": "<p>That way you can be 100% sure where your data is from / is going to.</p>",
+        "id": 641215211,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917848
+    },
+    {
+        "content": "<p>All of this container business works very very very reliable and is quite battle tested. I highly suspect a mixup in your configuration.</p>",
+        "id": 641215332,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917879
+    },
+    {
+        "content": "<p>As usual, mistakes in a configuration can only be found by pasting them...</p>",
+        "id": 641215408,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917895
+    },
+    {
+        "content": "<p>Also, this is often a nice task for an AI. Feed it your compose file and the inspect JSON. It should be able to figure out if all of that is aligned.</p>",
+        "id": 641215560,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917935
+    },
+    {
+        "content": "<p>In addition, log messages from the booting Solr container may provide helpful output.</p>",
+        "id": 641215753,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794917972
+    },
+    {
+        "content": "<p>I'd also recommend trying to start <em>only</em> the Solr bits on their own, to have less moving parts and less outputs to deal with.</p>",
+        "id": 641215923,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794918007
+    },
+    {
+        "content": "<p>As I don't know what the actual trouble is you are experiencing... Just in case... If you are using custom metadata blocks, make sure to add these to your Solr schema! Otherwise Dataverse will not be happy when comes dataset creation time.</p>",
+        "id": 641217611,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794918475
+    },
+    {
+        "content": "<p>I recommend using the Solr Driver Sidecar with <a href=\"http://solr-driver.sh\">solr-driver.sh</a>, available as of 6.11 (can be backported)</p>",
+        "id": 641217703,
+        "sender_full_name": "Oliver Bertuch",
+        "timestamp": 1794918496
+    },
+    {
+        "content": "<p>Thanks, guys.  We can close this thread.</p>",
+        "id": 641381577,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1794952728
+    },
+    {
+        "content": "<p>Ok, but should we add something to the guides? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 641382016,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794952833
+    },
+    {
+        "content": "<p>The issue was that the volumes for solr and solr_initializer were incorrect in the compose.yml file.</p>",
+        "id": 641383521,
+        "sender_full_name": "Renee L.",
+        "timestamp": 1794953246
+    },
+    {
+        "content": "<p>Ah, ok. In your local copy of the compose file.</p>",
+        "id": 641383771,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1794953324
+    }
+]

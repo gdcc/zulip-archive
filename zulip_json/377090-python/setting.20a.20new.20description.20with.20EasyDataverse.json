@@ -1,0 +1,86 @@
+[
+    {
+        "content": "<p>I know I can add a description to a dataset that doesn't have one like this:</p>\n<p><code>dataset.citation.add_ds_description(value=\"This is a description of the dataset\")</code></p>\n<p>But if I've loaded an existing dataset (<code>dataset = dataverse.load_dataset(pid)</code>) how do I update the description? <span aria-label=\"thinking\" class=\"emoji emoji-1f914\" role=\"img\" title=\"thinking\">:thinking:</span></p>",
+        "id": 493667087,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736887509
+    },
+    {
+        "content": "<p>You can edit the object directly, by using the following:</p>\n<div class=\"codehilite\" data-code-language=\"Python\"><pre><span></span><code><span class=\"n\">dataset</span><span class=\"o\">.</span><span class=\"n\">citation</span><span class=\"o\">.</span><span class=\"n\">ds_description</span><span class=\"o\">.</span><span class=\"n\">value</span> <span class=\"o\">=</span> <span class=\"s2\">\"New description\"</span>\n</code></pre></div>\n<p>The adder functions are more or less for convenience  to not have to \"dig-out\" the expected type and then set it to the appropriate attribute. In general, you can apply any Python OOP techniques for metadata blocks .</p>",
+        "id": 493917345,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736944963
+    },
+    {
+        "content": "<p>I thought I tried that! I will, as soon as I get to my desk. Is this documented? I couldn't find it anywhere. <span aria-label=\"sweat smile\" class=\"emoji emoji-1f605\" role=\"img\" title=\"sweat smile\">:sweat_smile:</span></p>",
+        "id": 493918095,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736945181
+    },
+    {
+        "content": "<p>It is kind of documented within this <a href=\"https://github.com/gdcc/easyDataverse/blob/main/examples/EasyDataverseBasics.ipynb\">Jupyter notebook</a> but only for the primitive and no compound case, but that should work as the Dataverse JSON is constructed from the given <code>Dataset</code> object.</p>",
+        "id": 493918496,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945303
+    },
+    {
+        "content": "<p>What about the fact that description is multi-valued? The code above would update the first description?</p>",
+        "id": 493919447,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736945564
+    },
+    {
+        "content": "<p>Oh you are right! In this case you'd need to add an index as the attribute is of type <code>List</code>. Here's an update:</p>\n<div class=\"codehilite\" data-code-language=\"Python\"><pre><span></span><code><span class=\"n\">dataset</span><span class=\"o\">.</span><span class=\"n\">citation</span><span class=\"o\">.</span><span class=\"n\">ds_description</span><span class=\"p\">[</span><span class=\"n\">i</span><span class=\"p\">]</span><span class=\"o\">.</span><span class=\"n\">value</span> <span class=\"o\">=</span> <span class=\"s2\">\"New description\"</span>\n</code></pre></div>",
+        "id": 493920000,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945686
+    },
+    {
+        "content": "<p>On another note, if the <code>Citation</code> block is consistent across versions and instances, we could add convenience functions for commonly used fields such as description and title</p>",
+        "id": 493920336,
+        "sender_full_name": "Jan Range",
+        "timestamp": 1736945773
+    },
+    {
+        "content": "<p>Ah ha. Do we need to add docs for this?</p>",
+        "id": 493922104,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736946258
+    },
+    {
+        "content": "<p>Technically, a description can have a date. I don't want to set a date but off the top of your head, do you think this is possible?</p>",
+        "id": 493922266,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736946312
+    },
+    {
+        "content": "<p>Ok, here's the final versions that works:</p>\n<div class=\"codehilite\"><pre><span></span><code># Update the metadata fields\ndataset.citation.title = title\ndataset.citation.subject = [&quot;Other&quot;]\ndataset.metadatablocks[&quot;citation&quot;].ds_description[0].value = description\ndataset.metadatablocks[&quot;citation&quot;].author[0].name = author_name\ndataset.metadatablocks[&quot;citation&quot;].author[0].affiliation = None\ndataset.metadatablocks[&quot;citation&quot;].dataset_contact[0].name = &quot;Dataverse Support&quot;\ndataset.metadatablocks[&quot;citation&quot;].dataset_contact[0].email = &quot;support@dataverse.org&quot;\ndataset.metadatablocks[&quot;citation&quot;].origin_of_sources = &#39;&lt;a href=&quot;&#39; + access_link_url + &#39;&quot;&gt;&#39; + access_link_name + &#39;&lt;/a&gt;&#39;\n</code></pre></div>",
+        "id": 493973436,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736959977
+    },
+    {
+        "content": "<p>In short, you should use the <code>dataset.metadatablocks</code> trick for direct access to the part of the dict you need to change.</p>",
+        "id": 493973647,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736960014
+    },
+    {
+        "content": "<p>Also this is super helpful for figuring out which values need to be set:</p>\n<p><code>print(dataverse.list_metadatablocks(detailed=True))</code></p>",
+        "id": 493973800,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736960055
+    },
+    {
+        "content": "<p>And you can print out the dataset as a dict:</p>\n<p><code>print(dataset.dataverse_dict())</code></p>\n<p>Or in JSON format (with optional indenting):</p>\n<p><code>print(dataset.dataverse_json(4))</code></p>",
+        "id": 493973984,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736960119
+    },
+    {
+        "content": "<p>Huge thanks to <span class=\"user-mention\" data-user-id=\"599841\">@Jan Range</span> for the live troubleshooting this morning. This is a good reason to attend the pyDataverse meeting! (<a class=\"stream-topic\" data-stream-id=\"377090\" href=\"/#narrow/channel/377090-python/topic/meetings\">#python &gt; meetings</a> ) <span aria-label=\"big smile\" class=\"emoji emoji-1f604\" role=\"img\" title=\"big smile\">:big_smile:</span></p>",
+        "id": 493974186,
+        "sender_full_name": "Philip Durbin 🚀",
+        "timestamp": 1736960180
+    }
+]
